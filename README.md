@@ -1,1 +1,1 @@
-# se-workshop-project-be
+# se-workshop-project
