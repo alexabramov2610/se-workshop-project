@@ -2,8 +2,9 @@
   "name": "service_layer",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "start": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,5 +12,8 @@
   "devDependencies": {
     "tslint": "^6.1.1",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "domain_layer": "file:../domain"
   }
 }
