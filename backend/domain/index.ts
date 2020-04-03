@@ -1,2 +1,2 @@
-import { exported as UserDemoExported } from "./src/User/UserDemo";
-export { UserDemoExported };
+import { UserDemo, IUserDemoFields } from "./src/User/UserDemo";
+export { UserDemo, IUserDemoFields };
