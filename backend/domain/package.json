@@ -6,7 +6,8 @@
   "types": "index.d.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "npm t -- --watch"
   },
   "author": "",
   "license": "ISC",
