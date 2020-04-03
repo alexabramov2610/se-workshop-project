@@ -1,5 +1,20 @@
-class UserDemo {
-  name: string;
+interface IUserDemoFields {
+  iName: string;
+  iAge: number;
 }
 
-export const exported: UserDemo = { name: "mock name" };
+class UserDemo {
+  name: string;
+  age: number;
+  constructor(fields: IUserDemoFields) {
+    this.name = fields.iName;
+    this.age = fields.iAge;
+  }
+
+  printMyName(): void {
+    console.log(this.name);
+  }
+}
+
+
+export { UserDemo, IUserDemoFields };
