@@ -1,5 +1,5 @@
 import { UserManagement, User } from "../user/internal_api";
-export default class TradingSystem {
+export class TradingSystem {
   private userManagement: UserManagement;
   public counter: number;
   constructor() {
