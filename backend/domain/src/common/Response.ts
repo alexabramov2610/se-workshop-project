@@ -10,4 +10,11 @@ interface RegisterResponse extends Response {
   data: { isAdded: boolean };
 }
 
-export { Response, RegisterResponse };
+interface LoginResponse extends Response {
+  data: { isLoggedIn: boolean };
+}
+
+
+
+
+export { Response, RegisterResponse ,LoginResponse };
