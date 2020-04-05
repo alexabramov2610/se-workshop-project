@@ -1,13 +1,23 @@
 import { Error } from "./internal_api";
-import { User } from "../user/User";
+import {User} from "../user/User"
 
 interface Response {
   data: any;
   error?: Error;
 }
 
-interface RegisterResponse extends Response {
-  data: { isAdded: boolean };
+
+
+interface ConnectResponse extends Response {
+  data: { name: string , isConnected: boolean };
 }
 
-export { Response, RegisterResponse };
+interface UserResponse extends Response {
+  data: { user: User};
+}
+
+
+interface BoolResponse extends Response {
+  data: { result: boolean };
+}
+export { Response,ConnectResponse,BoolResponse };
