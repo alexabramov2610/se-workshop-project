@@ -8,6 +8,11 @@ export class UserManagementDriver {
   addUser(name: string, password: string): Response {
     return this.userManagement.register(new User(name, password));
   }
+  setAdmin(name: string): Response {
+    this.userManagement.register(new User(name,"ss"))
+    return this.userManagement.setAdmin(name);
+  }
+  
   getUserByName(name: string): User {
     return this.userManagement.getUserByName(name);
   }

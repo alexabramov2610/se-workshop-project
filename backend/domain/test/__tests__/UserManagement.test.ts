@@ -11,4 +11,9 @@ describe("User Management Unit Tests", () => {
     const res: Responses.RegisterResponse = driver.addUser("ron", "123456");
     expect(res.data.isAdded).toBeTruthy();
   });
+
+  test("Set Admin", () => {
+    const res: Responses.AssignResponse = driver.setAdmin("ron");
+    expect(res.data.isAssigned).toBeTruthy();
+  });
 });

@@ -7,4 +7,14 @@ const ErrorMessages = {
   regiserError: "Registration Failed",
 };
 
-export { Error, ErrorMessages };
+interface ErrorMessages {
+  [key: string]:string;
+}
+
+const errorMsg:ErrorMessages = {
+  E_NF: "Not found",
+  E_CON: "Connected failed",
+  E_AL: "Already at this state",
+}
+
+export { Error, ErrorMessages,errorMsg };

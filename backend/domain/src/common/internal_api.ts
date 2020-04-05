@@ -1,2 +1,2 @@
-export { Error } from "./Error";
-export { Response, RegisterResponse } from "./Response";
+export * from "./Error";
+export * from "./Response";
