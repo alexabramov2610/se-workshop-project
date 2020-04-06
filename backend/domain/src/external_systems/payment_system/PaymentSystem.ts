@@ -1,4 +1,4 @@
-import { BoolResponse } from "../../common/internal_api";
+import { BoolResponse,errorMsg } from "../../common/internal_api";
 
 
 export class PaymentSystem{
@@ -22,12 +22,10 @@ export class PaymentSystem{
             return succ;
          }
          else {
-            return {error: {message: "cant connect to payment system"}, data: {result: this.paymentSys.connect()}};
+               return {error: {message: errorMsg['E_CON']+" : " + this.name}, data: {result: this.paymentSys.connect()}};}
          }
-      }
       else{
          return succ;
       }
    }
-
 }

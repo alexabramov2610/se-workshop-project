@@ -1,9 +1,9 @@
-import {BoolResponse,errorMsg} from '../../common/internal_api'
-export class DeliverySystem{
+import { BoolResponse,errorMsg} from "../../common/internal_api";
 
+
+export class DeliverySystem{
    private deliverySys : any;
    private name: string;
-
    constructor(){
       this.name = "Delivery System"
       this.deliverySys=null;

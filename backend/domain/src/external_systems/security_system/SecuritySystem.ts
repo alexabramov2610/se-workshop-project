@@ -22,7 +22,7 @@ export class SecuritySystem{
             return succ;
          }
          else {
-               return {error: {message: errorMsg['E_CON']+" : " + this.name}, data: {result: this.securitySys.connect()}};            }
+               return {error: {message: errorMsg['E_CON']+" : " + this.name}, data: {result: this.securitySys.connect()}};}
       }
       else{
          return succ;

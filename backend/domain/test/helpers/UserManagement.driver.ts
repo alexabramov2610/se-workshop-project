@@ -6,7 +6,7 @@ export class UserManagementDriver {
     this.userManagement = new UserManagement();
   }
   addUser(name: string, password: string): Response {
-    return this.userManagement.register(new User(name, password));
+    return this.userManagement.register(name,password);
   }
   setAdmin(name: string): Response {
     this.mockSetAdmin(name);
