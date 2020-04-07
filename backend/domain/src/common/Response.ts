@@ -7,11 +7,6 @@ interface Response {
 }
 
 
-
-interface ConnectResponse extends Response {
-  data: { name: string , isConnected: boolean };
-}
-
 interface UserResponse extends Response {
   data: { user: User};
 }
@@ -20,4 +15,4 @@ interface UserResponse extends Response {
 interface BoolResponse extends Response {
   data: { result: boolean };
 }
-export { Response,ConnectResponse,BoolResponse };
+export { Response,BoolResponse };
