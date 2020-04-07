@@ -7,8 +7,12 @@ describe("User Management Unit Tests", () => {
     driver = new UserManagementDriver();
   });
 
-  test("Registration Success Test", () => {
-    const res: Responses.RegisterResponse = driver.addUser("ron", "123456");
-    expect(res.data.isAdded).toBeTruthy();
-  });
+  // test("Registration Success Test", () => {
+  //   const res: Responses.RegisterResponse = driver.addUser("ron", "123456");
+  //   expect(res.data.isAdded).toBeTruthy();
+  // });
+
+
+  test("")
+
 });

@@ -5,10 +5,12 @@ export class UserManagementDriver {
   constructor() {
     this.userManagement = new UserManagement();
   }
-  addUser(name: string, password: string): Response {
-    return this.userManagement.register(new User(name, password));
-  }
+  // addUser(name: string, password: string): Response {
+  //   return this.userManagement.register(new User(name, password));
+  // }
   getUserByName(name: string): User {
     return this.userManagement.getUserByName(name);
   }
+
+
 }
