@@ -8,7 +8,12 @@ describe("User Management Unit Tests", () => {
   });
 
   test("Registration Success Test", () => {
-    const res: Responses.RegisterResponse = driver.addUser("ron", "123456");
-    expect(res.data.isAdded).toBeTruthy();
+    const res: Responses.BoolResponse = driver.addUser("ron", "123456");
+    expect(res.data.result).toBeTruthy();
+  });
+
+  test("Set Admin", () => {
+    const res: Responses.BoolResponse = driver.setAdmin("ron");
+    expect(res.data.result).toBeTruthy();
   });
 });

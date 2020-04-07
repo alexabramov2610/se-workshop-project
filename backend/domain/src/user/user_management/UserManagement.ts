@@ -1,14 +1,18 @@
-import { RegisterResponse } from "../../common/Response";
-import { User } from "../User";
+import { BoolResponse,errorMsg } from "../../common/internal_api";
+import { User,Admin } from "../internal_api";
+
 class UserManagement {
   private users: User[];
+  private admins: Admin[];
+
   constructor() {
     this.users = [];
+    this.admins= [];
   }
 
-  register(newUser: User): RegisterResponse {
-    this.users.push(newUser);
-    return { data: { isAdded: true } };
+  register(userName: string, password: string): BoolResponse {
+    this.users.push(new User(userName,password));
+    return { data: { result: true } };
   }
 
   getReigsteredUsers(): User[] {
@@ -16,6 +20,19 @@ class UserManagement {
   }
   getUserByName(name: string): User {
     return this.users.filter((u) => u.name === name).pop();
+  }
+
+  isAdmin(u:User) : boolean{
+    return this.admins.filter(val=> val.name === u.name).pop() !== null
+  }
+
+  setAdmin(userName:string): BoolResponse{
+    const u :User = this.getUserByName(userName);
+    if(!u) return {data:{result:false} , error: {message: errorMsg['E_NF']}}
+    const isAdmin:boolean = this.isAdmin(u);
+    if(isAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
+    this.admins = this.admins.concat([u]);
+    return {data:{result:true}};
   }
 }
 
