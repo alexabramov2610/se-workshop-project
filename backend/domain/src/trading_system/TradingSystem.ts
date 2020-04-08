@@ -10,8 +10,7 @@ export class TradingSystem {
   }
 
   register(userName: string, password: string): void {
-    const newUser: User = new User(userName, password);
-    const res = this.userManagement.register(newUser);
+    const res = this.userManagement.register(userName,password);
   }
   getUserByName(userName: string) {
     return this.userManagement.getUserByName(userName);
