@@ -7,14 +7,14 @@ interface Response {
 }
 
 interface RegisterResponse extends Response {
-  data: { isAdded: boolean };
+  data: { result: boolean };
 }
 
 interface LoginResponse extends Response {
-  data: { isLoggedIn: boolean };
+  data: { result: boolean };
 }
 interface LogoutResponse extends Response {
-  data: { isLoggedout: boolean };
+  data: { result: boolean };
 }
 
 

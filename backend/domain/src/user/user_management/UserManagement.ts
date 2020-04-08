@@ -1,52 +1,65 @@
-import { RegisterResponse,LoginResponse,LogoutResponse  } from "../../common/Response";
+import { RegisterResponse,LoginResponse,LogoutResponse,errorMsg } from "../../common/internal_api";
 import { User } from "../User";
 class UserManagement {
   private users: User[];
-  private LoggedInUsers:User[];
+  private loggedInUsers:User[];
   constructor() {
     this.users = [];
-    this.LoggedInUsers=[];
+    this.loggedInUsers=[];
   }
 
   register(userName,password): RegisterResponse {
     if(this.getUserByName(userName)){    //user already in system
-      return {data:{isAdded:false},error:{message:'user name is taken'}}
+      return {data:{result:false},error:{message:errorMsg['E_AT']}}
     }
-
-     else if(!this.vaildPassword){   
-       return {data:{isAdded:false},error:{message:'invalid password'}}
+     else if(!this.vaildPassword(password)){   
+       return {data:{result:false},error:{message:errorMsg['E_BP']}}
      }
     else{
-    this.users.push(new User(userName,password));
-    return { data: { isAdded: true } };
+    this.users.concat([new User(userName,password)]);
+    return { data: { result: true } };
     }}
    
 
   login(userName:string,password:string): LoginResponse{
+    
     if(!(this.getUserByName(userName))){ 
-      return {data:{isLoggedIn:false},error:{message:'user is not exist'}}
+      return {data:{result:false},error:{message:errorMsg['E_NF']}}  //not found
     }
-    else if(!this.vaildPassword(password)){
-      return {data:{isLoggedIn:false},error:{message:'invalid password'}}
+    else if(!this.verifyPassword(userName,password)){
+      return {data:{result:false},error:{message:errorMsg['E_BP']}} //bad pass
+    }
+    else if(this.getLoggedInUsers().find((u)=>u.name===userName)){ //already logged in 
+      return {data:{result:false},error:{message:errorMsg['E_AL']}}
 
     }
     else{
     const user=this.getUserByName(userName)
-    this.LoggedInUsers.push(user);
-    return { data: { isLoggedIn:true } };  
+    this.loggedInUsers.concat([user]);
+    return { data: { result:true } };  
   }} 
 
 
+ 
+
+
   logout(userName:string):LogoutResponse{
-    this.LoggedInUsers=this.LoggedInUsers.filter((u) => u.name !== userName)
-    return {data:{isLoggedout:true}}
-    
+    const loggedInUsers=this.getLoggedInUsers()
+    if(!loggedInUsers.filter((u)=>{u.name===userName}).pop()){ //user not logged in
+      return {data:{result:false},error:{message:errorMsg['E_AL']}}
+    }
+    else{
+    this.loggedInUsers=this.loggedInUsers.filter((u)=>u.name!==userName)
+    return {data:{result:true}}
+    }
   }
 
 
 
 
-    
+  verifyPassword(userName:string,password: string):boolean {
+    return true  //to implement with sequrity ..
+  }
 
 
    getReigsteredUsers(): User[] {
@@ -54,7 +67,7 @@ class UserManagement {
   }
 
    getLoggedInUsers(): User[] {
-    return this.LoggedInUsers;
+    return this.loggedInUsers;
   }
    getUserByName(name: string): User {
     return this.users.filter((u) => u.name === name).pop();
