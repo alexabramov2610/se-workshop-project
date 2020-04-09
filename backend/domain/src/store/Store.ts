@@ -127,13 +127,13 @@ export class Store {
 
         if (notRemovedProducts.length === products.size) { // failed removing
             return {
-                data: {result: false, productsNotRemoved: notRemovedProducts },
+                data: {result: false, ProductsNotRemoved: notRemovedProducts },
                 error: {message: Error['E_PROD_REM']}
             }
         }
         else {
             return {
-                data: {result: true, productsNotRemoved: notRemovedProducts }}
+                data: {result: true, ProductsNotRemoved: notRemovedProducts }}
         }
 
     }
@@ -154,13 +154,13 @@ export class Store {
 
         if (invalidProducts.length === products.length) { //failed adding
             return {
-                data: {result: false, productsNotAdded: invalidProducts},
+                data: {result: false, ProductsNotAdded: invalidProducts},
                 error: {message: Error['E_PROD_ADD']}
             }
         }
         else {
             return {
-                data: {result: true, productsNotAdded: invalidProducts}
+                data: {result: true, ProductsNotAdded: invalidProducts}
             }
         }
     }
@@ -186,13 +186,13 @@ export class Store {
 
         if (productsNotRemoved.length === products.length) {
             return {
-                data: {result: false, productsNotRemoved: productsNotRemoved},
+                data: {result: false, ProductsNotRemoved: productsNotRemoved},
                 error: {message: Error['E_PROD_REM']}
             };
         }
         else {
             return {
-                data: {result: true, productsNotRemoved: productsNotRemoved}
+                data: {result: true, ProductsNotRemoved: productsNotRemoved}
             };
         }
     }

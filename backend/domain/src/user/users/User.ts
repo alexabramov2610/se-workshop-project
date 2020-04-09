@@ -1,4 +1,4 @@
-import { UserRole } from "../common/internal_api"
+import { UserRole } from "../../common/internal_api"
 
 export abstract class User {
   private readonly _UUID: string;
@@ -15,6 +15,9 @@ export abstract class User {
     return this._name;
   }
 
+  get password(): string {
+    return this._password;
+  }
 
   get UUID(): string {
     return this._UUID;

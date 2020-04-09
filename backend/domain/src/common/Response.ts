@@ -1,6 +1,6 @@
 import { Error } from "./internal_api";
 import { Item, Product } from "../trading_system/internal_api";
-import {User} from "../user/User"
+import {User} from "../user/users/User"
 
 interface Response {
   data: any;
@@ -21,11 +21,11 @@ interface StoreItemsRemovalResponse extends Response {
 }
 
 interface StoreProductAdditionResponse extends Response {
-  data: {result: boolean, productsNotAdded: Product[] }
+  data: {result: boolean, ProductsNotAdded: Product[] }
 }
 
 interface StoreProductRemovalResponse extends Response {
-  data: {result: boolean, productsNotRemoved: Product[] }
+  data: {result: boolean, ProductsNotRemoved: Product[] }
 }
 
 interface BoolResponse extends Response {
@@ -33,4 +33,4 @@ interface BoolResponse extends Response {
 }
 
 
-export { Response, BoolResponse, RegisterResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
+export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };

@@ -1,3 +1,3 @@
-import { TradingSystem } from "./src/trading_system/TradingSystem";
-const tradingSystem = new TradingSystem();
+import { TradingSystemManager } from "./src/trading_system/TradingSystemManager";
+const tradingSystem = new TradingSystemManager();
 export { tradingSystem };

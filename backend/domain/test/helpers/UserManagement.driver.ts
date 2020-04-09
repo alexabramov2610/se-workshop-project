@@ -1,9 +1,9 @@
-import { UserManagement, User } from "../../src/user/internal_api";
+import { UserManager, User, Buyer } from "../../src/user/internal_api";
 import { Response } from "../../src/common/internal_api";
 export class UserManagementDriver {
-  userManagement: UserManagement;
+  userManagement: UserManager;
   constructor() {
-    this.userManagement = new UserManagement();
+    this.userManagement = new UserManager();
   }
   addUser(name: string, password: string): Response {
     return this.userManagement.register(name,password);
@@ -15,7 +15,7 @@ export class UserManagementDriver {
 
   mockSetAdmin(name: string){
    jest.spyOn(this.userManagement, "isAdmin").mockReturnValue(false);
-   jest.spyOn(this.userManagement, "getUserByName").mockReturnValue(new User(name,'123456'));
+   jest.spyOn(this.userManagement, "getUserByName").mockReturnValue(new Buyer(name,'123456'));
   }
   
   getUserByName(name: string): User {

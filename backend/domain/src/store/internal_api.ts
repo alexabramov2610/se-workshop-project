@@ -1,2 +1,2 @@
 export { Store } from './Store'
-export { StoreManagement } from './StoreManagement'
+export { StoreManager } from './StoreManager'

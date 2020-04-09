@@ -8,6 +8,7 @@
     "start": "tsc && node dist/index.js",
     "debug": "tsc && DEBUG=1 node dist/index.js ",
     "test": "jest",
+    "clear:test": "jest --clearCache",
     "test:watch": "npm t -- --watch"
   },
   "author": "",

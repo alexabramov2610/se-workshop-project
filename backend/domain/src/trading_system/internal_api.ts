@@ -1,3 +1,3 @@
-export { Item } from "./Item"
+export { Item } from "./data/Item"
 export { Store } from "../store/Store"
-export { Product } from "./Product"
+export { Product } from "./data/Product"

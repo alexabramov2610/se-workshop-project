@@ -1,23 +1,23 @@
-import {Store, StoreManagement} from "../../src/store/internal_api";
-import * as Responses from "../../src/common/Response";
-import {StoreOwner} from "../../src/user/internal_api";
+import {Store, StoreManager} from "../../../src/store/internal_api";
+import * as Responses from "../../../src/common/Response";
+import {StoreOwner} from "../../../src/user/internal_api";
 
 describe("Store Management Unit Tests", () => {
-    let storeManagement: StoreManagement;
+    let storeManagement: StoreManager;
     beforeEach(() => {
-        storeManagement = new StoreManagement();
+        storeManagement = new StoreManager();
     });
 
     test("addStore success", () => {
         const store: Store = new Store("name", 5);
-        const res : Responses.StoreAdditionResponse = storeManagement.addStore(store);
+        const res : Responses.BoolResponse = storeManagement.addStore(store);
         expect(res.data.result).toBeTruthy();
 
     });
 
     test("addStore failure", () => {
         let store: Store = new Store("", 5);
-        let res : Responses.StoreAdditionResponse = storeManagement.addStore(store);
+        let res : Responses.BoolResponse = storeManagement.addStore(store);
         expect(res.data.result).toBeFalsy();
 
         store = new Store("name", -5);

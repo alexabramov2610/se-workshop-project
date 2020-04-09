@@ -1,5 +1,5 @@
-import { UserManagementDriver } from "../helpers/UserManagement.driver";
-import * as Responses from "../../src/common/internal_api";
+import { UserManagementDriver } from "../../helpers/UserManagement.driver";
+import * as Responses from "../../../src/common/internal_api";
 
 describe("User Management Unit Tests", () => {
   let driver: UserManagementDriver;

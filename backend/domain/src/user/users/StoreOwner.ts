@@ -1,5 +1,5 @@
-import { User } from "./internal_api"
-import { UserRole } from "../common/internal_api"
+import { User } from "../internal_api"
+import { UserRole } from "../../common/internal_api"
 
 export class StoreOwner extends User {
     private readonly _role = UserRole.OWNER;
@@ -8,7 +8,7 @@ export class StoreOwner extends User {
         super(name, password);
     }
 
-    get id(): string {
+    get name(): string {
         return this._name;
     }
 

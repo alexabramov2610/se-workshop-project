@@ -1,10 +1,8 @@
-import {RegisterResponse} from "../../common/Response";
-import {User} from "../User";
 import {UserRole} from "../../common/Enums";
 import { BoolResponse,errorMsg } from "../../common/internal_api";
-import { User,Admin } from "../internal_api";
+import { User,Admin, Buyer } from "../internal_api";
 
-class UserManagement {
+class UserManager {
   private users: User[];
   private admins: Admin[];
 
@@ -14,7 +12,7 @@ class UserManagement {
   }
 
   register(userName: string, password: string): BoolResponse {
-    this.users.push(new User(userName,password));
+    this.users.push(new Buyer(userName,password));
     return { data: { result: true } };
   }
 
@@ -36,19 +34,20 @@ class UserManagement {
 
   isLoggedIn(user: User) {
     return false;
+  }
 
-    isAdmin(u:User) : boolean{
-    return this.admins.filter(val=> val.name === u.name).pop() !== null
+  isAdmin(u:User) : boolean {
+    return this.admins.filter(val => val.name === u.name).pop() !== null
   }
 
   setAdmin(userName:string): BoolResponse{
     const u :User = this.getUserByName(userName);
     if(!u) return {data:{result:false} , error: {message: errorMsg['E_NF']}}
-    const isAdmin:boolean = this.isAdmin(u);
-    if(isAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
-    this.admins = this.admins.concat([u]);
+    const isAlreadyAdmin:boolean = this.isAdmin(u);
+    if(isAlreadyAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
+    this.admins = this.admins.concat([new Admin(userName, u.password)]);
     return {data:{result:true}};
   }
 }
 
-export { UserManagement };
+export { UserManager };

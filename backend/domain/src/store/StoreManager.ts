@@ -3,7 +3,7 @@ import * as Responses from '../common/Response'
 import * as Error from '../common/Error'
 import { User } from "../user/internal_api";
 
-export class StoreManagement {
+export class StoreManager {
 
     private _stores: Store[];
 
@@ -11,7 +11,7 @@ export class StoreManagement {
         this._stores = [];
     }
 
-    addStore(store: Store) : Responses.StoreAdditionResponse {
+    addStore(store: Store) : Responses.BoolResponse {
         if (store.storeName && store.storeName !== '' && store.storeId > 0) {
             this._stores.push(store);
             return {data: {result: true}}
