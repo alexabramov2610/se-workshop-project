@@ -5,12 +5,24 @@ import {Item, Product} from "../../../src/trading_system/internal_api";
 
 describe("Store Management Unit Tests", () => {
     let store: Store;
-    let user: StoreOwner;
+    let storeOwner: StoreOwner;
 
     beforeEach(() => {
-        store = new Store("store", 5);
-        user = new StoreOwner("name","123123");
+        store = new Store("store");
+        storeOwner = new StoreOwner("name","123123");
     });
+
+    test("verifyIsStoreOwner success", () => {
+        const res: Responses.BoolResponse = store.addStoreOwner(storeOwner);
+        expect(res.data.result).toBeTruthy();
+
+        expect(store.verifyIsStoreOwner(storeOwner)).toBeTruthy();
+    })
+
+    test("verifyIsStoreOwner failure", () => {
+        expect(store.verifyIsStoreOwner(storeOwner)).toBeFalsy();
+    })
+
 
     test("addNewProducts success", () => {
         let products: Product[] = generateValidProducts(5);

@@ -1,4 +1,5 @@
 import { UserRole } from "../../common/internal_api"
+import { v4 as uuid } from 'uuid';
 
 export abstract class User {
   private readonly _UUID: string;
@@ -8,7 +9,7 @@ export abstract class User {
   protected constructor(name: string, password: string) {
     this._name = name;
     this._password = password;
-    this._UUID = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    this._UUID = uuid();
   }
 
   get name(): string {

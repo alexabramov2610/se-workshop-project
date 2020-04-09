@@ -17,7 +17,7 @@ describe("Store Management Unit Tests", () => {
     let user: StoreOwner;
 
     beforeEach(() => {
-        store = new Store("store", 5);
+        store = new Store("store");
         user = new StoreOwner("name","123123");
         mocked(UserManager).mockClear();
         mocked(StoreManager).mockClear();
@@ -35,9 +35,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeTruthy();
         expect(store.addItems).toBeCalledTimes(1);
     });
@@ -52,9 +49,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addItems).toBeCalledTimes(0);
@@ -72,9 +66,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addItems).toBeCalledTimes(0);
@@ -94,9 +85,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeFalsy();
         expect(store.addItems).toBeCalledTimes(0);
     });
@@ -113,9 +101,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeTruthy();
         expect(store.removeItems).toBeCalledTimes(1);
     });
@@ -130,9 +115,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeItems).toBeCalledTimes(0);
@@ -151,9 +133,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeFalsy();
         expect(store.removeItems).toBeCalledTimes(0);
 
@@ -171,9 +150,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeItems).toBeCalledTimes(0);
@@ -197,9 +173,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeTruthy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(1);
     });
@@ -219,9 +192,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
@@ -244,9 +214,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
@@ -271,9 +238,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
     });
@@ -290,9 +254,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeTruthy();
         expect(store.addNewProducts).toBeCalledTimes(1);
     });
@@ -307,9 +268,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addNewProducts).toBeCalledTimes(0);
@@ -328,9 +286,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addNewProducts).toBeCalledTimes(0);
@@ -351,9 +306,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeFalsy();
         expect(store.addNewProducts).toBeCalledTimes(0);
     });
@@ -370,9 +322,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeTruthy();
         expect(store.removeProducts).toBeCalledTimes(1);
     });
@@ -387,9 +336,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProducts).toBeCalledTimes(0);
@@ -409,9 +355,6 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
 
-        if (res.error)
-            console.log(res.error)
-
         expect(res.data.result).toBeFalsy();
         expect(store.removeProducts).toBeCalledTimes(0);
 
@@ -430,9 +373,6 @@ describe("Store Management Unit Tests", () => {
 
         tradingSystemManager = new TradingSystemManager();
         let res: Responses.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
-
-        if (res.error)
-            console.log(res.error)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProducts).toBeCalledTimes(0);
@@ -522,7 +462,7 @@ describe("Store Management Unit Tests", () => {
 
         mocked(StoreManager).mockImplementation(() :any => {
             return {
-                verifyStore: () => verifyStoreResMock,
+                verifyStoreExists: () => verifyStoreResMock,
                 verifyStoreOwner: () => verifyStoreOwnerResMock,
                 verifyStoreManager: () => verifyStoreManagerResMock
             }

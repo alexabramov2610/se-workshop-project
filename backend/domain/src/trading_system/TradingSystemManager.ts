@@ -5,96 +5,154 @@ import * as Responses from "../common/Response"
 import {errorMsg as Error} from "../common/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import { BoolResponse,ExternalSystems,Logger } from "../common/internal_api";
+import { Logger as logger } from "../common/Logger";
 
 export class TradingSystemManager {
-  private userManager: UserManager;
-  private storeManager: StoreManager;
-  private externalSystems: ExternalSystemsManager;
+    private userManager: UserManager;
+    private storeManager: StoreManager;
+    private externalSystems: ExternalSystemsManager;
 
-  constructor() {
-    this.userManager = new UserManager();
-    this.storeManager = new StoreManager();
-    this.externalSystems = new ExternalSystemsManager();
-  }
+    constructor() {
+        this.userManager = new UserManager();
+        this.storeManager = new StoreManager();
+        this.externalSystems = new ExternalSystemsManager();
+    }
 
-  register(userName: string, password: string): BoolResponse {
-    const res = this.userManager.register(userName,password);
-    return res;
-  }
+    register(userName: string, password: string): BoolResponse {
+        const res = this.userManager.register(userName,password);
+        return res;
+    }
 
-  getUserByName(userName: string) {
-    
-    return this.userManager.getUserByName(userName);
-  }
+    getUserByName(userName: string) {
+        return this.userManager.getUserByName(userName);
+    }
 
-  addItems(items: Item[], user: User, store: Store) : Responses.StoreItemsAdditionResponse {
-    return !this.userManager.isLoggedIn(user) ?
-        { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_NOT_LOGGED_IN']}} :
-      !this.storeManager.verifyStore(store) ?
-        { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_INVALID_STORE']}} :
-          !(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user)) ?
-        { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_NOT_AUTHORIZED']}} :
-        store.addItems(items);
-  }
+    addItems(items: Item[], user: User, store: Store) : Responses.StoreItemsAdditionResponse {
+        logger.info(`trying to add items to store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`);
+        if (!this.userManager.isLoggedIn(user)) {
+            const error = Error['E_NOT_LOGGED_IN'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotAdded: items } , error: { message: error}};
+        }
+        else if (!this.storeManager.verifyStoreExists(store)){
+            const error = Error['E_INVALID_STORE'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_INVALID_STORE']}};
+        }
+        else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
+            const error = Error['E_NOT_AUTHORIZED'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_NOT_AUTHORIZED']}};
+        }
+        else {
+            return store.addItems(items);
+        }
+    }
 
-  removeItems(items: Item[], user: User, store: Store) : Responses.StoreItemsRemovalResponse {
-    return !this.userManager.isLoggedIn(user) ?
-        { data: { result: false, ItemsNotRemoved: items } , error: { message: Error['E_NOT_LOGGED_IN']}} :
-      !this.storeManager.verifyStore(store) ?
-        { data: { result: false, ItemsNotRemoved: items } , error: { message: Error['E_INVALID_STORE']}} :
-      !(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user)) ?
-        { data: { result: false, ItemsNotRemoved: items } , error: { message: Error['E_NOT_AUTHORIZED']}} :
-        store.removeItems(items);
+    removeItems(items: Item[], user: User, store: Store) : Responses.StoreItemsRemovalResponse {
+        logger.info(`trying to remove items from store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`);
+        if (!this.userManager.isLoggedIn(user)) {
+            const error = Error['E_NOT_LOGGED_IN'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+        }
+        else if (!this.storeManager.verifyStoreExists(store)){
+            const error = Error['E_INVALID_STORE'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+        }
+        else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
+            const error = Error['E_NOT_AUTHORIZED'];
+            logger.error(error);
+            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+        }
+        else {
+            return store.removeItems(items);
+        }
+    }
 
-  }
+    removeProductsWithQuantity(products : Map<Product, number>, user: User, store: Store) : Responses.StoreProductRemovalResponse {
+        logger.info(`trying to remove items to store: ${JSON.stringify(store)} from user: ${JSON.stringify(user)}`);
+        if (!this.userManager.isLoggedIn(user)) {
+            const error = Error['E_NOT_LOGGED_IN'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+        }
+        else if (!this.storeManager.verifyStoreExists(store)){
+            const error = Error['E_INVALID_STORE'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+        }
+        else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
+            const error = Error['E_NOT_AUTHORIZED'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+        }
+        else {
+            return store.removeProductsWithQuantity(products);
+        }
+    }
 
-  removeProductsWithQuantity(products : Map<Product, number>, user: User, store: Store) : Responses.StoreProductRemovalResponse {
-    return !this.userManager.isLoggedIn(user) ?
-        { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: Error['E_NOT_LOGGED_IN']}} :
-        !this.storeManager.verifyStore(store) ?
-            { data: { result: false, ProductsNotRemoved: Array.from(products.keys())} , error: { message: Error['E_INVALID_STORE']}} :
-            !(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user)) ?
-                { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: Error['E_NOT_AUTHORIZED']}} :
-                store.removeProductsWithQuantity(products);
-  }
+    addNewProducts(products: Product[], user: User, store: Store) : Responses.StoreProductAdditionResponse {
+        logger.info(`trying to add products to store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`)
+        if (!this.userManager.isLoggedIn(user)) {
+            const error = Error['E_NOT_LOGGED_IN'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+        }
+        else if (!this.storeManager.verifyStoreExists(store)){
+            const error = Error['E_INVALID_STORE'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+        }
+        else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
+            const error = Error['E_NOT_AUTHORIZED'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+        }
+        else {
+            return store.addNewProducts(products);
+        }
+    }
 
-  addNewProducts(products: Product[], user: User, store: Store) : Responses.StoreProductAdditionResponse {
-    return !this.userManager.isLoggedIn(user) ?
-        { data: { result: false, ProductsNotAdded: products } , error: { message: Error['E_NOT_LOGGED_IN']}} :
-        !this.storeManager.verifyStore(store) ?
-            { data: { result: false, ProductsNotAdded: products} , error: { message: Error['E_INVALID_STORE']}} :
-            !(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user)) ?
-                { data: { result: false, ProductsNotAdded: products } , error: { message: Error['E_NOT_AUTHORIZED']}} :
-                store.addNewProducts(products);
-  }
+    removeProducts(products: Product[], user: User, store: Store) : Responses.StoreProductRemovalResponse {
+        logger.info(`trying to remove products from store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`)
+        if (!this.userManager.isLoggedIn(user)) {
+            const error = Error['E_NOT_LOGGED_IN'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+        }
+        else if (!this.storeManager.verifyStoreExists(store)){
+            const error = Error['E_INVALID_STORE'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+        }
+        else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
+            const error = Error['E_NOT_AUTHORIZED'];
+            logger.error(error);
+            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+        }
+        else {
+            return store.removeProducts(products);
+        }
+    }
 
-  removeProducts(products: Product[], user: User, store: Store) : Responses.StoreProductRemovalResponse {
-    return !this.userManager.isLoggedIn(user) ?
-        { data: { result: false, ProductsNotRemoved: products } , error: { message: Error['E_NOT_LOGGED_IN']}} :
-        !this.storeManager.verifyStore(store) ?
-            { data: { result: false, ProductsNotRemoved: products} , error: { message: Error['E_INVALID_STORE']}} :
-            !(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user)) ?
-                { data: { result: false, ProductsNotRemoved: products } , error: { message: Error['E_NOT_AUTHORIZED']}} :
-                store.removeProducts(products);
-  }
+    connectDeliverySys(): BoolResponse{
+        Logger.info('Trying to connect to delivery system');
+        const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.DELIVERY);
+        return res;
+    }
 
-  connectDeliverySys(): BoolResponse{
-    Logger.info('Trying to connect to delivery system');
-    const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.DELIVERY);
-    return res;
-  }
+    connectPaymentSys(): BoolResponse{
+        Logger.info('Trying to connect to payment system');
+        const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.PAYMENT);
+        return res;
+    }
 
-  connectPaymentSys(): BoolResponse{
-    Logger.info('Trying to connect to payment system');
-    const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.PAYMENT);
-    return res;
-  }
-
-  setAdmin(userName: string): BoolResponse{
-    const res:BoolResponse = this.userManager.setAdmin(userName);
-    return res;
-  }
+    setAdmin(userName: string): BoolResponse{
+        logger.info(`trying set ${userName} as an admin`)
+        const res:BoolResponse = this.userManager.setAdmin(userName);
+        return res;
+    }
 
 }
-
-
