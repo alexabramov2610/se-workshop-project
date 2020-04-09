@@ -1,13 +1,15 @@
 import { Error } from "./internal_api";
 import { Item, Product } from "../trading_system/internal_api";
+import {User} from "../user/User"
 
 interface Response {
   data: any;
   error?: Error;
 }
 
-interface RegisterResponse extends Response {
-  data: { isAdded: boolean };
+
+interface UserResponse extends Response {
+  data: { user: User};
 }
 
 interface StoreItemsAdditionResponse extends Response {
