@@ -67,7 +67,7 @@ export class Store {
         if (addedItems.length === 0) { // failed adding
             return {
                 data: {result: false, ItemsNotAdded: items },
-                error: {message: Error['E_ITEMS_ADDITION']}
+                error: {message: Error['E_ITEMS_ADD']}
             }
         }
         else {
@@ -101,7 +101,7 @@ export class Store {
         if (notRemovedItems.length === items.length) { // failed removing
             return {
                 data: {result: false, ItemsNotRemoved: items },
-                error: {message: Error['E_ITEMS_REMOVAL']}
+                error: {message: Error['E_ITEMS_REM']}
             }
         }
         else {
@@ -128,7 +128,7 @@ export class Store {
         if (notRemovedProducts.length === products.size) { // failed removing
             return {
                 data: {result: false, productsNotRemoved: notRemovedProducts },
-                error: {message: Error['E_PRODUCTS_REMOVAL']}
+                error: {message: Error['E_PROD_REM']}
             }
         }
         else {
@@ -155,7 +155,7 @@ export class Store {
         if (invalidProducts.length === products.length) { //failed adding
             return {
                 data: {result: false, productsNotAdded: invalidProducts},
-                error: {message: Error['E_PRODUCTS_ADDITION']}
+                error: {message: Error['E_PROD_ADD']}
             }
         }
         else {
@@ -187,7 +187,7 @@ export class Store {
         if (productsNotRemoved.length === products.length) {
             return {
                 data: {result: false, productsNotRemoved: productsNotRemoved},
-                error: {message: Error['E_PRODUCTS_REMOVAL']}
+                error: {message: Error['E_PROD_REM']}
             };
         }
         else {
@@ -244,13 +244,13 @@ export class Store {
         return false;
     }
 
-    addStoreOwner(user: StoreOwner) :Responses.StoreOwnerAdditionResponse {
+    addStoreOwner(user: StoreOwner) :Responses.BoolResponse {
         if (user.getRole() === UserRole.OWNER && !this.verifyStoreOwner(user)) {
             this._storeOwners.push(user);
             return { data: { result:true } }
         }
         else {
-            return { data: { result:false }, error: {message: Error['E_ASSIGN_OWNER']} }
+            return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "owner."} }
         }
     }
 
@@ -260,7 +260,7 @@ export class Store {
     //         return { data: { result:true } }
     //     }
     //     else {
-    //         return { data: { result:false }, error: {message: Error['E_ASSIGN_MANAGER']} }
+    //         return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
     //     }
     // }
 

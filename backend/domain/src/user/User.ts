@@ -3,11 +3,11 @@ import { UserRole } from "../common/internal_api"
 export abstract class User {
   private readonly _UUID: string;
   protected readonly _name: string;
-  protected password: string;
+  protected _password: string;
 
   protected constructor(name: string, password: string) {
     this._name = name;
-    this.password = password;
+    this._password = password;
     this._UUID = Math.random().toString(36).substring(2) + Date.now().toString(36);
   }
 

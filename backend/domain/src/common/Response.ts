@@ -26,16 +26,9 @@ interface StoreProductRemovalResponse extends Response {
   data: {result: boolean, productsNotRemoved: Product[] }
 }
 
-interface StoreAdditionResponse extends Response {
+interface BoolResponse extends Response {
   data: {result: boolean}
 }
 
-interface StoreOwnerAdditionResponse extends Response {
-  data: {result: boolean}
-}
 
-interface StoreManagerAdditionResponse extends Response {
-  data: {result: boolean}
-}
-
-export { Response, StoreOwnerAdditionResponse, StoreManagerAdditionResponse, StoreAdditionResponse, RegisterResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
+export { Response, BoolResponse, RegisterResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
