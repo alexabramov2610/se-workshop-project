@@ -1,6 +1,13 @@
 export interface ServiceBridge {
-  removeUser(_username: string): { success: boolean, error: string };
-  getUserByName(_username: string): { username: string; };
-  login(userName, password): { isLoggedin: boolean };
-  register(userName, password): { success: boolean, error: string };
+  getLoggedInUsers(): { users: string[] };
+  removeUser(username: string): { success: boolean; error: string };
+  getUserByName(username: string): { username: string };
+  login(
+    userName: string,
+    password: string
+  ): { success: boolean; error: string };
+  register(
+    userName: string,
+    password: string
+  ): { success: boolean; error: string };
 }

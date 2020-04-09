@@ -1,23 +1,67 @@
-import { ServiceBridge, Driver, ProxyBridge } from "../../src/test_env/exports";
-describe("User Management Unit Tests", () => {
-  let sb: ServiceBridge;
+import { ServiceBridge, Driver } from "../../src/test_env/exports";
+
+const UNREGISTERED_USER = "User is not registered";
+const INCORRECT_PASSWORD = "Password is incorrect";
+
+describe("Guest Login, UC: 2.3", () => {
+  let _serviceBridge: ServiceBridge;
+  var _username: string;
+  var _password: string;
+
   beforeEach(() => {
-    sb = Driver.makeBridge();
+    _serviceBridge = Driver.makeBridge();
   });
 
-  test("Login With Registered User", () => {
-    const userName: string = "Ron";
-    const password: string = "Avishai";
-    sb.register(userName, password);
-    const { isLoggedin } = sb.login(userName, password);
-    expect(isLoggedin).toBeTruthy();
+  test("Valid details and registered", () => {
+    _username = "validUsername";
+    _password = "validPassword123";
+    _serviceBridge.register(_username, _password);
+
+    const { success } = _serviceBridge.login(_username, _password);
+    expect(success).toBeTruthy();
+
+    const { users } = _serviceBridge.getLoggedInUsers();
+    expect(users.includes(_username)).toBeTruthy();
   });
 
-  test("Login With UnRegistered User", () => {
-    const userName: string = "Ron_Not_Exists";
-    const password: string = "Avishai_Likes_Banana";
-    const { isLoggedin } = sb.login(userName, password);
-    expect(isLoggedin).not.toBeTruthy();
+  test("Wrong password and registered", () => {
+    _username = "validUsername";
+    _password = "wrongPassword123";
+    _serviceBridge.register(_username, _password);
+
+    const { success, error } = _serviceBridge.login(_username, _password);
+    expect(success).toBeFalsy();
+    expect(error).toBe(INCORRECT_PASSWORD);
+
+    const { users } = _serviceBridge.getLoggedInUsers();
+    expect(users.includes(_username)).toBeFalsy();
   });
-  
+
+  test("Valid details and not registered", () => {
+    _username = "unregisterdUsername";
+    _password = "validPassword123";
+    _serviceBridge.removeUser(_username);
+
+    const { success, error } = _serviceBridge.login(_username, _password);
+    expect(success).toBeFalsy();
+    expect(error).toBe(UNREGISTERED_USER);
+
+    const { users } = _serviceBridge.getLoggedInUsers();
+    expect(users.includes(_username)).toBeFalsy();
+  });
+
+  test("Valid details and registered and logged in", () => {
+    _username = "alreadyLoggedInUsername";
+    _password = "validPassword123";
+    
+    _serviceBridge.register(_username, _password);
+    _serviceBridge.login(_username, _password);
+
+    const { success, error } = _serviceBridge.login(_username, _password);
+    expect(success).toBeFalsy();
+    expect(error).toBe(UNREGISTERED_USER);
+
+    const { users } = _serviceBridge.getLoggedInUsers();
+    expect(users.includes(_username)).toBeFalsy();
+  });
 });
