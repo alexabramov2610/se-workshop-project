@@ -7,6 +7,7 @@ describe("User Management Unit Tests", () => {
     driver = new UserManagementDriver();
   });
 
+
   test("Registration Success Test", () => {
     const res: Responses.BoolResponse = driver.addUser("ron", "123456");
     expect(res.data.result).toBeTruthy();
@@ -16,4 +17,5 @@ describe("User Management Unit Tests", () => {
     const res: Responses.BoolResponse = driver.setAdmin("ron");
     expect(res.data.result).toBeTruthy();
   });
+
 });

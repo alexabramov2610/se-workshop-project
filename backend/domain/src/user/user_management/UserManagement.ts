@@ -1,3 +1,6 @@
+import {RegisterResponse} from "../../common/Response";
+import {User} from "../User";
+import {UserRole} from "../../common/Enums";
 import { BoolResponse,errorMsg } from "../../common/internal_api";
 import { User,Admin } from "../internal_api";
 
@@ -22,7 +25,19 @@ class UserManagement {
     return this.users.filter((u) => u.name === name).pop();
   }
 
-  isAdmin(u:User) : boolean{
+  verifyOwner(user: User) : boolean {
+    return user.getRole() === UserRole.OWNER;
+  }
+
+  verifyManager(user: User) : boolean {
+    return user.getRole() === UserRole.MANAGER;
+  }
+
+
+  isLoggedIn(user: User) {
+    return false;
+
+    isAdmin(u:User) : boolean{
     return this.admins.filter(val=> val.name === u.name).pop() !== null
   }
 
