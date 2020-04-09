@@ -3,7 +3,7 @@ import { ServiceBridge, Driver } from "../../src/test_env/exports";
 const SHORT_PASS = "Password must contains at least 5 characters";
 const NON_CAPITAL_PASS = "Password must contains at least one capital letter";
 const NON_DIGIT_PASS = "Password must contains at least one digit";
-const USERNAME_EXISTS = "Username is taken"
+const USERNAME_EXISTS = "Username is taken";
 const EMPTY_USERNAME = "Username can not be empty";
 
 describe("Guset Registration, UC: 2.2", () => {
@@ -24,7 +24,8 @@ describe("Guset Registration, UC: 2.2", () => {
     const { success } = _serviceBridge.register(_username, _password);
     expect(success).toBeTruthy();
 
-    const { username } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName(_username);
+    const { username } = data;
     expect(username).toBe(_username);
   });
 
@@ -38,7 +39,8 @@ describe("Guset Registration, UC: 2.2", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(SHORT_PASS);
 
-    const { username } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName(_username);
+    const { username } = data;
     expect(username).not.toBe(_username);
   });
 
@@ -52,7 +54,8 @@ describe("Guset Registration, UC: 2.2", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(NON_CAPITAL_PASS);
 
-    const { username } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName(_username);
+    const { username } = data;
     expect(username).not.toBe(_username);
   });
 
@@ -66,7 +69,8 @@ describe("Guset Registration, UC: 2.2", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(NON_DIGIT_PASS);
 
-    const { username } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName(_username);
+    const { username } = data;
     expect(username).not.toBe(_username);
   });
 
@@ -93,5 +97,4 @@ describe("Guset Registration, UC: 2.2", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(EMPTY_USERNAME);
   });
-
 });

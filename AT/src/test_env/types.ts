@@ -4,8 +4,22 @@ interface User {
 }
 
 interface Item {
+  id: string;
   name: string;
   price: number;
+  description: string;
 }
 
-export { User, Item };
+interface Store {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface Response {
+  success: boolean;
+  data: any;
+  error: string;
+}
+
+export { User, Item, Store, Response };

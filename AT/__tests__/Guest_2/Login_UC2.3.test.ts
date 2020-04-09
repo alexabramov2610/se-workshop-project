@@ -20,7 +20,8 @@ describe("Guest Login, UC: 2.3", () => {
     const { success } = _serviceBridge.login(_username, _password);
     expect(success).toBeTruthy();
 
-    const { users } = _serviceBridge.getLoggedInUsers();
+    const { data } = _serviceBridge.getLoggedInUsers();
+    const { users } = data;
     expect(users.includes(_username)).toBeTruthy();
   });
 
@@ -33,7 +34,8 @@ describe("Guest Login, UC: 2.3", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(INCORRECT_PASSWORD);
 
-    const { users } = _serviceBridge.getLoggedInUsers();
+    const { data } = _serviceBridge.getLoggedInUsers();
+    const { users } = data;
     expect(users.includes(_username)).toBeFalsy();
   });
 
@@ -46,14 +48,15 @@ describe("Guest Login, UC: 2.3", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(UNREGISTERED_USER);
 
-    const { users } = _serviceBridge.getLoggedInUsers();
+    const { data } = _serviceBridge.getLoggedInUsers();
+    const { users } = data;
     expect(users.includes(_username)).toBeFalsy();
   });
 
   test("Valid details and registered and logged in", () => {
     _username = "alreadyLoggedInUsername";
     _password = "validPassword123";
-    
+
     _serviceBridge.register(_username, _password);
     _serviceBridge.login(_username, _password);
 
@@ -61,7 +64,8 @@ describe("Guest Login, UC: 2.3", () => {
     expect(success).toBeFalsy();
     expect(error).toBe(UNREGISTERED_USER);
 
-    const { users } = _serviceBridge.getLoggedInUsers();
+    const { data } = _serviceBridge.getLoggedInUsers();
+    const { users } = data;
     expect(users.includes(_username)).toBeFalsy();
   });
 });
