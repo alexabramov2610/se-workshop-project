@@ -1,4 +1,5 @@
 import { ServiceBridge, Driver } from "../../src/test_env/exports";
+import { AuthDetails } from "../../src/test_env/types";
 
 const SHORT_PASS = "Password must contains at least 5 characters";
 const NON_CAPITAL_PASS = "Password must contains at least one capital letter";
@@ -8,93 +9,84 @@ const EMPTY_USERNAME = "Username can not be empty";
 
 describe("Guset Registration, UC: 2.2", () => {
   let _serviceBridge: ServiceBridge;
-  var _username: string;
-  var _password: string;
+  var _authDetails: AuthDetails;
 
   beforeEach(() => {
     _serviceBridge = Driver.makeBridge();
   });
 
   test("Valid Details", () => {
-    _username = "validUsername";
-    _password = "validPassword123";
+    _authDetails.identifier = "validUsername";
+    _authDetails.password = "validPassword123";
 
-    _serviceBridge.removeUser(_username);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeUndefined();
 
-    const { success } = _serviceBridge.register(_username, _password);
-    expect(success).toBeTruthy();
-
-    const { data } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName({
+      username: _authDetails.identifier,
+    });
     const { username } = data;
-    expect(username).toBe(_username);
+    expect(username).toBe(_authDetails.identifier);
   });
 
   test("Invalid Password - Short", () => {
-    _username = "validUsername";
-    _password = "sP1"; // Short password
+    _authDetails.identifier = "validUsername";
+    _authDetails.password = "sP1"; // Short password
 
-    _serviceBridge.removeUser(_username);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeDefined();
 
-    const { success, error } = _serviceBridge.register(_username, _password);
-    expect(success).toBeFalsy();
-    expect(error).toBe(SHORT_PASS);
-
-    const { data } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName({
+      username: _authDetails.identifier,
+    });
     const { username } = data;
-    expect(username).not.toBe(_username);
+    expect(username).not.toBe(_authDetails.identifier);
   });
 
   test("Invalid Password - Non Capital", () => {
-    _username = "validUsername";
-    _password = "noncapitalpass123"; // Short password
+    _authDetails.identifier = "validUsername";
+    _authDetails.password = "noncapitalpass123"; // Short password
 
-    _serviceBridge.removeUser(_username);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeDefined();
 
-    const { success, error } = _serviceBridge.register(_username, _password);
-    expect(success).toBeFalsy();
-    expect(error).toBe(NON_CAPITAL_PASS);
-
-    const { data } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName({
+      username: _authDetails.identifier,
+    });
     const { username } = data;
-    expect(username).not.toBe(_username);
+    expect(username).not.toBe(_authDetails.identifier);
   });
 
   test("Invalid Password - Non Digit", () => {
-    _username = "validUsername";
-    _password = "nonDigitsPass"; // Short password
+    _authDetails.identifier = "validUsername";
+    _authDetails.password = "nonDigitsPass"; // Short password
 
-    _serviceBridge.removeUser(_username);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeDefined();
 
-    const { success, error } = _serviceBridge.register(_username, _password);
-    expect(success).toBeFalsy();
-    expect(error).toBe(NON_DIGIT_PASS);
-
-    const { data } = _serviceBridge.getUserByName(_username);
+    const { data } = _serviceBridge.getUserByName({
+      username: _authDetails.identifier,
+    });
     const { username } = data;
-    expect(username).not.toBe(_username);
+    expect(username).not.toBe(_authDetails.identifier);
   });
 
   test("Invalid Username - Already Taken", () => {
-    _username = "validUsername";
-    _password = "nonDigitsPass"; // Short password
+    _authDetails.identifier = "validUsername";
+    _authDetails.password = "nonDigitsPass"; // Short password
 
-    _serviceBridge.removeUser(_username);
-    const response = _serviceBridge.register(_username, _password);
-    expect(response.success).toBeTruthy();
+    const response = _serviceBridge.register(_authDetails);
+    expect(response.error).toBeUndefined();
 
-    const { success, error } = _serviceBridge.register(_username, _password);
-    expect(success).toBeFalsy();
-    expect(error).toBe(USERNAME_EXISTS);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeDefined();
   });
 
   test("Invalid Username - Empty Username", () => {
-    _username = "";
-    _password = "nonDigitsPass"; // Short password
+    _authDetails.identifier = "";
+    _authDetails.password = "nonDigitsPass"; // Short password
 
-    _serviceBridge.removeUser(_username);
-
-    const { success, error } = _serviceBridge.register(_username, _password);
-    expect(success).toBeFalsy();
-    expect(error).toBe(EMPTY_USERNAME);
+    const { error } = _serviceBridge.register(_authDetails);
+    expect(error).toBeDefined();
   });
 });

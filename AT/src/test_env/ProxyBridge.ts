@@ -1,5 +1,5 @@
 import { ServiceBridge } from "./exports";
-import { Item, Response } from "./types";
+import { Item, Response, Store, User, AuthDetails } from "./types";
 import {
   DummyResponse,
   DummyItemReposne,
@@ -15,50 +15,48 @@ class ProxyBridge implements ServiceBridge {
     this.real = adapter;
   }
 
-  removeItem(id: string): Response {
-    return this.real ? this.real.removeItem(id) : DummyResponse;
+  removeItem(item: Item): Response {
+    return this.real ? this.real.removeItem(item) : DummyResponse;
   }
 
-  removeStore(id: string) {
-    return this.real ? this.real.removeStore(id) : DummyResponse;
+  removeStore(store: Store) {
+    return this.real ? this.real.removeStore(store) : DummyResponse;
   }
 
-  addStore(id: string, name: string, description: string): Response {
-    return this.real
-      ? this.real.addStore(id, name, description)
-      : DummyStoreReposne;
+  addStore(store: Store) {
+    return this.real ? this.real.addStore(store) : DummyStoreReposne;
   }
 
-  addItemToStore(storeID: string, item: Item) {
-    return this.real ? this.real.addItemToStore(storeID, item) : DummyResponse;
+  addItemToStore(store: Store, item: Item) {
+    return this.real ? this.real.addItemToStore(store, item) : DummyResponse;
   }
 
-  viewItem(itemID: string) {
-    return this.real ? this.real.viewItem(itemID) : DummyItemReposne;
+  viewItem(item: Item) {
+    return this.real ? this.real.viewItem(item) : DummyItemReposne;
   }
 
-  viewStore(storeID: string) {
-    return this.real ? this.real.viewStore(storeID) : DummyStoreReposne;
+  viewStore(store: Store) {
+    return this.real ? this.real.viewStore(store) : DummyStoreReposne;
   }
 
   getLoggedInUsers() {
     return this.real ? this.real.getLoggedInUsers() : DummyUsersReposne;
   }
 
-  removeUser(username: string) {
-    return this.real ? this.real.removeUser(username) : DummyResponse;
+  removeUser(user: User) {
+    return this.real ? this.real.removeUser(user) : DummyResponse;
   }
 
-  getUserByName(username: string) {
-    return this.real ? this.real.getUserByName(username) : DummyUserReposne;
+  getUserByName(user: User) {
+    return this.real ? this.real.getUserByName(user) : DummyUserReposne;
   }
 
-  register(userName: string, password: string) {
-    return this.real ? this.real.register(userName, password) : DummyResponse;
+  register(authDetails: AuthDetails) {
+    return this.real ? this.real.register(authDetails) : DummyResponse;
   }
 
-  login(userName: string, password: string) {
-    return this.real ? this.real.login(userName, password) : DummyResponse;
+  login(authDetails: AuthDetails) {
+    return this.real ? this.real.login(authDetails) : DummyResponse;
   }
 }
 

@@ -1,15 +1,15 @@
-import { Item, Response } from "./types";
+import { Item, Response, Store, User, AuthDetails } from "./types";
 
 export interface ServiceBridge {
-  removeItem(id: string): Response;
-  removeStore(id: string): Response;
-  addStore(id: string, name: string, description: string): Response;
-  addItemToStore(storeID: string, item: Item): Response;
-  viewStore(storeID: string): Response;
-  viewItem(_itemID: string): Response;
+  removeItem(item: Item): Response;
+  removeStore(store: Store): Response;
+  addStore(store: Store): Response;
+  addItemToStore(store: Store, item: Item): Response;
+  viewStore(store: Store): Response;
+  viewItem(item: Item): Response;
   getLoggedInUsers(): Response;
-  removeUser(username: string): Response;
-  getUserByName(username: string): Response;
-  login(userName: string, password: string): Response;
-  register(userName: string, password: string): Response;
+  removeUser(user: User): Response;
+  getUserByName(user: User): Response;
+  login(authDetails: AuthDetails): Response;
+  register(authDetails: AuthDetails): Response;
 }

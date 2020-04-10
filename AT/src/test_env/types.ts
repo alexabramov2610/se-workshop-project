@@ -1,5 +1,9 @@
 interface User {
-  userName: string;
+  username: string;
+}
+
+interface AuthDetails {
+  identifier: string;
   password: string;
 }
 
@@ -17,9 +21,8 @@ interface Store {
 }
 
 interface Response {
-  success: boolean;
   data: any;
-  error: string;
+  error?: string;
 }
 
-export { User, Item, Store, Response };
+export { User, Item, Store, Response, AuthDetails };

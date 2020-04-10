@@ -1,8 +1,8 @@
 import { ServiceBridge, Driver } from "../../src/test_env/exports";
 import { Item, Store } from "../../src/test_env/types";
 
-const ITEM_NOT_FOUND = "Item not found";
-const STORE_NOT_FOUND = "Store not found";
+// const ITEM_NOT_FOUND = "Item not found";
+// const STORE_NOT_FOUND = "Store not found";
 
 describe("Guest - View Information, UC: 2.4", () => {
   let _serviceBridge: ServiceBridge;
@@ -19,11 +19,16 @@ describe("Guest - View Information, UC: 2.4", () => {
     _testItem.description = "itemTestDesc";
     _testItem.price = 33.5;
 
-    _serviceBridge.addItemToStore(_testStore.id, _testItem);
+    _testStore.id = "validStoreID";
+    _testStore.name = "storeTestName";
+    _testStore.description = "storeTestDesc";
 
-    const { data, error } = _serviceBridge.viewItem(_testItem.id);
+    _serviceBridge.addStore(_testStore);
+    _serviceBridge.addItemToStore(_testStore, _testItem);
+
+    const { data, error } = _serviceBridge.viewItem(_testItem);
     const { name, price, description } = data;
-    expect(error).toBeFalsy();
+    expect(error).toBeUndefined();
     expect(name).toEqual(_testItem.name);
     expect(price).toEqual(_testItem.price);
     expect(description).toEqual(_testItem.description);
@@ -35,11 +40,9 @@ describe("Guest - View Information, UC: 2.4", () => {
     _testItem.description = "itemTestDesc";
     _testItem.price = 33.5;
 
-    _serviceBridge.removeItem(_testItem.id);
-
-    const { data, error } = _serviceBridge.viewItem(_testItem.id);
+    const { data, error } = _serviceBridge.viewItem(_testItem);
     expect(data).toBeUndefined();
-    expect(error).toEqual(ITEM_NOT_FOUND);
+    expect(error).toBeDefined();
   });
 
   test("View valid store", () => {
@@ -47,16 +50,11 @@ describe("Guest - View Information, UC: 2.4", () => {
     _testStore.name = "storeTestName";
     _testStore.description = "storeTestDesc";
 
-    _serviceBridge.addStore(
-      _testStore.id,
-      _testStore.name,
-      _testStore.description
-    );
+    _serviceBridge.addStore(_testStore);
 
-    const { success, data , error } = _serviceBridge.viewStore(_testItem.id);
+    const { data, error } = _serviceBridge.viewStore(_testItem);
     const { name, description } = data;
-    expect(error).toBeFalsy();
-    expect(success).toBeTruthy();
+    expect(error).toBeUndefined();
     expect(name).toEqual(_testStore.name);
     expect(description).toEqual(_testStore.description);
   });
@@ -66,10 +64,8 @@ describe("Guest - View Information, UC: 2.4", () => {
     _testStore.name = "storeTestName";
     _testStore.description = "storeTestDesc";
 
-    _serviceBridge.removeStore(_testStore.id);
-
-    const { data, error } = _serviceBridge.viewStore(_testStore.id);
+    const { data, error } = _serviceBridge.viewStore(_testStore);
     expect(data).toBeUndefined();
-    expect(error).toEqual(STORE_NOT_FOUND);
+    expect(error).toBeDefined();
   });
 });
