@@ -33,4 +33,4 @@ interface BoolResponse extends Response {
 }
 
 
-export { Response, BoolResponse, RegisterResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
+export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };

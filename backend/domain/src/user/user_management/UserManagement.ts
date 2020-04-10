@@ -1,5 +1,3 @@
-import {RegisterResponse} from "../../common/Response";
-import {User} from "../User";
 import {UserRole} from "../../common/Enums";
 import { BoolResponse,errorMsg } from "../../common/internal_api";
 import { User,Admin } from "../internal_api";
@@ -14,7 +12,7 @@ class UserManagement {
     this.admins= [];
   }
 
-  register(userName,password): RegisterResponse {
+  register(userName,password): BoolResponse {
     if(this.getUserByName(userName)){    //user already in system
       return {data:{result:false},error:{message:errorMsg['E_AT']}}
     }
@@ -25,9 +23,10 @@ class UserManagement {
     this.users.concat([new User(userName,password)]);
     return { data: { result: true } };
     }}
+  
    
 
-  login(userName:string,password:string): LoginResponse{
+  login(userName:string,password:string): BoolResponse{
     
     if(!(this.getUserByName(userName))){ 
       return {data:{result:false},error:{message:errorMsg['E_NF']}}  //not found
@@ -49,7 +48,7 @@ class UserManagement {
  
 
 
-  logout(userName:string):LogoutResponse{
+  logout(userName:string):BoolResponse{
     const loggedInUsers=this.getLoggedInUsers()
     if(!loggedInUsers.filter((u)=>{u.name===userName}).pop()){ //user not logged in
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
@@ -63,6 +62,10 @@ class UserManagement {
 
   verifyPassword(userName:string,password: string):boolean {
     return true  //to implement with sequrity ..
+  }
+
+  vaildPassword(password: string) {
+    return password.length>=4;
   }
 
   getLoggedInUsers(): User[] {
