@@ -8,6 +8,7 @@
     "start": "tsc && node dist/index.js",
     "debug": "tsc && DEBUG=1 node dist/index.js ",
     "test": "jest",
+    "clear:test": "jest --clearCache",
     "test:watch": "npm t -- --watch"
   },
   "author": "",
@@ -20,5 +21,8 @@
     "tslint": "^6.1.1",
     "typescript": "^3.8.3",
     "winston": "^3.2.1"
+  },
+  "dependencies": {
+    "uuid": "^7.0.3"
   }
 }

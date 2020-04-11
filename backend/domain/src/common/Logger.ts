@@ -24,10 +24,10 @@ export const Logger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `debug` and below to `events.log`
     new winston.transports.File({ filename: 'logs/error.log', level: 'error', }), 
-    new winston.transports.File({ filename: 'logs/events.log',   level: process.env.DEBUG? 'debug' : 'info',
+    new winston.transports.File({ filename: 'logs/events.log', level: process.env.DEBUG? 'debug' : 'info',
 }),
     new winston.transports.Console({
-    format: winston.format.simple(),
+    format: myFormat,
       level: process.env.DEBUG? 'debug' : 'info',
 })
   ]

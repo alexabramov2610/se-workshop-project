@@ -5,6 +5,7 @@ export enum UserRole {
     MANAGER,
     OWNER,
     ADMIN
+}
 
  export enum ExternalSystems  {
    DELIVERY,

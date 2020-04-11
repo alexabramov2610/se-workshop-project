@@ -1,15 +1,16 @@
-import {UserRole} from "../../common/Enums";
-import { BoolResponse,errorMsg } from "../../common/internal_api";
-import { User,Admin } from "../internal_api";
+import {UserRole} from "../common/Enums";
+import { BoolResponse,errorMsg } from "../common/internal_api";
+import { RegisteredUser,Admin, Buyer } from "./internal_api";
 
-class UserManagement {
-  private users: User[];
-  private loggedInUsers:User[];
+class UserManager {
+  private registeredUsers: RegisteredUser[];
+  private loggedInUsers: RegisteredUser[];
   private admins: Admin[];
 
   constructor() {
-    this.users = [];
-    this.admins= [];
+    this.registeredUsers = [];
+    this.loggedInUsers = [];
+    this.admins = [];
   }
 
   register(userName,password): BoolResponse {
@@ -20,7 +21,7 @@ class UserManagement {
        return {data:{result:false},error:{message:errorMsg['E_BP']}}
      }
     else{
-    this.users.concat([new User(userName,password)]);
+    this.registeredUsers.concat([new Buyer(userName,password)]);
     return { data: { result: true } };
     }}
   
@@ -50,7 +51,7 @@ class UserManagement {
 
   logout(userName:string):BoolResponse{
     const loggedInUsers=this.getLoggedInUsers()
-    if(!loggedInUsers.filter((u)=>{u.name===userName}).pop()){ //user not logged in
+    if(!loggedInUsers.filter( (u: RegisteredUser) => u.name === userName ).pop()){ //user not logged in
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
     }
     else{
@@ -68,42 +69,46 @@ class UserManagement {
     return password.length>=4;
   }
 
-  getLoggedInUsers(): User[] {
+  getLoggedInUsers(): RegisteredUser[] {
     return this.loggedInUsers;
   }
 
-  getReigsteredUsers(): User[] {
-    return this.users;
-  }
-  getUserByName(name: string): User {
-    return this.users.filter((u) => u.name === name).pop();
+  getRegisteredUsers(): RegisteredUser[] {
+    return this.registeredUsers;
   }
 
-  verifyOwner(user: User) : boolean {
+  getUserByName(name: string): RegisteredUser {
+    return this.registeredUsers.filter((u) => u.name === name).pop();
+  }
+
+  verifyOwner(user: RegisteredUser) : boolean {
     return user.getRole() === UserRole.OWNER;
   }
 
-  verifyManager(user: User) : boolean {
+  verifyManager(user: RegisteredUser) : boolean {
     return user.getRole() === UserRole.MANAGER;
   }
 
-
-  isLoggedIn(user: User) {
+  isLoggedIn(user: RegisteredUser) {
     return false;
   }
   
-    isAdmin(u:User) : boolean{
+  isAdmin(u:RegisteredUser) : boolean{
     return this.admins.filter(val=> val.name === u.name).pop() !== null
   }
 
   setAdmin(userName:string): BoolResponse{
-    const u :User = this.getUserByName(userName);
+    const u :RegisteredUser = this.getUserByName(userName);
     if(!u) return {data:{result:false} , error: {message: errorMsg['E_NF']}}
     const isAdmin:boolean = this.isAdmin(u);
     if(isAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
+
+    u.setRole(UserRole.ADMIN);
     this.admins = this.admins.concat([u]);
+
+    this.registeredUsers = this.registeredUsers.concat([u]);
     return {data:{result:true}};
   }
 }
 
-export { UserManagement };
+export { UserManager };
