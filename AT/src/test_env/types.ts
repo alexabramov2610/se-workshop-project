@@ -3,15 +3,18 @@ interface User {
 }
 
 interface AuthDetails {
-  identifier: string;
+  userName: string;
   password: string;
 }
-
 interface Item {
   id: string;
   name: string;
   price: number;
   description: string;
+}
+interface BuyItem {
+  item: Item;
+  store: Store;
 }
 
 interface Store {
@@ -25,4 +28,4 @@ interface Response {
   error?: string;
 }
 
-export { User, Item, Store, Response, AuthDetails };
+export { User, Item, Store, Response, AuthDetails, BuyItem };

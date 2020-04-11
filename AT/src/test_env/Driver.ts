@@ -1,9 +1,9 @@
-import { ServiceBridge, ProxyBridge } from "./exports";
+import { Bridge, Proxy } from "../";
 class Driver {
   public static makeBridge() {
-    const bridge: ProxyBridge = new ProxyBridge();
+    const bridge: Bridge = new Proxy();
     //when its ready:
-    // bridge.setReal(new ServiceAdapter());
+    // bridge.setReal(new Adapter());
     return bridge;
   }
 }

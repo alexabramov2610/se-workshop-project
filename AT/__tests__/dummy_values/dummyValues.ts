@@ -1,4 +1,4 @@
-import { Response } from "../types";
+import { Response } from "../../src/test_env/types";
 
 const DummyResponse: Response = {
   data: {},
@@ -19,11 +19,18 @@ const DummyUsersReposne: Response = {
 const DummyUserReposne: Response = {
   data: { username: "dummyUser" },
 };
-
+const DummyBuyReposne: Response = {
+  data: { recieptId: "some-fake-id" },
+};
+const DummyPurchaseHistoryResponse: Response = {
+  data: { puchases: [{ productName: "some-name" }] },
+};
 export {
   DummyResponse,
   DummyItemReposne,
   DummyStoreReposne,
   DummyUsersReposne,
   DummyUserReposne,
+  DummyBuyReposne,
+  DummyPurchaseHistoryResponse,
 };

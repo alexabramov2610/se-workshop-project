@@ -1,11 +1,11 @@
-import { ServiceBridge, Driver } from "../../src/test_env/exports";
+import { Bridge, Driver } from "../../src/";
 import { Item, Store } from "../../src/test_env/types";
 
 // const ITEM_NOT_FOUND = "Item not found";
 // const STORE_NOT_FOUND = "Store not found";
 
 describe("Guest - View Information, UC: 2.4", () => {
-  let _serviceBridge: ServiceBridge;
+  let _serviceBridge: Bridge;
   var _testItem: Item;
   var _testStore: Store;
 

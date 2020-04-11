@@ -1,17 +1,19 @@
-import { ServiceBridge } from "./exports";
-import { Item, Response, Store, User, AuthDetails } from "./types";
+import { Bridge } from "../";
+import { Item, Response, Store, User, AuthDetails, BuyItem } from "./types";
 import {
   DummyResponse,
   DummyItemReposne,
   DummyStoreReposne,
   DummyUsersReposne,
   DummyUserReposne,
-} from "./dummy_values/dummyValues";
+  DummyBuyReposne,
+  DummyPurchaseHistoryResponse,
+} from "../../__tests__/dummy_values/dummyValues";
 
-class ProxyBridge implements ServiceBridge {
-  private real: ServiceBridge;
+class Proxy implements Bridge {
+  private real: Bridge;
 
-  setReal(adapter: ServiceBridge) {
+  setReal(adapter: Bridge) {
     this.real = adapter;
   }
 
@@ -58,6 +60,19 @@ class ProxyBridge implements ServiceBridge {
   login(authDetails: AuthDetails) {
     return this.real ? this.real.login(authDetails) : DummyResponse;
   }
+
+  logout() {
+    return this.real ? this.real.logout() : DummyResponse;
+  }
+
+  buyItem(transaction: BuyItem) {
+    return this.real ? this.real.buyItem(transaction) : DummyBuyReposne;
+  }
+  getPurchaseHistory() {
+    return this.real
+      ? this.real.getPurchaseHistory()
+      : DummyPurchaseHistoryResponse;
+  }
 }
 
-export { ProxyBridge };
+export { Proxy };

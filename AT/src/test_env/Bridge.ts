@@ -1,6 +1,6 @@
-import { Item, Response, Store, User, AuthDetails } from "./types";
+import { Item, Response, Store, User, AuthDetails, BuyItem } from "./types";
 
-export interface ServiceBridge {
+export interface Bridge {
   removeItem(item: Item): Response;
   removeStore(store: Store): Response;
   addStore(store: Store): Response;
@@ -12,4 +12,7 @@ export interface ServiceBridge {
   getUserByName(user: User): Response;
   login(authDetails: AuthDetails): Response;
   register(authDetails: AuthDetails): Response;
+  buyItem(tansaction: BuyItem): Response;
+  logout(): Response;
+  getPurchaseHistory(): Response;
 }
