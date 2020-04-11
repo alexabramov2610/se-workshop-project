@@ -1,8 +1,8 @@
 import {Item, Product} from "../trading_system/internal_api";
-import * as Responses from "../common/Response"
+import * as Res from "../common/Response"
 import {errorMsg as Error} from "../common/Error"
 import { Logger as logger } from "../common/Logger";
-import {StoreOwner, User} from "../user/internal_api";
+import {StoreOwner, RegisteredUser} from "../user/internal_api";
 import {UserRole} from "../common/Enums";
 import { v4 as uuid } from 'uuid';
 
@@ -76,7 +76,7 @@ export class Store {
 
     }
 
-    addItems(items: Item[]) : Responses.StoreItemsAdditionResponse {
+    addItems(items: Item[]) : Res.StoreItemsAdditionResponse {
         logger.info(`adding ${items.length} items to store id: ${this._UUID}`)
         let addedItems: Item[] = [];
         let notAddedItems: Item[] = [];
@@ -108,7 +108,7 @@ export class Store {
             }
     }
 
-    removeItems(items: Item[]) : Responses.StoreItemsRemovalResponse {
+    removeItems(items: Item[]) : Res.StoreItemsRemovalResponse {
         logger.info(`removing ${items.length} items from store id: ${this._UUID}`)
         let notRemovedItems: Item[] = [];
 
@@ -145,7 +145,7 @@ export class Store {
         }
     }
 
-    removeProductsWithQuantity(products : Map<Product, number>) : Responses.StoreProductRemovalResponse {
+    removeProductsWithQuantity(products : Map<Product, number>) : Res.StoreProductRemovalResponse {
         logger.info(`removing ${products.size} products with quantities from store id: ${this._UUID}`)
         let notRemovedProducts :Product[] = [];
 
@@ -176,7 +176,7 @@ export class Store {
 
     }
 
-    addNewProducts(products: Product[]) : Responses.StoreProductAdditionResponse {
+    addNewProducts(products: Product[]) : Res.StoreProductAdditionResponse {
         logger.info(`adding ${products.length} products to store id: ${this._UUID}`)
         let invalidProducts: Product[] = [];
 
@@ -207,7 +207,7 @@ export class Store {
         }
     }
 
-    removeProducts(products: Product[]) : Responses.StoreProductRemovalResponse {
+    removeProducts(products: Product[]) : Res.StoreProductRemovalResponse {
         logger.info(`removing ${products.length} items from store id: ${this._UUID}`)
         let productsNotRemoved: Product[] = [];
 
@@ -243,7 +243,7 @@ export class Store {
         }
     }
 
-    verifyIsStoreOwner(user: User) : boolean {
+    verifyIsStoreOwner(user: RegisteredUser) : boolean {
         logger.info(`verifying if user is owner: ${JSON.stringify(user)}`)
         if (user.getRole() != UserRole.OWNER) {
             logger.warn(`user: ${JSON.stringify(user)} is not an owner of store ${this._UUID}`)
@@ -259,7 +259,7 @@ export class Store {
         return false;
     }
 
-    verifyStoreManager(user: User) : boolean {
+    verifyStoreManager(user: RegisteredUser) : boolean {
         logger.info(`verify if user is manager: ${JSON.stringify(user)}`)
         // if (user.getRole() != UserRole.MANAGER) {
         //                logger.warn(`user: ${JSON.stringify(user)} is not a manager of store ${this._UUID}`)
@@ -275,7 +275,7 @@ export class Store {
         return false;
     }
 
-    addStoreOwner(user: StoreOwner) :Responses.BoolResponse {
+    addStoreOwner(user: StoreOwner) :Res.BoolResponse {
         if (user.getRole() === UserRole.OWNER && !this.verifyIsStoreOwner(user)) {
             logger.info(`adding user: ${JSON.stringify(user)} as an owner of store: ${this._UUID}`)
             this._storeOwners.push(user);

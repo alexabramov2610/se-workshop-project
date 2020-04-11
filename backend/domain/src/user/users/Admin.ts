@@ -1,14 +1,10 @@
-import { User } from "../internal_api";
+import { RegisteredUser } from "../internal_api";
 import {UserRole} from "../../common/Enums";
 
-export class Admin extends User{
-    private readonly _role = UserRole.ADMIN;
+export class Admin extends RegisteredUser {
 
     constructor(name: string, password: string) {
-      super(name,password);
-  }
-
-    getRole(): UserRole {
-        return this._role;
+        super(name, password);
+        this.setRole(UserRole.ADMIN);
     }
 }

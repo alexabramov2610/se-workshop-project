@@ -1,15 +1,15 @@
 import { Store, StoreManager } from "../../../src/store/internal_api";
 import * as Responses from "../../../src/common/Response";
-import {StoreOwner, User} from "../../../src/user/internal_api";
+import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
 import { TradingSystemManager } from "../../../src/trading_system/TradingSystemManager";
 import {Item, Product} from "../../../src/trading_system/internal_api";
 import { ExternalSystemsManager } from '../../../src/external_systems/ExternalSystemsManager'
-import { UserManager } from '../../../src/user/user_manager/UserManager';
+import { UserManager } from '../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
-jest.mock('../../../src/user/user_manager/UserManager');
+jest.mock('../../../src/user/UserManager');
 jest.mock('../../../src/store/StoreManager');
 jest.mock('../../../src/external_systems/ExternalSystemsManager');
-jest.mock('../../../src/user/user_manager/UserManager');
+jest.mock('../../../src/user/UserManager');
 
 describe("Store Management Unit Tests", () => {
     let tradingSystemManager: TradingSystemManager;

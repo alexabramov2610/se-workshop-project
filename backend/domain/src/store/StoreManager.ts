@@ -1,7 +1,7 @@
 import { Store } from './internal_api'
 import * as Responses from '../common/Response'
 import * as Error from '../common/Error'
-import { User } from "../user/internal_api";
+import { RegisteredUser } from "../user/internal_api";
 import { Logger as logger } from "../common/Logger";
 
 export class StoreManager {
@@ -42,11 +42,11 @@ export class StoreManager {
         return store.storeName && store.storeName !== '' && store.UUID && store.UUID !== '';
     }
 
-    verifyStoreOwner(store: Store, user: User) : boolean {
+    verifyStoreOwner(store: Store, user: RegisteredUser) : boolean {
         return store.verifyIsStoreOwner(user);
     }
 
-    verifyStoreManager(store: Store, user: User) : boolean {
+    verifyStoreManager(store: Store, user: RegisteredUser) : boolean {
         return store.verifyStoreManager(user);
     }
 

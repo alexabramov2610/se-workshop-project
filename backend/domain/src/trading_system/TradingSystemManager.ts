@@ -1,4 +1,4 @@
-import { UserManager, User } from "../user/internal_api";
+import { UserManager, RegisteredUser } from "../user/internal_api";
 import { Item, Product } from "../trading_system/internal_api"
 import { StoreManager, Store } from '../store/internal_api';
 import * as Responses from "../common/Response"
@@ -27,7 +27,7 @@ export class TradingSystemManager {
         return this.userManager.getUserByName(userName);
     }
 
-    addItems(items: Item[], user: User, store: Store) : Responses.StoreItemsAdditionResponse {
+    addItems(items: Item[], user: RegisteredUser, store: Store) : Responses.StoreItemsAdditionResponse {
         logger.info(`trying to add items to store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
@@ -49,7 +49,7 @@ export class TradingSystemManager {
         }
     }
 
-    removeItems(items: Item[], user: User, store: Store) : Responses.StoreItemsRemovalResponse {
+    removeItems(items: Item[], user: RegisteredUser, store: Store) : Responses.StoreItemsRemovalResponse {
         logger.info(`trying to remove items from store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
@@ -71,7 +71,7 @@ export class TradingSystemManager {
         }
     }
 
-    removeProductsWithQuantity(products : Map<Product, number>, user: User, store: Store) : Responses.StoreProductRemovalResponse {
+    removeProductsWithQuantity(products : Map<Product, number>, user: RegisteredUser, store: Store) : Responses.StoreProductRemovalResponse {
         logger.info(`trying to remove items to store: ${JSON.stringify(store)} from user: ${JSON.stringify(user)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
@@ -93,7 +93,7 @@ export class TradingSystemManager {
         }
     }
 
-    addNewProducts(products: Product[], user: User, store: Store) : Responses.StoreProductAdditionResponse {
+    addNewProducts(products: Product[], user: RegisteredUser, store: Store) : Responses.StoreProductAdditionResponse {
         logger.info(`trying to add products to store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`)
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
@@ -115,7 +115,7 @@ export class TradingSystemManager {
         }
     }
 
-    removeProducts(products: Product[], user: User, store: Store) : Responses.StoreProductRemovalResponse {
+    removeProducts(products: Product[], user: RegisteredUser, store: Store) : Responses.StoreProductRemovalResponse {
         logger.info(`trying to remove products from store: ${JSON.stringify(store)} by user: ${JSON.stringify(user)}`)
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];

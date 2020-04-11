@@ -1,6 +1,6 @@
 import { Error } from "./internal_api";
 import { Item, Product } from "../trading_system/internal_api";
-import {User} from "../user/users/User"
+import {RegisteredUser} from "../user/users/RegisteredUser"
 
 interface Response {
   data: any;
@@ -9,7 +9,7 @@ interface Response {
 
 
 interface UserResponse extends Response {
-  data: { user: User};
+  data: { user: RegisteredUser};
 }
 
 interface StoreItemsAdditionResponse extends Response {
