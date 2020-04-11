@@ -15,12 +15,12 @@ export class ExternalSystemsManager {
   }
   
   connectSystem(system:ExternalSystems): BoolResponse {
-     switch(+ExternalSystems){
+     switch(system){
         case (ExternalSystems.DELIVERY):
            return this.deliverySystem.connect();
-         case ExternalSystems.PAYMENT:
+         case (ExternalSystems.PAYMENT):
             return this.paymentSystem.connect();
-         case ExternalSystems.SECURITY:
+         case (ExternalSystems.SECURITY):
             return this.securitySystem.connect();
      }
   }
