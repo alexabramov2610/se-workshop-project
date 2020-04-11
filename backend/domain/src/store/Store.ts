@@ -244,7 +244,7 @@ export class Store {
     }
 
     verifyIsStoreOwner(user: RegisteredUser) : boolean {
-        logger.info(`verifying if user is owner: ${JSON.stringify(user)}`)
+        logger.info(`verifying if user is owner: ${JSON.stringify(user.UUID)}`)
         if (user.getRole() != UserRole.OWNER) {
             logger.warn(`user: ${JSON.stringify(user)} is not an owner of store ${this._UUID}`)
             return false;
@@ -255,46 +255,46 @@ export class Store {
                 return true;
             }
         }
-        logger.warn(`user: ${JSON.stringify(user)} is not an owner of store ${this._UUID}`)
+        logger.warn(`user: ${JSON.stringify(user.UUID)} is not an owner of store ${this._UUID}`)
         return false;
     }
 
     verifyStoreManager(user: RegisteredUser) : boolean {
-        logger.info(`verify if user is manager: ${JSON.stringify(user)}`)
+        logger.info(`verify if user is manager: ${JSON.stringify(user.UUID)}`)
         // if (user.getRole() != UserRole.MANAGER) {
-        //                logger.warn(`user: ${JSON.stringify(user)} is not a manager of store ${this._UUID}`)
+        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
         //     return false;
         // }
         // for (let manager of this._storeManagers) {
         //     if (manager.UUID === user.UUID) {
-        //                        logger.info(`user: ${JSON.stringify(user)} is a manager of store ${this._UUID}`)
+        //                        logger.info(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
         //                        return true;
         //     }
         // }
-        //                logger.warn(`user: ${JSON.stringify(user)} is not a manager of store ${this._UUID}`)
+        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
         return false;
     }
 
     addStoreOwner(user: StoreOwner) :Res.BoolResponse {
         if (user.getRole() === UserRole.OWNER && !this.verifyIsStoreOwner(user)) {
-            logger.info(`adding user: ${JSON.stringify(user)} as an owner of store: ${this._UUID}`)
+            logger.info(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID}`)
             this._storeOwners.push(user);
             return { data: { result:true } }
         }
         else {
-            logger.warn(`adding user: ${JSON.stringify(user)} as an owner of store: ${this._UUID} FAILED!`)
+            logger.warn(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID} FAILED!`)
             return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "owner."} }
         }
     }
 
     // addStoreManager(user: StoreManager) :Responses.StoreManagerAdditionResponse {
     //     if (user.getRole() === UserRole.MANAGER && !this.verifyStoreManager(user)) {
-    //                     logger.info(`adding user: ${JSON.stringify(user)} as a manager of store: ${this._UUID}`)
+    //                     logger.info(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID}`)
     //         this._storeOwners.push(user);
     //         return { data: { result:true } }
     //     }
     //     else {
-    //                     logger.warn(`adding user: ${JSON.stringify(user)} as a manager of store: ${this._UUID} FAILED!`)
+    //                     logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID} FAILED!`)
     //                     return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
     //     }
     // }

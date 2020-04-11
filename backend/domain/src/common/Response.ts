@@ -32,5 +32,4 @@ interface BoolResponse extends Response {
   data: {result: boolean}
 }
 
-
 export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
