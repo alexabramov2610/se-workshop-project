@@ -1,7 +1,7 @@
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../common/Response"
 import {errorMsg as Error} from "../common/Error"
-import { Logger as logger } from "../common/Logger";
+import { logger } from "../common/Logger";
 import {StoreOwner, RegisteredUser} from "../user/internal_api";
 import {UserRole} from "../common/Enums";
 import { v4 as uuid } from 'uuid';
@@ -68,7 +68,6 @@ export class Store {
                 !isIdValid && !isNameValid ? `product name and id are illegal. name: ${product.name}, id: ${product.catalogNumber}` :
                     !isIdValid ? `product id is illegal. id: ${product.catalogNumber}` :
                         !isNameValid ? `product name is illegal. name: ${product.name}` : "";
-            console.log("error: invalid product");
             return {
                 isValid: false, error: error
             }
@@ -285,6 +284,10 @@ export class Store {
             logger.warn(`adding user: ${JSON.stringify(user)} as an owner of store: ${this._UUID} FAILED!`)
             return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "owner."} }
         }
+    }
+
+    setFirstOwner(user: RegisteredUser) :void{
+        this._storeOwners.push(user);
     }
 
     // addStoreManager(user: StoreManager) :Responses.StoreManagerAdditionResponse {

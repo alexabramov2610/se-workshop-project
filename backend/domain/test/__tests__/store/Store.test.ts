@@ -3,6 +3,7 @@ import * as Responses from "../../../src/common/Response";
 import {StoreOwner} from "../../../src/user/internal_api";
 import {Item, Product} from "../../../src/trading_system/internal_api";
 
+
 describe("Store Management Unit Tests", () => {
     let store: Store;
     let storeOwner: StoreOwner;
@@ -10,6 +11,7 @@ describe("Store Management Unit Tests", () => {
     beforeEach(() => {
         store = new Store("store");
         storeOwner = new StoreOwner("name","123123");
+
     });
 
     test("verifyIsStoreOwner success", () => {

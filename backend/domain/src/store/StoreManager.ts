@@ -1,8 +1,6 @@
 import { Store } from './internal_api'
-import * as Responses from '../common/Response'
-import * as Error from '../common/Error'
+import {logger, BoolResponse , Error, UserRole} from '../common/internal_api'
 import { RegisteredUser } from "../user/internal_api";
-import { Logger as logger } from "../common/Logger";
 
 export class StoreManager {
 
@@ -12,15 +10,17 @@ export class StoreManager {
         this._stores = [];
     }
 
-    addStore(store: Store) : Responses.BoolResponse {
-        logger.info(`trying to add store: ${JSON.stringify(store)} to system`)
-        if (this.verifyStore(store)) {
-            this._stores.push(store);
-            logger.info(`successfully added store: ${JSON.stringify(store)} to system`)
+    addStore(storeName: string, owner: RegisteredUser) : BoolResponse {
+        if(storeName !== ''){
+            const newStore = new Store(storeName);
+            newStore.setFirstOwner(owner);
+            owner.setRole(UserRole.OWNER);
+            this._stores.push(newStore);
+            logger.info(`successfully added store: ${JSON.stringify(newStore)} to system`)
             return {data: {result: true}}
         }
         else {
-            logger.warn(`failed adding store ${JSON.stringify(store)} to system`)
+            logger.warn(`failed adding store ${storeName} to system`)
             return {data: {result: false}, error: {message: Error["E_STORE_ADDITION"]}}
         }
     }
@@ -29,7 +29,6 @@ export class StoreManager {
         if (this.verifyStore(store)) {
             for (let currStore of this._stores) {
                 if (currStore.UUID === store.UUID) {
-                    logger.info(`verified store ${JSON.stringify(store)}`)
                     return true;
                 }
             }

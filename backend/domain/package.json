@@ -6,10 +6,14 @@
   "types": "index.d.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
+    "start:silent": "tsc && SILENT=1 node dist/index.js",
     "debug": "tsc && DEBUG=1 node dist/index.js ",
-    "test": "jest",
+    "test": "TEST_MODE=1 jest",
+    "test:silent": "TEST_MODE=1 SILENT=1 jest",
     "clear:test": "jest --clearCache",
-    "test:watch": "npm t -- --watch"
+    "test:watch": "npm t -- --watch",
+    "clean": "rm -rf dist",
+    "clean:hard": "rm -rf dist && rm -rf logs"
   },
   "author": "",
   "license": "ISC",

@@ -2,10 +2,11 @@ import { UserManager, RegisteredUser } from "../user/internal_api";
 import { Item, Product } from "../trading_system/internal_api"
 import { StoreManager, Store } from '../store/internal_api';
 import * as Responses from "../common/Response"
-import {errorMsg as Error} from "../common/Error";
+import {errorMsg as Error, errorMsg} from "../common/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import { BoolResponse,ExternalSystems,Logger } from "../common/internal_api";
-import { Logger as logger } from "../common/Logger";
+import { BoolResponse,ExternalSystems,logger,OpenStoreRequest } from "../common/internal_api";
+
+
 
 export class TradingSystemManager {
     private userManager: UserManager;
@@ -138,13 +139,13 @@ export class TradingSystemManager {
     }
 
     connectDeliverySys(): BoolResponse{
-        Logger.info('Trying to connect to delivery system');
+        logger.info('Trying to connect to delivery system');
         const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.DELIVERY);
         return res;
     }
 
     connectPaymentSys(): BoolResponse{
-        Logger.info('Trying to connect to payment system');
+        logger.info('Trying to connect to payment system');
         const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.PAYMENT);
         return res;
     }
@@ -152,6 +153,15 @@ export class TradingSystemManager {
     setAdmin(userName: string): BoolResponse{
         logger.info(`trying set ${userName} as an admin`)
         const res:BoolResponse = this.userManager.setAdmin(userName);
+        return res;
+    }
+
+    createStore(storeReq: OpenStoreRequest) : BoolResponse{
+        logger.info(`user ${storeReq.requestor} trying open store: ${storeReq.body.storeName}`)
+        const u: RegisteredUser = this.userManager.getUserByName(storeReq.requestor);
+        if(!u) return {data: {result:false}, error:{message: errorMsg['E_NOT_AUTHORIZED']}}
+        if(!this.userManager.isLoggedIn(u)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
+        const res:BoolResponse = this.storeManager.addStore(storeReq.body.storeName, u);
         return res;
     }
 

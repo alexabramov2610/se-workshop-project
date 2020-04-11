@@ -4,12 +4,13 @@ import { BoolResponse,errorMsg} from "../../common/internal_api";
 export class DeliverySystem{
    private deliverySys : any;
    private name: string;
+
    constructor(){
       this.name = "Delivery System"
       this.deliverySys=null;
       
    }
-   setDeliverySys(real: any){
+   setDeliverySys(real: any) : void{
       this.deliverySys=real;
    }
 
