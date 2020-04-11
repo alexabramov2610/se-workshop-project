@@ -1,6 +1,7 @@
 import { Error } from "./internal_api";
 import { Item, Product } from "../trading_system/internal_api";
 import {RegisteredUser} from "../user/users/RegisteredUser"
+import { StoreOwner } from "../user/internal_api";
 
 interface Response {
   data: any;
@@ -32,5 +33,13 @@ interface BoolResponse extends Response {
   data: {result: boolean}
 }
 
+interface StoreInfoResponse extends Response{
+  data:{result:boolean,info:{storeName:string,storeOwners:StoreOwner[],products:Product[]}}
+}
 
-export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };
+interface ProductInfoResponse extends Response{
+  data:{result:boolean,info:{name:string,catalogNumber:number,price:number}}
+}
+
+
+export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse,StoreInfoResponse,ProductInfoResponse };

@@ -320,6 +320,31 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    test("view store info seccess",()=>{
+
+        let dor=new StoreOwner("dor","9815616")
+        let chair=new Product("chair",6)
+        store.addStoreOwner(dor)
+        store.addNewProducts([chair])
+
+        const res=store.viewStoreInfo()
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.info).toStrictEqual({storeName:store.storeName,storeOwners:[dor],products:[chair]})
+
+
+    })
+
+    test("view product info seccess",()=>{
+
+        let game=new Product("YO-YO",5)
+        game.price=20.5;
+        const res=game.viewInfo()
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.info).toEqual({name:"YO-YO",catalogNumber:5,price:20.5})
+
+    })
+
+
     function generateValidProducts(numOfItems: number): Product[] {
         let products: Product[] = [];
         for (let i = 1; i < numOfItems +1; i ++)

@@ -1,3 +1,4 @@
+import * as Res from "../../common/Response"
 export class Product {
     private readonly _catalogNumber: number;
     private readonly _name: string;
@@ -8,8 +9,8 @@ export class Product {
         this._catalogNumber = catalogNumber;
     }
 
-    set price(price: number) {
-        this.price = price;
+    set price(newPrice: number) {
+        this._price = newPrice;
     }
 
     get price(): number {
@@ -27,6 +28,11 @@ export class Product {
     isEqual(other: Product): Boolean {
         return this._catalogNumber === other._catalogNumber;
     }
+
+    viewInfo():Res.ProductInfoResponse{
+        return{data:{result:true,info:{name:this._name,catalogNumber:this._catalogNumber,price:this._price}}}
+    }
+
 
 
 }

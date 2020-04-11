@@ -287,6 +287,20 @@ export class Store {
         }
     }
 
+
+    // viewStoreInfo():Res.StoreInfoResponse{
+    //     let info="Store Name:"+this.storeName+"\nStore Owners:";
+    //      this._storeOwners.forEach(owner => {info=info+owner.name+" , "});
+    //      //add items? 
+    //     return{data:{result:true,info}}
+    // }
+
+    viewStoreInfo():Res.StoreInfoResponse{
+        let prod = Array.from( this.products.keys() );
+        return {data:{result:true,info:{storeName:this.storeName,storeOwners:this._storeOwners,products:prod}}}
+    }
+
+   
     // addStoreManager(user: StoreManager) :Responses.StoreManagerAdditionResponse {
     //     if (user.getRole() === UserRole.MANAGER && !this.verifyStoreManager(user)) {
     //                     logger.info(`adding user: ${JSON.stringify(user)} as a manager of store: ${this._UUID}`)

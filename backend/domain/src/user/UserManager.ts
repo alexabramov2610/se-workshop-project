@@ -1,6 +1,8 @@
 import {UserRole} from "../common/Enums";
 import { BoolResponse,errorMsg } from "../common/internal_api";
 import { RegisteredUser,Admin, Buyer } from "./internal_api";
+import { Logger as logger } from "../common/Logger";
+
 
 class UserManager {
   private registeredUsers: RegisteredUser[];
@@ -14,7 +16,10 @@ class UserManager {
   }
 
   register(userName,password): BoolResponse {
+    logger.info(`registering new user : ${userName} ${password} `);
+
     if(this.getUserByName(userName)){    //user already in system
+      logger.info(`fail to register ,${userName} already exist `);
       return {data:{result:false},error:{message:errorMsg['E_AT']}}
     }
      else if(!this.vaildPassword(password)){   
@@ -22,6 +27,8 @@ class UserManager {
      }
     else{
     this.registeredUsers.concat([new Buyer(userName,password)]);
+    logger.info(`${userName} has registed to the system `);
+
     return { data: { result: true } };
     }}
   
@@ -30,12 +37,15 @@ class UserManager {
   login(userName:string,password:string): BoolResponse{
     
     if(!(this.getUserByName(userName))){ 
+      logger.info(`fail to login ,${userName} not found `);
       return {data:{result:false},error:{message:errorMsg['E_NF']}}  //not found
     }
     else if(!this.verifyPassword(userName,password)){
+      logger.info(`fail to login ${userName} ,bad password `);
       return {data:{result:false},error:{message:errorMsg['E_BP']}} //bad pass
     }
     else if(this.getLoggedInUsers().find((u)=>u.name===userName)){ //already logged in 
+      logger.info(`fail to login ,${userName} is allredy logged in `);
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
 
     }
@@ -50,12 +60,16 @@ class UserManager {
 
 
   logout(userName:string):BoolResponse{
+    logger.info(`logging out ${userName}  `);
     const loggedInUsers=this.getLoggedInUsers()
     if(!loggedInUsers.filter( (u: RegisteredUser) => u.name === userName ).pop()){ //user not logged in
+      logger.info(`logging out ${userName} fail, user is not logged in  `);
+
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
     }
     else{
     this.loggedInUsers=this.loggedInUsers.filter((u)=>u.name!==userName)
+    logger.info(`logging out ${userName} seccess `);
     return {data:{result:true}}
     }
   }
