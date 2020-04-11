@@ -27,7 +27,7 @@ describe("Store Management Unit Tests", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const verifyBool: boolean = true;
-        const storeRes: Responses.StoreItemsAdditionResponse = {data: {result: true, ItemsNotAdded: []} };
+        const storeRes: Responses.StoreItemsAdditionResponse = {data: {result: true, itemsNotAdded: []} };
 
         prepareMocksForInventoryManagement(verifyBool, verifyBool, verifyBool, verifyBool);
         jest.spyOn(store, "addItems").mockReturnValue(storeRes);
@@ -93,7 +93,7 @@ describe("Store Management Unit Tests", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const verifyBool: boolean = true;
-        const storeRes: Responses.StoreItemsRemovalResponse = {data: {result: true, ItemsNotRemoved: []} };
+        const storeRes: Responses.StoreItemsRemovalResponse = {data: {result: true, itemsNotRemoved: []} };
 
         prepareMocksForInventoryManagement(verifyBool, verifyBool, verifyBool, verifyBool);
         jest.spyOn(store, "removeItems").mockReturnValue(storeRes);
@@ -165,7 +165,7 @@ describe("Store Management Unit Tests", () => {
         }
 
         const verifyBool: boolean = true;
-        const storeRes: Responses.StoreProductRemovalResponse = {data: {result: true, ProductsNotRemoved: [] } };
+        const storeRes: Responses.StoreProductRemovalResponse = {data: {result: true, productsNotRemoved: [] } };
 
         prepareMocksForInventoryManagement(verifyBool, verifyBool, verifyBool, verifyBool);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(storeRes);
@@ -246,7 +246,7 @@ describe("Store Management Unit Tests", () => {
         const numOfItems: number = 5;
         const products: Product[] = generateProducts(numOfItems);
         const verifyBool: boolean = true;
-        const storeRes: Responses.StoreProductAdditionResponse = {data: {result: true, ProductsNotAdded: [] } };
+        const storeRes: Responses.StoreProductAdditionResponse = {data: {result: true, productsNotAdded: [] } };
 
         prepareMocksForInventoryManagement(verifyBool, verifyBool, verifyBool, verifyBool);
         jest.spyOn(store, "addNewProducts").mockReturnValue(storeRes);
@@ -314,7 +314,7 @@ describe("Store Management Unit Tests", () => {
         const numOfItems: number = 5;
         const products: Product[] = generateProducts(numOfItems);
         const verifyBool: boolean = true;
-        const storeRes: Responses.StoreProductRemovalResponse = {data: {result: true, ProductsNotRemoved: [] } };
+        const storeRes: Responses.StoreProductRemovalResponse = {data: {result: true, productsNotRemoved: [] } };
 
         prepareMocksForInventoryManagement(verifyBool, verifyBool, verifyBool, verifyBool);
         jest.spyOn(store, "removeProducts").mockReturnValue(storeRes);

@@ -13,19 +13,19 @@ interface UserResponse extends Response {
 }
 
 interface StoreItemsAdditionResponse extends Response {
-  data: {result: boolean, ItemsNotAdded: Item[] }
+  data: {result: boolean, itemsNotAdded: Item[] }
 }
 
 interface StoreItemsRemovalResponse extends Response {
-  data: {result: boolean, ItemsNotRemoved: Item[] }
+  data: {result: boolean, itemsNotRemoved: Item[] }
 }
 
 interface StoreProductAdditionResponse extends Response {
-  data: {result: boolean, ProductsNotAdded: Product[] }
+  data: {result: boolean, productsNotAdded: Product[] }
 }
 
 interface StoreProductRemovalResponse extends Response {
-  data: {result: boolean, ProductsNotRemoved: Product[] }
+  data: {result: boolean, productsNotRemoved: Product[] }
 }
 
 interface BoolResponse extends Response {

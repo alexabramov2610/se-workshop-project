@@ -32,17 +32,17 @@ export class TradingSystemManager {
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.error(error);
-            return { data: { result: false, ItemsNotAdded: items } , error: { message: error}};
+            return { data: { result: false, itemsNotAdded: items } , error: { message: error}};
         }
         else if (!this.storeManager.verifyStoreExists(store)){
             const error = Error['E_INVALID_STORE'];
             logger.error(error);
-            return { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_INVALID_STORE']}};
+            return { data: { result: false, itemsNotAdded: items } , error: { message: Error['E_INVALID_STORE']}};
         }
         else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
             const error = Error['E_NOT_AUTHORIZED'];
             logger.error(error);
-            return { data: { result: false, ItemsNotAdded: items } , error: { message: Error['E_NOT_AUTHORIZED']}};
+            return { data: { result: false, itemsNotAdded: items } , error: { message: Error['E_NOT_AUTHORIZED']}};
         }
         else {
             return store.addItems(items);
@@ -54,17 +54,17 @@ export class TradingSystemManager {
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.error(error);
-            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+            return { data: { result: false, itemsNotRemoved: items } , error: { message: error}};
         }
         else if (!this.storeManager.verifyStoreExists(store)){
             const error = Error['E_INVALID_STORE'];
             logger.error(error);
-            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+            return { data: { result: false, itemsNotRemoved: items } , error: { message: error}};
         }
         else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
             const error = Error['E_NOT_AUTHORIZED'];
             logger.error(error);
-            return { data: { result: false, ItemsNotRemoved: items } , error: { message: error}};
+            return { data: { result: false, itemsNotRemoved: items } , error: { message: error}};
         }
         else {
             return store.removeItems(items);
@@ -76,17 +76,17 @@ export class TradingSystemManager {
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
         }
         else if (!this.storeManager.verifyStoreExists(store)){
             const error = Error['E_INVALID_STORE'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
         }
         else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
             const error = Error['E_NOT_AUTHORIZED'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
         }
         else {
             return store.removeProductsWithQuantity(products);
@@ -98,17 +98,17 @@ export class TradingSystemManager {
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.error(error);
-            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+            return { data: { result: false, productsNotAdded: products } , error: { message: error}};
         }
         else if (!this.storeManager.verifyStoreExists(store)){
             const error = Error['E_INVALID_STORE'];
             logger.error(error);
-            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+            return { data: { result: false, productsNotAdded: products } , error: { message: error}};
         }
         else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
             const error = Error['E_NOT_AUTHORIZED'];
             logger.error(error);
-            return { data: { result: false, ProductsNotAdded: products } , error: { message: error}};
+            return { data: { result: false, productsNotAdded: products } , error: { message: error}};
         }
         else {
             return store.addNewProducts(products);
@@ -120,17 +120,17 @@ export class TradingSystemManager {
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: products } , error: { message: error}};
         }
         else if (!this.storeManager.verifyStoreExists(store)){
             const error = Error['E_INVALID_STORE'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: products } , error: { message: error}};
         }
         else if (!(this.storeManager.verifyStoreOwner(store, user) || this.storeManager.verifyStoreManager(store, user))) {
             const error = Error['E_NOT_AUTHORIZED'];
             logger.error(error);
-            return { data: { result: false, ProductsNotRemoved: products } , error: { message: error}};
+            return { data: { result: false, productsNotRemoved: products } , error: { message: error}};
         }
         else {
             return store.removeProducts(products);

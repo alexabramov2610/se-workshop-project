@@ -97,14 +97,14 @@ export class Store {
         if (addedItems.length === 0) { // failed adding
             logger.error(`failed adding all requested ${items.length} items to store id: ${this._UUID}`)
             return {
-                data: {result: false, ItemsNotAdded: items },
+                data: {result: false, itemsNotAdded: items },
                 error: {message: Error['E_ITEMS_ADD']}
             }
         }
         else {
             logger.info(`added ${items.length - notAddedItems.length} of ${items.length} request items to store id: ${this._UUID}`)
             return {
-                data: {result: true, ItemsNotAdded: notAddedItems }}
+                data: {result: true, itemsNotAdded: notAddedItems }}
             }
     }
 
@@ -134,14 +134,14 @@ export class Store {
         if (notRemovedItems.length === items.length) { // failed removing
             logger.error(`failed removing all requested ${items.length} items from store id: ${this._UUID}`)
             return {
-                data: {result: false, ItemsNotRemoved: items },
+                data: {result: false, itemsNotRemoved: items },
                 error: {message: Error['E_ITEMS_REM']}
             }
         }
         else {
             logger.info(`removed ${items.length - notRemovedItems.length} of ${items.length} request items from store id: ${this._UUID}`)
             return {
-                data: {result: true, ItemsNotRemoved: notRemovedItems }}
+                data: {result: true, itemsNotRemoved: notRemovedItems }}
         }
     }
 
@@ -164,14 +164,14 @@ export class Store {
         if (notRemovedProducts.length === products.size) { // failed removing
             logger.error(`failed removing all requested ${products.size} products from store id: ${this._UUID}`)
             return {
-                data: {result: false, ProductsNotRemoved: notRemovedProducts },
+                data: {result: false, productsNotRemoved: notRemovedProducts },
                 error: {message: Error['E_PROD_REM']}
             }
         }
         else {
             logger.info(`removed ${products.size - notRemovedProducts.length} of ${products.size} request products from store id: ${this._UUID}`)
             return {
-                data: {result: true, ProductsNotRemoved: notRemovedProducts }}
+                data: {result: true, productsNotRemoved: notRemovedProducts }}
         }
 
     }
@@ -195,14 +195,14 @@ export class Store {
         if (invalidProducts.length === products.length) { //failed adding
             logger.error(`failed adding all requested ${products.length} products to store id: ${this._UUID}`)
             return {
-                data: {result: false, ProductsNotAdded: invalidProducts},
+                data: {result: false, productsNotAdded: invalidProducts},
                 error: {message: Error['E_PROD_ADD']}
             }
         }
         else {
             logger.info(`added ${products.length - invalidProducts.length} of ${products.length} request products to store id: ${this._UUID}`)
             return {
-                data: {result: true, ProductsNotAdded: invalidProducts}
+                data: {result: true, productsNotAdded: invalidProducts}
             }
         }
     }
@@ -231,14 +231,14 @@ export class Store {
         if (productsNotRemoved.length === products.length) {
             logger.error(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
             return {
-                data: {result: false, ProductsNotRemoved: productsNotRemoved},
+                data: {result: false, productsNotRemoved: productsNotRemoved},
                 error: {message: Error['E_PROD_REM']}
             };
         }
         else {
             logger.info(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store id: ${this._UUID}`)
             return {
-                data: {result: true, ProductsNotRemoved: productsNotRemoved}
+                data: {result: true, productsNotRemoved: productsNotRemoved}
             };
         }
     }
