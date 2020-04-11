@@ -1,22 +1,28 @@
-import {Store, StoreManagement} from "../../src/store/internal_api";
-import * as Responses from "../../src/common/Response";
-import {StoreOwner, UserManagement} from "../../src/user/internal_api";
-import {TradingSystem} from "../../src/trading_system/TradingSystem";
-import {Item, Product} from "../../src/trading_system/internal_api";
+import {Store} from "../../../src/store/internal_api";
+import * as Responses from "../../../src/common/Response";
+import {StoreOwner} from "../../../src/user/internal_api";
+import {Item, Product} from "../../../src/trading_system/internal_api";
 
 describe("Store Management Unit Tests", () => {
-    let tradingSystem: TradingSystem;
     let store: Store;
-    let user: StoreOwner;
-    let userManagement: UserManagement;
-    let storeManagement: StoreManagement;
+    let storeOwner: StoreOwner;
 
     beforeEach(() => {
-        tradingSystem = new TradingSystem();
-        store = new Store("store", 5);
-        user = new StoreOwner("name","123123");
-        userManagement = new UserManagement();
+        store = new Store("store");
+        storeOwner = new StoreOwner("name","123123");
     });
+
+    test("verifyIsStoreOwner success", () => {
+        const res: Responses.BoolResponse = store.addStoreOwner(storeOwner);
+        expect(res.data.result).toBeTruthy();
+
+        expect(store.verifyIsStoreOwner(storeOwner)).toBeTruthy();
+    })
+
+    test("verifyIsStoreOwner failure", () => {
+        expect(store.verifyIsStoreOwner(storeOwner)).toBeFalsy();
+    })
+
 
     test("addNewProducts success", () => {
         let products: Product[] = generateValidProducts(5);
@@ -109,7 +115,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
     });
 
@@ -120,7 +126,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeFalsy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(numberOfItems);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
     });
 
     test("addItems success - some in store", () => {
@@ -135,7 +141,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(numberOfItems);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
 
     });
 
@@ -151,11 +157,11 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
         let removeItemsRes: Responses.StoreItemsRemovalResponse = store.removeItems(items);
         expect(removeItemsRes.data.result).toBeTruthy();
-        expect(removeItemsRes.data.ItemsNotRemoved.length).toBe(0);
+        expect(removeItemsRes.data.itemsNotRemoved.length).toBe(0);
 
     });
 
@@ -171,13 +177,13 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
         items.length = numberOfItems;
 
         let removeItemsRes: Responses.StoreItemsRemovalResponse = store.removeItems(items);
         expect(removeItemsRes.data.result).toBeTruthy();
-        expect(removeItemsRes.data.ItemsNotRemoved.length).toBe(0);
+        expect(removeItemsRes.data.itemsNotRemoved.length).toBe(0);
 
         let productsInStore: Map<Product, Item[]> = store.products;
         for (let items of productsInStore.values()) {
@@ -198,7 +204,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsRemovalResponse = store.removeItems(items);
         expect(addItemsRes.data.result).toBeFalsy();
-        expect(addItemsRes.data.ItemsNotRemoved.length).toBe(numberOfItems*2);
+        expect(addItemsRes.data.itemsNotRemoved.length).toBe(numberOfItems*2);
 
     });
 
@@ -214,7 +220,7 @@ describe("Store Management Unit Tests", () => {
 
         let removeItemsRes: Responses.StoreItemsRemovalResponse = store.removeItems(items);
         expect(removeItemsRes.data.result).toBeFalsy();
-        expect(removeItemsRes.data.ItemsNotRemoved.length).toBe(numberOfItems);
+        expect(removeItemsRes.data.itemsNotRemoved.length).toBe(numberOfItems);
         expect(removeItemsRes.error).toBeDefined();
     });
 
@@ -230,7 +236,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
         products = generateValidProducts(numberOfItems);
         let removeProducts :Map<Product, number> = new Map();
@@ -263,7 +269,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
         products = generateValidProducts(numberOfItems);
         let removeProducts: Map<Product, number> = new Map();
@@ -294,7 +300,7 @@ describe("Store Management Unit Tests", () => {
 
         let addItemsRes: Responses.StoreItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
-        expect(addItemsRes.data.ItemsNotAdded.length).toBe(0);
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
         products = generateValidProducts(numberOfItems*2);
         let removeProducts: Map<Product, number> = new Map();

@@ -1,6 +1,6 @@
 export { Error } from "./Error";
-export { Response, RegisterResponse } from "./Response";
-export { UserRole } from "./Enums"
+export { Response, BoolResponse } from "./Response";
+export { UserRole } from "./Enums";
 
 
 export * from "./Error";

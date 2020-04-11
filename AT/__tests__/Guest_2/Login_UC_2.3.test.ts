@@ -1,9 +1,9 @@
 import { Bridge, Driver } from "../../src/";
 import { AuthDetails } from "../../src/test_env/types";
 
-// const UNREGISTERED_USER = "User is not registered";
+// const UNREGISTERED_USER = "RegisteredUser is not registered";
 // const INCORRECT_PASSWORD = "Password is incorrect";
-// const ALREADY_LOGGED_IN = "User is already logged in";
+// const ALREADY_LOGGED_IN = "RegisteredUser is already logged in";
 
 describe("Guest Login, UC: 2.3", () => {
   let _serviceBridge: Bridge;
