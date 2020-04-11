@@ -1,4 +1,5 @@
 import winston from 'winston'
+import daily from 'winston-daily-rotate-file'
 const format = winston.format;
 /*
   emerg: 0, 
@@ -23,8 +24,8 @@ export const Logger = winston.createLogger({
   transports: [
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `debug` and below to `events.log`
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error', }), 
-    new winston.transports.File({ filename: 'logs/events.log', level: process.env.DEBUG? 'debug' : 'info',
+    new daily({ filename: `logs/error-%DATE%.log`, level: 'error', }), 
+    new daily({ filename: 'logs/events-%DATE%.log', level: process.env.DEBUG? 'debug' : 'info',
 }),
     new winston.transports.Console({
     format: myFormat,

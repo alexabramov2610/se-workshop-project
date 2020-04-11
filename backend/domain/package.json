@@ -23,6 +23,7 @@
     "winston": "^3.2.1"
   },
   "dependencies": {
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "winston-daily-rotate-file": "^4.4.2"
   }
 }
