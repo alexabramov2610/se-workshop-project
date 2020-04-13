@@ -12,8 +12,10 @@ const format = winston.format;
   debug: 7
 */
 //npm run debug - start in debug mode
-//Logger.debug('Debug messag');
-//Logger.error('Error messag');
+//logger.debug('Debug messag');
+//logger.error('Error messag');
+
+
 const myFormat = format.printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}]:\t${message}`;
 });
@@ -29,7 +31,9 @@ export const logger = winston.createLogger({
     // - Write all logs with level `debug` and below to `events.log`
     new daily({ filename: test_mode? `logs/%DATE%/error-TEST.log`:`logs/%DATE%/error-%DATE%.log`, level: 'error', silent}),
     new daily({ filename: test_mode? `logs/%DATE%/events-TEST%DATE%.log`: 'logs/%DATE%/events-%DATE%.log', level: debug? 'debug' : 'info',silent: silent
+
 }),
+
     new winston.transports.Console({format: myFormat,level: debug? 'debug' : 'info', silent: silent})
   ]
 });
