@@ -27,4 +27,4 @@ const errorMsg:ErrorMessages = {
 
 };
 
-export { Error, ErrorMessages,errorMsg };
+export { Error, ErrorMessages, errorMsg };
