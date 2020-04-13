@@ -1,6 +1,6 @@
 import { UserManagerDriver } from "../../helpers/UserManager.driver";
-import * as Responses from "../../../src/common/internal_api";
-import { logger } from "../../../src/common/internal_api";
+import * as Responses from "../../../src/api-int/internal_api";
+import { logger } from "../../../src/api-int/internal_api";
 
 describe("RegisteredUser Management Unit Tests", () => {
   let driver: UserManagerDriver;

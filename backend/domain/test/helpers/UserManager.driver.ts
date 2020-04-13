@@ -1,5 +1,5 @@
 import {UserManager, Buyer, RegisteredUser} from "../../src/user/internal_api";
-import { Response } from "../../src/common/internal_api";
+import { Response } from "../../src/api-int/internal_api";
 export class UserManagerDriver {
  
   

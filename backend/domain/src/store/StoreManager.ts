@@ -1,6 +1,10 @@
 import { Store } from './internal_api'
-import { logger, BoolResponse , errorMsg , UserRole} from '../common/internal_api'
+import { logger, BoolResponse , errorMsg , UserRole} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner} from "../user/internal_api";
+import {Item, Product} from "../trading_system/internal_api";
+import * as Res from "../api-ext/Response";
+import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../api-ext/CommonInterface";
+import * as Req from "../api-ext/Request";
 
 export class StoreManager {
 
@@ -25,15 +29,12 @@ export class StoreManager {
         }
     }
 
-    verifyStoreExists(store: Store) : boolean {
-        if (this.verifyStore(store)) {
-            for (let currStore of this._stores) {
-                if (currStore.UUID === store.UUID) {
-                    return true;
-                }
-            }
+    verifyStoreExists(storeName: string) : boolean {
+        for (let store of this._stores) {
+            if (store.storeName === storeName)
+                return true;
         }
-        logger.warn(`could not verify store ${JSON.stringify(store.UUID)}`)
+        logger.warn(`could not verify store ${storeName}`);
         return false;
     }
 
@@ -41,38 +42,91 @@ export class StoreManager {
         return store.storeName && store.storeName !== '' && store.UUID && store.UUID !== '';
     }
 
-    verifyStoreOwner(store: Store, user: RegisteredUser) : boolean {
-        return store.verifyIsStoreOwner(user);
+    verifyStoreOwner(storeName: string, user: RegisteredUser) : boolean {
+        const store: Store = this.findStoreByName(storeName);
+        return store ? store.verifyIsStoreOwner(user) : false;
     }
 
-    verifyStoreManager(store: Store, user: RegisteredUser) : boolean {
-        return store.verifyStoreManager(user);
+    verifyStoreManager(storeName: string, user: RegisteredUser) : boolean {
+        const store: Store = this.findStoreByName(storeName);
+        return store ? store.verifyIsStoreManager(user) : false;
     }
 
-    verifyStoreOperation(store: Store, user: RegisteredUser) : BoolResponse {
-        if (!this.verifyStoreExists(store)) {
-            const error = errorMsg['E_INVALID_STORE'];
-            logger.warn(error);
-            return { data: { result: false } , error: { message: error}};
+    verifyStoreOperation(storeName: string, user: RegisteredUser) : BoolResponse {
+        const error: string = !this.verifyStoreExists(storeName) ? errorMsg['E_INVALID_STORE'] :
+            !this.verifyStoreOwner(storeName, user) ? errorMsg['E_NOT_AUTHORIZED'] :
+                !this.verifyStoreManager(storeName, user) ? errorMsg['E_NOT_AUTHORIZED'] : undefined;
+
+        return error ? { data: { result: false }, error: { message: error } } : { data: { result: true } };
+    }
+
+    addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]) : Res.ItemsAdditionResponse {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+
+        if (operationValid.error) {
+            return { data: {result: false, itemsNotAdded: itemsReq}, error: operationValid.error };
         }
-        else if (!(this.verifyStoreOwner(store, user) || this.verifyStoreManager(store, user))) {
-            const error = errorMsg['E_NOT_AUTHORIZED'];
-            logger.warn(error);
-            return { data: { result: false } , error: { message: error}};
-        }
-        return { data: { result: true } }
+
+        const store: Store = this.findStoreByName(storeName);
+        const items: Item[] = this.getItemsFromRequest(itemsReq);
+        return store.addItems(items);
     }
 
-    assignStoreOwner(store: Store, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
+    removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]) : Res.ItemsRemovalResponse {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+        if (operationValid.error) {
+            return { data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error };
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+        const items: Item[] = this.getItemsFromRequest(itemsReq);
+        return store.removeItems(items);
+
+    }
+
+    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]) : Res.ProductRemovalResponse {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+        if (operationValid.error) {
+            return { data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error };
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+        return store.removeProductsWithQuantity(productsReq);
+    }
+
+    addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]) : Res.ProductAdditionResponse {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+        if (operationValid.error) {
+            return { data: {result: false, productsNotAdded: productsReq}, error: operationValid.error };
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+        const products: Product[] = this.getProductsFromRequest(productsReq);
+        return store.addNewProducts(products);
+    }
+
+    removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]) : Res.ProductRemovalResponse {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+        if (operationValid.error) {
+            return { data: {result: false, productsNotRemoved: products}, error: operationValid.error };
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+        return store.removeProductsByCatalogNumber(products);
+    }
+
+    assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:
-                ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)} `)
+                ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)} `)
 
-        const operationValid: BoolResponse = this.verifyStoreOperation(store, userWhoAssigns);
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, userWhoAssigns);
         if (operationValid.error) {
             logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
-                ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}. error: ${operationValid.error.message}`);
+                ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}. error: ${operationValid.error.message}`);
             return operationValid;
         }
+
+        const store: Store = this.findStoreByName(storeName);
 
         if (store.verifyIsStoreOwner(userToAssign)) {   // already store owner
             const error = errorMsg['E_AL'];
@@ -81,9 +135,38 @@ export class StoreManager {
             return {data : {result: false}, error : {message : error}};
         }
 
-        logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}, assigned by user ${userWhoAssigns.UUID}`)
+        logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
         return store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password));    //TODO: fix new StoreOwner
 
+    }
+
+    findStoreByName(storeName: string): Store {
+        for (let store of this._stores) {
+            if (store.storeName === storeName)
+                return store;
+        }
+
+        return undefined;
+    }
+
+    private getProductsFromRequest(productsReq: ProductReq[]) : Product[] {
+        let products: Product[] = [];
+        for (let productReq of productsReq){
+            const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price);
+            products.push(product);
+        }
+
+        return products;
+    }
+
+    private getItemsFromRequest(itemsReq: ItemReq[]) : Item[] {
+        let items: Item[] = [];
+        for (let itemReq of itemsReq){
+            const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
+            items.push(item);
+        }
+
+        return items;
     }
 
 }

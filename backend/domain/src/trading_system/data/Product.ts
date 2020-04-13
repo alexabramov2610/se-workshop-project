@@ -3,9 +3,10 @@ export class Product {
     private readonly _name: string;
     private _price: number;
 
-    constructor(name: string, catalogNumber: number) {
+    constructor(name: string, catalogNumber: number, price: number)  {
         this._name = name;
         this._catalogNumber = catalogNumber;
+        this._price = price;
     }
 
     set price(price: number) {

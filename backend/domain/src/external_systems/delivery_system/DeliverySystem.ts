@@ -1,4 +1,4 @@
-import { BoolResponse,errorMsg} from "../../common/internal_api";
+import { BoolResponse,errorMsg} from "../../api-int/internal_api";
 
 
 export class DeliverySystem{
