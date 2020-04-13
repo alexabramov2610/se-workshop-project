@@ -1,4 +1,5 @@
 import winston from 'winston'
+import daily from 'winston-daily-rotate-file'
 const format = winston.format;
 /*
   emerg: 0, 
@@ -16,19 +17,19 @@ const format = winston.format;
 const myFormat = format.printf(({ level, message, timestamp }) => {
   return `${timestamp} [${level.toUpperCase()}]:\t${message}`;
 });
-export const Logger = winston.createLogger({
+const silent = process.env.SILENT? true: false;
+const debug = process.env.DEBUG? true: false;
+const test_mode = process.env.TEST_MODE? true:false;
+export const logger = winston.createLogger({
    level: process.env.DEBUG? 'debug' : 'info',
    
   format: format.combine(format.json(),format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),myFormat),
   transports: [
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `debug` and below to `events.log`
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error', }), 
-    new winston.transports.File({ filename: 'logs/events.log', level: process.env.DEBUG? 'debug' : 'info',
+    new daily({ filename: test_mode? `logs/%DATE%/error-TEST.log`:`logs/%DATE%/error-%DATE%.log`, level: 'error', silent}),
+    new daily({ filename: test_mode? `logs/%DATE%/events-TEST%DATE%.log`: 'logs/%DATE%/events-%DATE%.log', level: debug? 'debug' : 'info',silent: silent
 }),
-    new winston.transports.Console({
-    format: myFormat,
-      level: process.env.DEBUG? 'debug' : 'info',
-})
+    new winston.transports.Console({format: myFormat,level: debug? 'debug' : 'info', silent: silent})
   ]
 });
