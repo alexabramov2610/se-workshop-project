@@ -3,7 +3,7 @@ import {Response} from "./Response";
 
 interface Request {
   body: any;
-  requester: string;
+  token: string;
 }
 
 

@@ -35,66 +35,66 @@ export class TradingSystemManager {
     }
 
     addItems(req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse {
-        logger.info(`trying to add items to store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.requester)}`);
+        logger.info(`trying to add items to store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.token)}`);
 
-        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
 
         if (userVerification.error)
             return { data: {result: false, itemsNotAdded: req.body.items} , error: userVerification.error};
 
-        return this.storeManager.addItems(this.userManager.getUserByToken(req.requester), req.body.storeName, req.body.items);
+        return this.storeManager.addItems(this.userManager.getUserByToken(req.token), req.body.storeName, req.body.items);
 
     }
 
     removeItems(req: Req.ItemsRemovalRequest) : Res.ItemsRemovalResponse {
-        logger.info(`trying to remove items from store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.requester)}`);
+        logger.info(`trying to remove items from store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.token)}`);
 
-        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
 
         if (userVerification.error)
             return { data: {result: false, itemsNotRemoved: req.body.items} , error: userVerification.error};
 
-        return this.storeManager.removeItems(this.userManager.getUserByToken(req.requester), req.body.storeName, req.body.items);
+        return this.storeManager.removeItems(this.userManager.getUserByToken(req.token), req.body.storeName, req.body.items);
     }
 
     removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity) : Res.ProductRemovalResponse {
-        logger.info(`trying to remove items to store: ${JSON.stringify(req.body.storeName)} from user: ${JSON.stringify(req.requester)}`);
+        logger.info(`trying to remove items to store: ${JSON.stringify(req.body.storeName)} from user: ${JSON.stringify(req.token)}`);
 
-        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
 
         if (userVerification.error)
             return { data: {result: false, productsNotRemoved: req.body.products} , error: userVerification.error};
 
-        return this.storeManager.removeProductsWithQuantity(this.userManager.getUserByToken(req.requester), req.body.storeName, req.body.products);
+        return this.storeManager.removeProductsWithQuantity(this.userManager.getUserByToken(req.token), req.body.storeName, req.body.products);
     }
 
     addNewProducts(req: Req.AddProductsRequest) : Res.ProductAdditionResponse {
-        logger.info(`trying to add products to store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.requester)}`)
+        logger.info(`trying to add products to store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.token)}`)
 
-        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
 
         if (userVerification.error)
             return { data: {result: false, productsNotAdded: req.body.products} , error: userVerification.error};
 
-        return this.storeManager.addNewProducts(this.userManager.getUserByToken(req.requester), req.body.storeName, req.body.products);
+        return this.storeManager.addNewProducts(this.userManager.getUserByToken(req.token), req.body.storeName, req.body.products);
     }
 
     removeProducts(req: Req.ProductRemovalRequest) : Res.ProductRemovalResponse {
-        logger.info(`trying to remove products from store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.requester)}`);
+        logger.info(`trying to remove products from store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.token)}`);
 
-        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const userVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
 
         if (userVerification.error)
             return { data: {result: false, productsNotRemoved: req.body.products} , error: userVerification.error};
 
-        return this.storeManager.removeProducts(this.userManager.getUserByToken(req.requester), req.body.storeName, req.body.products);
+        return this.storeManager.removeProducts(this.userManager.getUserByToken(req.token), req.body.storeName, req.body.products);
     }
 
     assignStoreOwner(req: Req.AssignStoreOwnerRequest) : Res.BoolResponse {
-        logger.info(`user: ${JSON.stringify(req.requester)} requested to assign user:
+        logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
                 ${JSON.stringify(req.body.usernameToAssign)} as a manager in store: ${JSON.stringify(req.body.storeName)} `)
 
-        const usernameWhoAssignsVerification: Res.BoolResponse = this.userManager.verifyUser(req.requester, true);
+        const usernameWhoAssignsVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
         const usernameToAssignVerification: Res.BoolResponse = this.userManager.verifyUser(req.body.usernameToAssign, false);
 
         let error: string = usernameWhoAssignsVerification.error ? usernameWhoAssignsVerification.error.message + " " : "";
@@ -104,7 +104,7 @@ export class TradingSystemManager {
             return { data: { result: false } , error: { message: error}};
         }
 
-        const usernameWhoAssigns: RegisteredUser = this.userManager.getUserByToken(req.requester);
+        const usernameWhoAssigns: RegisteredUser = this.userManager.getUserByToken(req.token);
         const usernameToAssign: RegisteredUser = this.userManager.getUserByToken(req.body.usernameToAssign);
 
         return this.storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
@@ -129,8 +129,8 @@ export class TradingSystemManager {
     }
 
     createStore(storeReq: OpenStoreRequest) : BoolResponse{
-        logger.info(`user ${storeReq.requester} trying open store: ${storeReq.body.storeName}`)
-        const u: RegisteredUser = this.userManager.getUserByName(storeReq.requester);
+        logger.info(`user ${storeReq.token} trying open store: ${storeReq.body.storeName}`)
+        const u: RegisteredUser = this.userManager.getUserByName(storeReq.token);
         if(!u) return {data: {result:false}, error:{message: errorMsg['E_NOT_AUTHORIZED']}}
         if(!this.userManager.isLoggedIn(u)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
         const res:BoolResponse = this.storeManager.addStore(storeReq.body.storeName, u);

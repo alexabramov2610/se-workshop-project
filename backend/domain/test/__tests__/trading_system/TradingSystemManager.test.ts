@@ -45,7 +45,7 @@ describe("Store Management Unit Tests", () => {
         prepareAddItemMock(isLoggedIn, isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.ItemsAdditionRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}}
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
         let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeTruthy();
@@ -59,7 +59,7 @@ describe("Store Management Unit Tests", () => {
 
         prepareAddItemMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.ItemsAdditionRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}}
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
         let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeFalsy();
@@ -73,7 +73,7 @@ describe("Store Management Unit Tests", () => {
         prepareAddItemMock(isLoggedIn, isSuccess);
 
         const tradingSystemManager: TradingSystemManager = new TradingSystemManager();
-        const req: Req.ItemsAdditionRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}}
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
         let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeFalsy();
@@ -98,7 +98,7 @@ describe("Store Management Unit Tests", () => {
         prepareRemoveItemsMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
 
-        const req: Req.ItemsRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}}
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
         let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeTruthy();
@@ -113,7 +113,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeItems").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.ItemsRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}}
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
         let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeFalsy();
@@ -130,7 +130,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeItems").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.ItemsRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, items: items}};
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}};
         let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeFalsy();
@@ -163,7 +163,7 @@ describe("Store Management Unit Tests", () => {
         prepareRemoveProductsWithQuantityMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
 
-        const req: Req.RemoveProductsWithQuantity = { requester: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeTruthy();
@@ -185,7 +185,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.RemoveProductsWithQuantity = { requester: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeFalsy();
@@ -208,7 +208,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.RemoveProductsWithQuantity = { requester: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeFalsy();
@@ -242,7 +242,7 @@ describe("Store Management Unit Tests", () => {
         }
 
 
-        const req: Req.AddProductsRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeTruthy();
@@ -264,7 +264,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.AddProductsRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeFalsy();
@@ -287,7 +287,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.AddProductsRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeFalsy();
@@ -319,7 +319,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.ProductRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeTruthy();
@@ -341,7 +341,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.ProductRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeFalsy();
@@ -365,7 +365,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.ProductRemovalRequest = { requester: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
         let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeFalsy();
@@ -397,7 +397,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.AssignStoreOwnerRequest = { requester: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
 
         expect(res.data.result).toBeTruthy();
@@ -419,7 +419,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.AssignStoreOwnerRequest = { requester: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
 
         expect(res.data.result).toBeFalsy();
@@ -442,7 +442,7 @@ describe("Store Management Unit Tests", () => {
             productsReq.push(prodReq);
         }
 
-        const req: Req.AssignStoreOwnerRequest = { requester: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
 
         expect(res.data.result).toBeFalsy();
