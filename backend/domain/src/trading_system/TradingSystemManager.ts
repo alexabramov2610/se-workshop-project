@@ -32,7 +32,7 @@ export class TradingSystemManager {
         logger.info(`trying to add items to store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false, itemsNotAdded: items } , error: { message: error}};
         }
 
@@ -47,7 +47,7 @@ export class TradingSystemManager {
         logger.info(`trying to remove items from store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false, itemsNotRemoved: items } , error: { message: error}};
         }
 
@@ -62,7 +62,7 @@ export class TradingSystemManager {
         logger.info(`trying to remove items to store: ${JSON.stringify(store.UUID)} from user: ${JSON.stringify(user.UUID)}`);
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false, productsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
         }
 
@@ -77,7 +77,7 @@ export class TradingSystemManager {
         logger.info(`trying to add products to store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`)
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false, productsNotAdded: products } , error: { message: error}};
         }
 
@@ -92,7 +92,7 @@ export class TradingSystemManager {
         logger.info(`trying to remove products from store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`)
         if (!this.userManager.isLoggedIn(user)) {
             const error = Error['E_NOT_LOGGED_IN'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false, productsNotRemoved: products } , error: { message: error}};
         }
 

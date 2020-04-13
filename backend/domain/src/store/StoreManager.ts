@@ -16,7 +16,7 @@ export class StoreManager {
             newStore.setFirstOwner(owner);
             owner.setRole(UserRole.OWNER);
             this._stores.push(newStore);
-            logger.info(`successfully added store: ${JSON.stringify(newStore)} to system`)
+            logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
             return {data: {result: true}}
         }
         else {
@@ -52,36 +52,36 @@ export class StoreManager {
     verifyStoreOperation(store: Store, user: RegisteredUser) : BoolResponse {
         if (!this.verifyStoreExists(store)) {
             const error = errorMsg['E_INVALID_STORE'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false } , error: { message: error}};
         }
         else if (!(this.verifyStoreOwner(store, user) || this.verifyStoreManager(store, user))) {
             const error = errorMsg['E_NOT_AUTHORIZED'];
-            logger.error(error);
+            logger.warn(error);
             return { data: { result: false } , error: { message: error}};
         }
         return { data: { result: true } }
     }
 
     assignStoreOwner(store: Store, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
-        logger.info(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:
+        logger.debug(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)} `)
 
         const operationValid: BoolResponse = this.verifyStoreOperation(store, userWhoAssigns);
         if (operationValid.error) {
-            logger.error(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
+            logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}. error: ${operationValid.error.message}`);
             return operationValid;
         }
 
         if (store.verifyIsStoreOwner(userToAssign)) {   // already store owner
             const error = errorMsg['E_AL'];
-            logger.error(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
+            logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}. error: ${error}`);
             return {data : {result: false}, error : {message : error}};
         }
 
-        logger.info(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}, assigned by user ${userWhoAssigns.UUID}`)
+        logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}, assigned by user ${userWhoAssigns.UUID}`)
         return store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password));    //TODO: fix new StoreOwner
 
     }
