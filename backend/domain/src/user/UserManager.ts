@@ -131,19 +131,9 @@ class UserManager {
 
     setUserRole(username: string, role: UserRole) : BoolResponse {
         const userToChange: RegisteredUser = this.getUserByName(username);
+        let error: string;
         if (userToChange) {
-            let newUser: RegisteredUser;
-            switch (role) {
-                case UserRole.OWNER: {
-                    newUser = new StoreOwner(userToChange.name, userToChange.password, userToChange.UUID);
-                    break;
-                }
-                case UserRole.MANAGER: {
-                    newUser = new StoreManager(userToChange.name, userToChange.password, userToChange.UUID);
-                    break;
-                }
-            }
-
+            let newUser: RegisteredUser = this.duplicateUserByRole(userToChange, role);
             if (newUser) {
                 let newRegisteredUsers : RegisteredUser[] = this.registeredUsers.filter(user => user.UUID != userToChange.UUID);
                 this.registeredUsers = newRegisteredUsers.concat([newUser]);
@@ -154,19 +144,26 @@ class UserManager {
                 }
                 return {data : {result: true, value: newUser}};
             }
-            else {
-                const error: string = `failed setting user role, invalid user role: ${role}`;
-                logger.warn(error);
-                return {data: {result: false}, error: {message: error}};
-            }
-
+            else
+                error = `failed setting user role, invalid user role: ${role}`;
         }
         else {
-            const error: string = `failed setting user role, user does not exist: ${username}`;
-            logger.warn(error);
-            return {data: {result: false}, error: {message: error}};
+            error = `failed setting user role, user does not exist: ${username}`;
         }
+        logger.warn(error);
+        return {data: {result: false}, error: {message: error}};
+    }
 
+    private duplicateUserByRole(userToChange: RegisteredUser, role) : RegisteredUser {
+        switch (role) {
+            case UserRole.OWNER: {
+                return new StoreOwner(userToChange.name, userToChange.password, userToChange.UUID);
+            }
+            case UserRole.MANAGER: {
+                return new StoreManager(userToChange.name, userToChange.password, userToChange.UUID);
+            }
+        }
+        return undefined;
     }
 
     assignStoreManagerBasicPermissions (username : string) : BoolResponse {
