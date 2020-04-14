@@ -4,17 +4,19 @@ import * as StoreService from '../store_service/StoreService'
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {logger} from "domain_layer/dist/src/api-int/Logger";
+import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
+import {UserRole} from "domain_layer/dist/src/api-int/Enums";
 
-export const systemInit = ():BoolResponse=>{
+export const systemInit = (): Res.BoolResponse=>{
     let res:boolean = true;
-    const connectDelivery: BoolResponse = tradingSystem.connectDeliverySys();
+    const connectDelivery: Res.BoolResponse = tradingSystem.connectDeliverySys();
    if(connectDelivery.error) return connectDelivery;
-    const connectPayment: BoolResponse =  tradingSystem.connectPaymentSys();
+    const connectPayment: Res.BoolResponse =  tradingSystem.connectPaymentSys();
    if(connectPayment.error) return connectPayment;
     return tradingSystem.register("Admin","Admin");
 }
 
-export const createStore = (createStoreReq: OpenStoreRequest):BoolResponse => {
+export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolResponse => {
     return StoreService.createStore(createStoreReq);
 }
 
@@ -40,4 +42,8 @@ export const removeProducts = (req: Req.ProductRemovalRequest) : Res.ProductRemo
 
 export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest) : Res.BoolResponse => {
     return StoreService.assignStoreOwner(req);
+}
+
+export const assignStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
+    return StoreService.assignStoreManager(req);
 }

@@ -6,6 +6,7 @@ import {StoreOwner, RegisteredUser} from "../user/internal_api";
 import {UserRole} from "../api-int/Enums";
 import { v4 as uuid } from 'uuid';
 import {ProductCatalogNumber, Product as ProductReq, ProductWithQuantity} from "../api-ext/CommonInterface";
+import {StoreManager} from "./../user/users/StoreManager";
 
 interface ProductValidator {
     isValid: boolean,
@@ -18,14 +19,14 @@ export class Store {
     private _products: Map<Product, Item[]>;
     private readonly _storeName: string;
     private _storeOwners: StoreOwner[];
-    // private _storeManagers: StoreManager[];
+    private _storeManagers: StoreManager[];
 
     constructor(storeName: string) {
         this._UUID = uuid();
         this._storeName = storeName;
         this._products = new Map();
         this._storeOwners = [];
-        // this._storeManagers = [];
+        this._storeManagers = [];
     }
 
     private getProductByCatalogNumber(catalogNumber: number) : Product {
@@ -266,21 +267,21 @@ export class Store {
 
     verifyIsStoreManager(user: RegisteredUser) : boolean {
         logger.debug(`verify if user is manager: ${JSON.stringify(user.UUID)}`)
-        // if (user.getRole() != UserRole.MANAGER) {
-        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
-        //     return false;
-        // }
-        // for (let manager of this._storeManagers) {
-        //     if (manager.UUID === user.UUID) {
-        //                        logger.debug(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
-        //                        return true;
-        //     }
-        // }
-        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
+        if (user.getRole() != UserRole.MANAGER) {
+                       logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
+            return false;
+        }
+        for (let manager of this._storeManagers) {
+            if (manager.UUID === user.UUID) {
+               logger.debug(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
+               return true;
+            }
+        }
+        logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
         return false;
     }
 
-    addStoreOwner(user: StoreOwner) :Res.BoolResponse {
+    addStoreOwner(user: StoreOwner) : Res.BoolResponse {
         if (user.getRole() === UserRole.OWNER && !this.verifyIsStoreOwner(user)) {
             logger.debug(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID}`)
             this._storeOwners.push(user);
@@ -292,21 +293,21 @@ export class Store {
         }
     }
 
-    setFirstOwner(user: RegisteredUser) :void{
+    setFirstOwner(user: StoreOwner) : void {
         this._storeOwners.push(user);
     }
 
-    // addStoreManager(user: StoreManager) :Responses.StoreManagerAdditionResponse {
-    //     if (user.getRole() === UserRole.MANAGER && !this.verifyStoreManager(user)) {
-    //                     logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID}`)
-    //         this._storeOwners.push(user);
-    //         return { data: { result:true } }
-    //     }
-    //     else {
-    //                     logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID} FAILED!`)
-    //                     return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
-    //     }
-    // }
+    addStoreManager(user: StoreManager) :Res.BoolResponse {
+        if (user.getRole() === UserRole.MANAGER && !this.verifyIsStoreManager(user)) {
+            logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID}`)
+            this._storeManagers.push(user);
+            return { data: { result:true } }
+        }
+        else {
+            logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID} FAILED!`)
+            return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
+        }
+    }
 
     get storeName(): string {
         return this._storeName;

@@ -449,7 +449,81 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
+    function prepareAssignStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                assignStoreManager: () => operationResMock
+            }
+        });
+    }
 
+    test("assignStoreManager success", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("assignStoreManager failure - not logged in", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = true;
+
+        prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
+
+    test("assignStoreManager failure - failure", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
 
     test("connectDeliverySys success", () => {
         const connectSystemRes: Res.BoolResponse = {data: {result: true }};
@@ -542,6 +616,8 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+
+
     function prepereMocksForCreateStore(succ: boolean){
         const getUserByToken: RegisteredUser= new Buyer("tal","tal123");
         const createStoreRes: Res.BoolResponse = {data: {result: succ }};
@@ -560,6 +636,8 @@ describe("Store Management Unit Tests", () => {
             return {
                 verifyUser: () => verifyResMock,
                 getUserByToken: () => user,
+                setUserRole: () => true,
+                assignStoreManagerBasicPermissions: () => true
             }
         });
     }

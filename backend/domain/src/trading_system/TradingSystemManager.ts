@@ -9,7 +9,7 @@ import {
     BoolResponse,
     ExternalSystems,
     logger,
-    OpenStoreRequest,
+    OpenStoreRequest, UserRole,
 } from "../api-int/internal_api";
 
 
@@ -91,6 +91,30 @@ export class TradingSystemManager {
 
     assignStoreOwner(req: Req.AssignStoreOwnerRequest) : Res.BoolResponse {
         logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
+                ${JSON.stringify(req.body.usernameToAssign)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
+
+        const usernameWhoAssignsVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
+        const usernameToAssignVerification: Res.BoolResponse = this.userManager.verifyUser(req.body.usernameToAssign, false);
+
+        let error: string = usernameWhoAssignsVerification.error ? usernameWhoAssignsVerification.error.message + " " : "";
+        error = usernameToAssignVerification.error ? error + usernameToAssignVerification.error.message : error + "";
+
+        if (error.length > 0) {
+            return { data: { result: false } , error: { message: error}};
+        }
+
+        const usernameWhoAssigns: RegisteredUser = this.userManager.getUserByToken(req.token);
+        const usernameToAssign: RegisteredUser = this.userManager.getUserByToken(req.body.usernameToAssign);
+
+        const res: Res.BoolResponse = this.storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        if (res.data.result) {
+            this.userManager.setUserRole(usernameToAssign.name, UserRole.OWNER);
+        }
+        return res;
+    }
+
+    assignStoreManager(req: Req.AssignStoreManagerRequest) : Res.BoolResponse {
+        logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
                 ${JSON.stringify(req.body.usernameToAssign)} as a manager in store: ${JSON.stringify(req.body.storeName)} `)
 
         const usernameWhoAssignsVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
@@ -106,7 +130,12 @@ export class TradingSystemManager {
         const usernameWhoAssigns: RegisteredUser = this.userManager.getUserByToken(req.token);
         const usernameToAssign: RegisteredUser = this.userManager.getUserByToken(req.body.usernameToAssign);
 
-        return this.storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        const res: Res.BoolResponse = this.storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        if (res.data.result) {
+            this.userManager.setUserRole(usernameToAssign.name, UserRole.MANAGER);
+            this.userManager.assignStoreManagerBasicPermissions(usernameToAssign.name);
+        }
+        return res;
     }
 
     connectDeliverySys(): BoolResponse{

@@ -7,8 +7,14 @@ export enum UserRole {
     ADMIN
 }
 
- export enum ExternalSystems  {
+export enum ExternalSystems  {
    DELIVERY,
    PAYMENT,
    SECURITY
+}
+
+export enum ManagementPermission {
+    WATCH_PURCHASES_HISTORY,
+    WATCH_USER_QUESTIONS,
+    REPLY_USER_QUESTIONS
 }
