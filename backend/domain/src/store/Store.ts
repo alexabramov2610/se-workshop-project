@@ -1,10 +1,12 @@
 import {Item, Product} from "../trading_system/internal_api";
-import * as Res from "../common/Response"
-import {errorMsg as Error} from "../common/Error"
-import { logger } from "../common/Logger";
+import * as Res from "../api-ext/Response"
+import {errorMsg as Error} from "../api-int/Error"
+import { logger } from "../api-int/Logger";
 import {StoreOwner, RegisteredUser} from "../user/internal_api";
-import {UserRole} from "../common/Enums";
+import {UserRole} from "../api-int/Enums";
 import { v4 as uuid } from 'uuid';
+import {ProductCatalogNumber, Product as ProductReq, ProductWithQuantity} from "../api-ext/CommonInterface";
+import {StoreManager} from "./../user/users/StoreManager";
 
 interface ProductValidator {
     isValid: boolean,
@@ -17,14 +19,14 @@ export class Store {
     private _products: Map<Product, Item[]>;
     private readonly _storeName: string;
     private _storeOwners: StoreOwner[];
-    // private _storeManagers: StoreManager[];
+    private _storeManagers: StoreManager[];
 
     constructor(storeName: string) {
         this._UUID = uuid();
         this._storeName = storeName;
         this._products = new Map();
         this._storeOwners = [];
-        // this._storeManagers = [];
+        this._storeManagers = [];
     }
 
     private getProductByCatalogNumber(catalogNumber: number) : Product {
@@ -52,6 +54,10 @@ export class Store {
 
     private validateProduct(product: Product): ProductValidator{
         logger.debug(`validating product: ${JSON.stringify(product)}`)
+
+        if (!product)
+            return {isValid: false, error: Error['E_INVALID_PROD']}
+
         let isNameValid: boolean = product.name && product.name != "";
         let isIdValid: boolean = product.catalogNumber && product.catalogNumber > 0;
 
@@ -75,7 +81,7 @@ export class Store {
 
     }
 
-    addItems(items: Item[]) : Res.StoreItemsAdditionResponse {
+    addItems(items: Item[]) : Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
         let addedItems: Item[] = [];
         let notAddedItems: Item[] = [];
@@ -107,7 +113,7 @@ export class Store {
             }
     }
 
-    removeItems(items: Item[]) : Res.StoreItemsRemovalResponse {
+    removeItems(items: Item[]) : Res.ItemsRemovalResponse {
         logger.debug(`removing ${items.length} items from store id: ${this._UUID}`)
         let notRemovedItems: Item[] = [];
 
@@ -144,40 +150,40 @@ export class Store {
         }
     }
 
-    removeProductsWithQuantity(products : Map<Product, number>) : Res.StoreProductRemovalResponse {
-        logger.debug(`removing ${products.size} products with quantities from store id: ${this._UUID}`)
-        let notRemovedProducts :Product[] = [];
+    removeProductsWithQuantity(products : ProductWithQuantity[]) : Res.ProductRemovalResponse {
+        logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
+        let notRemovedProducts :ProductCatalogNumber[] = [];
 
-        for (let product of products.keys()) {
+        for (let product of products) {
             let productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
                 let items: Item[] = this._products.get(productInStore);
-                let numToRemove: number = products.get(product);
 
-                items.length = numToRemove >= items.length ? 0 : items.length - numToRemove;
+                items.length = product.quantity >= items.length ? 0 : items.length - product.quantity;
             } else {
-                notRemovedProducts.push(product);
+                const prodCatalogNumber: ProductCatalogNumber = {catalogNumber: product.catalogNumber};
+                notRemovedProducts.push(prodCatalogNumber);
             }
         }
 
-        if (notRemovedProducts.length === products.size) { // failed removing
-            logger.warn(`failed removing all requested ${products.size} products from store id: ${this._UUID}`)
+        if (notRemovedProducts.length === products.length) { // failed removing
+            logger.warn(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
             return {
                 data: {result: false, productsNotRemoved: notRemovedProducts },
                 error: {message: Error['E_PROD_REM']}
             }
         }
         else {
-            logger.debug(`removed ${products.size - notRemovedProducts.length} of ${products.size} request products from store id: ${this._UUID}`)
+            logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store id: ${this._UUID}`)
             return {
                 data: {result: true, productsNotRemoved: notRemovedProducts }}
         }
 
     }
 
-    addNewProducts(products: Product[]) : Res.StoreProductAdditionResponse {
+    addNewProducts(products: Product[]) : Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store id: ${this._UUID}`)
-        let invalidProducts: Product[] = [];
+        let invalidProducts: ProductReq[] = [];
 
         for (let product of products) {
             if (this.getProductByCatalogNumber(product.catalogNumber)){
@@ -206,12 +212,13 @@ export class Store {
         }
     }
 
-    removeProducts(products: Product[]) : Res.StoreProductRemovalResponse {
+    removeProductsByCatalogNumber(products: ProductCatalogNumber[]) : Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} items from store id: ${this._UUID}`)
         let productsNotRemoved: Product[] = [];
 
-        for (let product of products) {
-            let productValidator: ProductValidator = this.validateProduct(product);
+        for (let catalogNumber of products) {
+            const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
+            const productValidator: ProductValidator = this.validateProduct(product);
             if (productValidator.isValid) {
                 let productFromStore :Product = this.getProductByCatalogNumber(product.catalogNumber);
                 if (productFromStore) {
@@ -258,23 +265,23 @@ export class Store {
         return false;
     }
 
-    verifyStoreManager(user: RegisteredUser) : boolean {
+    verifyIsStoreManager(user: RegisteredUser) : boolean {
         logger.debug(`verify if user is manager: ${JSON.stringify(user.UUID)}`)
-        // if (user.getRole() != UserRole.MANAGER) {
-        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
-        //     return false;
-        // }
-        // for (let manager of this._storeManagers) {
-        //     if (manager.UUID === user.UUID) {
-        //                        logger.debug(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
-        //                        return true;
-        //     }
-        // }
-        //                logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
+        if (user.getRole() != UserRole.MANAGER) {
+                       logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
+            return false;
+        }
+        for (let manager of this._storeManagers) {
+            if (manager.UUID === user.UUID) {
+               logger.debug(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
+               return true;
+            }
+        }
+        logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
         return false;
     }
 
-    addStoreOwner(user: StoreOwner) :Res.BoolResponse {
+    addStoreOwner(user: StoreOwner) : Res.BoolResponse {
         if (user.getRole() === UserRole.OWNER && !this.verifyIsStoreOwner(user)) {
             logger.debug(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID}`)
             this._storeOwners.push(user);
@@ -294,22 +301,22 @@ export class Store {
         return {data:{result:true,info:{storeName:this.storeName,storeOwnersNames,productNames}}}
     }
 
-   
-    setFirstOwner(user: RegisteredUser) :void{
+
+    setFirstOwner(user: StoreOwner) : void {
         this._storeOwners.push(user);
     }
 
-    // addStoreManager(user: StoreManager) :Responses.StoreManagerAdditionResponse {
-    //     if (user.getRole() === UserRole.MANAGER && !this.verifyStoreManager(user)) {
-    //                     logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID}`)
-    //         this._storeOwners.push(user);
-    //         return { data: { result:true } }
-    //     }
-    //     else {
-    //                     logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager of store: ${this._UUID} FAILED!`)
-    //                     return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
-    //     }
-    // }
+    addStoreManager(user: StoreManager) :Res.BoolResponse {
+        if (user.getRole() === UserRole.MANAGER && !this.verifyIsStoreManager(user)) {
+            logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID}`)
+            this._storeManagers.push(user);
+            return { data: { result:true } }
+        }
+        else {
+            logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID} FAILED!`)
+            return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
+        }
+    }
 
     get storeName(): string {
         return this._storeName;

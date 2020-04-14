@@ -3,9 +3,9 @@ import {ExternalSystemsManager} from "../../../src/external_systems/ExternalSyst
 import {DeliverySystem} from "../../../src/external_systems/delivery_system/DeliverySystem";
 import {PaymentSystem} from "../../../src/external_systems/payment_system/PaymentSystem";
 import {SecuritySystem} from "../../../src/external_systems/security_system/SecuritySystem";
-import * as Responses from "../../../src/common/Response";
-import {BoolResponse} from "../../../src/common/Response";
-import {ExternalSystems } from "../../../src/common/internal_api"
+import * as Responses from "../../../src/api-ext/Response";
+import {BoolResponse} from "../../../src/api-ext/Response";
+import {ExternalSystems } from "../../../src/api-int/internal_api"
 jest.mock("../../../src/external_systems/delivery_system/DeliverySystem");
 jest.mock('../../../src/external_systems/payment_system/PaymentSystem');
 jest.mock('../../../src/external_systems/security_system/SecuritySystem');

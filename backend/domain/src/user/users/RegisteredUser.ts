@@ -1,4 +1,4 @@
-import { UserRole } from "../../common/internal_api"
+import { UserRole } from "../../api-int/internal_api"
 import { v4 as uuid } from 'uuid';
 
 export abstract class RegisteredUser {
@@ -10,7 +10,7 @@ export abstract class RegisteredUser {
   protected constructor(name: string, password: string,uid?:string) {
     this._name = name;
     this._password = password;
-    this._UUID = uid? uid:uuid();
+    this._UUID = uid? uid: uuid();
   }
 
   get name(): string {

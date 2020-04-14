@@ -1,5 +1,7 @@
 import {UserManager, Buyer, RegisteredUser} from "../../src/user/internal_api";
-import { Response } from "../../src/common/internal_api";
+import { Response } from "../../src/api-int/internal_api";
+import * as Req from "../../src/api-ext/Request"
+
 export class UserManagerDriver {
  
   
@@ -76,8 +78,8 @@ export class UserManagerDriver {
     return this.userManager.getUserByName(name);
   }
 
-  setAdmin(name: string): Response {
-    this.mockSetAdmin(name);
-    return this.userManager.setAdmin(name);
-  }
+  // setAdmin(name: string): Response {
+  //   this.mockSetAdmin(name);
+  //   return this.userManager.setAdmin(name);
+  // }
 }
