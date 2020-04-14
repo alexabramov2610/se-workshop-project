@@ -2,6 +2,11 @@ interface User {
     username: string;
 }
 
+interface Cart {
+    items: Item[];
+    quantities: number[];
+}
+
 interface Credentials {
     userName: string;
     password: string;
@@ -58,9 +63,22 @@ enum RATE {
     ZERO_STARS,
     ONE_STAR,
     TWO_STARS,
-    THREES_STARS,
+    THREE_STARS,
     FOUR_STARS,
     FIVE_STARS
 }
 
-export {User, Item, Store, Response, Credentials, BuyItem, SearchData, Filters, CATEGORY, RATE, PriceRange};
+export {
+    User,
+    Item,
+    Store,
+    Response,
+    Credentials,
+    BuyItem,
+    SearchData,
+    Filters,
+    CATEGORY,
+    RATE,
+    PriceRange,
+    Cart
+};

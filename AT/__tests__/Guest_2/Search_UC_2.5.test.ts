@@ -53,7 +53,7 @@ describe("Guest Search, UC: 2.5", () => {
         _testFilters = {
             category: CATEGORY.ELECTRONICS,
             priceRange: _priceRange,
-            storeRate: RATE.THREES_STARS,
+            storeRate: RATE.THREE_STARS,
             itemRate: RATE.ONE_STAR
         };
         _testSearchData = {

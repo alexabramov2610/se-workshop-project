@@ -1,31 +1,37 @@
-import {Bridge, Driver, Filters, CATEGORY, RATE, Item, PriceRange, Credentials, SearchData, Store} from "../../src/";
+import {
+    Bridge,
+    Driver,
+    CATEGORY,
+    RATE,
+    Item,
+    Store,
+    Cart
+} from "../../src/";
 
 
-describe("Guest Search, UC: 2.5", () => {
+
+describe("Guest saves items in the cart, UC: 2.6", () => {
     let _serviceBridge: Bridge;
-    let _credentials: Credentials;
+    let _testCart: Cart;
     let _testStore1: Store;
     let _testStore2: Store;
     let _testItem1: Item;
     let _testItem2: Item;
     let _testItem3: Item;
-    let _testSearchData: SearchData;
-    let _testFilters: Filters;
-    let _priceRange: PriceRange;
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
-        _credentials = {userName: "test-name", password: "test-PASS-123"};
+
         _testItem1 = {
             id: "test-id1",
-            name: "test-item",
+            name: "test-item1",
             price: 999,
             description: "lovely-test-store",
             category: CATEGORY.ELECTRONICS,
         };
         _testItem2 = {
             id: "test-id2",
-            name: "test-item",
+            name: "test-item2",
             price: 999,
             description: "lovely-test-store",
             category: CATEGORY.ELECTRONICS,
@@ -37,6 +43,7 @@ describe("Guest Search, UC: 2.5", () => {
             description: "lovely-test-store",
             category: CATEGORY.CLOTHING,
         };
+
         _testStore1 = {
             id: "test-store-id1",
             name: "test-store1",
@@ -47,16 +54,10 @@ describe("Guest Search, UC: 2.5", () => {
             name: "test-store2",
             description: "lovely-test-store"
         };
-        _priceRange = {low: 0, high: Number.MAX_SAFE_INTEGER};
-        _testFilters = {
-            category: CATEGORY.ELECTRONICS,
-            priceRange: _priceRange,
-            storeRate: RATE.THREES_STARS,
-            itemRate: RATE.ONE_STAR
-        };
-        _testSearchData = {
-            input: "test-input",
-            filters: _testFilters,
+
+        _testCart = {
+            items: [_testItem1],
+            quantities: [1]
         }
 
         _serviceBridge.addStore(_testStore1);
@@ -65,19 +66,55 @@ describe("Guest Search, UC: 2.5", () => {
         _serviceBridge.addItemToStore(_testStore1, _testItem1);
         _serviceBridge.addItemToStore(_testStore1, _testItem3);
         _serviceBridge.addItemToStore(_testStore2, _testItem2);
-
-        _serviceBridge.register(_credentials);
     });
 
-    test("Valid search input, not filters", () => {
-        _testSearchData.filters = undefined;
-        _testSearchData.input = _testItem1.name;
-
-        const {data, error} = _serviceBridge.search(_testSearchData);
+    test("Valid insertion, item doesn't exist in cart", () => {
+        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem2);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        const {items} = data;
-        expect(items.filter(item => item.name === _testItem1.name).length === 2).toBeTruthy();
+        expect(_testCart.items.includes(_testItem2)).toBeTruthy();
+
+        const testItem2Idx = _testCart.items.indexOf(_testItem2);
+        expect(_testCart.quantities[testItem2Idx]).toBe(1);
     });
+
+    test("Valid insertion, item isn't in stock",() => {
+        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem2);
+        expect(data).toBeUndefined();
+        expect(error).toBeDefined();
+
+        expect(_testCart.items.includes(_testItem2)).toBeFalsy();
+
+        const testItem2Idx = _testCart.items.indexOf(_testItem2);
+        expect(_testCart.quantities[testItem2Idx]).toBeUndefined();
+    });
+
+    test("Valid insertion, item already exists in cart", () => {
+        _testCart.items = [_testItem1, _testItem2, _testItem3];
+        _testCart.quantities = [2, 6, 3];
+
+        const beforeQuantities = _testCart.quantities;
+
+        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem1);
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
+
+        expect(_testCart.items.includes(_testItem1)).toBeTruthy();
+        expect(_testCart.items.includes(_testItem2)).toBeTruthy();
+        expect(_testCart.items.includes(_testItem3)).toBeTruthy();
+
+        const testItem1Idx = _testCart.items.indexOf(_testItem1);
+        const testItem2Idx = _testCart.items.indexOf(_testItem2);
+        const testItem3Idx = _testCart.items.indexOf(_testItem3);
+
+        const q1 = _testCart.quantities[testItem1Idx];
+        const q2 = _testCart.quantities[testItem2Idx];
+        const q3 = _testCart.quantities[testItem3Idx];
+
+        expect(q1).toBe(beforeQuantities[testItem1Idx] + 1);
+        expect(q2).toBe(beforeQuantities[testItem2Idx]);
+        expect(q3).toBe(beforeQuantities[testItem3Idx]);
+    });
+
 });

@@ -1,5 +1,5 @@
 import {Bridge} from './Bridge';
-import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData} from "./types";
+import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData, Cart} from "./types";
 import {
     DummyResponse,
     DummyItemResponse,
@@ -82,6 +82,10 @@ class Proxy implements Bridge {
 
     rate(toRate: Store | Item, rate: RATE): Response {
         return this.real ? this.real.rate(toRate, rate) : DummySearchResponse;
+    }
+
+    addToCart(cart: Cart, item: Item) {
+        return this.real ? this.real.addToCart(cart, item) : DummyResponse;
     }
 }
 
