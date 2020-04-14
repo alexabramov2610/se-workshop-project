@@ -14,18 +14,17 @@ describe("Guest Buyer, UC: 3.1", () => {
     _serviceBridge.login(_authDetails);
     const { users } = _serviceBridge.getLoggedInUsers().data;
     const myUser = users.filter((u) => u === "Ron");
-    expect(myUser).toBeTruthy();
+    expect(myUser).toContain('Ron');
     _serviceBridge.logout();
     const usersPostLogout = _serviceBridge.getLoggedInUsers().data.users;
     const myUserAfterLogOut = usersPostLogout.filter((u) => u === "Ron");
-    expect(myUserAfterLogOut).toBeFalsy();
+    expect(myUserAfterLogOut).toBeUndefined();
   });
 
   test("Logout - Sad Path: user wasnt logged in ", () => {
     _serviceBridge.logout();
     const { users } = _serviceBridge.getLoggedInUsers().data;
-    _serviceBridge.logout();
     const myUser = users.filter((u) => u === "Ron");
-    expect(myUser).toBeFalsy();
+    expect(myUser).toBeUndefined();
   });
 });

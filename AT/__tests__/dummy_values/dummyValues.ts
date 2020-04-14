@@ -19,12 +19,15 @@ const DummyUsersReposne: Response = {
 const DummyUserReposne: Response = {
   data: { username: "dummyUser" },
 };
+
 const DummyBuyReposne: Response = {
   data: { recieptId: "some-fake-id" },
 };
+
 const DummyPurchaseHistoryResponse: Response = {
   data: { puchases: [{ productName: "some-name" }] },
 };
+
 export {
   DummyResponse,
   DummyItemReposne,
