@@ -43,6 +43,10 @@ interface AssignStoreManagerRequest extends Request {
   body: { storeName: string, usernameToAssign: string }
 }
 
+interface RemoveStoreOwnerRequest extends Request {
+  body: { storeName: string, usernameToRemove: string }
+}
+
 export { AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
-  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, RemoveStoreOwnerRequest,
   RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest };

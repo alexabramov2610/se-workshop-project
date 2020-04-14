@@ -81,6 +81,14 @@ export class Store {
 
     }
 
+    private getStoreOwnerByName(username: string) : StoreOwner {
+        for (let storeOwner of this._storeOwners) {
+            if (storeOwner.name === username)
+                return storeOwner;
+        }
+        return undefined;
+    }
+
     addItems(items: Item[]) : Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
         let addedItems: Item[] = [];
@@ -297,7 +305,7 @@ export class Store {
         this._storeOwners.push(user);
     }
 
-    addStoreManager(user: StoreManager) :Res.BoolResponse {
+    addStoreManager(user: StoreManager) : Res.BoolResponse {
         if (user.getRole() === UserRole.MANAGER && !this.verifyIsStoreManager(user)) {
             logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID}`)
             this._storeManagers.push(user);
@@ -307,6 +315,15 @@ export class Store {
             logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID} FAILED!`)
             return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
         }
+    }
+
+    removeStoreOwner(user: StoreOwner) : Res.BoolResponse {
+        const storeManagerToRemove: StoreOwner = this.getStoreOwnerByName(user.name);
+        if (!storeManagerToRemove)
+            return {data: { result:false }, error: {message: Error['E_NAL']}}
+
+        this._storeOwners = this._storeOwners.filter(currOwner => currOwner.UUID != storeManagerToRemove.UUID)
+        return { data: { result:true}};
     }
 
     get storeName(): string {

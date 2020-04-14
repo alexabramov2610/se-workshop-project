@@ -162,6 +162,9 @@ class UserManager {
             case UserRole.MANAGER: {
                 return new StoreManager(userToChange.name, userToChange.password, userToChange.UUID);
             }
+            case UserRole.BUYER: {
+                return new Buyer(userToChange.name, userToChange.password, userToChange.UUID);
+            }
         }
         return undefined;
     }

@@ -191,6 +191,59 @@ describe("Store Management Unit Tests", () => {
         expect(res.error).toBeDefined();
     });
 
+
+    test("removeStoreOwner success", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result:true}};
+        jest.spyOn(storeManagement, "verifyStoreOperation").mockReturnValue(isOperationValid);
+        jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
+        jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+
+        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
+        const ownerToRemove: StoreOwner = new StoreOwner("name2","123123");
+
+        let res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeTruthy();
+
+        res = storeManagement.removeStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure - store doesn't exist or invalid store owner", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result:false}, error: {message: "mockerror"}};
+        jest.spyOn(storeManagement, "verifyStoreOperation").mockReturnValue(isOperationValid);
+        jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
+        jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+
+        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
+        const ownerToRemove: StoreOwner = new StoreOwner("name2","123123");
+
+        let res: Res.BoolResponse = storeManagement.removeStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("removeStoreOwner failure - not assigner of owner", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result:true}};
+        jest.spyOn(storeManagement, "verifyStoreOperation").mockReturnValue(isOperationValid);
+        jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
+        jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+
+        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
+        const ownerToRemove: StoreOwner = new StoreOwner("name2","123123");
+
+        let res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeTruthy();
+
+        res = storeManagement.removeStoreOwner(store.storeName, alreadyOwner, ownerToRemove);
+        expect(res.data.result).toBeFalsy();
+    });
+
+
     test("verifyStoreExists Success", () => {
         const storeName: string = 'mock-store';
         const user: RegisteredUser = new StoreOwner("usermock", "pwmock");

@@ -140,7 +140,7 @@ export class StoreManager {
         }
 
         logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
-        const additionRes: Res.BoolResponse = store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password, userToAssign.UUID));
+        const additionRes: Res.BoolResponse = store.addStoreOwner(new StoreOwner(userToAssign.name, userToAssign.password, userToAssign.UUID));
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, false);
         return additionRes;
@@ -152,7 +152,7 @@ export class StoreManager {
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)} `)
 
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, userWhoAssigns);
-        if (operationValid.error) {
+        if (!operationValid.data.result) {
             logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}. error: ${operationValid.error.message}`);
             return operationValid;
@@ -174,6 +174,31 @@ export class StoreManager {
         return additionRes;
     }
 
+    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser) : BoolResponse {
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.UUID)} requested to assign user:
+                ${JSON.stringify(userToRemove.UUID)} as a manager in store: ${JSON.stringify(storeName)} `)
+
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, userWhoRemoves);
+        if (!operationValid.data.result) {
+            logger.warn(`user: ${JSON.stringify(userWhoRemoves.UUID)} failed to assign user:
+                ${JSON.stringify(userToRemove.UUID)} as a manager in store: ${JSON.stringify(storeName)}. error: ${operationValid.error.message}`);
+            return operationValid;
+        }
+
+        if (!this.isAssignerOf(userWhoRemoves, userToRemove, false)) {
+            const error: string = `user: ${userWhoRemoves} did not assign user: ${userToRemove}`;
+            logger.warn(error);
+            return {data: {result: false}, error: {message: error}};
+        }
+        const store: Store = this.findStoreByName(storeName);
+
+        logger.debug(`successfully assigned user: ${JSON.stringify(userToRemove.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoRemoves.UUID}`)
+        const additionRes: Res.BoolResponse = store.removeStoreOwner(new StoreManagerUser(userToRemove.name, userWhoRemoves.password, userWhoRemoves.UUID));
+        if (additionRes.data.result)
+            this.removeStoreAssigner(userWhoRemoves, userToRemove, false);
+        return additionRes;
+    }
+
     findStoreByName(storeName: string): Store {
         for (let store of this._stores) {
             if (store.storeName === storeName)
@@ -183,14 +208,74 @@ export class StoreManager {
         return undefined;
     }
 
-    private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean) :void{
+    private getAssignedListByUUID(uuid: string, isManager: boolean) : RegisteredUser[] {
+        let assignedList: RegisteredUser[] = undefined;
         if (isManager) {
-            let usersList: RegisteredUser[] = this._storeManagerAssigners.get(userWhoAssigns);
+            for (let user of this._storeManagerAssigners.keys()) {
+                if (user.UUID === uuid) {
+                    return this._storeManagerAssigners.get(user);
+                }
+            }
+        }
+        else {
+            for (let user of this._storeOwnerAssigners.keys()) {
+                if (user.UUID === uuid) {
+                    return this._storeOwnerAssigners.get(user);
+                }
+            }
+        }
+        return assignedList;
+    }
+
+    private isAssignerOf(userWhoAssigned: RegisteredUser, assignedUser: RegisteredUser, isManager: boolean) : boolean {
+        if (isManager) {
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoAssigned.UUID, isManager);
+            if (usersList) {
+                for (let user of usersList){
+                    if (user.UUID === assignedUser.UUID)
+                        return true;
+                }
+            }
+        }
+        else {
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoAssigned.UUID, isManager);
+            if (usersList) {
+                for (let user of usersList){
+                    if (user.UUID === assignedUser.UUID)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private removeStoreAssigner(userWhoRemoves: RegisteredUser, userToRemove: RegisteredUser, isManager: boolean) :void{
+        if (isManager) {
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoRemoves.UUID, isManager);
+            if (!usersList)
+                return;
+
+            usersList = usersList.filter(currUser => currUser.UUID != userToRemove.UUID);
+            this._storeManagerAssigners.set(userWhoRemoves, usersList)
+        }
+        else {
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoRemoves.UUID, isManager);
+            if (!usersList)
+                return;
+
+            usersList = usersList.filter(currUser => currUser.UUID != userToRemove.UUID);
+            this._storeOwnerAssigners.set(userWhoRemoves, usersList)
+        }
+    }
+
+    private addStoreAssigner(userWhoAssigns: RegisteredUser, userToAssign: RegisteredUser, isManager: boolean) :void{
+        if (isManager) {
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoAssigns.UUID, isManager);
             usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
             this._storeManagerAssigners.set(userWhoAssigns, usersList)
         }
         else {
-            let usersList: RegisteredUser[] = this._storeOwnerAssigners.get(userWhoAssigns);
+            let usersList: RegisteredUser[] = this.getAssignedListByUUID(userWhoAssigns.UUID, isManager);
             usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
             this._storeOwnerAssigners.set(userWhoAssigns, usersList)
         }

@@ -373,6 +373,16 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+    test("removeStoreOwner success", () => {
+        const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
+        expect(store.removeStoreOwner(storeOwner).data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure", () => {
+        const res: Res.BoolResponse = store.removeStoreOwner(storeOwner);
+        expect(res.data.result).toBeFalsy();
+    });
+
 
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
         let products: ProductCatalogNumber[] = [];

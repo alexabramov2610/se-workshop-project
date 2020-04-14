@@ -34,3 +34,7 @@ export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest) : Res.BoolRes
 export const assignStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
    return tradingSystem.assignStoreManager(req);
 }
+
+export const removeStoreManager = (req: Req.RemoveStoreOwnerRequest) : Res.BoolResponse => {
+   return tradingSystem.removeStoreOwner(req);
+}

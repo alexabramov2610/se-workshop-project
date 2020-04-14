@@ -138,6 +138,30 @@ export class TradingSystemManager {
         return res;
     }
 
+    removeStoreOwner(req: Req.RemoveStoreOwnerRequest) : Res.BoolResponse {
+        logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
+                ${JSON.stringify(req.body.usernameToRemove)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
+
+        const usernameWhoAssignsVerification: Res.BoolResponse = this.userManager.verifyUser(req.token, true);
+        const usernameToAssignVerification: Res.BoolResponse = this.userManager.verifyUser(req.body.usernameToRemove, false);
+
+        let error: string = usernameWhoAssignsVerification.error ? usernameWhoAssignsVerification.error.message + " " : "";
+        error = usernameToAssignVerification.error ? error + usernameToAssignVerification.error.message : error + "";
+
+        if (error.length > 0) {
+            return { data: { result: false } , error: { message: error}};
+        }
+
+        const usernameWhoAssigns: RegisteredUser = this.userManager.getUserByToken(req.token);
+        const usernameToAssign: RegisteredUser = this.userManager.getUserByToken(req.body.usernameToRemove);
+
+        const res: Res.BoolResponse = this.storeManager.removeStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        if (res.data.result) {
+            this.userManager.setUserRole(usernameToAssign.name, UserRole.BUYER);
+        }
+        return res;
+    }
+
     connectDeliverySys(): BoolResponse{
         logger.info('Trying to connect to delivery system');
         const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.DELIVERY);

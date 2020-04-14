@@ -47,3 +47,7 @@ export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest) : Res.BoolRes
 export const assignStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
     return StoreService.assignStoreManager(req);
 }
+
+export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
+    return StoreService.removeStoreManager(req);
+}

@@ -384,18 +384,11 @@ describe("Store Management Unit Tests", () => {
     }
 
     test("assignStoreOwner success", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = true;
 
         prepareAssignStoreOwnerMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
@@ -404,8 +397,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreOwner failure - not logged in", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = false;
         const isSuccess: boolean = true;
 
@@ -413,11 +404,6 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
@@ -426,9 +412,7 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
-    test("assignStoreOwner failure - failure", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
+    test("assignStoreOwner failure", () => {
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = false;
 
@@ -436,11 +420,6 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
@@ -460,18 +439,11 @@ describe("Store Management Unit Tests", () => {
     }
 
     test("assignStoreManager success", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = true;
 
         prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
@@ -480,8 +452,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreManager failure - not logged in", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = false;
         const isSuccess: boolean = true;
 
@@ -489,11 +459,6 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
@@ -502,9 +467,7 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
-    test("assignStoreManager failure - failure", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
+    test("assignStoreManager failure", () => {
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = false;
 
@@ -512,11 +475,6 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (let prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
         let res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
@@ -524,6 +482,59 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
+
+
+    function prepareRemoveStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                removeStoreOwner: () => operationResMock
+            }
+        });
+    }
+
+    test("removeStoreOwner success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure - not logged in", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("removeStoreOwner failure", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+
 
     test("connectDeliverySys success", () => {
         const connectSystemRes: Res.BoolResponse = {data: {result: true }};
