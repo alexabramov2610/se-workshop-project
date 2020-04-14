@@ -1,17 +1,16 @@
-import { Bridge, Driver } from "../../src";
-import { AuthDetails } from "../../src/test_env/types";
+import {Bridge, Driver, Credentials} from "../../src";
 
 describe("Guest Buyer, UC: 3.1", () => {
-  let _serviceBridge: Bridge;
-  var _authDetails: AuthDetails;
+    let _serviceBridge: Bridge;
+    var _credentials: Credentials;
 
-  beforeEach(() => {
-    _serviceBridge = Driver.makeBridge();
-    _authDetails = { userName: "Ron", password: "ronpassword" };
-  });
+    beforeEach(() => {
+        _serviceBridge = Driver.makeBridge();
+        _credentials = {userName: "Ron", password: "ronpassword"};
+    });
 
   test("Logout - Happy Path: after user was logged in ", () => {
-    _serviceBridge.login(_authDetails);
+    _serviceBridge.login(_credentials);
     const { users } = _serviceBridge.getLoggedInUsers().data;
     const myUser = users.filter((u) => u === "Ron");
     expect(myUser).toContain('Ron');

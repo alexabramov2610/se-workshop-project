@@ -1,10 +1,9 @@
-import { Bridge, Driver } from "../../src/";
-import { Store, AuthDetails } from "../../src/test_env/types";
+import { Bridge, Driver, Store, Credentials } from "../../src/";
 
 describe("Create Store Buyer, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: AuthDetails;
+  let _credentials: Credentials;
 
   beforeEach(() => {
     _serviceBridge = Driver.makeBridge();
