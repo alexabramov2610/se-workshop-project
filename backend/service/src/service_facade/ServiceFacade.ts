@@ -1,17 +1,18 @@
 import { tradingSystem } from "domain_layer";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
-import {OpenStoreRequest} from "domain_layer/src/common/internal_api";
+import {OpenStoreRequest, BoolResponse} from "domain_layer/src/common/internal_api";
 
-export const systemInit = ():boolean=>{
+export const systemInit = ():BoolResponse=>{
    let res:boolean = true;
-   res = res && !tradingSystem.connectDeliverySys().error;
-   res = res && !tradingSystem.connectPaymentSys().error;
-   const hasAdmin:boolean = tradingSystem.getUserByName("Admin") != undefined
-   return hasAdmin? res : res && !tradingSystem.register("Admin","Admin").error
+   const connectDelivery: BoolResponse = tradingSystem.connectDeliverySys();
+   if(connectDelivery.error) return connectDelivery;
+   const connectPayment: BoolResponse =  tradingSystem.connectPaymentSys();
+   if(connectPayment.error) return connectPayment;
+   return tradingSystem.register("Admin","Admin");
 }
 
-export const createStore = (createStoreReq: OpenStoreRequest):boolean => {
+export const createStore = (createStoreReq: OpenStoreRequest):BoolResponse => {
    return StoreService.createStore(createStoreReq);
 }
    
