@@ -1,36 +1,65 @@
-import { Response } from "../../src/test_env/types";
+import {Response, CATEGORY, Cart} from "../../src/test_env/types";
+
 
 const DummyResponse: Response = {
-  data: {},
+    data: {},
 };
 
-const DummyItemReposne: Response = {
-  data: { name: "dummyItem", price: 33.5, description: "dummyDescription" },
+const DummyItemResponse: Response = {
+    data: {name: "dummyItem", price: 33.5, description: "dummyDescription"},
 };
 
-const DummyStoreReposne: Response = {
-  data: { name: "dummyStore", description: "dummyDescription" },
+const DummyStoreResponse: Response = {
+    data: {name: "dummyStore", description: "dummyDescription"},
 };
 
-const DummyUsersReposne: Response = {
-  data: { users: ["dummyUser1", "dummyUser2", "dummyUser3"] },
+const DummyUsersResponse: Response = {
+    data: {users: ["dummyUser1", "dummyUser2", "dummyUser3"]},
 };
 
-const DummyUserReposne: Response = {
-  data: { username: "dummyUser" },
+const DummyUserResponse: Response = {
+    data: {username: "dummyUser"},
 };
-const DummyBuyReposne: Response = {
-  data: { recieptId: "some-fake-id" },
+
+const DummyBuyResponse: Response = {
+    data: {receiptId: "some-fake-id"},
 };
+
 const DummyPurchaseHistoryResponse: Response = {
-  data: { puchases: [{ productName: "some-name" }] },
+    data: {purchases: [{productName: "some-name"}]},
 };
+
+const DummySearchResponse: Response = {
+    data: {
+        items: [
+            {name: "dummy-name1", category: CATEGORY.ELECTRONICS, description: "dummy-description1", price: 20},
+            {name: "dummy-name2", category: CATEGORY.ELECTRONICS, description: "dummy-description2", price: 20},
+            {name: "dummy-name3", category: CATEGORY.ELECTRONICS, description: "dummy-description3", price: 20}
+        ]
+    },
+};
+
+const DummyCartResponse: Response = {
+    data: {
+        cart: {
+            items: [
+                {name: "dummy-name1", category: CATEGORY.ELECTRONICS, description: "dummy-description1", price: 20},
+                {name: "dummy-name2", category: CATEGORY.ELECTRONICS, description: "dummy-description2", price: 20},
+                {name: "dummy-name3", category: CATEGORY.ELECTRONICS, description: "dummy-description3", price: 20}
+            ], quantities: [5, 2, 7],
+        }
+    },
+};
+
+
 export {
-  DummyResponse,
-  DummyItemReposne,
-  DummyStoreReposne,
-  DummyUsersReposne,
-  DummyUserReposne,
-  DummyBuyReposne,
-  DummyPurchaseHistoryResponse,
+    DummyResponse,
+    DummyItemResponse,
+    DummyStoreResponse,
+    DummyUsersResponse,
+    DummyUserResponse,
+    DummyBuyResponse,
+    DummyPurchaseHistoryResponse,
+    DummySearchResponse,
+    DummyCartResponse
 };
