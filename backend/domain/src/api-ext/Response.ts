@@ -29,7 +29,7 @@ interface ProductRemovalResponse extends Response {
 }
 
 interface BoolResponse extends Response {
-  data: {result: boolean}
+  data: {result: boolean, value?: any}
 }
 
 export { Response, BoolResponse, ProductAdditionResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse };

@@ -1,6 +1,7 @@
-import {UserRole} from "../api-int/Enums";
+import { UserRole, ManagementPermission } from "../api-int/Enums";
 import {BoolResponse, errorMsg, SetAdminRequest} from "../api-int/internal_api";
-import {Admin, Buyer, RegisteredUser} from "./internal_api";
+import {Admin, Buyer, RegisteredUser, StoreOwner, StoreManager} from "./internal_api";
+import { logger } from "../api-int/internal_api";
 
 class UserManager {
     private registeredUsers: RegisteredUser[];
@@ -91,12 +92,16 @@ class UserManager {
         }
     }
 
-    verifyOwner(user: RegisteredUser) : boolean {
+    isOwner(user: RegisteredUser) : boolean {
         return user.getRole() === UserRole.OWNER;
     }
 
-    verifyManager(user: RegisteredUser) : boolean {
+    isManager(user: RegisteredUser) : boolean {
         return user.getRole() === UserRole.MANAGER;
+    }
+
+    isAdmin(u:RegisteredUser) : boolean{
+        return this.admins.filter(val=> val.name === u.name).pop() !== null
     }
 
     isLoggedIn(userToCheck: RegisteredUser) : boolean {
@@ -105,10 +110,6 @@ class UserManager {
                 return true;
         }
         return false;
-    }
-
-    isAdmin(u:RegisteredUser) : boolean{
-        return this.admins.filter(val=> val.name === u.name).pop() !== null
     }
 
     setAdmin(setAdminRequest: SetAdminRequest): BoolResponse{
@@ -127,6 +128,61 @@ class UserManager {
         this.registeredUsers = this.registeredUsers.concat([u]);
         return {data:{result:true}};
     }
+
+    setUserRole(username: string, role: UserRole) : BoolResponse {
+        const userToChange: RegisteredUser = this.getUserByName(username);
+        let error: string;
+        if (userToChange) {
+            let newUser: RegisteredUser = this.duplicateUserByRole(userToChange, role);
+            if (newUser) {
+                let newRegisteredUsers : RegisteredUser[] = this.registeredUsers.filter(user => user.UUID != userToChange.UUID);
+                this.registeredUsers = newRegisteredUsers.concat([newUser]);
+
+                if (this.isLoggedIn((userToChange))) {
+                    let newRegisteredUsers : RegisteredUser[] = this.loggedInUsers.filter(user => user.UUID != userToChange.UUID);
+                    this.loggedInUsers = newRegisteredUsers.concat([newUser]);
+                }
+                return {data : {result: true, value: newUser}};
+            }
+            else
+                error = `failed setting user role, invalid user role: ${role}`;
+        }
+        else {
+            error = `failed setting user role, user does not exist: ${username}`;
+        }
+        logger.warn(error);
+        return {data: {result: false}, error: {message: error}};
+    }
+
+    private duplicateUserByRole(userToChange: RegisteredUser, role) : RegisteredUser {
+        switch (role) {
+            case UserRole.OWNER: {
+                return new StoreOwner(userToChange.name, userToChange.password, userToChange.UUID);
+            }
+            case UserRole.MANAGER: {
+                return new StoreManager(userToChange.name, userToChange.password, userToChange.UUID);
+            }
+        }
+        return undefined;
+    }
+
+    assignStoreManagerBasicPermissions (username : string) : BoolResponse {
+        const userToChange: RegisteredUser = this.getUserByName(username);
+        let error: string = !userToChange ?  `failed assigning basic permissions, user does not exists: ${username}` :
+            !(userToChange.getRole().valueOf() === UserRole.MANAGER) ? `failed assigning basic permissions, user is not manager: ${username}` : undefined;
+
+        if (error) {
+            logger.warn(error);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        (<StoreManager> userToChange).addPermission(ManagementPermission.WATCH_PURCHASES_HISTORY);
+        (<StoreManager> userToChange).addPermission(ManagementPermission.WATCH_USER_QUESTIONS);
+        (<StoreManager> userToChange).addPermission(ManagementPermission.REPLY_USER_QUESTIONS);
+
+        return {data: {result: true}};
+    }
+
 }
 
 export { UserManager };
