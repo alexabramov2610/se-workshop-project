@@ -1,5 +1,5 @@
 import {UserRole} from "../common/Enums";
-import {BoolResponse, errorMsg, SetAdminRequest,UserRequest,logger} from "../common/internal_api";
+import {BoolResponse, errorMsg, SetAdminRequest,UserRequest,logger, RegisterRequest,LoginRequest,LogoutRequest} from "../common/internal_api";
 import {Admin, Buyer, RegisteredUser} from "./internal_api";
 
 class UserManager {
@@ -13,10 +13,10 @@ class UserManager {
     this.admins = [];
   }
 
-  register(req:UserRequest): BoolResponse {
+  register(req:RegisterRequest): BoolResponse {
     const userName=req.body.username
     const password=req.body.password
-    logger.info(`registering new user : ${req.body.uuid} `);
+    logger.info(`registering new user : ${req.body.username} `);
 
     if(this.getUserByName(userName)){    //user already in system
       logger.info(`fail to register ,${userName} already exist `);
@@ -34,49 +34,42 @@ class UserManager {
   
    
 
-  login(req:UserRequest): BoolResponse{
+  login(req:LoginRequest): BoolResponse{
     const userName=req.body.username;
     const password=req.body.password;
-    const uuid=req.body.uuid;
-    logger.info(`try to login ,${uuid}  `);
-    if(!(this.getUserByName(uuid))){ 
-      logger.warn(`fail to login ,${uuid} not found `);
+    logger.info(`try to login ,${userName}  `);
+    if(!(this.getUserByName(userName))){ 
+      logger.warn(`fail to login ,${userName} not found `);
       return {data:{result:false},error:{message:errorMsg['E_NF']}}  //not found
     }
     else if(!this.verifyPassword(userName,password)){
-      logger.warn(`fail to login ${uuid} ,bad password `);
+      logger.warn(`fail to login ${userName} ,bad password `);
       return {data:{result:false},error:{message:errorMsg['E_BP']}} //bad pass
     }
     else if(this.getLoggedInUsers().find((u)=>u.name===userName)){ //already logged in 
-      logger.warn(`fail to login ,${uuid} is allredy logged in `);
+      logger.warn(`fail to login ,${userName} is allredy logged in `);
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
 
     }
     else{
     const user=this.getUserByName(userName)
     this.loggedInUsers.concat([user]);
-    logger.info(`${uuid} has logged in  `);
+    logger.info(`${userName} has logged in  `);
     return { data: { result:true } };  
   }} 
 
-
- 
-
-
-  logout(req:UserRequest):BoolResponse{
-    const userName=req.body.username;
-    const password=req.body.password;
-    const uuid=req.body.uuid;
-    logger.info(`logging out ${uuid}  `);
+  logout(req:LogoutRequest):BoolResponse{
+    const username=req.body.username;
+    logger.info(`logging out ${username}  `);
     const loggedInUsers=this.getLoggedInUsers()
-    if(!loggedInUsers.filter( (u: RegisteredUser) => u.name === userName ).pop()){ //user not logged in
-      logger.warn(`logging out ${uuid} fail, user is not logged in  `);
+    if(!loggedInUsers.filter( (u: RegisteredUser) => u.name === username ).pop()){ //user not logged in
+      logger.warn(`logging out ${username} fail, user is not logged in  `);
 
       return {data:{result:false},error:{message:errorMsg['E_AL']}}
     }
     else{
-    this.loggedInUsers=this.loggedInUsers.filter((u)=>u.name!==userName)
-    logger.info(`logging out ${uuid} seccess `);
+    this.loggedInUsers=this.loggedInUsers.filter((u)=>u.name!==username)
+    logger.info(`logging out ${username} seccess `);
     return {data:{result:true}}
     }
   }

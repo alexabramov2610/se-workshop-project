@@ -2,6 +2,8 @@ import { UserManager, RegisteredUser } from "../user/internal_api";
 import { Item, Product } from "../trading_system/internal_api"
 import { StoreManager, Store } from '../store/internal_api';
 import * as Res from "../common/Response"
+import * as Req from "../common/Request"
+
 import { errorMsg as Error , errorMsg} from "../common/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {BoolResponse, ExternalSystems, logger, OpenStoreRequest, SetAdminRequest} from "../common/internal_api";
@@ -17,8 +19,18 @@ export class TradingSystemManager {
         this.externalSystems = new ExternalSystemsManager();
     }
 
-    register(userName: string, password: string): BoolResponse {
-        const res = this.userManager.register(userName,password);
+    register(req:Req.RegisterRequest): BoolResponse {        
+        const res = this.userManager.register(req);
+        return res;
+    }
+
+    login(req:Req.LoginRequest): BoolResponse {        
+        const res = this.userManager.login(req);
+        return res;
+    }
+
+    logout(req:Req.LogoutRequest): BoolResponse {        
+        const res = this.userManager.logout(req);
         return res;
     }
 

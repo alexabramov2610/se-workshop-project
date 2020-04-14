@@ -287,16 +287,11 @@ export class Store {
     }
 
 
-    // viewStoreInfo():Res.StoreInfoResponse{
-    //     let info="Store Name:"+this.storeName+"\nStore Owners:";
-    //      this._storeOwners.forEach(owner => {info=info+owner.name+" , "});
-    //      //add items? 
-    //     return{data:{result:true,info}}
-    // }
 
     viewStoreInfo():Res.StoreInfoResponse{
-        let prod = Array.from( this.products.keys() );
-        return {data:{result:true,info:{storeName:this.storeName,storeOwners:this._storeOwners,products:prod}}}
+        let productNames = Array.from( this.products.keys() ).map((p)=>p.name);
+        let storeOwnersNames=this._storeOwners.map((o)=>o.name)
+        return {data:{result:true,info:{storeName:this.storeName,storeOwnersNames,productNames}}}
     }
 
    
