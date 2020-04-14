@@ -9,9 +9,16 @@ export interface ProductCatalogNumber {
 
 export interface Product extends ProductCatalogNumber {
     name: string,
-    price: number
+    price: number,
+    category: ProductCategory
 }
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number
+}
+
+export enum ProductCategory {
+    Electronics,
+    Hobbies,
+    Home
 }

@@ -2,7 +2,7 @@ import {Store} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
 import {StoreOwner} from "../../../src/user/internal_api";
 import {Item, Product} from "../../../src/trading_system/internal_api";
-import {ProductCatalogNumber, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+import {ProductCatalogNumber, ProductCategory, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
 
 
 describe("Store Management Unit Tests", () => {
@@ -331,7 +331,7 @@ describe("Store Management Unit Tests", () => {
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
         let products: ProductCatalogNumber[] = [];
         for (let i = 1; i < numberOfItems +1; i ++)
-            products.push(new Product("name", i, 5));
+            products.push(new Product("name", i, 5, ProductCategory.Electronics));
 
         return products;
 
@@ -340,7 +340,7 @@ describe("Store Management Unit Tests", () => {
     function generateValidProducts(numOfItems: number): Product[] {
         let products: Product[] = [];
         for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name", i, 5));
+            products.push(new Product("name", i, 5, ProductCategory.Electronics));
 
         return products;
     }
@@ -348,7 +348,7 @@ describe("Store Management Unit Tests", () => {
     function generateInvalidProducts(numOfItems: number): Product[] {
         let products: Product[] = [];
         for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("", i, 5));
+            products.push(new Product("", i, 5, ProductCategory.Electronics));
 
         return products;
     }

@@ -1,14 +1,15 @@
-import { Store, StoreManager } from "../../../src/store/internal_api";
+import {Store, StoreManager} from "../../../src/store/internal_api";
 import * as Res from "../../../src/api-ext/Response";
-import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
-import { TradingSystemManager } from "../../../src/trading_system/TradingSystemManager";
+import {StoreOwner} from "../../../src/user/internal_api";
+import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
 import {Item, Product} from "../../../src/trading_system/internal_api";
-import { ExternalSystemsManager } from '../../../src/external_systems/ExternalSystemsManager'
-import { UserManager } from '../../../src/user/UserManager';
+import {ExternalSystemsManager} from '../../../src/external_systems/ExternalSystemsManager'
+import {UserManager} from '../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
 import * as Req from "../../../src/api-ext/Request";
-import {Product as ProductReq, Item as ItemReq, ProductCatalogNumber} from "../../../src/api-ext/external_api";
+import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+
 jest.mock('../../../src/user/UserManager');
 jest.mock('../../../src/store/StoreManager');
 jest.mock('../../../src/external_systems/ExternalSystemsManager');
@@ -237,7 +238,7 @@ describe("Store Management Unit Tests", () => {
 
         const productsReq: ProductReq[] = [];
         for (let prod of products) {
-            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price};
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
             productsReq.push(prodReq);
         }
 
@@ -260,7 +261,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         const productsReq: ProductReq[] = [];
         for (let prod of products) {
-            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price};
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
             productsReq.push(prodReq);
         }
 
@@ -283,7 +284,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
         const productsReq: ProductReq[] = [];
         for (let prod of products) {
-            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price};
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
             productsReq.push(prodReq);
         }
 
@@ -548,7 +549,7 @@ describe("Store Management Unit Tests", () => {
     function generateProducts(numOfItems: number): ProductReq[] {
         let products: ProductReq[] = [];
         for (let i = 0; i < numOfItems; i ++)
-            products.push({name: 'name', catalogNumber: 2, price: 5});
+            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.Electronics});
 
         return products;
     }
