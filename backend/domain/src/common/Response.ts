@@ -33,13 +33,4 @@ interface BoolResponse extends Response {
   data: {result: boolean}
 }
 
-interface StoreInfoResponse extends Response{
-  data:{result:boolean,info:{storeName:string,storeOwners:StoreOwner[],products:Product[]}}
-}
-
-interface ProductInfoResponse extends Response{
-  data:{result:boolean,info:{name:string,catalogNumber:number,price:number}}
-}
-
-
-export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse,StoreInfoResponse,ProductInfoResponse };
+export { Response, BoolResponse, StoreProductAdditionResponse, StoreProductRemovalResponse, StoreItemsAdditionResponse, StoreItemsRemovalResponse };

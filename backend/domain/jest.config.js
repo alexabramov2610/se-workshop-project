@@ -1,8 +1,6 @@
 module.exports = {
     "roots": [
-        "test/__tests__/store",
-        "test/__tests__/trading_system",
-        "test/__tests__/user",
+        "test/__tests__/",
         "src"
     ],
     "testMatch": [
@@ -13,4 +11,5 @@ module.exports = {
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest"
     },
+    
   }

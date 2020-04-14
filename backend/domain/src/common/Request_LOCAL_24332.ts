@@ -1,6 +1,6 @@
 interface Request {
   body: any;
-  token: string;
+  requestor: string;
 }
 
 interface OpenStoreRequest extends Request {
@@ -11,9 +11,5 @@ interface UserRequest extends Request{
   body:{username:string,password:string,uuid:string}
 }
 
-interface SetAdminRequest extends Request {
-  body: { newAdminUUID: string};
-}
 
-
-export { OpenStoreRequest, SetAdminRequest ,UserRequest};
+export { OpenStoreRequest,Request,UserRequest  };

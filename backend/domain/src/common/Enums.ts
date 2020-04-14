@@ -1,6 +1,6 @@
 export enum UserRole {
+    GUEST,  
     BUYER,
-    GUEST,
     SELLER,
     MANAGER,
     OWNER,

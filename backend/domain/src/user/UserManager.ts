@@ -1,8 +1,6 @@
 import {UserRole} from "../common/Enums";
-import { BoolResponse,errorMsg,UserRequest } from "../common/internal_api";
-import { RegisteredUser,Admin, Buyer } from "./internal_api";
-import { Logger as logger } from "../common/Logger";
-
+import {BoolResponse, errorMsg, SetAdminRequest,UserRequest,logger} from "../common/internal_api";
+import {Admin, Buyer, RegisteredUser} from "./internal_api";
 
 class UserManager {
   private registeredUsers: RegisteredUser[];
@@ -112,20 +110,28 @@ class UserManager {
     return user.getRole() === UserRole.MANAGER;
   }
 
-  isLoggedIn(user: RegisteredUser) {
-    return false;
+  isLoggedIn(uuid: string): boolean {
+    return this.loggedInUsers.filter(u=> u.name === uuid).pop() !== null
   }
   
   isAdmin(u:RegisteredUser) : boolean{
     return this.admins.filter(val=> val.name === u.name).pop() !== null
   }
 
-  setAdmin(userName:string): BoolResponse{
-    const u :RegisteredUser = this.getUserByName(userName);
+  getUserByToken(uuid: string): RegisteredUser {
+    return this.registeredUsers.filter((u) => u.UUID === uuid).pop();
+  }
+
+  setAdmin(setAdminRequest: SetAdminRequest): BoolResponse{
+    const admin :RegisteredUser = this.getUserByToken(setAdminRequest.token);
+    if(this.admins.length !== 0 && (!admin || admin.getRole() !== UserRole.ADMIN)){
+      //there is already admin - only admin can assign another.
+      return {data:{result:false} , error: {message: errorMsg['E_NOT_AUTHORIZED']}}
+    }
+    const u :RegisteredUser = this.getUserByToken(setAdminRequest.body.newAdminUUID);
     if(!u) return {data:{result:false} , error: {message: errorMsg['E_NF']}}
     const isAdmin:boolean = this.isAdmin(u);
     if(isAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
-
     u.setRole(UserRole.ADMIN);
     this.admins = this.admins.concat([u]);
 
