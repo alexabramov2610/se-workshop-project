@@ -8,7 +8,7 @@ import {
     DummyUserResponse,
     DummyBuyResponse,
     DummyPurchaseHistoryResponse,
-    DummySearchResponse
+    DummySearchResponse, DummyCartResponse
 } from "../../__tests__/dummy_values/dummyValues";
 
 class Proxy implements Bridge {
@@ -84,8 +84,12 @@ class Proxy implements Bridge {
         return this.real ? this.real.rate(toRate, rate) : DummySearchResponse;
     }
 
-    addToCart(cart: Cart, item: Item) {
-        return this.real ? this.real.addToCart(cart, item) : DummyResponse;
+    addToCart(item: Item) {
+        return this.real ? this.real.addToCart(item) : DummyResponse;
+    }
+
+    watchCart() {
+        return this.real ? this.real.watchCart() : DummyCartResponse;
     }
 }
 

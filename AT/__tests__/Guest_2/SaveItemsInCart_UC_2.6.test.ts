@@ -2,7 +2,6 @@ import {
     Bridge,
     Driver,
     CATEGORY,
-    RATE,
     Item,
     Store,
     Cart
@@ -12,7 +11,6 @@ import {
 
 describe("Guest saves items in the cart, UC: 2.6", () => {
     let _serviceBridge: Bridge;
-    let _testCart: Cart;
     let _testStore1: Store;
     let _testStore2: Store;
     let _testItem1: Item;
@@ -55,11 +53,6 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
             description: "lovely-test-store"
         };
 
-        _testCart = {
-            items: [_testItem1],
-            quantities: [1]
-        }
-
         _serviceBridge.addStore(_testStore1);
         _serviceBridge.addStore(_testStore2);
 
@@ -69,48 +62,63 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     });
 
     test("Valid insertion, item doesn't exist in cart", () => {
-        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem2);
+        const {data, error} = _serviceBridge.addToCart(_testItem2);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        expect(_testCart.items.includes(_testItem2)).toBeTruthy();
+        const cart: Cart = _serviceBridge.watchCart().data.cart;
+        expect(cart.items.includes(_testItem2)).toBeTruthy();
 
-        const testItem2Idx = _testCart.items.indexOf(_testItem2);
-        expect(_testCart.quantities[testItem2Idx]).toBe(1);
+        const testItem2Idx = cart.items.indexOf(_testItem2);
+        expect(cart.quantities[testItem2Idx]).toBe(1);
     });
 
     test("Valid insertion, item isn't in stock",() => {
-        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem2);
+        const {data, error} = _serviceBridge.addToCart(_testItem2);
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
 
-        expect(_testCart.items.includes(_testItem2)).toBeFalsy();
+        const cart: Cart = _serviceBridge.watchCart().data.cart;
+        expect(cart.items.includes(_testItem2)).toBeFalsy();
 
-        const testItem2Idx = _testCart.items.indexOf(_testItem2);
-        expect(_testCart.quantities[testItem2Idx]).toBeUndefined();
+        const testItem2Idx = cart.items.indexOf(_testItem2);
+        expect(cart.quantities[testItem2Idx]).toBeUndefined();
     });
 
     test("Valid insertion, item already exists in cart", () => {
-        _testCart.items = [_testItem1, _testItem2, _testItem3];
-        _testCart.quantities = [2, 6, 3];
+        const res1 = _serviceBridge.addToCart(_testItem1);
+        const data1 = res1.data;
+        const error1 = res1.error;
+        expect(error1).toBeUndefined();
+        expect(data1).toBeDefined();
 
-        const beforeQuantities = _testCart.quantities;
+        const res2 = _serviceBridge.addToCart(_testItem2);
+        const data2 = res2.data;
+        const error2 = res2.error;
+        expect(error2).toBeUndefined();
+        expect(data2).toBeDefined();
 
-        const {data, error} = _serviceBridge.addToCart(_testCart, _testItem1);
+        const res3 = _serviceBridge.addToCart(_testItem3);
+        const data3 = res3.data;
+        const error3 = res3.error;
+        expect(error3).toBeUndefined();
+        expect(data3).toBeDefined();
+
+        const beforeQuantities = _serviceBridge.watchCart().data.cart.quantities;
+
+        const {data, error} = _serviceBridge.addToCart(_testItem1);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        expect(_testCart.items.includes(_testItem1)).toBeTruthy();
-        expect(_testCart.items.includes(_testItem2)).toBeTruthy();
-        expect(_testCart.items.includes(_testItem3)).toBeTruthy();
+        const cart: Cart = _serviceBridge.watchCart().data.cart;
 
-        const testItem1Idx = _testCart.items.indexOf(_testItem1);
-        const testItem2Idx = _testCart.items.indexOf(_testItem2);
-        const testItem3Idx = _testCart.items.indexOf(_testItem3);
+        const testItem1Idx = cart.items.indexOf(_testItem1);
+        const testItem2Idx = cart.items.indexOf(_testItem2);
+        const testItem3Idx = cart.items.indexOf(_testItem3);
 
-        const q1 = _testCart.quantities[testItem1Idx];
-        const q2 = _testCart.quantities[testItem2Idx];
-        const q3 = _testCart.quantities[testItem3Idx];
+        const q1 = cart.quantities[testItem1Idx];
+        const q2 = cart.quantities[testItem2Idx];
+        const q3 = cart.quantities[testItem3Idx];
 
         expect(q1).toBe(beforeQuantities[testItem1Idx] + 1);
         expect(q2).toBe(beforeQuantities[testItem2Idx]);

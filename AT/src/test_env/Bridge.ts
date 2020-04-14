@@ -17,5 +17,6 @@ export interface Bridge {
     getPurchaseHistory(): Response;
     search(input: SearchData): Response;
     rate(toRate: Store | Item, rate: RATE): Response;
-    addToCart(cart: Cart, item: Item): Response;
+    addToCart(item: Item): Response;
+    watchCart(): Response;
 }

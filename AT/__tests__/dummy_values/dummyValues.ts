@@ -1,4 +1,4 @@
-import {Response, CATEGORY} from "../../src/test_env/types";
+import {Response, CATEGORY, Cart} from "../../src/test_env/types";
 
 
 const DummyResponse: Response = {
@@ -39,6 +39,19 @@ const DummySearchResponse: Response = {
     },
 };
 
+const DummyCartResponse: Response = {
+    data: {
+        cart: {
+            items: [
+                {name: "dummy-name1", category: CATEGORY.ELECTRONICS, description: "dummy-description1", price: 20},
+                {name: "dummy-name2", category: CATEGORY.ELECTRONICS, description: "dummy-description2", price: 20},
+                {name: "dummy-name3", category: CATEGORY.ELECTRONICS, description: "dummy-description3", price: 20}
+            ], quantities: [5, 2, 7],
+        }
+    },
+};
+
+
 export {
     DummyResponse,
     DummyItemResponse,
@@ -48,4 +61,5 @@ export {
     DummyBuyResponse,
     DummyPurchaseHistoryResponse,
     DummySearchResponse,
+    DummyCartResponse
 };
