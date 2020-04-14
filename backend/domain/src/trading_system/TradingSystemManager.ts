@@ -4,10 +4,9 @@ import { StoreManager, Store } from '../store/internal_api';
 import * as Res from "../api-ext/Response"
 import * as Req from "../api-ext/Request"
 import { errorMsg } from "../api-int/Error";
-import * as Res from "../common/Response"
-import * as Req from "../common/Request"
 
-import { errorMsg as Error , errorMsg} from "../common/Error";
+
+import { errorMsg as Error } from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {
     BoolResponse,

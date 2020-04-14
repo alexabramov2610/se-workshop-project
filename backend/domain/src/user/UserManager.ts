@@ -1,5 +1,6 @@
 import { UserRole, ManagementPermission } from "../api-int/Enums";
-import {BoolResponse, errorMsg, SetAdminRequest,UserRequest,logger, RegisterRequest,LoginRequest,LogoutRequest} from "../api-int/internal_api";
+import {BoolResponse, errorMsg, SetAdminRequest} from "../api-int/internal_api";
+import { RegisterRequest,LoginRequest,LogoutRequest} from "../api-ext/external_api"
 import {Admin, Buyer, RegisteredUser, StoreOwner, StoreManager} from "./internal_api";
 import { logger } from "../api-int/internal_api";
 

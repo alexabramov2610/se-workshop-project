@@ -43,6 +43,18 @@ interface AssignStoreManagerRequest extends Request {
   body: { storeName: string, usernameToAssign: string }
 }
 
+interface RegisterRequest extends Request {
+  body: { username: string, password: string }
+}
+
+interface LoginRequest extends Request {
+  body: { username: string, password: string }
+}
+
+interface LogoutRequest extends Request {
+  body: { username: string}
+}
+
 export { AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest };
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};

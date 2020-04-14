@@ -1,4 +1,4 @@
-import { Error } from "./internal_api";
+import { Error } from "../api-int/internal_api";
 import { Item, Product } from "../trading_system/internal_api";
 import {RegisteredUser} from "../user/users/RegisteredUser"
 import { StoreOwner } from "../user/internal_api";

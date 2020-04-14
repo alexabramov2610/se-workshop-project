@@ -19,51 +19,51 @@ describe("RegisteredUser Management Unit Tests", () => {
 
   test("Registration Success Test", () => {
     driver.mockRegistrationSuccess()
-    const res: Responses.BoolResponse = driver.addUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.addUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeTruthy();
   });
 
   test("Registration user exist Fail Test", () => {
     driver.mockRegistrationUserExistFail()
-    const res: Responses.BoolResponse = driver.addUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.addUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeFalsy();
   });
 
   test("Registration bad pass Fail Test", () => {
     driver.mockRegistrationBadPassFail()
-    const res: Responses.BoolResponse = driver.addUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.addUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeFalsy();
   });
 
 
   test("Login Success Test", () => {
     driver.mockLoginSuccess();
-    const res: Responses.BoolResponse = driver.loginUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.loginUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeTruthy();
   });
 
   test("Login bad password fail Test", () => {
     driver.mockWrongPasswordForLoginError();
-    const res: Responses.BoolResponse = driver.loginUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.loginUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeFalsy();
   });
 
   test("Login already logged in fail Test", () => {
     driver.mockWrongPasswordForLoginError();
-    const res: Responses.BoolResponse = driver.loginUser("ron", "123456");
+    const res: Responses.BoolResponse = driver.loginUser({body:{username:'ron',password:'123456'},token:"token"});
     expect(res.data.result).toBeFalsy();
   });
 
 
   test("logout Success Test", () => { 
     driver.mockLogoutSuccess();   
-    const res: Responses.BoolResponse = driver.logoutUser("ron")
+    const res: Responses.BoolResponse = driver.logoutUser({body:{username:'ron'},token:"token"})
     expect(res.data.result).toBeTruthy();
   });
 
   test("logout already out fail Test", () => { 
     driver.mockLogoutAlreadyOutFail()
-    const res: Responses.BoolResponse =driver.logoutUser('ron')
+    const res: Responses.BoolResponse =driver.logoutUser({body:{username:'ron'},token:"token"})
     expect(res.data.result).toBeFalsy();
   });
 

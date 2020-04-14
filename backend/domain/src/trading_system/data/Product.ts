@@ -1,4 +1,5 @@
-import * as Res from "../../common/Response"
+import {ProductCategory} from "../../api-ext/CommonInterface";
+
 export class Product {
     private readonly _catalogNumber: number;
     private readonly _name: string;
@@ -12,8 +13,10 @@ export class Product {
         this._price = price;
     }
 
-    set price(newPrice: number) {
-        this._price = newPrice;
+
+
+    set price(price: number) {
+        this.price = price;
     }
 
     get price(): number {
@@ -30,15 +33,5 @@ export class Product {
     get catalogNumber(): number {
         return this._catalogNumber;
     }
-
-    isEqual(other: Product): Boolean {
-        return this._catalogNumber === other._catalogNumber;
-    }
-
-    viewInfo():Res.ProductInfoResponse{
-        return{data:{result:true,info:{name:this._name,catalogNumber:this._catalogNumber,price:this._price}}}
-    }
-
-
 
 }

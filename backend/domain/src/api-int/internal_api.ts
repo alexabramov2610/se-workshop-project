@@ -7,4 +7,3 @@ export * from "./Error";
 export * from "../api-ext/Response";
 export * from "./Enums";
 export * from "./Logger";
-export * from "./Request";
