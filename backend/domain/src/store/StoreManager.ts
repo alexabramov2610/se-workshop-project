@@ -152,7 +152,7 @@ export class StoreManager {
     private getProductsFromRequest(productsReq: ProductReq[]) : Product[] {
         let products: Product[] = [];
         for (let productReq of productsReq){
-            const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price);
+            const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
 
