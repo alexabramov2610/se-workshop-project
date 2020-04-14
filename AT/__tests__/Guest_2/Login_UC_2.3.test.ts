@@ -68,6 +68,6 @@ describe("Guest Login, UC: 2.3", () => {
 
         const {data} = _serviceBridge.getLoggedInUsers();
         const {users} = data;
-        expect(users.includes(_credentials.userName)).toBeFalsy();
+        expect(users.includes(_credentials.userName)).toBeTruthy();
     });
 });
