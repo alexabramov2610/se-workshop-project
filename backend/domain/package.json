@@ -10,7 +10,8 @@
     "debug": "tsc && DEBUG=1 node dist/index.js ",
     "test": "TEST_MODE=1 jest",
     "test:silent": "TEST_MODE=1 SILENT=1 jest",
-    "clear:test": "jest --clearCache",
+    "test:clear": "jest --clearCache",
+    "test:cov": "jest --coverage",
     "test:watch": "npm t -- --watch",
     "clean": "rm -rf dist",
     "clean:hard": "rm -rf dist && rm -rf logs"
