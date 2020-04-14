@@ -1,11 +1,16 @@
+import {ProductCategory} from "../../api-ext/CommonInterface";
+
 export class Product {
     private readonly _catalogNumber: number;
     private readonly _name: string;
     private _price: number;
+    private _category: ProductCategory;
 
-    constructor(name: string, catalogNumber: number) {
+    constructor(name: string, catalogNumber: number, price: number, productCategory: ProductCategory) {
+        this._category = productCategory;
         this._name = name;
         this._catalogNumber = catalogNumber;
+        this._price = price;
     }
 
     set price(price: number) {
@@ -19,14 +24,12 @@ export class Product {
     get name(): string {
         return this._name;
     }
+    get category(): ProductCategory {
+        return this._category;
+    }
 
     get catalogNumber(): number {
         return this._catalogNumber;
     }
-
-    isEqual(other: Product): Boolean {
-        return this._catalogNumber === other._catalogNumber;
-    }
-
 
 }

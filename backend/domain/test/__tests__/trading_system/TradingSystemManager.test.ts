@@ -1,12 +1,14 @@
-import { Store, StoreManager } from "../../../src/store/internal_api";
-import * as Res from "../../../src/common/Response";
+import {Store, StoreManager} from "../../../src/store/internal_api";
+import * as Res from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser, Buyer} from "../../../src/user/internal_api";
 import { TradingSystemManager } from "../../../src/trading_system/TradingSystemManager";
 import {Item, Product} from "../../../src/trading_system/internal_api";
-import { ExternalSystemsManager } from '../../../src/external_systems/ExternalSystemsManager'
-import { UserManager } from '../../../src/user/UserManager';
+import {ExternalSystemsManager} from '../../../src/external_systems/ExternalSystemsManager'
+import {UserManager} from '../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
-import {OpenStoreRequest, SetAdminRequest} from "../../../src/common/Request";
+import * as Req from "../../../src/api-ext/Request";
+import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../src/api-ext/external_api";
+import {ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
 jest.mock('../../../src/user/UserManager');
 jest.mock('../../../src/store/StoreManager');
 jest.mock('../../../src/external_systems/ExternalSystemsManager');
@@ -24,84 +26,95 @@ describe("Store Management Unit Tests", () => {
         mocked(StoreManager).mockClear();
     });
 
+    function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                addItems: () => operationResMock
+            }
+        });
+    }
+
     test("addItems success", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = true;
-        const storeRes: Res.StoreItemsAdditionResponse = {data: {result: true, itemsNotAdded: []} };
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "addItems").mockReturnValue(storeRes);
+        prepareAddItemMock(isLoggedIn, isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
+        let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeTruthy();
-        expect(store.addItems).toBeCalledTimes(1);
     });
 
     test("addItems failure - not logged in", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "addItems").mockReturnValue(undefined);
-
+        prepareAddItemMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
+        let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeFalsy();
-        expect(store.addItems).toBeCalledTimes(0);
     });
 
     test("addItems failure - inventory operation verification failed", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: false}, error: {message: "mock error"} }
+        const isSuccess: boolean = false;
+        prepareAddItemMock(isLoggedIn, isSuccess);
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "addItems").mockReturnValue(undefined);
-
-        tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsAdditionResponse = tradingSystemManager.addItems(items, user, store)
+        const tradingSystemManager: TradingSystemManager = new TradingSystemManager();
+        const req: Req.ItemsAdditionRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
+        let res: Res.ItemsAdditionResponse = tradingSystemManager.addItems(req)
 
         expect(res.data.result).toBeFalsy();
-        expect(store.addItems).toBeCalledTimes(0);
-
     });
+
+    function prepareRemoveItemsMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                removeItems: () => operationResMock
+            }
+        });
+    }
 
     test("removeItems success", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = true;
-        const storeRes: Res.StoreItemsRemovalResponse = {data: {result: true, itemsNotRemoved: []} };
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "removeItems").mockReturnValue(storeRes);
-
+        prepareRemoveItemsMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
+
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
+        let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeTruthy();
-        expect(store.removeItems).toBeCalledTimes(1);
     });
 
     test("removeItems failure - not logged in", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
-
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        const isSuccess: boolean = true;
+        prepareRemoveItemsMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "removeItems").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}}
+        let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeItems).toBeCalledTimes(0);
@@ -111,60 +124,69 @@ describe("Store Management Unit Tests", () => {
         const numOfItems: number = 5;
         const items: Item[] = generateItems(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: false}, error: {message: "mock error"} }
+        const isSuccess: boolean = false;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        prepareRemoveItemsMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "removeItems").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreItemsRemovalResponse = tradingSystemManager.removeItems(items, user, store)
+        const req: Req.ItemsRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, items: items}};
+        let res: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(req)
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeItems).toBeCalledTimes(0);
 
     });
 
+    function prepareRemoveProductsWithQuantityMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                removeProductsWithQuantity: () => operationResMock
+            }
+        });
+    }
+
     test("removeProductsWithQuantity success", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
-        let productsMap :Map<Product, number> = new Map();
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
+        let productsWithQuantity: ProductWithQuantity[] = [];
 
         for (let i = 0 ; i< numOfItems ; i++){
-            productsMap.set(products[i], i);
+            const currProduct: ProductWithQuantity = {catalogNumber: products[i].catalogNumber, quantity: i}
+            productsWithQuantity.push(currProduct);
         }
 
-        const verifyBool: boolean = true;
-        const storeRes: Res.StoreProductRemovalResponse = {data: {result: true, productsNotRemoved: [] } };
-
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(storeRes);
-
+        prepareRemoveProductsWithQuantityMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
+
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeTruthy();
-        expect(store.removeProductsWithQuantity).toBeCalledTimes(1);
     });
 
     test("removeProductsWithQuantity failure - not logged in", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
-        let productsMap :Map<Product, number> = new Map();
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
+        let productsWithQuantity: ProductWithQuantity[] = [];
 
         for (let i = 0 ; i< numOfItems ; i++){
-            productsMap.set(products[i], i);
+            const currProduct: ProductWithQuantity = {catalogNumber: products[i].catalogNumber, quantity: i}
+            productsWithQuantity.push(currProduct);
         }
-        const verifyRes: boolean = false;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        prepareRemoveProductsWithQuantityMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
@@ -172,54 +194,78 @@ describe("Store Management Unit Tests", () => {
 
     test("removeProductsWithQuantity inventory operation verification failed", () => {
         const numOfItems: number = 5;
-        let productsMap :Map<Product, number> = new Map();
-        const products: Product[] = generateProducts(numOfItems);
-        const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: false} }
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+        let productsWithQuantity: ProductWithQuantity[] = [];
 
         for (let i = 0 ; i< numOfItems ; i++){
-            productsMap.set(products[i], i);
+            const currProduct: ProductWithQuantity = {catalogNumber: products[i].catalogNumber, quantity: i}
+            productsWithQuantity.push(currProduct);
         }
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        prepareRemoveProductsWithQuantityMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(productsMap, user, store)
+        const req: Req.RemoveProductsWithQuantity = { token: user.UUID, body: {storeName: store.storeName, products: productsWithQuantity}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(req);
 
         expect(res.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
 
     });
 
+    function prepareAddNewProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                addNewProducts: () => operationResMock
+            }
+        });
+    }
+
     test("addNewProducts success", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
-        const storeRes: Res.StoreProductAdditionResponse = {data: {result: true, productsNotAdded: [] } };
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "addNewProducts").mockReturnValue(storeRes);
-
+        prepareAddNewProductsMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
+
+        const productsReq: ProductReq[] = [];
+        for (let prod of products) {
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
+            productsReq.push(prodReq);
+        }
+
+
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeTruthy();
-        expect(store.addNewProducts).toBeCalledTimes(1);
     });
 
     test("addNewProducts failure - not logged in", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        prepareAddNewProductsMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "addNewProducts").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
+        const productsReq: ProductReq[] = [];
+        for (let prod of products) {
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addNewProducts).toBeCalledTimes(0);
@@ -227,71 +273,183 @@ describe("Store Management Unit Tests", () => {
 
     test("addNewProducts failure - inventory operation verification failed", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: false}, error: {message: "mock error"} }
+        const isSuccess: boolean = false;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
+        prepareAddNewProductsMock(isLoggedIn, isSuccess);
         jest.spyOn(store, "addNewProducts").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductAdditionResponse = tradingSystemManager.addNewProducts(products, user, store)
+        const productsReq: ProductReq[] = [];
+        for (let prod of products) {
+            const prodReq: ProductReq = {catalogNumber: prod.catalogNumber, name: prod.name, price: prod.price, category: ProductCategory.Electronics};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AddProductsRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(req)
 
         expect(res.data.result).toBeFalsy();
         expect(store.addNewProducts).toBeCalledTimes(0);
 
     });
 
+    function prepareRemoveProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                removeProducts: () => operationResMock
+            }
+        });
+    }
+
     test("removeProducts success", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
-        const storeRes: Res.StoreProductRemovalResponse = {data: {result: true, productsNotRemoved: [] } };
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "removeProducts").mockReturnValue(storeRes);
-
+        prepareRemoveProductsMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeTruthy();
-        expect(store.removeProducts).toBeCalledTimes(1);
     });
 
     test("removeProducts failure - not logged in", () => {
         const numOfItems: number = 5;
-        const products: Product[] = generateProducts(numOfItems);
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = false;
-        const boolResponse: Res.BoolResponse = { data: {result: true} }
+        const isSuccess: boolean = true;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "removeProducts").mockReturnValue(undefined);
+        prepareRemoveProductsMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeFalsy();
-        expect(store.removeProducts).toBeCalledTimes(0);
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
     test("removeProducts failure - inventory operation verification failed", () => {
         const numOfItems: number = 5;
         let productsMap :Map<Product, number> = new Map();
-        const products: Product[] = generateProducts(numOfItems);
+        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
-        const boolResponse: Res.BoolResponse = { data: {result: false}, error: {message: "mock error"} }
+        const isSuccess: boolean = false;
 
-        prepareMocksForInventoryManagement(isLoggedIn, boolResponse);
-        jest.spyOn(store, "removeProducts").mockReturnValue(undefined);
+        prepareRemoveProductsMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        let res: Res.StoreProductRemovalResponse = tradingSystemManager.removeProducts(products, user, store)
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.ProductRemovalRequest = { token: user.UUID, body: {storeName: store.storeName, products: productsReq}};
+        let res: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(req)
 
         expect(res.data.result).toBeFalsy();
-        expect(store.removeProducts).toBeCalledTimes(0);
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
 
     });
+
+    function prepareAssignStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManager).mockImplementation(() :any => {
+            return {
+                assignStoreOwner: () => operationResMock
+            }
+        });
+    }
+
+    test("assignStoreOwner success", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareAssignStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("assignStoreOwner failure - not logged in", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = true;
+
+        prepareAssignStoreOwnerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
+
+    test("assignStoreOwner failure - failure", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareAssignStoreOwnerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (let prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = { token: user.UUID, body: {storeName: store.storeName, usernameToAssign: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
+
+
 
     test("connectDeliverySys success", () => {
         const connectSystemRes: Res.BoolResponse = {data: {result: true }};
@@ -347,7 +505,7 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation(() :any => {
             return { setAdmin: () => setAdminRes }
         });
-        const setAdminRequest: SetAdminRequest = {body: {newAdminUUID: "123"} ,token: "1"};
+        const setAdminRequest: Req.SetAdminRequest = {body: {newAdminUUID: "123"} ,token: "1"};
 
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.setAdmin(setAdminRequest);
@@ -360,7 +518,7 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation(() :any => {
             return { setAdmin: () => setAdminRes }
         });
-        const setAdminRequest: SetAdminRequest = {body: {newAdminUUID: "123"} ,token: "1"};
+        const setAdminRequest: Req.SetAdminRequest = {body: {newAdminUUID: "123"} ,token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.setAdmin(setAdminRequest);
         expect(res.data.result).toBeFalsy();
@@ -369,7 +527,7 @@ describe("Store Management Unit Tests", () => {
 
     test("Create store success", () => {
         prepereMocksForCreateStore(true);
-        const createStoreRequest: OpenStoreRequest = {body: {storeName: "new store"} ,token: "1"};
+        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"} ,token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeTruthy();
@@ -378,7 +536,7 @@ describe("Store Management Unit Tests", () => {
 
     test("Create store failure", () => {
         prepereMocksForCreateStore(false);
-        const createStoreRequest: OpenStoreRequest = {body: {storeName: "new store"} ,token: "1"};
+        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"} ,token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeFalsy();
@@ -395,15 +553,13 @@ describe("Store Management Unit Tests", () => {
         });
     }
 
-    function prepareMocksForInventoryManagement(isLoggedIn: boolean, verifyStoreInventoryOperationMock: Res.BoolResponse) {
+    function prepareMocksForInventoryManagement(isLoggedIn: boolean) {
+        const verifyResMock: Res.BoolResponse = isLoggedIn ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
 
         mocked(UserManager).mockImplementation(() :any => {
-            return { isLoggedIn: () => isLoggedIn }
-        });
-
-        mocked(StoreManager).mockImplementation(() :any => {
             return {
-                verifyStoreOperation: () => verifyStoreInventoryOperationMock
+                verifyUser: () => verifyResMock,
+                getUserByToken: () => user,
             }
         });
     }
@@ -416,10 +572,10 @@ describe("Store Management Unit Tests", () => {
         return items;
     }
 
-    function generateProducts(numOfItems: number): Product[] {
-        let products: Product[] = [];
+    function generateProducts(numOfItems: number): ProductReq[] {
+        let products: ProductReq[] = [];
         for (let i = 0; i < numOfItems; i ++)
-            products.push(new Product('name', 2));
+            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.Electronics});
 
         return products;
     }

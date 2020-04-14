@@ -1,4 +1,4 @@
-import { UserRole } from "../../common/internal_api"
+import { UserRole } from "../../api-int/internal_api"
 import { v4 as uuid } from 'uuid';
 
 export abstract class RegisteredUser {
