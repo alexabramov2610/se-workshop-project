@@ -31,7 +31,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
       description: "",
       id: "",
     }).error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 
   test("Create Store - Sad Path: missing name", () => {
@@ -42,7 +42,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
       description: "nice description",
       id: "cool.unique.id",
     }).error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 
   test("Create Store - Sad Path: create and create again with same info", () => {
@@ -51,13 +51,13 @@ describe("Create Store Buyer, UC: 3.2", () => {
     const { name } = _serviceBridge.addStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     const error = _serviceBridge.addStore(_storeInformation).error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 
   test("Create Store - Sad Path: valid store information - not logged in user", () => {
     _serviceBridge.logout();
     const error = _serviceBridge.addStore(_storeInformation).error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 });
   
