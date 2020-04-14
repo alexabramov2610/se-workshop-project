@@ -140,7 +140,7 @@ export class StoreManager {
         }
 
         logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
-        const additionRes: Res.BoolResponse = store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password));    //TODO: fix new StoreOwner
+        const additionRes: Res.BoolResponse = store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password, userToAssign.UUID));
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, false);
         return additionRes;
@@ -168,7 +168,7 @@ export class StoreManager {
         }
 
         logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
-        const additionRes: Res.BoolResponse = store.addStoreManager(new StoreManagerUser(userToAssign.name, userWhoAssigns.password));    //TODO: fix new StoreManager
+        const additionRes: Res.BoolResponse = store.addStoreManager(new StoreManagerUser(userToAssign.name, userWhoAssigns.password, userWhoAssigns.UUID));
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, true);
         return additionRes;
