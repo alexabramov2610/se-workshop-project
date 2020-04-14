@@ -26,7 +26,7 @@ class UserManager {
        return {data:{result:false},error:{message:errorMsg['E_BP']}}
      }
     else{
-    this.registeredUsers.concat([new Buyer(userName,password)]);
+    this.registeredUsers.concat([new Buyer(userName,password,req.token)]);
     logger.info(`${userName} has registed to the system `);
 
     return { data: { result: true } };
