@@ -1,10 +1,15 @@
 interface Request {
   body: any;
-  requestor: string;
+  token: string;
 }
 
 interface OpenStoreRequest extends Request {
   body: { storeName: string};
 }
 
-export { OpenStoreRequest,  };
+interface SetAdminRequest extends Request {
+  body: { newAdminUUID: string};
+}
+
+
+export { OpenStoreRequest, SetAdminRequest };

@@ -4,9 +4,7 @@ import { StoreManager, Store } from '../store/internal_api';
 import * as Res from "../common/Response"
 import { errorMsg as Error , errorMsg} from "../common/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import { BoolResponse,ExternalSystems,logger,OpenStoreRequest } from "../common/internal_api";
-
-
+import {BoolResponse, ExternalSystems, logger, OpenStoreRequest, SetAdminRequest} from "../common/internal_api";
 
 export class TradingSystemManager {
     private userManager: UserManager;
@@ -30,7 +28,7 @@ export class TradingSystemManager {
 
     addItems(items: Item[], user: RegisteredUser, store: Store) : Res.StoreItemsAdditionResponse {
         logger.info(`trying to add items to store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`);
-        if (!this.userManager.isLoggedIn(user)) {
+        if (!this.userManager.isLoggedIn(user.UUID)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.warn(error);
             return { data: { result: false, itemsNotAdded: items } , error: { message: error}};
@@ -45,7 +43,7 @@ export class TradingSystemManager {
 
     removeItems(items: Item[], user: RegisteredUser, store: Store) : Res.StoreItemsRemovalResponse {
         logger.info(`trying to remove items from store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`);
-        if (!this.userManager.isLoggedIn(user)) {
+        if (!this.userManager.isLoggedIn(user.UUID)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.warn(error);
             return { data: { result: false, itemsNotRemoved: items } , error: { message: error}};
@@ -60,7 +58,7 @@ export class TradingSystemManager {
 
     removeProductsWithQuantity(products : Map<Product, number>, user: RegisteredUser, store: Store) : Res.StoreProductRemovalResponse {
         logger.info(`trying to remove items to store: ${JSON.stringify(store.UUID)} from user: ${JSON.stringify(user.UUID)}`);
-        if (!this.userManager.isLoggedIn(user)) {
+        if (!this.userManager.isLoggedIn(user.UUID)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.warn(error);
             return { data: { result: false, productsNotRemoved: Array.from(products.keys()) } , error: { message: error}};
@@ -75,7 +73,7 @@ export class TradingSystemManager {
 
     addNewProducts(products: Product[], user: RegisteredUser, store: Store) : Res.StoreProductAdditionResponse {
         logger.info(`trying to add products to store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`)
-        if (!this.userManager.isLoggedIn(user)) {
+        if (!this.userManager.isLoggedIn(user.UUID)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.warn(error);
             return { data: { result: false, productsNotAdded: products } , error: { message: error}};
@@ -90,7 +88,7 @@ export class TradingSystemManager {
 
     removeProducts(products: Product[], user: RegisteredUser, store: Store) : Res.StoreProductRemovalResponse {
         logger.info(`trying to remove products from store: ${JSON.stringify(store.UUID)} by user: ${JSON.stringify(user.UUID)}`)
-        if (!this.userManager.isLoggedIn(user)) {
+        if (!this.userManager.isLoggedIn(user.UUID)) {
             const error = Error['E_NOT_LOGGED_IN'];
             logger.warn(error);
             return { data: { result: false, productsNotRemoved: products } , error: { message: error}};
@@ -115,17 +113,17 @@ export class TradingSystemManager {
         return res;
     }
 
-    setAdmin(userName: string): BoolResponse{
-        logger.info(`trying set ${userName} as an admin`)
-        const res:BoolResponse = this.userManager.setAdmin(userName);
+    setAdmin(setAdminRequest: SetAdminRequest): BoolResponse{
+        logger.info(`user ${setAdminRequest.token} trying set ${setAdminRequest.body.newAdminUUID} as an admin`)
+        const res:BoolResponse = this.userManager.setAdmin(setAdminRequest);
         return res;
     }
 
     createStore(storeReq: OpenStoreRequest) : BoolResponse{
-        logger.info(`user ${storeReq.requestor} trying open store: ${storeReq.body.storeName}`)
-        const u: RegisteredUser = this.userManager.getUserByName(storeReq.requestor);
+        logger.info(`user ${storeReq.token} trying open store: ${storeReq.body.storeName}`)
+        const u: RegisteredUser = this.userManager.getUserByToken(storeReq.token);
         if(!u) return {data: {result:false}, error:{message: errorMsg['E_NOT_AUTHORIZED']}}
-        if(!this.userManager.isLoggedIn(u)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
+        if(!this.userManager.isLoggedIn(u.UUID)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
         const res:BoolResponse = this.storeManager.addStore(storeReq.body.storeName, u);
         return res;
     }
