@@ -8,7 +8,11 @@ interface Request {
 
 
 interface OpenStoreRequest extends Request {
-  body: { storeName: string}
+  body: { storeName: string};
+}
+
+interface SetAdminRequest extends Request {
+  body: { newAdminUUID: string};
 }
 
 interface ItemsAdditionRequest extends Request {
@@ -35,4 +39,6 @@ interface AssignStoreOwnerRequest extends Request {
   body: { storeName: string, usernameToAssign: string }
 }
 
-export { AssignStoreOwnerRequest, OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest };
+export { AssignStoreOwnerRequest, SetAdminRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest };

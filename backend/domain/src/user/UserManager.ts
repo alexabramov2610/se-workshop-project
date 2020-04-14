@@ -111,12 +111,16 @@ class UserManager {
         return this.admins.filter(val=> val.name === u.name).pop() !== null
     }
 
-    setAdmin(userName:string): BoolResponse{
-        const u :RegisteredUser = this.getUserByName(userName);
+    setAdmin(setAdminRequest: SetAdminRequest): BoolResponse{
+        const admin :RegisteredUser = this.getUserByToken(setAdminRequest.token);
+        if(this.admins.length !== 0 && (!admin || admin.getRole() !== UserRole.ADMIN)){
+            //there is already admin - only admin can assign another.
+            return {data:{result:false} , error: {message: errorMsg['E_NOT_AUTHORIZED']}}
+        }
+        const u :RegisteredUser = this.getUserByToken(setAdminRequest.body.newAdminUUID);
         if(!u) return {data:{result:false} , error: {message: errorMsg['E_NF']}}
         const isAdmin:boolean = this.isAdmin(u);
         if(isAdmin) return {data:{result:false} , error: {message: errorMsg['E_AL']}}
-
         u.setRole(UserRole.ADMIN);
         this.admins = this.admins.concat([u]);
 
