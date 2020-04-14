@@ -63,7 +63,7 @@ describe("Guest watch cart, UC: 2.7", () => {
     test("Non empty cart", () => {
         _serviceBridge.addToCart(_testItem2);
 
-        const {data, error} = _serviceBridge.watchCart().data.cart;
+        const {data, error} = _serviceBridge.watchCart();
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -76,7 +76,7 @@ describe("Guest watch cart, UC: 2.7", () => {
     });
 
     test("Empty cart", () => {
-        const {data, error} = _serviceBridge.watchCart().data.cart;
+        const {data, error} = _serviceBridge.watchCart();
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
