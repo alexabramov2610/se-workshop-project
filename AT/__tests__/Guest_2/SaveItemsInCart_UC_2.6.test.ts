@@ -124,5 +124,4 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         expect(q2).toBe(beforeQuantities[testItem2Idx]);
         expect(q3).toBe(beforeQuantities[testItem3Idx]);
     });
-
 });
