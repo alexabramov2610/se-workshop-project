@@ -45,6 +45,6 @@ describe("Watch Purchases History, UC: 3.7", () => {
 
   test("Sad Path: not-logged in user", () => {
     const error = _serviceBridge.getPurchaseHistory().error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 });

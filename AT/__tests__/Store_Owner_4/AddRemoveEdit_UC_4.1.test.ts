@@ -1,9 +1,10 @@
-import { Bridge, Driver, Store, Credentials } from "../../src/";
+import { Bridge, Driver } from "../../src/";
+import { Store, AuthDetails } from "../../src/test_env/types";
 
-describe("Create Store Buyer, UC: 3.2", () => {
+describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: Credentials;
+  let _credentials: AuthDetails;
 
   beforeEach(() => {
     _serviceBridge = Driver.makeBridge();
@@ -30,7 +31,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
       description: "",
       id: "",
     }).error;
-    expect(error).toBeDefined();
+    expect(error).toBeTruthy();
   });
 
   test("Create Store - Sad Path: missing name", () => {
@@ -41,7 +42,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
       description: "nice description",
       id: "cool.unique.id",
     }).error;
-    expect(error).toBeDefined();
+    expect(error).toBeTruthy();
   });
 
   test("Create Store - Sad Path: create and create again with same info", () => {
@@ -50,13 +51,12 @@ describe("Create Store Buyer, UC: 3.2", () => {
     const { name } = _serviceBridge.addStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     const error = _serviceBridge.addStore(_storeInformation).error;
-    expect(error).toBeDefined();
+    expect(error).toBeTruthy();
   });
 
   test("Create Store - Sad Path: valid store information - not logged in user", () => {
     _serviceBridge.logout();
     const error = _serviceBridge.addStore(_storeInformation).error;
-    expect(error).toBeDefined();
+    expect(error).toBeTruthy();
   });
 });
-  
