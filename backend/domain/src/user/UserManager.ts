@@ -1,6 +1,6 @@
 import {UserRole} from "../api-int/Enums";
-import { BoolResponse,errorMsg } from "../api-int/internal_api";
-import { RegisteredUser,Admin, Buyer } from "./internal_api";
+import {BoolResponse, errorMsg, SetAdminRequest} from "../api-int/internal_api";
+import {Admin, Buyer, RegisteredUser} from "./internal_api";
 
 class UserManager {
     private registeredUsers: RegisteredUser[];

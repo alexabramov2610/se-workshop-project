@@ -5,16 +5,17 @@ import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {logger} from "domain_layer/dist/src/api-int/Logger";
 
-export const systemInit = ():boolean=>{
+export const systemInit = ():BoolResponse=>{
     let res:boolean = true;
-    res = res && !tradingSystem.connectDeliverySys().error;
-    res = res && !tradingSystem.connectPaymentSys().error;
-    const hasAdmin:boolean = tradingSystem.getUserByName("Admin") != undefined
-    return hasAdmin? res : res && !tradingSystem.register("Admin","Admin").error
+    const connectDelivery: BoolResponse = tradingSystem.connectDeliverySys();
+   if(connectDelivery.error) return connectDelivery;
+    const connectPayment: BoolResponse =  tradingSystem.connectPaymentSys();
+   if(connectPayment.error) return connectPayment;
+    return tradingSystem.register("Admin","Admin");
 }
 
-export const createStore = (storeName: string, requestor: string):boolean => {
-    return StoreService.createStore(storeName, requestor);
+export const createStore = (createStoreReq: OpenStoreRequest):BoolResponse => {
+    return StoreService.createStore(createStoreReq);
 }
 
 export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse => {

@@ -13,6 +13,7 @@ import {
 } from "../api-int/internal_api";
 
 
+import {BoolResponse, ExternalSystems, logger, OpenStoreRequest, SetAdminRequest} from "../common/internal_api";
 
 export class TradingSystemManager {
     private userManager: UserManager;
@@ -122,17 +123,17 @@ export class TradingSystemManager {
         return res;
     }
 
-    setAdmin(userName: string): BoolResponse{
-        logger.info(`trying set ${userName} as an admin`)
-        const res:BoolResponse = this.userManager.setAdmin(userName);
+    setAdmin(setAdminRequest: SetAdminRequest): BoolResponse{
+        logger.info(`user ${setAdminRequest.token} trying set ${setAdminRequest.body.newAdminUUID} as an admin`)
+        const res:BoolResponse = this.userManager.setAdmin(setAdminRequest);
         return res;
     }
 
     createStore(storeReq: OpenStoreRequest) : BoolResponse{
         logger.info(`user ${storeReq.token} trying open store: ${storeReq.body.storeName}`)
-        const u: RegisteredUser = this.userManager.getUserByName(storeReq.token);
+        const u: RegisteredUser = this.userManager.getUserByToken(storeReq.token);
         if(!u) return {data: {result:false}, error:{message: errorMsg['E_NOT_AUTHORIZED']}}
-        if(!this.userManager.isLoggedIn(u)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
+        if(!this.userManager.isLoggedIn(u.UUID)) return {data: {result:false}, error:{message: errorMsg['E_NOT_LOGGED_IN']}}
         const res:BoolResponse = this.storeManager.addStore(storeReq.body.storeName, u);
         return res;
     }
