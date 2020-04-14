@@ -91,6 +91,9 @@ class Proxy implements Bridge {
     watchCart() {
         return this.real ? this.real.watchCart() : DummyCartResponse;
     }
+    addStoreOwner(user: User){
+        return this.real ? this.real.addStoreOwner() : DummyCartResponse;
+    };
 }
 
 export {Proxy};

@@ -1,65 +1,98 @@
-import {Response, CATEGORY, Cart} from "../../src/test_env/types";
-
+import { Response, CATEGORY, Cart } from "../../src/test_env/types";
 
 const DummyResponse: Response = {
-    data: {},
+  data: {},
 };
 
 const DummyItemResponse: Response = {
-    data: {name: "dummyItem", price: 33.5, description: "dummyDescription"},
+  data: { name: "dummyItem", price: 33.5, description: "dummyDescription" },
 };
 
 const DummyStoreResponse: Response = {
-    data: {name: "dummyStore", description: "dummyDescription"},
+  data: { name: "dummyStore", description: "dummyDescription" },
 };
 
 const DummyUsersResponse: Response = {
-    data: {users: ["dummyUser1", "dummyUser2", "dummyUser3"]},
+  data: { users: ["dummyUser1", "dummyUser2", "dummyUser3"] },
 };
 
 const DummyUserResponse: Response = {
-    data: {username: "dummyUser"},
+  data: { username: "dummyUser" },
 };
 
 const DummyBuyResponse: Response = {
-    data: {receiptId: "some-fake-id"},
+  data: { receiptId: "some-fake-id" },
 };
 
 const DummyPurchaseHistoryResponse: Response = {
-    data: {purchases: [{productName: "some-name"}]},
+  data: { purchases: [{ productName: "some-name" }] },
 };
 
 const DummySearchResponse: Response = {
-    data: {
-        items: [
-            {name: "dummy-name1", category: CATEGORY.ELECTRONICS, description: "dummy-description1", price: 20},
-            {name: "dummy-name2", category: CATEGORY.ELECTRONICS, description: "dummy-description2", price: 20},
-            {name: "dummy-name3", category: CATEGORY.ELECTRONICS, description: "dummy-description3", price: 20}
-        ]
-    },
+  data: {
+    items: [
+      {
+        name: "dummy-name1",
+        category: CATEGORY.ELECTRONICS,
+        description: "dummy-description1",
+        price: 20,
+      },
+      {
+        name: "dummy-name2",
+        category: CATEGORY.ELECTRONICS,
+        description: "dummy-description2",
+        price: 20,
+      },
+      {
+        name: "dummy-name3",
+        category: CATEGORY.ELECTRONICS,
+        description: "dummy-description3",
+        price: 20,
+      },
+    ],
+  },
+};
+
+const DummyAssignedAsOwnerResponse: Response = {
+  data: { assigned: true },
 };
 
 const DummyCartResponse: Response = {
-    data: {
-        cart: {
-            items: [
-                {name: "dummy-name1", category: CATEGORY.ELECTRONICS, description: "dummy-description1", price: 20},
-                {name: "dummy-name2", category: CATEGORY.ELECTRONICS, description: "dummy-description2", price: 20},
-                {name: "dummy-name3", category: CATEGORY.ELECTRONICS, description: "dummy-description3", price: 20}
-            ], quantities: [5, 2, 7],
-        }
+  data: {
+    cart: {
+      items: [
+        {
+          name: "dummy-name1",
+          category: CATEGORY.ELECTRONICS,
+          description: "dummy-description1",
+          price: 20,
+        },
+        {
+          name: "dummy-name2",
+          category: CATEGORY.ELECTRONICS,
+          description: "dummy-description2",
+          price: 20,
+        },
+        {
+          name: "dummy-name3",
+          category: CATEGORY.ELECTRONICS,
+          description: "dummy-description3",
+          price: 20,
+        },
+      ],
+      quantities: [5, 2, 7],
     },
+  },
 };
 
-
 export {
-    DummyResponse,
-    DummyItemResponse,
-    DummyStoreResponse,
-    DummyUsersResponse,
-    DummyUserResponse,
-    DummyBuyResponse,
-    DummyPurchaseHistoryResponse,
-    DummySearchResponse,
-    DummyCartResponse
+  DummyResponse,
+  DummyItemResponse,
+  DummyStoreResponse,
+  DummyUsersResponse,
+  DummyUserResponse,
+  DummyBuyResponse,
+  DummyPurchaseHistoryResponse,
+  DummySearchResponse,
+  DummyCartResponse,
 };
