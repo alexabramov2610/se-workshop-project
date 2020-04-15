@@ -91,7 +91,6 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(receiptId.length > 0).toBeTruthy();
         expect(transaction.ccHoldName).toEqual(_testCreditCard.ownerName);
         expect(transaction.amountCharged).toEqual(_testItem1.price);
-        expect(transaction.ccNumber).toEqual(_testCreditCard.number);
 
         const start = _testCreditCard.number.length - 4;
         const last4 = _testCreditCard.number.substring(start);
@@ -115,6 +114,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
         _serviceBridge.setDiscountToStore(_testStore1, _testDiscount);
         _serviceBridge.logout();
+        _serviceBridge.addToCart(_testItem1);
 
         const {data, error} = _serviceBridge.checkout(_testCreditCard);
         expect(data).toBeDefined();
@@ -124,7 +124,6 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(receiptId.length > 0).toBeTruthy();
         expect(transaction.ccHoldName).toEqual(_testCreditCard.ownerName);
         expect(transaction.amountCharged).toEqual(priceAfterDiscount);
-        expect(transaction.ccNumber).toEqual(_testCreditCard.number);
 
         const start = _testCreditCard.number.length - 4;
         const last4 = _testCreditCard.number.substring(start);
