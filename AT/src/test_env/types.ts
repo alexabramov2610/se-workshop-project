@@ -38,11 +38,6 @@ interface Item {
     description: string
 }
 
-interface BuyItem {
-    item: Item,
-    store: Store
-}
-
 interface Store {
     id: string,
     name: string,
@@ -98,7 +93,6 @@ export {
     Store,
     Response,
     Credentials,
-    BuyItem,
     SearchData,
     Filters,
     CATEGORY,

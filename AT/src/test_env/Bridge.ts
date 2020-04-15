@@ -12,7 +12,6 @@ export interface Bridge {
     getUserByName(user: User): Response;
     login(credentials: Credentials): Response;
     register(credentials: Credentials): Response;
-    buyItem(transaction: BuyItem): Response;
     logout(): Response;
     getPurchaseHistory(): Response;
     search(input: SearchData): Response;

@@ -66,10 +66,6 @@ class Proxy implements Bridge {
         return this.real ? this.real.logout() : DummyResponse;
     }
 
-    buyItem(transaction: BuyItem) {
-        return this.real ? this.real.buyItem(transaction) : DummyCheckoutResponse;
-    }
-
     getPurchaseHistory() {
         return this.real
             ? this.real.getPurchaseHistory()
