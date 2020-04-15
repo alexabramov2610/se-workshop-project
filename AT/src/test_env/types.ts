@@ -2,7 +2,25 @@ interface User {
     username: string;
 }
 
+interface CreditCard {
+    ownerName: string;
+    number: string;
+    expirationMonth: string;
+    expirationYear: string;
+    cvv: number;
+}
+
 interface Cart {
+    items: Item[];
+    quantities: number[];
+}
+
+interface Discount {
+    items: Item[];
+    quantities: number[];
+}
+
+interface ShownDiscount extends Discount {
     items: Item[];
     quantities: number[];
 }
@@ -29,6 +47,12 @@ interface Store {
     id: string;
     name: string;
     description: string;
+    inventory?: inventory
+}
+
+interface inventory {
+    items: Item[];
+    quantities: number[]
 }
 
 interface Response {
@@ -80,5 +104,6 @@ export {
     CATEGORY,
     RATE,
     PriceRange,
-    Cart
+    Cart,
+    CreditCard
 };

@@ -26,21 +26,21 @@ describe("Watch Purchases History, UC: 3.7", () => {
   test("Happy Path: logged in user with history", () => {
     _serviceBridge.register(_credentials);
     _serviceBridge.login(_credentials);
-    const { recieptId } = _serviceBridge.buyItem({
+    const { receiptId: receiptId } = _serviceBridge.buyItem({
       item: _item,
       store: _storeInformation,
     }).data;
     const latestBuy = _serviceBridge
       .getPurchaseHistory()
-      .data.puchases.filter((p) => p.recieptId === recieptId)[0];
-    expect(latestBuy.recieptId).toBe(recieptId);
+      .data.puchases.filter((p) => p.recieptId === receiptId)[0];
+    expect(latestBuy.recieptId).toBe(receiptId);
   });
 
   test("Happy Path: logged in user no history", () => {
     _serviceBridge.register(_credentials);
     _serviceBridge.login(_credentials);
-    const { puchases } = _serviceBridge.getPurchaseHistory().data;
-    expect(puchases.length).toBe(0);
+    const { purchases: purchases } = _serviceBridge.getPurchaseHistory().data;
+    expect(purchases.length).toBe(0);
   });
 
   test("Sad Path: not-logged in user", () => {
