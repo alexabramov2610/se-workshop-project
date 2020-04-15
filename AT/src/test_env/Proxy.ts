@@ -1,5 +1,5 @@
 import {Bridge} from './Bridge';
-import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData, Cart, CreditCard} from "./types";
+import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData, Cart, CreditCard, Discount} from "./types";
 import {
     DummyResponse,
     DummyItemResponse,
@@ -94,6 +94,14 @@ class Proxy implements Bridge {
 
     checkout(creditCard: CreditCard) {
         return this.real ? this.real.checkout(creditCard) : DummyCheckoutResponse;
+    }
+
+    setDiscountToStore(store: Store, discount: Discount) {
+        return this.real ? this.real.setDiscountToStore(store, discount) : DummyResponse;
+    }
+
+    setDiscountToItem(store: Store, item: Item, discount: Discount) {
+        return this.real ? this.real.setDiscountToItem(store, item, discount) : DummyResponse;
     }
 }
 

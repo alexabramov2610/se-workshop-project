@@ -20,6 +20,6 @@ export interface Bridge {
     addToCart(item: Item): Response;
     watchCart(): Response;
     checkout(creditCard: CreditCard): Response;
-    setDiscount(store: Store, discount: Discount): Response;
-    setDiscount(store: Store, item: Item, discount: Discount): Response;
+    setDiscountToStore(store: Store, discount: Discount): Response;
+    setDiscountToItem(store: Store, item: Item, discount: Discount): Response;
 }

@@ -113,7 +113,7 @@ describe("Guest buy items, UC: 2.8", () => {
         const discount = (originPrice * _testDiscount.percents) / 100;
         const priceAfterDiscount = originPrice - discount;
 
-        _serviceBridge.setDiscount(_testStore1, _testDiscount);
+        _serviceBridge.setDiscountToStore(_testStore1, _testDiscount);
         _serviceBridge.logout();
 
         const {data, error} = _serviceBridge.checkout(_testCreditCard);

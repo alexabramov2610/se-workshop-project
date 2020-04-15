@@ -92,6 +92,5 @@ describe("Guest - View Information, UC: 2.4", () => {
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
     });
-
 });
 
