@@ -171,7 +171,7 @@ class UserManager {
         return {data: {result: false}, error: {message: error}};
     }
 
-    private duplicateUserByRole(userToChange: RegisteredUser, role): RegisteredUser {
+    private duplicateUserByRole(userToChange: RegisteredUser, role: UserRole): RegisteredUser {
         switch (role) {
             case UserRole.OWNER: {
                 return new StoreOwner(userToChange.name, userToChange.password, userToChange.UUID);

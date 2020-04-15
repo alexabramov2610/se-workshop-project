@@ -1,6 +1,8 @@
 import {Error} from "../api-int/internal_api";
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
 import {TradingSystemState} from "./Enums";
+import {Receipt} from "../trading_system/internal_api";
+
 
 interface Response {
   data: any;
@@ -35,4 +37,11 @@ interface StoreInfoResponse extends Response{
 interface TradingSystemStateResponse extends Response{
   data: {state: TradingSystemState}
 }
-export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse };
+
+
+interface ViewShopPurchasesHistoryResponse  extends Response {
+  data: {purchases: Receipt[]}
+}
+
+export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
+

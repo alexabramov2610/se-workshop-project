@@ -25,7 +25,8 @@ const errorMsg:ErrorMessages = {
     E_NOT_AUTHORIZED: "User is not authorized.",
     E_STORE_ADDITION: "Could not add store.",
     E_ASSIGN: "Failed assigning",
-    E_INVALID_PROD: "Invalid product."
+    E_INVALID_PROD: "Invalid product.",
+    E_PERMISSION: "This manager dont have this permission."
 
 
 

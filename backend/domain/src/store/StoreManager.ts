@@ -1,16 +1,22 @@
-import { Store } from './internal_api'
-import { logger, BoolResponse , errorMsg , UserRole} from '../api-int/internal_api'
+import {Store} from './internal_api'
+import {logger, BoolResponse, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager as StoreManagerUser} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
-import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../api-ext/CommonInterface";
+import {
+    Product as ProductReq,
+    ProductCatalogNumber,
+    ProductWithQuantity,
+    Item as ItemReq
+} from "../api-ext/CommonInterface";
 import * as Req from "../api-ext/Request";
+import {Receipt} from "../trading_system/data/Receipt";
 
 export class StoreManager {
 
     private _stores: Store[];
-    private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[] >;
-    private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[] >;
+    private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
+    private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
 
     constructor() {
         this._stores = [];
@@ -18,22 +24,21 @@ export class StoreManager {
         this._storeOwnerAssigners = new Map();
     }
 
-    addStore(storeName: string, owner: RegisteredUser) : BoolResponse {
-        if(storeName !== ''){
+    addStore(storeName: string, owner: RegisteredUser): BoolResponse {
+        if (storeName !== '') {
             const newStore = new Store(storeName);
             newStore.setFirstOwner(owner);
             owner.setRole(UserRole.OWNER);
             this._stores.push(newStore);
             logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
             return {data: {result: true}}
-        }
-        else {
+        } else {
             logger.warn(`failed adding store ${storeName} to system`)
             return {data: {result: false}, error: {message: errorMsg["E_STORE_ADDITION"]}}
         }
     }
 
-    verifyStoreExists(storeName: string) : boolean {
+    verifyStoreExists(storeName: string): boolean {
         for (let store of this._stores) {
             if (store.storeName === storeName)
                 return true;
@@ -46,29 +51,29 @@ export class StoreManager {
         return store.storeName && store.storeName !== '' && store.UUID && store.UUID !== '';
     }
 
-    verifyStoreOwner(storeName: string, user: RegisteredUser) : boolean {
+    verifyStoreOwner(storeName: string, user: RegisteredUser): boolean {
         const store: Store = this.findStoreByName(storeName);
-        return store ? store.verifyIsStoreOwner(user) : false;
+        return store ? store.verifyIsStoreOwner(user.name) : false;
     }
 
-    verifyStoreManager(storeName: string, user: RegisteredUser) : boolean {
+    verifyStoreManager(storeName: string, user: RegisteredUser): boolean {
         const store: Store = this.findStoreByName(storeName);
-        return store ? store.verifyIsStoreManager(user) : false;
+        return store ? store.verifyIsStoreManager(user.name) : false;
     }
 
-    verifyStoreOperation(storeName: string, user: RegisteredUser) : BoolResponse {
+    verifyStoreOperation(storeName: string, user: RegisteredUser): BoolResponse {
         const error: string = !this.verifyStoreExists(storeName) ? errorMsg['E_INVALID_STORE'] :
             !this.verifyStoreOwner(storeName, user) ? errorMsg['E_NOT_AUTHORIZED'] :
                 !this.verifyStoreManager(storeName, user) ? errorMsg['E_NOT_AUTHORIZED'] : undefined;
 
-        return error ? { data: { result: false }, error: { message: error } } : { data: { result: true } };
+        return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
-    addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]) : Res.ItemsAdditionResponse {
+    addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 
         if (!operationValid.data.result) {
-            return { data: {result: false, itemsNotAdded: itemsReq}, error: operationValid.error };
+            return {data: {result: false, itemsNotAdded: itemsReq}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
@@ -76,10 +81,10 @@ export class StoreManager {
         return store.addItems(items);
     }
 
-    removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]) : Res.ItemsRemovalResponse {
+    removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsRemovalResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
         if (operationValid.error) {
-            return { data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error };
+            return {data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
@@ -88,20 +93,20 @@ export class StoreManager {
 
     }
 
-    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]) : Res.ProductRemovalResponse {
+    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]): Res.ProductRemovalResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
         if (operationValid.error) {
-            return { data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error };
+            return {data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
         return store.removeProductsWithQuantity(productsReq);
     }
 
-    addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]) : Res.ProductAdditionResponse {
+    addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
         if (operationValid.error) {
-            return { data: {result: false, productsNotAdded: productsReq}, error: operationValid.error };
+            return {data: {result: false, productsNotAdded: productsReq}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
@@ -109,17 +114,17 @@ export class StoreManager {
         return store.addNewProducts(products);
     }
 
-    removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]) : Res.ProductRemovalResponse {
+    removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
         if (operationValid.error) {
-            return { data: {result: false, productsNotRemoved: products}, error: operationValid.error };
+            return {data: {result: false, productsNotRemoved: products}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
         return store.removeProductsByCatalogNumber(products);
     }
 
-    assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
+    assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as an owner in store: ${JSON.stringify(storeName)} `)
 
@@ -132,22 +137,22 @@ export class StoreManager {
 
         const store: Store = this.findStoreByName(storeName);
 
-        if (store.verifyIsStoreOwner(userToAssign)) {   // already store owner
+        if (store.verifyIsStoreOwner(userToAssign.name)) {   // already store owner
             const error = errorMsg['E_AL'];
             logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}. error: ${error}`);
-            return {data : {result: false}, error : {message : error}};
+            return {data: {result: false}, error: {message: error}};
         }
 
         logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
-        const additionRes: Res.BoolResponse = store.addStoreOwner(new StoreOwner(userToAssign.name, userWhoAssigns.password, userToAssign.UUID));
+        const additionRes: Res.BoolResponse = store.addStoreOwner(userToAssign.name);
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, false);
         return additionRes;
     }
 
 
-    assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
+    assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)} `)
 
@@ -160,15 +165,15 @@ export class StoreManager {
 
         const store: Store = this.findStoreByName(storeName);
 
-        if (store.verifyIsStoreManager(userToAssign)) {   // already store manager
+        if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
             const error = errorMsg['E_AL'];
             logger.warn(`user: ${JSON.stringify(userWhoAssigns.UUID)} failed to assign user:
                 ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(store.UUID)}. error: ${error}`);
-            return {data : {result: false}, error : {message : error}};
+            return {data: {result: false}, error: {message: error}};
         }
 
         logger.debug(`successfully assigned user: ${JSON.stringify(userToAssign.UUID)} as a manager in store: ${JSON.stringify(storeName)}, assigned by user ${userWhoAssigns.UUID}`)
-        const additionRes: Res.BoolResponse = store.addStoreManager(new StoreManagerUser(userToAssign.name, userWhoAssigns.password, userWhoAssigns.UUID));
+        const additionRes: Res.BoolResponse = store.addStoreManager(userToAssign.name);
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, true);
         return additionRes;
@@ -183,22 +188,21 @@ export class StoreManager {
         return undefined;
     }
 
-    private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean) :void{
+    private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean): void {
         if (isManager) {
             let usersList: RegisteredUser[] = this._storeManagerAssigners.get(userWhoAssigns);
             usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
             this._storeManagerAssigners.set(userWhoAssigns, usersList)
-        }
-        else {
+        } else {
             let usersList: RegisteredUser[] = this._storeOwnerAssigners.get(userWhoAssigns);
             usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
             this._storeOwnerAssigners.set(userWhoAssigns, usersList)
         }
     }
 
-    private getProductsFromRequest(productsReq: ProductReq[]) : Product[] {
+    private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
         let products: Product[] = [];
-        for (let productReq of productsReq){
+        for (let productReq of productsReq) {
             const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
@@ -206,9 +210,9 @@ export class StoreManager {
         return products;
     }
 
-    private getItemsFromRequest(itemsReq: ItemReq[]) : Item[] {
+    private getItemsFromRequest(itemsReq: ItemReq[]): Item[] {
         let items: Item[] = [];
-        for (let itemReq of itemsReq){
+        for (let itemReq of itemsReq) {
             const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
             items.push(item);
         }
@@ -216,4 +220,14 @@ export class StoreManager {
         return items;
     }
 
+    viewStorePurchaseHistory(user: RegisteredUser, shopName: string): Res.ViewShopPurchasesHistoryResponse {
+        const store: Store = this.findStoreByName(shopName);
+        if (!store) return {data: {purchases: []}, error: {message: errorMsg['E_NF']}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY)) return {
+            data: {purchases: []},
+            error: {message: errorMsg['E_PERMISSION']}
+        }
+        const receipts: Receipt[] = store.getPurchasesHistory();
+        return {data: {purchases: receipts}}
+    }
 }
