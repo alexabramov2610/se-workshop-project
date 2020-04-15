@@ -1,4 +1,4 @@
-import {Item, Response, Store, User, Credentials, BuyItem, SearchData, RATE, CreditCard, Discount} from "./types";
+import {Item, Response, Store, User, Credentials, SearchData, RATE, CreditCard, Discount} from "./types";
 
 export interface Bridge {
     removeItem(item: Item): Response;

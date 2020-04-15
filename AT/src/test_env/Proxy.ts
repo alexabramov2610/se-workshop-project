@@ -1,5 +1,5 @@
 import {Bridge} from './Bridge';
-import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData, Cart, CreditCard, Discount} from "./types";
+import {Item, Response, Store, User, Credentials, RATE, SearchData, Cart, CreditCard, Discount} from "./types";
 import {
     DummyResponse,
     DummyItemResponse,
