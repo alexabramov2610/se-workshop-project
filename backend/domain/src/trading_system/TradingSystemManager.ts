@@ -1,30 +1,41 @@
-import {UserManager, RegisteredUser, StoreOwner} from "../user/internal_api";
-import { Item, Product } from "../trading_system/internal_api"
-import { StoreManager, Store } from '../store/internal_api';
+import {RegisteredUser, UserManager} from "../user/internal_api";
+import {StoreManager} from '../store/internal_api';
 import * as Res from "../api-ext/Response"
 import * as Req from "../api-ext/Request"
-import { errorMsg } from "../api-int/Error";
-
-
-import { errorMsg as Error } from "../api-int/Error";
+import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {
     BoolResponse,
     ExternalSystems,
     logger,
-    OpenStoreRequest, UserRole,
+    OpenStoreRequest,
+    UserRole,
 } from "../api-int/internal_api";
+import {TradingSystemState} from "../api-ext/Enums";
 
 
 export class TradingSystemManager {
     private userManager: UserManager;
     private storeManager: StoreManager;
     private externalSystems: ExternalSystemsManager;
+    private state: TradingSystemState;
 
     constructor() {
         this.userManager = new UserManager();
         this.storeManager = new StoreManager();
         this.externalSystems = new ExternalSystemsManager();
+        this.state= TradingSystemState.CLOSED;
+    }
+
+    OpenTradeSystem(req: Req.Request): BoolResponse{
+        const u:RegisteredUser=  this.userManager.getUserByToken(req.token);
+        if(!u || u.getRole() != UserRole.ADMIN) return {data: {result: false}};
+        this.state = TradingSystemState.OPEN;
+        return {data:{result:true}};
+    }
+
+    GetTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse{
+        return {data:{state: this.state}};
     }
 
     register(req:Req.RegisterRequest): BoolResponse {
@@ -151,13 +162,13 @@ export class TradingSystemManager {
         return res;
     }
 
-    connectDeliverySys(): BoolResponse{
+    connectDeliverySys(connectExtReq: Req.Request): BoolResponse{
         logger.info('Trying to connect to delivery system');
         const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.DELIVERY);
         return res;
     }
 
-    connectPaymentSys(): BoolResponse{
+    connectPaymentSys(connectExtReq: Req.Request): BoolResponse{
         logger.info('Trying to connect to payment system');
         const res:BoolResponse = this.externalSystems.connectSystem(ExternalSystems.PAYMENT);
         return res;

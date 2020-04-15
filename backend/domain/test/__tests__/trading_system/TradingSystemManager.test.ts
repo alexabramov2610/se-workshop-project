@@ -532,7 +532,8 @@ describe("Store Management Unit Tests", () => {
         });
 
         tradingSystemManager = new TradingSystemManager();
-        const res: Res.BoolResponse = tradingSystemManager.connectDeliverySys();
+        const req: Req.Request = {body:{} ,token:"1"};
+        const res: Res.BoolResponse = tradingSystemManager.connectDeliverySys(req);
 
         expect(res.data.result).toBeTruthy();
     });
@@ -544,7 +545,8 @@ describe("Store Management Unit Tests", () => {
         });
 
         tradingSystemManager = new TradingSystemManager();
-        const res: Res.BoolResponse = tradingSystemManager.connectDeliverySys();
+        const req: Req.Request = {body:{} ,token:"1"};
+        const res: Res.BoolResponse = tradingSystemManager.connectDeliverySys(req);
 
         expect(res.data.result).toBeFalsy();
     });
@@ -556,7 +558,8 @@ describe("Store Management Unit Tests", () => {
         });
 
         tradingSystemManager = new TradingSystemManager();
-        const res: Res.BoolResponse = tradingSystemManager.connectPaymentSys();
+        const req: Req.Request = {body:{} ,token:"1"};
+        const res: Res.BoolResponse = tradingSystemManager.connectPaymentSys(req);
 
         expect(res.data.result).toBeTruthy();
     });
@@ -568,7 +571,8 @@ describe("Store Management Unit Tests", () => {
         });
 
         tradingSystemManager = new TradingSystemManager();
-        const res: Res.BoolResponse = tradingSystemManager.connectPaymentSys();
+        const req: Req.Request = {body:{} ,token:"1"};
+        const res: Res.BoolResponse = tradingSystemManager.connectPaymentSys(req);
 
         expect(res.data.result).toBeFalsy();
 

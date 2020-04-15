@@ -144,8 +144,8 @@ export class StoreManager {
         if (additionRes.data.result)
             this.addStoreAssigner(userWhoAssigns, userToAssign, false);
         return additionRes;
-
     }
+
 
     assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoAssigns.UUID)} requested to assign user:

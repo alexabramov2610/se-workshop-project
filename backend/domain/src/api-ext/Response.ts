@@ -1,16 +1,12 @@
-import { Error } from "../api-int/internal_api";
-import {RegisteredUser} from "../user/users/RegisteredUser"
+import {Error} from "../api-int/internal_api";
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {TradingSystemState} from "./Enums";
 
 interface Response {
   data: any;
   error?: Error;
 }
 
-
-interface UserResponse extends Response {
-  data: { user: RegisteredUser};
-}
 
 interface ItemsAdditionResponse extends Response {
   data: {result: boolean, itemsNotAdded: Item[] }
@@ -36,4 +32,7 @@ interface StoreInfoResponse extends Response{
   data:{result:boolean,info:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
 }
 
-export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse };
+interface TradingSystemStateResponse extends Response{
+  data: {state: TradingSystemState}
+}
+export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse };

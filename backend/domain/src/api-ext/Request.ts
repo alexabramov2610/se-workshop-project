@@ -1,5 +1,4 @@
 import { Item, ProductCatalogNumber, Product, ProductWithQuantity } from "./CommonInterface";
-import {Response} from "./Response";
 
 interface Request {
   body: any;
@@ -55,6 +54,6 @@ interface LogoutRequest extends Request {
   body: { username: string}
 }
 
-export { AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
+export { Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
   RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};

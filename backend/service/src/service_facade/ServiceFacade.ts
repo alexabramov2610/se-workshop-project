@@ -1,64 +1,88 @@
-import {tradingSystem} from "domain_layer/src/api-ext/external_api";
-import * as UserService from '../user_service/UserService'
-import * as StoreService from '../store_service/StoreService'
+import {tradingSystem} from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
-import {logger} from "domain_layer/dist/src/api-int/Logger";
-import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
-import {UserRole} from "domain_layer/dist/src/api-int/Enums";
-import {OpenStoreRequest, LoginRequest,BoolResponse, RegisterRequest,LogoutRequest} from "domain_layer/src/common/internal_api";
+import * as UserService from '../user_service/UserService'
+import * as StoreService from '../store_service/StoreService'
+import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 
-export const systemInit = (): Res.BoolResponse=>{
-    let res:boolean = true;
-    const connectDelivery: Res.BoolResponse = tradingSystem.connectDeliverySys();
-   if(connectDelivery.error) return connectDelivery;
-    const connectPayment: Res.BoolResponse =  tradingSystem.connectPaymentSys();
-   if(connectPayment.error) return connectPayment;
-    return tradingSystem.register("Admin","Admin");
+
+
+/*
+export const startNewSession = (): string =>{
+    //return new token from the domain
+
+}
+*/
+export const systemInit = (initReq: Req.InitReq): Res.BoolResponse => {
+    const registerRequest: Req.RegisterRequest = {body: {username: "Admin", password: "Admin"}, token: initReq.token};
+    const registerRes: Res.BoolResponse = tradingSystem.register(registerRequest);
+    if (registerRes.error) return registerRes;
+    const loginReq: Req.BoolResponse = {body: {username: "Admin", password: "Admin"}, token: initReq.token};
+    const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
+    const newToken: string = loginRes.data.value;
+    if (loginRes.error || !newToken) return loginRes;
+    const setAdminReq: Req.RegisterRequest = {body: {newAdminUUID: newToken}, token: newToken};
+    const setAdminRes: Res.BoolResponse =  tradingSystem.setAdmin(setAdminReq)
+    if(setAdminRes.error) return setAdminRes;
+    const connectExtReq: Req.Request = {body: {} ,token: newToken};
+    const connectDeliveryRes: Res.BoolResponse = tradingSystem.connectDeliverySys(connectExtReq);
+    if (connectDeliveryRes.error) return connectDeliveryRes;
+    const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
+    if (connectPaymentRes.error) return connectPaymentRes;
+    tradingSystem.OpenTradeSystem({body:{} ,token: newToken})
+    return {data: {result:true}}
 }
 
-export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolResponse => {
-    return StoreService.createStore(createStoreReq);
-}
-
-export const registerUser = (registerUserReq: RegisterRequest):BoolResponse => {
-   return UserService.registerUser(registerUserReq);
-}
-
-export const loginUser = (loginUserReq: LoginRequest):BoolResponse => {
-   return UserService.loginUser(loginUserReq);
-}
-
-export const logoutUser = (logoutUserReq: LogoutRequest):BoolResponse => {
-   return UserService.logoutUser(logoutUserReq);
+export const registerUser = (req: Req.RegisterRequest): Res.BoolResponse => {
+    return runIfOpen(req, UserService.registerUser);
 }
 
 
-
-export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse => {
-    return StoreService.addItems(req);
+export const createStore = (req: Req.OpenStoreRequest): Res.BoolResponse => {
+    return runIfOpen(req,StoreService.createStore)
 }
 
-export const removeItems = (req: Req.ItemsRemovalRequest) : Res.ItemsRemovalResponse => {
-    return StoreService.removeItems(req);
+
+export const loginUser = (req: Req.LoginRequest): Res.BoolResponse => {
+    return runIfOpen(req,UserService.loginUser);
 }
 
-export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity) : Res.ProductRemovalResponse => {
-    return StoreService.removeProductsWithQuantity(req);
+export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
+    return runIfOpen(req,UserService.logoutUser)
 }
 
-export const addNewProducts = (req: Req.AddProductsRequest) : Res.ProductAdditionResponse => {
-    return StoreService.addNewProducts(req);
+
+export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
+    return runIfOpen(req,StoreService.addItems);
 }
 
-export const removeProducts = (req: Req.ProductRemovalRequest) : Res.ProductRemovalResponse => {
-    return StoreService.removeProducts(req);
+export const removeItems = (req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse => {
+    return runIfOpen(req,StoreService.removeItems);
 }
 
-export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest) : Res.BoolResponse => {
-    return StoreService.assignStoreOwner(req);
+export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse => {
+    return runIfOpen(req,StoreService.removeProductsWithQuantity);
 }
 
-export const assignStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
-    return StoreService.assignStoreManager(req);
+export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAdditionResponse => {
+    return runIfOpen(req,StoreService.addNewProducts);
+}
+
+export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
+    return runIfOpen(req,StoreService.removeProducts);
+}
+
+export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Res.BoolResponse => {
+    return runIfOpen(req,StoreService.assignStoreOwner);
+}
+
+export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
+    return runIfOpen(req,StoreService.assignStoreManager);
+}
+
+
+const runIfOpen = (req: Req.Request, fn: any) :any =>{
+    const isOpenReq: Req.Request = {body:{} , token: req.token};
+    if(tradingSystem.GetTradeSystemState(isOpenReq).data.state != TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
+    return fn.call(this,req);
 }

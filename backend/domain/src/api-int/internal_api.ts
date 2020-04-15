@@ -1,5 +1,4 @@
 export { Error } from "./Error";
-export { Response, BoolResponse } from "../api-ext/Response";
 export { UserRole } from "./Enums";
 
 export * from "../api-ext/Request"
