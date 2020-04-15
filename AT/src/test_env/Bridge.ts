@@ -1,4 +1,4 @@
-import {Item, Response, Store, User, Credentials, BuyItem, SearchData, RATE, CreditCard} from "./types";
+import {Item, Response, Store, User, Credentials, BuyItem, SearchData, RATE, CreditCard, Discount} from "./types";
 
 export interface Bridge {
     removeItem(item: Item): Response;
@@ -20,4 +20,6 @@ export interface Bridge {
     addToCart(item: Item): Response;
     watchCart(): Response;
     checkout(creditCard: CreditCard): Response;
+    setDiscount(store: Store, discount: Discount): Response;
+    setDiscount(store: Store, item: Item, discount: Discount): Response;
 }

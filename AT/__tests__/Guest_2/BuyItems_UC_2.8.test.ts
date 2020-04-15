@@ -4,7 +4,9 @@ import {
     CATEGORY,
     Item,
     Store,
-    CreditCard, Credentials
+    CreditCard,
+    Credentials,
+    Discount
 } from "../../src/";
 
 
@@ -12,6 +14,7 @@ import {
 describe("Guest buy items, UC: 2.8", () => {
     let _serviceBridge: Bridge;
     let _testCreditCard: CreditCard;
+    let _testDiscount: Discount;
     let _credentials: Credentials;
     let _testStore1: Store;
     let _testStore2: Store;
@@ -67,6 +70,8 @@ describe("Guest buy items, UC: 2.8", () => {
             cvv: 123
         };
 
+        _testDiscount = {percents: 20, timePeriod: {startTime: new Date(), endTime: new Date()}};
+
         _serviceBridge.createStore(_testStore1);
         _serviceBridge.createStore(_testStore2);
 
@@ -100,21 +105,30 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(data).toBeUndefined();
     });
 
-    // test("Non empty cart, items in stock, with discount" ,() => {
-    //     _serviceBridge.addToCart(_testItem1);
-    //     const {data, error} = _serviceBridge.checkout(_testCreditCard);
-    //     expect(data).toBeDefined();
-    //     expect(error).toBeUndefined();
-    //
-    //     const {transaction, receiptId} = data;
-    //     expect(receiptId.length > 0).toBeTruthy();
-    //     expect(transaction.ccHoldName).toEqual(_testCreditCard.ownerName);
-    //     expect(transaction.amountCharged).toEqual(_testItem1.price);
-    //     expect(transaction.ccNumber).toEqual(_testCreditCard.number);
-    //
-    //     const start = _testCreditCard.number.length - 4;
-    //     const last4 = _testCreditCard.number.substring(start);
-    //     expect(transaction.ccLast4).toEqual(last4);
-    // });
+    test("Non empty cart, items in stock, with discount" ,() => {
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
+
+        const originPrice = _testItem1.price;
+        const discount = (originPrice * _testDiscount.percents) / 100;
+        const priceAfterDiscount = originPrice - discount;
+
+        _serviceBridge.setDiscount(_testStore1, _testDiscount);
+        _serviceBridge.logout();
+
+        const {data, error} = _serviceBridge.checkout(_testCreditCard);
+        expect(data).toBeDefined();
+        expect(error).toBeUndefined();
+
+        const {transaction, receiptId} = data;
+        expect(receiptId.length > 0).toBeTruthy();
+        expect(transaction.ccHoldName).toEqual(_testCreditCard.ownerName);
+        expect(transaction.amountCharged).toEqual(priceAfterDiscount);
+        expect(transaction.ccNumber).toEqual(_testCreditCard.number);
+
+        const start = _testCreditCard.number.length - 4;
+        const last4 = _testCreditCard.number.substring(start);
+        expect(transaction.ccLast4).toEqual(last4);
+    });
 
 });
