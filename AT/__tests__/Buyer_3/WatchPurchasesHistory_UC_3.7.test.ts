@@ -1,10 +1,9 @@
-import { Bridge, Driver } from "../../src";
-import { Store, AuthDetails, Item } from "../../src/test_env/types";
+import {Bridge, CATEGORY, Driver, Store, Credentials, Item} from "../../src";
 
 describe("Watch Purchases History, UC: 3.7", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: AuthDetails;
+  let _credentials: Credentials;
   let _item: Item;
 
   beforeEach(() => {
@@ -18,6 +17,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _item = {
       id: "some-id",
       name: "some-name",
+      category: CATEGORY.ELECTRONICS,
       description: "some-desc",
       price: 999,
     };
@@ -45,6 +45,6 @@ describe("Watch Purchases History, UC: 3.7", () => {
 
   test("Sad Path: not-logged in user", () => {
     const error = _serviceBridge.getPurchaseHistory().error;
-    expect(error).toBeTruthy();
+    expect(error).toBeDefined();
   });
 });

@@ -6,6 +6,7 @@ import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {logger} from "domain_layer/dist/src/api-int/Logger";
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import {UserRole} from "domain_layer/dist/src/api-int/Enums";
+import {OpenStoreRequest, LoginRequest,BoolResponse, RegisterRequest,LogoutRequest} from "domain_layer/src/common/internal_api";
 
 export const systemInit = (): Res.BoolResponse=>{
     let res:boolean = true;
@@ -19,6 +20,20 @@ export const systemInit = (): Res.BoolResponse=>{
 export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolResponse => {
     return StoreService.createStore(createStoreReq);
 }
+
+export const registerUser = (registerUserReq: RegisterRequest):BoolResponse => {
+   return UserService.registerUser(registerUserReq);
+}
+
+export const loginUser = (loginUserReq: LoginRequest):BoolResponse => {
+   return UserService.loginUser(loginUserReq);
+}
+
+export const logoutUser = (logoutUserReq: LogoutRequest):BoolResponse => {
+   return UserService.logoutUser(logoutUserReq);
+}
+
+
 
 export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse => {
     return StoreService.addItems(req);

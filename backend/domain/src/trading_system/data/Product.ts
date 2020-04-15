@@ -13,6 +13,8 @@ export class Product {
         this._price = price;
     }
 
+
+
     set price(price: number) {
         this.price = price;
     }

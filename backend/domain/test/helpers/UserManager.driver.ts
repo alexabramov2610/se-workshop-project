@@ -1,5 +1,5 @@
 import {UserManager, Buyer, RegisteredUser} from "../../src/user/internal_api";
-import { Response } from "../../src/api-int/internal_api";
+import {RegisterRequest,LoginRequest,LogoutRequest, Response} from "../../src/api-int/internal_api";
 import * as Req from "../../src/api-ext/Request"
 
 export class UserManagerDriver {
@@ -62,16 +62,16 @@ export class UserManagerDriver {
 
 
 
-  addUser(name: string, password: string): Response {
-    return this.userManager.register(name, password);
+  addUser(req:RegisterRequest): Response {
+    return this.userManager.register(req);
   }
 
-  loginUser(userName:string,password:string):Response{
-    return this.userManager.login(userName,password)
+  loginUser(req:LoginRequest):Response{
+    return this.userManager.login(req)
   }
 
-  logoutUser(userName:string):Response{
-    return this.userManager.logout(userName)
+  logoutUser(req:LogoutRequest):Response{
+    return this.userManager.logout(req)
   }
 
   getUserByName(name: string): RegisteredUser {

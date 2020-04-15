@@ -301,6 +301,15 @@ export class Store {
         }
     }
 
+
+
+    viewStoreInfo():Res.StoreInfoResponse{
+        let productNames = Array.from( this.products.keys() ).map((p)=>p.name);
+        let storeOwnersNames=this._storeOwners.map((o)=>o.name)
+        return {data:{result:true,info:{storeName:this.storeName,storeOwnersNames,productNames}}}
+    }
+
+
     setFirstOwner(user: StoreOwner) : void {
         this._storeOwners.push(user);
     }

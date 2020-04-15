@@ -1,6 +1,7 @@
-import { Bridge, Driver, Store, Credentials } from "../../src/";
+import { Bridge, Driver } from "../../src/";
+import { Store, Credentials } from "../../src/test_env/types";
 
-describe("Create Store Buyer, UC: 3.2", () => {
+describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
   let _credentials: Credentials;
@@ -59,4 +60,3 @@ describe("Create Store Buyer, UC: 3.2", () => {
     expect(error).toBeDefined();
   });
 });
-  

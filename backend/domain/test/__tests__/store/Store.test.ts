@@ -1,9 +1,9 @@
 import {Store} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
+import * as Res from "../../../src/api-ext/Response";
 import {Buyer, StoreManager, StoreOwner} from "../../../src/user/internal_api";
 import {Item, Product} from "../../../src/trading_system/internal_api";
 import {ProductCatalogNumber, ProductCategory, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
-import * as Res from "../../../src/api-ext/Response";
 
 
 describe("Store Management Unit Tests", () => {
@@ -392,6 +392,31 @@ describe("Store Management Unit Tests", () => {
         return products;
 
     }
+
+    test("view store info seccess",()=>{
+
+        let dor=new StoreOwner("dor","9815616")
+        let chair=new Product("chair",6,200,ProductCategory.Home)
+        store.addStoreOwner(dor)
+        store.addNewProducts([chair])
+
+        const res=store.viewStoreInfo()
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.info).toStrictEqual({storeName:store.storeName,storeOwnersNames:['dor'],productNames:['chair']})
+
+
+    })
+
+    // test("view product info seccess",()=>{
+    //
+    //     let game=new Product("YO-YO",5,19.5,ProductCategory.Hobbies)
+    //     game.price=20.5;
+    //     const res=game.viewInfo()
+    //     expect(res.data.result).toBeTruthy();
+    //     expect(res.data.info).toEqual({name:"YO-YO",catalogNumber:5,price:20.5})
+    //
+    // })
+
 
     function generateValidProducts(numOfItems: number): Product[] {
         let products: Product[] = [];

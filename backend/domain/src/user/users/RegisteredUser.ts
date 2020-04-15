@@ -7,10 +7,10 @@ export abstract class RegisteredUser {
   protected _password: string;
   protected _role;
 
-  protected constructor(name: string, password: string, uid?: string) {
+  protected constructor(name: string, password: string,uid?:string) {
     this._name = name;
     this._password = password;
-    this._UUID = uid ? uid : uuid();
+    this._UUID = uid? uid: uuid();
   }
 
   get name(): string {

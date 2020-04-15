@@ -47,6 +47,18 @@ interface RemoveStoreOwnerRequest extends Request {
   body: { storeName: string, usernameToRemove: string }
 }
 
+interface RegisterRequest extends Request {
+  body: { username: string, password: string }
+}
+
+interface LoginRequest extends Request {
+  body: { username: string, password: string }
+}
+
+interface LogoutRequest extends Request {
+  body: { username: string}
+}
+
 export { AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, RemoveStoreOwnerRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest };
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};
