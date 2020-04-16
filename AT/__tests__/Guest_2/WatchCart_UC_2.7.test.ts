@@ -3,13 +3,14 @@ import {
     Driver,
     CATEGORY,
     Item,
-    Store,
+    Store, Credentials,
 } from "../../src/";
 
 
 
 describe("Guest watch cart, UC: 2.7", () => {
     let _serviceBridge: Bridge;
+    let _credentials: Credentials;
     let _testStore1: Store;
     let _testStore2: Store;
     let _testItem1: Item;
@@ -18,6 +19,10 @@ describe("Guest watch cart, UC: 2.7", () => {
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
+
+        _credentials = {userName: "testUsername", password: "testPassword"};
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
 
         _testItem1 = {
             id: "test-id1",
@@ -52,12 +57,14 @@ describe("Guest watch cart, UC: 2.7", () => {
             description: "lovely-test-store"
         };
 
-        _serviceBridge.addStore(_testStore1);
-        _serviceBridge.addStore(_testStore2);
+        _serviceBridge.createStore(_testStore1);
+        _serviceBridge.createStore(_testStore2);
 
         _serviceBridge.addItemToStore(_testStore1, _testItem1);
         _serviceBridge.addItemToStore(_testStore1, _testItem3);
         _serviceBridge.addItemToStore(_testStore2, _testItem2);
+
+        _serviceBridge.logout();
     });
 
     test("Non empty cart", () => {

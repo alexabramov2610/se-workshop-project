@@ -1,12 +1,12 @@
 import {Bridge} from './Bridge';
-import {Item, Response, Store, User, Credentials, BuyItem, RATE, SearchData, Cart} from "./types";
+import {Item, Response, Store, User, Credentials, RATE, SearchData, Cart, CreditCard, Discount} from "./types";
 import {
     DummyResponse,
     DummyItemResponse,
     DummyStoreResponse,
     DummyUsersResponse,
     DummyUserResponse,
-    DummyBuyResponse,
+    DummyCheckoutResponse,
     DummyPurchaseHistoryResponse,
     DummySearchResponse, DummyCartResponse
 } from "../../__tests__/dummy_values/dummyValues";
@@ -26,8 +26,8 @@ class Proxy implements Bridge {
         return this.real ? this.real.removeStore(store) : DummyResponse;
     }
 
-    addStore(store: Store) {
-        return this.real ? this.real.addStore(store) : DummyStoreResponse;
+    createStore(store: Store) {
+        return this.real ? this.real.createStore(store) : DummyStoreResponse;
     }
 
     addItemToStore(store: Store, item: Item) {
@@ -66,10 +66,6 @@ class Proxy implements Bridge {
         return this.real ? this.real.logout() : DummyResponse;
     }
 
-    buyItem(transaction: BuyItem) {
-        return this.real ? this.real.buyItem(transaction) : DummyBuyResponse;
-    }
-
     getPurchaseHistory() {
         return this.real
             ? this.real.getPurchaseHistory()
@@ -90,6 +86,18 @@ class Proxy implements Bridge {
 
     watchCart() {
         return this.real ? this.real.watchCart() : DummyCartResponse;
+    }
+
+    checkout(creditCard: CreditCard) {
+        return this.real ? this.real.checkout(creditCard) : DummyCheckoutResponse;
+    }
+
+    setDiscountToStore(store: Store, discount: Discount) {
+        return this.real ? this.real.setDiscountToStore(store, discount) : DummyResponse;
+    }
+
+    setDiscountToItem(store: Store, item: Item, discount: Discount) {
+        return this.real ? this.real.setDiscountToItem(store, item, discount) : DummyResponse;
     }
 }
 
