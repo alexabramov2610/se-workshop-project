@@ -54,6 +54,10 @@ interface LogoutRequest extends Request {
   body: { username: string}
 }
 
-export { Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
+interface StoreInfoRequest extends Request{
+  body:{storeName:string}
+}
+
+export { Request,AssignStoreOwnerRequest,StoreInfoRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
   RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};

@@ -37,19 +37,21 @@ class UserManager {
         const userName = req.body.username;
         const password = req.body.password;
         logger.info(`try to login ,${userName}  `);
+
         if (!(this.getUserByName(userName))) {
             logger.warn(`fail to login ,${userName} not found `);
             return {data: {result: false}, error: {message: errorMsg['E_NF']}}  //not found
         } else if (!this.verifyPassword(userName, password)) {
             logger.warn(`fail to login ${userName} ,bad password `);
             return {data: {result: false}, error: {message: errorMsg['E_BP']}} //bad pass
-        } else if (this.getLoggedInUsers().find((u) => u.name === userName)) { //already logged in
+        }
+        else if (this.getLoggedInUsers().find((u) => u.name === userName)) { //already logged in
             logger.warn(`fail to login ,${userName} is allredy logged in `);
             return {data: {result: false}, error: {message: errorMsg['E_AL']}}
-
-        } else {
+        }
+        else {
             const user = this.getUserByName(userName)
-           this.loggedInUsers = this.loggedInUsers.concat([user]);
+            this.loggedInUsers = this.loggedInUsers.concat([user]);
             logger.info(`${userName} has logged in  `);
             return {data: {result: true, value: user.UUID}};
         }
@@ -61,7 +63,6 @@ class UserManager {
         const loggedInUsers = this.getLoggedInUsers()
         if (!loggedInUsers.filter((u: RegisteredUser) => u.name === username).pop()) { //user not logged in
             logger.warn(`logging out ${username} fail, user is not logged in  `);
-
             return {data: {result: false}, error: {message: errorMsg['E_AL']}}
         } else {
             this.loggedInUsers = this.loggedInUsers.filter((u) => u.name !== username)

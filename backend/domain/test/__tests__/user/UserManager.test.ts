@@ -296,7 +296,7 @@ describe("RegisteredUser Management Unit Tests", () => {
 
   });
 
-  test("getUserByToekn seccess test", ()=> {
+  test("getUserByToken seccess test", ()=> {
     const bob=new Buyer('bob','123456');
     this.userManager.register({body:{username:bob.name,password:bob.password},token:bob.UUID});
     const res=this.userManager.getUserByToken(bob.UUID);
@@ -304,7 +304,7 @@ describe("RegisteredUser Management Unit Tests", () => {
 
   });
 
-  test("getUserByToekn fail test", ()=> {
+  test("getUserByToken fail test", ()=> {
     const bob=new Buyer('bob','123456');
     this.userManager.register({body:{username:bob.name,password:bob.password},token:bob.UUID});
     const res=this.userManager.getUserByToken('5');

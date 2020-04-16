@@ -29,7 +29,7 @@ interface BoolResponse extends Response {
 }
 
 interface StoreInfoResponse extends Response{
-  data:{result:boolean,info:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
+  data:{result:boolean, info?:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
 }
 
 interface TradingSystemStateResponse extends Response{

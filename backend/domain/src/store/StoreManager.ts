@@ -1,5 +1,5 @@
 import { Store } from './internal_api'
-import { logger, BoolResponse , errorMsg , UserRole} from '../api-int/internal_api'
+import { logger, BoolResponse ,StoreInfoResponse, errorMsg , UserRole} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager as StoreManagerUser} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
@@ -181,6 +181,17 @@ export class StoreManager {
         }
 
         return undefined;
+    }
+
+    viewStoreInfo(storeName:string):StoreInfoResponse{
+        const store=this.findStoreByName(storeName);
+        if(store) {
+            return store.viewStoreInfo();
+        }
+        else{   //store not found
+            return {data:{result:false},error:{message:errorMsg['E_NF']}}
+        }
+
     }
 
     private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean) :void{

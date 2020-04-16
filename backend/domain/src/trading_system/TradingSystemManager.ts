@@ -12,6 +12,7 @@ import {
     UserRole,
 } from "../api-int/internal_api";
 import {TradingSystemState} from "../api-ext/Enums";
+import {StoreInfoRequest} from "../api-ext/Request";
 
 
 export class TradingSystemManager {
@@ -56,6 +57,11 @@ export class TradingSystemManager {
     getUserByName(userName: string) {
         return this.userManager.getUserByName(userName);
     }
+
+    viewStoreInfo(req:Req.StoreInfoRequest){
+        return this.storeManager.viewStoreInfo(req.body.storeName);
+    }
+
 
     addItems(req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse {
         logger.info(`trying to add items to store: ${JSON.stringify(req.body.storeName)} by user: ${JSON.stringify(req.token)}`);
