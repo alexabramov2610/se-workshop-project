@@ -21,8 +21,11 @@ const DummyUserResponse: Response = {
     data: {username: "dummyUser"},
 };
 
-const DummyBuyResponse: Response = {
-    data: {receiptId: "some-fake-id"},
+const DummyCheckoutResponse: Response = {
+    data: {
+        receiptId: "some-fake-id",
+        transaction: {ccHoldName: "testOwner", ccLast4: "4242", amountCharged: 100, ccVendor: "visa"}
+        },
 };
 
 const DummyPurchaseHistoryResponse: Response = {
@@ -51,14 +54,13 @@ const DummyCartResponse: Response = {
     },
 };
 
-
 export {
     DummyResponse,
     DummyItemResponse,
     DummyStoreResponse,
     DummyUsersResponse,
     DummyUserResponse,
-    DummyBuyResponse,
+    DummyCheckoutResponse,
     DummyPurchaseHistoryResponse,
     DummySearchResponse,
     DummyCartResponse

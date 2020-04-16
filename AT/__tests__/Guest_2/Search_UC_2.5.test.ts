@@ -17,7 +17,11 @@ describe("Guest Search, UC: 2.5", () => {
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
+
         _credentials = {userName: "test-name", password: "test-PASS-123"};
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
+
         _testItem1 = {
             id: "test-id1",
             name: "test-item",
@@ -39,6 +43,7 @@ describe("Guest Search, UC: 2.5", () => {
             description: "lovely-test-store",
             category: CATEGORY.CLOTHING,
         };
+
         _testStore1 = {
             id: "test-store-id1",
             name: "test-store1",
@@ -49,6 +54,7 @@ describe("Guest Search, UC: 2.5", () => {
             name: "test-store2",
             description: "lovely-test-store"
         };
+
         _priceRange = {low: 0, high: Number.MAX_SAFE_INTEGER};
         _testFilters = {
             category: CATEGORY.ELECTRONICS,
@@ -61,14 +67,14 @@ describe("Guest Search, UC: 2.5", () => {
             filters: _testFilters,
         }
 
-        _serviceBridge.addStore(_testStore1);
-        _serviceBridge.addStore(_testStore2);
+        _serviceBridge.createStore(_testStore1);
+        _serviceBridge.createStore(_testStore2);
 
         _serviceBridge.addItemToStore(_testStore1, _testItem1);
         _serviceBridge.addItemToStore(_testStore1, _testItem3);
         _serviceBridge.addItemToStore(_testStore2, _testItem2);
 
-        _serviceBridge.register(_credentials);
+        _serviceBridge.logout();
     });
 
     test("Valid search input, not filters", () => {
@@ -132,9 +138,15 @@ describe("Guest Search, UC: 2.5", () => {
         };
         _testSearchData.input = _testItem1.name;
 
+        _credentials.userName = "new test user";
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
+
         _serviceBridge.rate(_testItem1, RATE.FIVE_STARS);
         _serviceBridge.rate(_testItem2, RATE.ONE_STAR);
         _serviceBridge.rate(_testItem3, RATE.TWO_STARS);
+
+        _serviceBridge.logout();
 
         const {data, error} = _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();

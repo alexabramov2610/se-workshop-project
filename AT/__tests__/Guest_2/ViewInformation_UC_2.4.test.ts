@@ -1,4 +1,4 @@
-import {Bridge,  Driver, Item, CATEGORY, Store} from "../../src/";
+import {Bridge, Driver, Item, CATEGORY, Store, Credentials} from "../../src/";
 
 // const ITEM_NOT_FOUND = "Item not found";
 // const STORE_NOT_FOUND = "Store not found";
@@ -7,9 +7,12 @@ describe("Guest - View Information, UC: 2.4", () => {
     let _serviceBridge: Bridge;
     let _testItem: Item;
     let _testStore: Store;
+    let _credentials: Credentials;
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
+        _credentials = {userName: "test-name", password: "test-PASS-123"};
+
         _testStore = {
             name: "some-mock-store",
             description: "selling cool items",
@@ -34,8 +37,13 @@ describe("Guest - View Information, UC: 2.4", () => {
         _testStore.name = "storeTestName";
         _testStore.description = "storeTestDesc";
 
-        _serviceBridge.addStore(_testStore);
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
+
+        _serviceBridge.createStore(_testStore);
         _serviceBridge.addItemToStore(_testStore, _testItem);
+
+        _serviceBridge.logout();
 
         const {data, error} = _serviceBridge.viewItem(_testItem);
         const {name, price, description} = data;
@@ -61,7 +69,12 @@ describe("Guest - View Information, UC: 2.4", () => {
         _testStore.name = "storeTestName";
         _testStore.description = "storeTestDesc";
 
-        _serviceBridge.addStore(_testStore);
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
+
+        _serviceBridge.createStore(_testStore);
+
+        _serviceBridge.logout();
 
         const {data, error} = _serviceBridge.viewStore(_testItem);
         const {name, description} = data;
@@ -80,3 +93,4 @@ describe("Guest - View Information, UC: 2.4", () => {
         expect(error).toBeDefined();
     });
 });
+
