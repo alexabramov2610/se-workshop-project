@@ -1,104 +1,122 @@
-import {Bridge} from './Bridge';
-import {Item, Response, Store, User, Credentials, RATE, SearchData, Cart, CreditCard, Discount} from "./types";
+import { Bridge } from "./Bridge";
 import {
-    DummyResponse,
-    DummyItemResponse,
-    DummyStoreResponse,
-    DummyUsersResponse,
-    DummyUserResponse,
-    DummyCheckoutResponse,
-    DummyPurchaseHistoryResponse,
-    DummySearchResponse, DummyCartResponse
-} from "../../__tests__/dummy_values/dummyValues";
+  Item,
+  Response,
+  Store,
+  User,
+  Credentials,
+  RATE,
+  SearchData,
+  Cart,
+  CreditCard,
+  Discount,
+} from "./types";
+import { DummyValues } from "../../__tests__/dummy_values/dummyValues";
 
-class Proxy implements Bridge {
-    private real: Bridge;
+let real: Bridge;
 
-    setReal(adapter: Bridge) {
-        this.real = adapter;
-    }
+const Proxy: Bridge = {
+  setReal(impl: Bridge) {
+    real = impl;
+  },
+  setToken(token: string): void {
+    return;
+  },
 
-    removeItem(item: Item): Response {
-        return this.real ? this.real.removeItem(item) : DummyResponse;
-    }
+  startSession() {
+    return real && real.startSession
+      ? real.startSession()
+      : DummyValues.SessionResponse;
+  },
 
-    removeStore(store: Store) {
-        return this.real ? this.real.removeStore(store) : DummyResponse;
-    }
+  removeItem(item: Item) {
+    return real ? real.removeItem(item) : DummyValues.Response;
+  },
 
-    createStore(store: Store) {
-        return this.real ? this.real.createStore(store) : DummyStoreResponse;
-    }
+  removeStore(store: Store) {
+    return real ? real.removeStore(store) : DummyValues.Response;
+  },
 
-    addItemToStore(store: Store, item: Item) {
-        return this.real ? this.real.addItemToStore(store, item) : DummyResponse;
-    }
+  createStore(store: Store) {
+    return real ? real.createStore(store) : DummyValues.StoreResponse;
+  },
 
-    viewItem(item: Item) {
-        return this.real ? this.real.viewItem(item) : DummyItemResponse;
-    }
+  addItemToStore(store: Store, item: Item) {
+    return real ? real.addItemToStore(store, item) : DummyValues.Response;
+  },
 
-    viewStore(store: Store) {
-        return this.real ? this.real.viewStore(store) : DummyStoreResponse;
-    }
+  viewItem(item: Item) {
+    return real ? real.viewItem(item) : DummyValues.ItemResponse;
+  },
 
-    getLoggedInUsers() {
-        return this.real ? this.real.getLoggedInUsers() : DummyUsersResponse;
-    }
+  viewStore(store: Store) {
+    return real ? real.viewStore(store) : DummyValues.StoreResponse;
+  },
 
-    removeUser(user: User) {
-        return this.real ? this.real.removeUser(user) : DummyResponse;
-    }
+  getLoggedInUsers() {
+    return real ? real.getLoggedInUsers() : DummyValues.UsersResponse;
+  },
 
-    getUserByName(user: User) {
-        return this.real ? this.real.getUserByName(user) : DummyUserResponse;
-    }
+  removeUser(user: User) {
+    return real ? real.removeUser(user) : DummyValues.Response;
+  },
 
-    register(credentials: Credentials) {
-        return this.real ? this.real.register(credentials) : DummyResponse;
-    }
+  getUserByName(user: User) {
+    return real ? real.getUserByName(user) : DummyValues.UserResponse;
+  },
 
-    login(credentials: Credentials) {
-        return this.real ? this.real.login(credentials) : DummyResponse;
-    }
+  register(credentials: Credentials) {
+    return real ? real.register(credentials) : DummyValues.Response;
+  },
 
-    logout() {
-        return this.real ? this.real.logout() : DummyResponse;
-    }
+  login(credentials: Credentials) {
+    return real ? real.login(credentials) : DummyValues.Response;
+  },
 
-    getPurchaseHistory() {
-        return this.real
-            ? this.real.getPurchaseHistory()
-            : DummyPurchaseHistoryResponse;
-    }
+  logout() {
+    return real ? real.logout() : DummyValues.Response;
+  },
 
-    search(searchData: SearchData): Response {
-        return this.real ? this.real.search(searchData) : DummySearchResponse;
-    }
+  getPurchaseHistory() {
+    return real
+      ? real.getPurchaseHistory()
+      : DummyValues.PurchaseHistoryResponse;
+  },
 
-    rate(toRate: Store | Item, rate: RATE): Response {
-        return this.real ? this.real.rate(toRate, rate) : DummySearchResponse;
-    }
+  search(searchData: SearchData): Response {
+    return real ? real.search(searchData) : DummyValues.SearchResponse;
+  },
 
-    addToCart(item: Item) {
-        return this.real ? this.real.addToCart(item) : DummyResponse;
-    }
+  rate(toRate: Store | Item, rate: RATE): Response {
+    return real ? real.rate(toRate, rate) : DummyValues.SearchResponse;
+  },
 
-    watchCart() {
-        return this.real ? this.real.watchCart() : DummyCartResponse;
-    }
+  addToCart(item: Item) {
+    return real ? real.addToCart(item) : DummyValues.Response;
+  },
 
-    checkout(creditCard: CreditCard) {
-        return this.real ? this.real.checkout(creditCard) : DummyCheckoutResponse;
-    }
+  watchCart() {
+    return real ? real.watchCart() : DummyValues.CartResponse;
+  },
 
-    setDiscountToStore(store: Store, discount: Discount) {
-        return this.real ? this.real.setDiscountToStore(store, discount) : DummyResponse;
-    }
+  checkout(creditCard: CreditCard) {
+    return real ? real.checkout(creditCard) : DummyValues.CheckoutResponse;
+  },
 
-    setDiscountToItem(store: Store, item: Item, discount: Discount) {
-        return this.real ? this.real.setDiscountToItem(store, item, discount) : DummyResponse;
-    }
-}
+  setDiscountToStore(store: Store, discount: Discount) {
+    return real
+      ? real.setDiscountToStore(store, discount)
+      : DummyValues.Response;
+  },
 
-export {Proxy};
+  setDiscountToItem(store: Store, item: Item, discount: Discount) {
+    return real
+      ? real.setDiscountToItem(store, item, discount)
+      : DummyValues.Response;
+  },
+  init(cred: Credentials) {
+    return real && real.init ? real.init(cred) : DummyValues.Response;
+  },
+};
+
+export { Proxy };
