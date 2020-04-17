@@ -1,104 +1,118 @@
 interface User {
-    username: string
+  username: string;
+}
+
+interface ProductCatalogNumber {
+  catalogNumber: number;
+}
+
+interface ProductCatalogNumber {
+  catalogNumber: number;
+}
+
+interface Item extends ProductCatalogNumber {
+  id: number;
+}
+
+interface Product extends ProductCatalogNumber {
+  name: string;
+  price: number;
+  category: CATEGORY;
 }
 
 interface CreditCard {
-    ownerName: string,
-    number: string,
-    expirationMonth: string,
-    expirationYear: string,
-    cvv: number
+  ownerName: string;
+  number: string;
+  expirationMonth: string;
+  expirationYear: string;
+  cvv: number;
 }
 
 interface Cart {
-    items: Item[],
-    quantities: number[]
+  items: { product: Product; amount: number }[];
 }
 
 interface Discount {
-    percents: number,
-    timePeriod: TimePeriod
+  percents: number;
+  timePeriod: TimePeriod;
 }
 
 interface TimePeriod {
-    startTime: Date,
-    endTime: Date
+  startTime: Date;
+  endTime: Date;
 }
 
 interface Credentials {
-    userName: string,
-    password: string
+  userName: string;
+  password: string;
 }
 
-interface Item {
-    id: string,
-    name: string,
-    price: number,
-    category: CATEGORY,
-    description: string
-}
 
 interface Store {
-    id: string,
-    name: string,
-    description: string,
-    inventory?: inventory
+  id: string;
+  name: string;
+  description: string;
+  inventory?: inventory;
 }
 
 interface inventory {
-    items: Item[],
-    quantities: number[],
+  items: Item[];
+  quantities: number[];
 }
 
 interface Response {
-    data: any,
-    error?: string
+  data: any;
+  error?: string;
 }
 
 interface SearchData {
-    input: string,
-    filters?: Filters,
+  input: string;
+  filters?: Filters;
 }
 
 interface PriceRange {
-    low: number,
-    high: number,
+  low: number;
+  high: number;
 }
 
 interface Filters {
-    category?: CATEGORY;
-    priceRange?: PriceRange;
-    storeRate?: RATE;
-    itemRate?: RATE;
+  category?: CATEGORY;
+  priceRange?: PriceRange;
+  storeRate?: RATE;
+  itemRate?: RATE;
 }
 
 enum CATEGORY {
-    ELECTRONICS,
-    HOME_AND_OFFICE,
-    CLOTHING
+  ELECTRONICS,
+  HOME_AND_OFFICE,
+  CLOTHING,
+  Electronics,
+  Hobbies,
+  Home,
 }
 
 enum RATE {
-    ZERO_STARS,
-    ONE_STAR,
-    TWO_STARS,
-    THREE_STARS,
-    FOUR_STARS,
-    FIVE_STARS
+  ZERO_STARS,
+  ONE_STAR,
+  TWO_STARS,
+  THREE_STARS,
+  FOUR_STARS,
+  FIVE_STARS,
 }
 
 export {
-    User,
-    Item,
-    Store,
-    Response,
-    Credentials,
-    SearchData,
-    Filters,
-    CATEGORY,
-    RATE,
-    PriceRange,
-    Cart,
-    CreditCard,
-    Discount
+  User,
+  Item,
+  Store,
+  Product,
+  Response,
+  Credentials,
+  SearchData,
+  Filters,
+  CATEGORY,
+  RATE,
+  PriceRange,
+  Cart,
+  CreditCard,
+  Discount,
 };
