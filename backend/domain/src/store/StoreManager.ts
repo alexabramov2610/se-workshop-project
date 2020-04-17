@@ -191,7 +191,6 @@ export class StoreManager {
         else{   //store not found
             return {data:{result:false},error:{message:errorMsg['E_NF']}}
         }
-
     }
 
     private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean) :void{
