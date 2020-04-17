@@ -281,6 +281,7 @@ export class Store {
         return {data: {result: true, info: {storeName: this.storeName, storeOwnersNames: this._storeOwners.map((owner)=> owner.name), productNames}}}
     }
 
+
     setFirstOwner(user: RegisteredUser): void {
         this._storeOwners.push(new StoreOwner(user.name));
     }

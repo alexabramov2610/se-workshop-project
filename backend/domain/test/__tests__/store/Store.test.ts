@@ -32,38 +32,38 @@ describe("Store Management Unit Tests", () => {
     })
 /*
     test("verifyIsStoreOwner success", () => {
-        const res: Responses.BoolResponse = store.addStoreOwner(storeOwner);
+        const res: Responses.BoolResponse = store.addStoreOwner(storeOwner.name);
         expect(res.data.result).toBeTruthy();
 
-        expect(store.verifyIsStoreOwner(storeOwner)).toBeTruthy();
+        expect(store.verifyIsStoreOwner(storeOwner.name)).toBeTruthy();
     })
 
     test("verifyIsStoreOwner failure", () => {
-        expect(store.verifyIsStoreOwner(storeOwner)).toBeFalsy();
+        expect(store.verifyIsStoreOwner(storeOwner.name)).toBeFalsy();
     })
 
     test("verifyIsStoreOwner failure - not store owner", () => {
-        expect(store.verifyIsStoreOwner(new Buyer('mockname', 'mockpw'))).toBeFalsy();
+        expect(store.verifyIsStoreOwner('mockname')).toBeFalsy();
     })
 
     test("verifyIsStoreManager success", () => {
-        const res: Responses.BoolResponse = store.addStoreManager(storeManager);
+        const res: Responses.BoolResponse = store.addStoreManager(storeOwner.name);
         expect(res.data.result).toBeTruthy();
 
-        expect(store.verifyIsStoreManager(storeManager)).toBeTruthy();
+        expect(store.verifyIsStoreManager(storeOwner.name)).toBeTruthy();
     })
 
     test("verifyIsStoreManager failure", () => {
-        expect(store.verifyIsStoreManager(storeManager)).toBeFalsy();
+        expect(store.verifyIsStoreManager(storeOwner.name)).toBeFalsy();
     })
 
     test("verifyIsStoreManager failure - not store owner", () => {
-        expect(store.verifyIsStoreManager(new Buyer('mockname', 'mockpw'))).toBeFalsy();
+        expect(store.verifyIsStoreManager('mockname')).toBeFalsy();
     })
 
     test("setFirstOwner", () => {
         store.setFirstOwner(storeOwner);
-        expect(store.verifyIsStoreOwner(storeOwner)).toBeTruthy();
+        expect(store.verifyIsStoreOwner(storeOwner.name)).toBeTruthy();
     })
 
     test("addNewProducts success", () => {
@@ -367,22 +367,27 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("addStoreOwner success", () => {
-       const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
+       const res: Res.BoolResponse = store.addStoreOwner(storeOwner.name);
        expect(res.data.result).toBeTruthy();
     });
 
     test("addStoreOwner failure", () => {
-        const res: Res.BoolResponse = store.addStoreOwner((<StoreOwner>storeManager));
+        let res: Res.BoolResponse = store.addStoreOwner(storeManager.name);;
+        expect(res.data.result).toBeTruthy();
+        res = store.addStoreOwner(storeManager.name);
         expect(res.data.result).toBeFalsy();
     });
 
     test("addStoreManager success", () => {
-        const res: Res.BoolResponse = store.addStoreManager(storeManager);
+        const res: Res.BoolResponse = store.addStoreManager(storeManager.name);
         expect(res.data.result).toBeTruthy();
     });
 
     test("addStoreManager failure", () => {
-        const res: Res.BoolResponse = store.addStoreManager((<StoreManagement>storeOwner));
+
+        let res: Res.BoolResponse = store.addStoreManager(storeManager.name);
+        expect(res.data.result).toBeTruthy();
+        res = store.addStoreManager(storeOwner.name);
         expect(res.data.result).toBeFalsy();
     });
 
