@@ -286,7 +286,7 @@ export class Store {
 
 
     setFirstOwner(user: StoreOwner): void {
-        this._storeOwners.push(user.UUID);
+        this._storeOwners.push(user.name);
     }
 
     addStoreManager(userName: string): Res.BoolResponse {
