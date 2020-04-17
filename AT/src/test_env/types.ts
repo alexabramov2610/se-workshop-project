@@ -47,12 +47,8 @@ interface Credentials {
   password: string;
 }
 
-
 interface Store {
-  id: string;
-  name: string;
-  description: string;
-  inventory?: inventory;
+  name;
 }
 
 interface inventory {
