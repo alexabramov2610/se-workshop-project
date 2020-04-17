@@ -320,5 +320,21 @@ describe("RegisteredUser Management Unit Tests", () => {
     expect(res).toEqual([bob]);
   })
 
+  test('isLoggedIn seccess test',()=>{
+    const bob=new Buyer('bob','123456','1');
+    this.userManager.register({body:{username:bob.name,password:bob.password},token:bob.UUID});
+    this.userManager.login({body:{username:bob.name,password:bob.password},token:bob.UUID});
+    const res= this.userManager.isLoggedIn(bob)
+    expect(res).toBeTruthy()
+
+  })
+
+  test('isLoggedIn fail test',()=>{
+    const bob=new Buyer('bob','123456','1');
+    this.userManager.register({body:{username:bob.name,password:bob.password},token:bob.UUID});
+    const res= this.userManager.isLoggedIn(bob)
+    expect(res).toBeFalsy()
+
+  })
 
 });
