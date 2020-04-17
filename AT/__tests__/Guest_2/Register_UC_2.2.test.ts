@@ -26,7 +26,7 @@ describe("Guest Registration, UC: 2.2", () => {
       username: _credentials.userName,
     });
     const { username } = data;
-    expect(username).toBe(_credentials.userName);
+    expect(username).toEqual(_credentials.userName);
   });
 
   test("Invalid Password - Short", () => {
