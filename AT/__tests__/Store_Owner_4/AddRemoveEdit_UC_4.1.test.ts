@@ -16,11 +16,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _credentials = { userName: "ron", password: "ronpwd" };
   });
 
-  test("Create Store - Happy Path: valid store information - logged in user", () => {
-    _serviceBridge.register(_credentials);
-    _serviceBridge.login(_credentials);
-    const { name } = _serviceBridge.addStore(_storeInformation).data;
-    expect(name).toBe(_storeInformation.name);
+  test("Create Store - Add", () => {
+      
   });
 
   test("Create Store - Sad Path: empty store information", () => {
@@ -55,6 +52,12 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
   test("Create Store - Sad Path: valid store information - not logged in user", () => {
+    _serviceBridge.logout();
+    const error = _serviceBridge.addStore(_storeInformation).error;
+    expect(error).toBeDefined();
+  });
+
+  test("Remove Store - Sad Path: valid store information - not logged in user", () => {
     _serviceBridge.logout();
     const error = _serviceBridge.addStore(_storeInformation).error;
     expect(error).toBeDefined();
