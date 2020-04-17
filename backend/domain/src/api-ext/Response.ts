@@ -27,7 +27,11 @@ interface ProductRemovalResponse extends Response {
 }
 
 interface BoolResponse extends Response {
-  data: {result: boolean, value?: any}
+  data: {result: boolean}
+}
+
+interface LoginResponse extends Response {
+  data: {result: boolean, newToken: string}
 }
 
 interface StoreInfoResponse extends Response{
@@ -43,5 +47,5 @@ interface ViewShopPurchasesHistoryResponse  extends Response {
   data: {purchases: Receipt[]}
 }
 
-export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
+export { Response,LoginResponse, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
 

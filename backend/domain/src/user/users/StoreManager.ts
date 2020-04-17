@@ -1,15 +1,13 @@
-import { RegisteredUser } from "../internal_api"
-import { UserRole } from "../../api-int/internal_api"
-import { ManagementPermission } from "../../api-int/internal_api";
+import {RegisteredUser} from "../internal_api"
+import {ManagementPermission} from "../../api-int/internal_api";
 
 export class StoreManager extends RegisteredUser {
 
     private _permissions: ManagementPermission[];
 
-    constructor(name: string, password: string, uuid?: string) {
-        super(name, password, uuid);
-        this.setRole(UserRole.MANAGER);
-        this._permissions = [];
+    constructor(name: string) {
+        super(name);
+        this._permissions = [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS];
     }
 
     addPermission(permission: ManagementPermission) {
@@ -19,10 +17,15 @@ export class StoreManager extends RegisteredUser {
     }
 
     removePermission(permission: ManagementPermission) {
-        this._permissions = this._permissions.filter(perm => permission.valueOf() != perm.valueOf());
+        this._permissions = this._permissions.filter(perm => permission.valueOf() !== perm.valueOf());
     }
 
     getPermissions(): ManagementPermission[] {
         return this._permissions;
     }
+
+    isAllowed(permission: ManagementPermission) : boolean{
+        return this._permissions.find((p) => p === permission) >= 0
+    }
+
 }

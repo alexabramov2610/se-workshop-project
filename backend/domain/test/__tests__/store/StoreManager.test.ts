@@ -1,4 +1,4 @@
-import {Store, StoreManager} from "../../../src/store/internal_api";
+import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser, Buyer} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
@@ -8,9 +8,9 @@ import {Item} from "../../../src/trading_system/data/Item";
 import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
 
 describe("Store Management Unit Tests", () => {
-    let storeManagement: StoreManager;
+    let storeManagement: StoreManagement;
     beforeEach(() => {
-        storeManagement = new StoreManager();
+        storeManagement = new StoreManagement();
             //logger.transports.forEach((t) => (t.silent = true));
     });
 

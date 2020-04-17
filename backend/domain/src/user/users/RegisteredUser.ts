@@ -1,35 +1,23 @@
-import { UserRole } from "../../api-int/internal_api"
-import { v4 as uuid } from 'uuid';
+import {User} from "./User";
 
-export abstract class RegisteredUser {
-  protected readonly _UUID: string;
-  protected readonly _name: string;
-  protected _password: string;
-  protected _role;
+export class RegisteredUser extends User {
+    protected readonly _name: string;
+    protected _password: string;
+    protected _role;
 
-  protected constructor(name: string, password: string,uid?:string) {
-    this._name = name;
-    this._password = password;
-    this._UUID = uid? uid: uuid();
-  }
+    constructor();
+    constructor(name:string);
+    constructor(name?: string, password?: string) {
+        super();
+        this._name = name;
+        this._password = password;
+    }
 
-  get name(): string {
-    return this._name;
-  }
+    get name(): string {
+        return this._name;
+    }
 
-  get password(): string {
-    return this._password;
-  }
-
-  get UUID(): string {
-    return this._UUID;
-  }
-
-  getRole(): UserRole {
-   return this._role;
-  }
-
-  setRole(role: UserRole): void {
-    this._role = role;
-  }
+    get password(): string {
+        return this._password;
+    }
 }

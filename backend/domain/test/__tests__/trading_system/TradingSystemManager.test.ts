@@ -1,4 +1,4 @@
-import {Store, StoreManager} from "../../../src/store/internal_api";
+import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Res from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser, Buyer} from "../../../src/user/internal_api";
 import { TradingSystemManager } from "../../../src/trading_system/TradingSystemManager";
@@ -10,7 +10,7 @@ import * as Req from "../../../src/api-ext/Request";
 import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
 jest.mock('../../../src/user/UserManager');
-jest.mock('../../../src/store/StoreManager');
+jest.mock('../../../src/store/StoreManagement');
 jest.mock('../../../src/external_systems/ExternalSystemsManager');
 jest.mock('../../../src/user/UserManager');
 
@@ -21,15 +21,15 @@ describe("Store Management Unit Tests", () => {
 
     beforeEach(() => {
         store = new Store("store");
-        user = new StoreOwner("name","123123");
+        user = new StoreOwner("name");
         mocked(UserManager).mockClear();
-        mocked(StoreManager).mockClear();
+        mocked(StoreManagement).mockClear();
     });
 
     function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 addItems: () => operationResMock
             }
@@ -82,7 +82,7 @@ describe("Store Management Unit Tests", () => {
     function prepareRemoveItemsMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 removeItems: () => operationResMock
             }
@@ -141,7 +141,7 @@ describe("Store Management Unit Tests", () => {
     function prepareRemoveProductsWithQuantityMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 removeProductsWithQuantity: () => operationResMock
             }
@@ -219,7 +219,7 @@ describe("Store Management Unit Tests", () => {
     function prepareAddNewProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 addNewProducts: () => operationResMock
             }
@@ -298,7 +298,7 @@ describe("Store Management Unit Tests", () => {
     function prepareRemoveProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 removeProducts: () => operationResMock
             }
@@ -376,7 +376,7 @@ describe("Store Management Unit Tests", () => {
     function prepareAssignStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 assignStoreOwner: () => operationResMock
             }
@@ -452,7 +452,7 @@ describe("Store Management Unit Tests", () => {
     function prepareAssignStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return {
                 assignStoreManager: () => operationResMock
             }
@@ -628,7 +628,7 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation(() :any => {
             return { getUserByToken: () => getUserByToken, isLoggedIn: () => succ }
         });
-        mocked(StoreManager).mockImplementation(() :any => {
+        mocked(StoreManagement).mockImplementation(() :any => {
             return { addStore: () => createStoreRes}
         });
     }

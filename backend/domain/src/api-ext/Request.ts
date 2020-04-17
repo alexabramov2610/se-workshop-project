@@ -5,13 +5,12 @@ interface Request {
   token: string;
 }
 
-
 interface OpenStoreRequest extends Request {
   body: { storeName: string};
 }
 
 interface SetAdminRequest extends Request {
-  body: { newAdminUUID: string};
+  body: { newAdminUserName: string};
 }
 
 interface ItemsAdditionRequest extends Request {
