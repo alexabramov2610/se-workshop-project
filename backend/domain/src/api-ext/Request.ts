@@ -79,10 +79,10 @@ interface ChangeProductPriceRequest extends Request {
 }
 
 interface ChangeProductNameRequest extends Request {
-  body:{storeName:string, catalogNumber: number, newName: number}
+  body:{storeName:string, catalogNumber: number, newName: string}
 }
 
 export {RemoveStoreOwnerRequest, Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
-  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest, ChangeProductNameRequest, ChangeProductPriceRequest,
   RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest,RemoveStoreManagerRequest};
 

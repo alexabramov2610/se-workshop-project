@@ -69,28 +69,40 @@ export class StoreManagement {
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
-    changeProductName = (user: RegisteredUser, storeName: string, newProductName: string): Res.BoolResponse => {
+    changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 
-        if (!operationValid.data.result) {
+        if (!operationValid.data.result)
             return {data: {result: false}, error: operationValid.error};
-        }
 
         const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
 
-        return store.addItems(items);
+        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        if (!product)
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+
+        product.name = newProductName;
+        return {data: {result: true}};
     }
 
-    changeProductPrice = (user: RegisteredUser, storeName: string, newPrice: number): Res.BoolResponse => {
+    changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 
-        if (!operationValid.data.result) {
+        if (!operationValid.data.result)
             return {data: {result: false}, error: operationValid.error};
-        }
 
         const store: Store = this.findStoreByName(storeName);
-        const items: Item[] = this.getItemsFromRequest(itemsReq);
-        return store.addItems(items);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+
+        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        if (!product)
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+
+        product.price = newPrice;
+        return {data: {result: true}};
     }
 
     addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {

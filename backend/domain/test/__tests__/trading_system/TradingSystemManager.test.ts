@@ -432,7 +432,78 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    function prepareChangeProductPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                changeProductPrice: () => operationResMock
+            }
+        });
+    }
 
+    test("changeProductPrice success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareChangeProductPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductPriceRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductPrice failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareChangeProductPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductPriceRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    function prepareChangeProductNameMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                changeProductName: () => operationResMock
+            }
+        });
+    }
+
+    test("changeProductName success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareChangeProductNameMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductNameRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductName failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareChangeProductNameMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductNameRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
 
 
     test("connectDeliverySys success", () => {

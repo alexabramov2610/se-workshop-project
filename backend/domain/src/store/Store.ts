@@ -30,7 +30,7 @@ export class Store {
         this._receipts = [];
     }
 
-    private getProductByCatalogNumber(catalogNumber: number): Product {
+    getProductByCatalogNumber(catalogNumber: number): Product {
         logger.debug(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this._products.keys()) {
             if (product.catalogNumber === catalogNumber) {

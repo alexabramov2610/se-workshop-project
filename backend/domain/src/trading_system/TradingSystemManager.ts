@@ -73,22 +73,25 @@ export class TradingSystemManager {
     changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
         logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
-        if (!user) return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this.storeManager.changeProductName(user, req.body.storeName, req.body.newName);
+        if (!user)
+            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.changeProductName(user, req.body.catalogNumber ,req.body.storeName, req.body.newName);
     }
 
     changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
         logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
-        if (!user) return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this.storeManager.changeProductPrice(user, req.body.storeName, req.body.newPrice);
+        if (!user)
+            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
 
 
     addItems(req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse {
         logger.info(`trying to add items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
-        if (!user) return  {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        if (!user)
+            return  {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this.storeManager.addItems(user, req.body.storeName, req.body.items);
     }
 
