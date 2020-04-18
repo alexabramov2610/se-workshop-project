@@ -13,7 +13,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
   });
 
   test("Create Store - Happy Path: valid store information - logged in user", () => {
-    const res = _serviceBridge.register(_credentials);
+    _serviceBridge.register(_credentials);
     _serviceBridge.login(_credentials);
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);

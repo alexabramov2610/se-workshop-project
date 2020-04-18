@@ -4,12 +4,12 @@ import { ServiceFacade } from "service_layer";
 
 let token;
 const wrapWithToken = (req: any) => {
-  return { body: { ...req }, token: this._sessionToken };
+  return { body: { ...req }, token };
 };
 
-const Adapter: Partial<Env.Bridge> = {
-  setToken(token: string): void {
-    token = token;
+export const Adapter: Partial<Env.Bridge> = {
+  setToken(sessionToken: string): void {
+    token = sessionToken;
   },
   register(credentials: Types.Credentials): Types.Response {
     const reqCred = {

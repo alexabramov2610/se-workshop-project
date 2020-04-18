@@ -13,7 +13,7 @@ import * as DummyTypes from "../../__tests__/dummy_values/dummyValues";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
-  setToken(token: string): void;
+  setToken(sessionToken: string): void;
   init(cred: Credentials): DummyTypes.IBoolResponse;
   removeItem(item: Item): DummyTypes.IResponse;
   removeStore(store: Store): DummyTypes.IResponse;

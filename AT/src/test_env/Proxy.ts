@@ -1,4 +1,5 @@
 import { Bridge } from "./Bridge";
+import { Adapter } from "./Adapter";
 import {
   Item,
   Response,
@@ -13,14 +14,14 @@ import {
 } from "./types";
 import { DummyValues } from "../../__tests__/dummy_values/dummyValues";
 
-let real: Bridge;
+let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
   setReal(impl: Bridge) {
     real = impl;
   },
-  setToken(token: string): void {
-    return;
+  setToken(sessionToken: string): void {
+    return real && real.setToken ? real.setToken(sessionToken) : null;
   },
 
   startSession() {
