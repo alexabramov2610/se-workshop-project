@@ -389,6 +389,22 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+    test("view store info seccess",()=>{
+        let product1=new Product('product1',1,1,ProductCategory.Home)
+        let product2=new Product('product2',2,2,ProductCategory.Home)
+        let products: Product[] = [product1,product2];
+
+        store.addNewProducts(products);
+        store.addStoreOwner(storeOwner);
+
+        const res=store.viewStoreInfo();
+        expect(res.data.info.storeName).toEqual(store.storeName);
+        expect(res.data.info.productNames).toContain(product1.name);
+        expect(res.data.info.productNames).toContain(product2.name);
+        expect(res.data.info.storeOwnersNames).toContain(storeOwner.name)
+
+    })
+
 
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
         const products: ProductCatalogNumber[] = [];

@@ -4,6 +4,7 @@ import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
 import {BoolResponse} from "../../../src/api-ext/Response";
 import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
+import {errorMsg} from "../../../src/api-int/Error";
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
@@ -371,6 +372,16 @@ describe("Store Management Unit Tests", () => {
     test("findStoreByName Failure", () => {
         expect(storeManagement.findStoreByName('storename')).toBeFalsy();
     });
+
+    test('viewStoreInfo cant find store Fail ',()=>{
+        jest.spyOn(storeManagement,'findStoreByName').mockReturnValueOnce(undefined);
+        const res:Responses.StoreInfoResponse=storeManagement.viewStoreInfo('whatever');
+        expect(res.data.result).toBeFalsy();
+        expect(res.error.message).toEqual(errorMsg['E_NF']);
+
+
+
+    })
 
 
     function mockVerifyStoreOperation(isSuccess: boolean) {

@@ -11,6 +11,10 @@ export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionRespo
    return tradingSystem.addItems(req);
 }
 
+export const viewStoreInfo=(req:Req.StoreInfoRequest):Res.StoreInfoResponse => {
+   return tradingSystem.viewStoreInfo(req);
+}
+
 export const removeItems = (req: Req.ItemsRemovalRequest) : Res.ItemsRemovalResponse => {
    return tradingSystem.removeItems(req);
 }

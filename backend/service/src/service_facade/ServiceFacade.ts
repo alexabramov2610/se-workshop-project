@@ -80,6 +80,10 @@ export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Res.Bool
     return runIfOpen(req,StoreService.assignStoreManager);
 }
 
+export const viewStoreInfo=(req:Req.StoreInfoRequest):Res.StoreInfoResponse =>{
+    return runIfOpen(req,StoreService.viewStoreInfo);
+}
+
 
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};

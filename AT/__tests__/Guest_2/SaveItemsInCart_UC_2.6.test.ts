@@ -4,13 +4,14 @@ import {
     CATEGORY,
     Item,
     Store,
-    Cart
+    Cart, Credentials
 } from "../../src/";
 
 
 
 describe("Guest saves items in the cart, UC: 2.6", () => {
     let _serviceBridge: Bridge;
+    let _credentials: Credentials;
     let _testStore1: Store;
     let _testStore2: Store;
     let _testItem1: Item;
@@ -19,6 +20,10 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
+
+        _credentials = {userName: "test-name", password: "test-PASS-123"};
+        _serviceBridge.register(_credentials);
+        _serviceBridge.login(_credentials);
 
         _testItem1 = {
             id: "test-id1",
@@ -53,12 +58,14 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
             description: "lovely-test-store"
         };
 
-        _serviceBridge.addStore(_testStore1);
-        _serviceBridge.addStore(_testStore2);
+        _serviceBridge.createStore(_testStore1);
+        _serviceBridge.createStore(_testStore2);
 
         _serviceBridge.addItemToStore(_testStore1, _testItem1);
         _serviceBridge.addItemToStore(_testStore1, _testItem3);
         _serviceBridge.addItemToStore(_testStore2, _testItem2);
+
+        _serviceBridge.logout();
     });
 
     test("Valid insertion, item doesn't exist in cart", () => {
