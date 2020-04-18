@@ -1,49 +1,47 @@
-import {getInstance, CreateInstance} from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
-
-let tradingSystem = getInstance();
-export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolResponse => {
-    return tradingSystem.createStore(createStoreReq);
+import {TradingSystemManager} from "domain_layer/dist/src/trading_system/TradingSystemManager";
+export const createStore = (createStoreReq: Req.OpenStoreRequest,ts:TradingSystemManager): Res.BoolResponse => {
+    return ts.createStore(createStoreReq);
 
 }
 
-export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
-    return tradingSystem.addItems(req);
+export const addItems = (req: Req.ItemsAdditionRequest,ts:TradingSystemManager): Res.ItemsAdditionResponse => {
+    return ts.addItems(req);
 }
 
-export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse => {
-    return tradingSystem.viewStoreInfo(req);
+export const viewStoreInfo = (req: Req.StoreInfoRequest,ts:TradingSystemManager): Res.StoreInfoResponse => {
+    return ts.viewStoreInfo(req);
 }
 
-export const removeItems = (req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse => {
-    return tradingSystem.removeItems(req);
+export const removeItems = (req: Req.ItemsRemovalRequest,ts:TradingSystemManager): Res.ItemsRemovalResponse => {
+    return ts.removeItems(req);
 }
 
-export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse => {
-    return tradingSystem.removeProductsWithQuantity(req);
+export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity,ts:TradingSystemManager): Res.ProductRemovalResponse => {
+    return ts.removeProductsWithQuantity(req);
 }
 
-export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAdditionResponse => {
-    return tradingSystem.addNewProducts(req);
+export const addNewProducts = (req: Req.AddProductsRequest,ts:TradingSystemManager): Res.ProductAdditionResponse => {
+    return ts.addNewProducts(req);
 }
 
-export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
-    return tradingSystem.removeProducts(req);
+export const removeProducts = (req: Req.ProductRemovalRequest,ts:TradingSystemManager): Res.ProductRemovalResponse => {
+    return ts.removeProducts(req);
 }
 
-export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Res.BoolResponse => {
-    return tradingSystem.assignStoreOwner(req);
+export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest,ts:TradingSystemManager): Res.BoolResponse => {
+    return ts.assignStoreOwner(req);
 }
 
-export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
-    return tradingSystem.assignStoreManager(req);
+export const assignStoreManager = (req: Req.AssignStoreManagerRequest,ts:TradingSystemManager): Res.BoolResponse => {
+    return ts.assignStoreManager(req);
 }
 
-export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Res.BoolResponse => {
-    return tradingSystem.removeStoreManager(req);
+export const removeStoreManager = (req: Req.RemoveStoreManagerRequest,ts:TradingSystemManager): Res.BoolResponse => {
+    return ts.removeStoreManager(req);
 }
 
-export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Res.BoolResponse => {
-    return tradingSystem.removeStoreOwner(req);
+export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest,ts:TradingSystemManager): Res.BoolResponse => {
+    return ts.removeStoreOwner(req);
 }

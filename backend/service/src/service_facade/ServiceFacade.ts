@@ -93,5 +93,5 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.Boo
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};
     if(tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
-    return fn.call(this,req);
+    return fn.call(this,req,tradingSystem);
 }
