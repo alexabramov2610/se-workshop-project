@@ -5,7 +5,7 @@
   "scripts": {
     "start": "tsc && node dist/index.js",
     "test": "SILENT=1 jest",
-    "test:watch": "tsc && npm t -- --watch"
+    "test:watch": "npm t -- --watch"
   },
   "author": "",
   "license": "ISC",
