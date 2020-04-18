@@ -1,12 +1,20 @@
 import {RegisteredUser, StoreManager} from "../internal_api"
 
 export class StoreOwner extends StoreManager {
-    private _storeManagerAssigners: RegisteredUser[];
-    private _storeOwnerAssigners: RegisteredUser[];
+    private _assignedStoreManagers: RegisteredUser[];
+    private _assignedStoreOwners: RegisteredUser[];
 
     constructor(name: string) {
         super(name);
-        this._storeManagerAssigners = [];
-        this._storeOwnerAssigners = [];
+        this._assignedStoreOwners = [];
+        this._assignedStoreManagers = [];
+    }
+
+    assignStoreOwner(storeOwner: StoreOwner) : void {
+        this._assignedStoreOwners = this._assignedStoreOwners.concat(storeOwner);
+    }
+
+    assignStoreManager(storeManager: StoreManager) : void {
+        this._assignedStoreManagers = this._assignedStoreManagers.concat(storeManager);
     }
 }

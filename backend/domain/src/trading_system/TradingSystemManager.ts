@@ -26,6 +26,7 @@ export class TradingSystemManager {
         this.externalSystems = new ExternalSystemsManager();
         this.state = TradingSystemState.CLOSED;
     }
+
     startNewSession(): string {
         let newID: string = uuid();
         while (this.userManager.getUserByToken(newID)) {

@@ -1,6 +1,6 @@
 import {Store} from './internal_api'
 import {logger, BoolResponse, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
-import {RegisteredUser, StoreOwner, StoreManager as StoreManagerUser} from "../user/internal_api";
+import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import {
@@ -128,60 +128,75 @@ export class StoreManagement {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as an owner in store: ${JSON.stringify(storeName)}`)
 
-        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, userWhoAssigns);
-        if (!operationValid.data.result) {
+        let error: string;
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as an owner in store: ${storeName}. error: ${operationValid.error.message}`);
-            return operationValid;
+                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const store: Store = this.findStoreByName(storeName);
-
-        if (store.verifyIsStoreOwner(userToAssign.name)) {   // already store owner
-            const error = errorMsg.E_AL;
+        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoAssigns.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
+            error = errorMsg.E_AL;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        logger.debug(`successfully assigned user: ${userToAssign.name} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
-        const additionRes: Res.BoolResponse = store.addStoreOwner(userToAssign.name);
+        const newUserToAssign: StoreOwner = new StoreOwner(userToAssign.name);
+
+        logger.debug(`successfully assigned user: ${userToAssign} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+        const additionRes: Res.BoolResponse = store.addStoreOwner(newUserToAssign);
         if (additionRes.data.result)
-            this.addStoreAssigner(userWhoAssigns, userToAssign, false);
+            userWhoAssignsOwner.assignStoreOwner(newUserToAssign);
         return additionRes;
     }
 
     assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): BoolResponse {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as a manager in store: ${storeName}`)
-
-        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, userWhoAssigns);
-        if (operationValid.error) {
-            logger.warn(`user: ${userWhoAssigns} failed to assign user:
-                ${userToAssign} as a manager in store: ${storeName}. error: ${operationValid.error.message}`);
-            return operationValid;
-        }
+        let error: string;
 
         const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoAssigns.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
 
         if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
-            const error = errorMsg.E_AL;
+            error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
+        const newUserToAssign: StoreManager = new StoreManager(userToAssign.name);
+
         logger.debug(`successfully assigned user: ${userToAssign} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
-        const additionRes: Res.BoolResponse = store.addStoreManager(userToAssign.name);
+        const additionRes: Res.BoolResponse = store.addStoreManager(newUserToAssign);
         if (additionRes.data.result)
-            this.addStoreAssigner(userWhoAssigns, userToAssign, true);
+            userWhoAssignsOwner.assignStoreManager(newUserToAssign);
         return additionRes;
     }
-
-    // addPermissionToManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse{
-    //
-    //
-    // }
 
     findStoreByName(storeName: string): Store {
         for (const store of this._stores) {
@@ -190,18 +205,6 @@ export class StoreManagement {
         }
 
         return undefined;
-    }
-
-    private addStoreAssigner(userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser, isManager: boolean): void {
-        if (isManager) {
-            let usersList: RegisteredUser[] = this._storeManagerAssigners.get(userWhoAssigns);
-            usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
-            this._storeManagerAssigners.set(userWhoAssigns, usersList)
-        } else {
-            let usersList: RegisteredUser[] = this._storeOwnerAssigners.get(userWhoAssigns);
-            usersList = usersList ? usersList.concat([userToAssign]) : [userToAssign];
-            this._storeOwnerAssigners.set(userWhoAssigns, usersList)
-        }
     }
 
     private getProductsFromRequest(productsReq: ProductReq[]): Product[] {

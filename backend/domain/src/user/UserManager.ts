@@ -1,7 +1,7 @@
 import {UserRole, ManagementPermission} from "../api-int/Enums";
 import {BoolResponse, errorMsg, SetAdminRequest, LoginResponse} from "../api-int/internal_api";
 import {RegisterRequest, LoginRequest, LogoutRequest} from "../api-ext/external_api"
-import {Admin, Buyer, RegisteredUser, StoreOwner, StoreManager} from "./internal_api";
+import {Admin, RegisteredUser, StoreOwner, StoreManager} from "./internal_api";
 import {logger} from "../api-int/internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -30,7 +30,7 @@ class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         } else {
             logger.debug(`${userName} has registered to the system `);
-            this.registeredUsers = this.registeredUsers.concat([new Buyer(userName, password)]);
+            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, password)]);
             return {data: {result: true}};
         }
     }
@@ -170,25 +170,6 @@ class UserManager {
         return undefined;
     }
 
-    /*
-        assignStoreManagerBasicPermissions(username: string): BoolResponse {
-            const userToChange: RegisteredUser = this.getUserByName(username);
-            const error: string = !userToChange ? `failed assigning basic permissions, user does not exists: ${username}` :
-                !(userToChange.getRole().valueOf() === UserRole.MANAGER) ? `failed assigning basic permissions, user is not manager: ${username}` : undefined;
-
-            if (error) {
-                logger.warn(error);
-                return {data: {result: false}, error: {message: error}};
-            }
-
-            (<StoreManagement>userToChange).addPermission(ManagementPermission.WATCH_PURCHASES_HISTORY);
-            (<StoreManagement>userToChange).addPermission(ManagementPermission.WATCH_USER_QUESTIONS);
-            (<StoreManagement>userToChange).addPermission(ManagementPermission.REPLY_USER_QUESTIONS);
-
-            return {data: {result: true}};
-        }
-    */
-
     addGuestToken(token: string): void {
         this.guests.set(token, new Guest());
     }
@@ -203,4 +184,4 @@ class UserManager {
     }
 }
 
-export { UserManager };
+export {UserManager};

@@ -264,17 +264,6 @@ export class Store {
         return false;
     }
 
-    addStoreOwner(userName: string): Res.BoolResponse {
-        if (!this.verifyIsStoreOwner(userName)) {
-            logger.debug(`adding user: ${userName} as an owner of store: ${this.storeName}`)
-            this._storeOwners.push(new StoreOwner(userName));
-            return {data: {result: true}}
-        } else {
-            logger.warn(`adding user: ${userName} as an owner of store: ${this.storeName} FAILED!`)
-            return {data: {result: false}, error: {message: Error.E_ASSIGN + "owner."}}
-        }
-    }
-
     viewStoreInfo(): Res.StoreInfoResponse {
         const productNames = Array.from(this.products.keys()).map((p) => p.name);
         const storeOwnersNames = this._storeOwners;
@@ -286,14 +275,25 @@ export class Store {
         this._storeOwners.push(new StoreOwner(user.name));
     }
 
-    addStoreManager(userName: string): Res.BoolResponse {
-        if (!this.verifyIsStoreManager(userName)) {
-            logger.debug(`adding user: ${userName} as a manager to store: ${this.storeName}`)
-            this._storeManagers.push(new StoreManager(userName));
+    addStoreManager(storeManager: StoreManager): Res.BoolResponse {
+        if (!this.verifyIsStoreManager(storeManager.name)) {
+            logger.debug(`adding user: ${storeManager.name} as a manager to store: ${this.storeName}`)
+            this._storeManagers.push(storeManager);
             return {data: {result: true}}
         } else {
-            logger.warn(`adding user: ${JSON.stringify(userName)} as a manager to store: ${this.storeName} FAILED!`)
+            logger.warn(`adding user: ${storeManager.name} as a manager to store: ${this.storeName} FAILED!`)
             return {data: {result: false}, error: {message: Error.E_ASSIGN + "manager."}}
+        }
+    }
+
+    addStoreOwner(storeOwner: StoreOwner): Res.BoolResponse {
+        if (!this.verifyIsStoreOwner(storeOwner.name)) {
+            logger.debug(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName}`)
+            this._storeOwners.push(storeOwner);
+            return {data: {result: true}}
+        } else {
+            logger.warn(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName} FAILED!`)
+            return {data: {result: false}, error: {message: Error.E_ASSIGN + "owner."}}
         }
     }
 
