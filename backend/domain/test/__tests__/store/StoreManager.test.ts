@@ -2,7 +2,7 @@ import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
-import {BoolResponse} from "../../../src/api-ext/Response";
+import {BoolResponse, StoreInfoResponse} from "../../../src/api-ext/Response";
 import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../src/api-int/Error";
 
@@ -378,6 +378,17 @@ describe("Store Management Unit Tests", () => {
         const res:Responses.StoreInfoResponse=storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
         expect(res.error.message).toEqual(errorMsg['E_NF']);
+    });
+
+    test('viewStoreInfo Success ',()=>{
+        const storeName:string = 'mock-store';
+        const store: Store = new Store(storeName);
+        const response: StoreInfoResponse = {data : {result : true}};
+        jest.spyOn(storeManagement,'findStoreByName').mockReturnValueOnce(store);
+        jest.spyOn(store,'viewStoreInfo').mockReturnValueOnce(response);
+
+        const res:Responses.StoreInfoResponse = storeManagement.viewStoreInfo(storeName);
+        expect(res).toBe(response);
     });
 
 

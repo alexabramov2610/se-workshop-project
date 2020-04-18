@@ -1,10 +1,9 @@
 import {tradingSystem} from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
+import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
-import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
-
 
 
 /*
