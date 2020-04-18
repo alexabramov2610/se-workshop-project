@@ -28,6 +28,19 @@ describe("Guest Registration, UC: 2.2", () => {
         expect(data).toBeUndefined();
     });
 
+    test("Invalid Username - Already Taken", () => {
+        _credentials.userName = "validUsername";
+        _credentials.password = "nonDigitsPass";
+
+        const response = _serviceBridge.register(_credentials);
+        expect(response.error).toBeUndefined();
+        expect(response.data).toBeDefined();
+
+        const {data, error} = _serviceBridge.register(_credentials);
+        expect(error).toBeDefined();
+        expect(data).toBeUndefined();
+    });
+
     // test("Invalid Password - Non Capital", () => {
     //     _credentials.userName = "validUsername";
     //     _credentials.password = "noncapitalpass123"; // Short password
@@ -45,19 +58,6 @@ describe("Guest Registration, UC: 2.2", () => {
     //     expect(error).toBeDefined();
     //     expect(data).toBeUndefined();
     // });
-
-    test("Invalid Username - Already Taken", () => {
-        _credentials.userName = "validUsername";
-        _credentials.password = "nonDigitsPass";
-
-        const response = _serviceBridge.register(_credentials);
-        expect(response.error).toBeUndefined();
-        expect(response.data).toBeDefined();
-
-        const {data, error} = _serviceBridge.register(_credentials);
-        expect(error).toBeDefined();
-        expect(data).toBeUndefined();
-    });
 
     // test("Invalid Username - Empty Username", () => {
     //     _credentials.userName = "";

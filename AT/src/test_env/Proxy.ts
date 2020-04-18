@@ -14,7 +14,7 @@ import {
   PERMISSION, Product,
 } from "./types";
 import {
-  DummyValues,
+  DummyValues, IProductsRemovalResponse,
   IResponse,
 } from "../../__tests__/mocks/responses";
 
@@ -96,7 +96,7 @@ const Proxy: Bridge = {
     return real.search ? real.search(searchData) : DummyValues.SearchResponse;
   },
 
-  rate(toRate: Store | Item, rate: RATE): Response {
+  rate(toRate: Store | Product, rate: RATE): Response {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
@@ -119,9 +119,11 @@ const Proxy: Bridge = {
       ? real.setDiscountToStore(store, discount)
       : DummyValues.Response;
   },
+
   reset() {
     return real.reset ? real.reset() : null;
   },
+
   setDiscountToItem(store: Store, item: Item, discount: Discount) {
     return real.setDiscountToItem
       ? real.setDiscountToItem(store, item, discount)
@@ -141,8 +143,13 @@ const Proxy: Bridge = {
   },
 
   addProductsToStore(store: Store, products: Product[]): IResponse {
-    return this.real.addProductsToStore ? this.real.addProductsToStore(store, products) : DummyValues.Response;
+    return real.addProductsToStore ? real.addProductsToStore(store, products) : DummyValues.Response;
   },
+
+  removeProductsFromStore(store: Store, products: Product[]): IProductsRemovalResponse {
+    return real.removeProductsFromStore ? real.removeProductsFromStore(store, products) : DummyValues.ProductsRemovalResponse;
+  },
+
 };
 
 export { Proxy };

@@ -1,4 +1,5 @@
 import {Response, CATEGORY, Cart, Product} from "../../src/test_env/types";
+import {ProductCatalogNumber} from "../../../backend/domain/src/api-ext/CommonInterface";
 
 export interface IResponse extends Response {
     data: any;
@@ -166,6 +167,17 @@ const CartResponse: ICartResponse = {
     },
 };
 
+const ProductsRemovalResponse: IProductsRemovalResponse = {
+    data: {
+        productsNotRemoved: []
+    },
+};
+
+export interface IProductsRemovalResponse extends Response {
+    data: { productsNotRemoved: ProductCatalogNumber[] };
+}
+
+
 const DummyValues = {
     Response,
     ItemResponse,
@@ -177,6 +189,7 @@ const DummyValues = {
     SearchResponse,
     InitResponse,
     SessionResponse,
+    ProductsRemovalResponse,
     CartResponse,
 };
 
