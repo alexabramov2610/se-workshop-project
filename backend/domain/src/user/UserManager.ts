@@ -1,8 +1,7 @@
-import {UserRole, ManagementPermission} from "../api-int/Enums";
-import {BoolResponse, errorMsg, SetAdminRequest, LoginResponse} from "../api-int/internal_api";
-import {RegisterRequest, LoginRequest, LogoutRequest} from "../api-ext/external_api"
-import {Admin, RegisteredUser, StoreOwner, StoreManager} from "./internal_api";
-import {logger} from "../api-int/internal_api";
+import {UserRole} from "../api-int/Enums";
+import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
+import {LoginRequest, LogoutRequest, RegisterRequest} from "../api-ext/external_api"
+import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 
@@ -25,7 +24,7 @@ class UserManager {
         // user already in system
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
-            return {data: {result: false}, error: {message: errorMsg.E_AT}}
+            return {data: {result: false}, error: {message: errorMsg.E_BU}}
         } else if (!this.isValidPassword(password)) {
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         } else {
@@ -38,8 +37,8 @@ class UserManager {
     login(req: LoginRequest): BoolResponse {
         const userName = req.body.username;
         const password = req.body.password;
-
-        if (!(this.getUserByName(userName))) {
+        const user = this.getUserByName(userName)
+        if (!user) {
             logger.warn(`fail to login ,${userName} not found `);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
         } else if (!this.verifyPassword(userName, password)) {
@@ -48,10 +47,14 @@ class UserManager {
         } else if (this.isLoggedIn(userName)) { // already logged in
             logger.warn(`fail to login ,${userName} is allredy logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        } else {
+        } else if(req.body.asAdmin && !this.isAdmin(user)) {
+            logger.warn(`fail to login ,${userName} as Admin- this user dont have admin privileges `);
+            return {data: {result: false}, error: {message: errorMsg.E_NA}}
+        }
+        else{
             logger.info(`${userName} has logged in  `);
-            const user = this.getUserByName(userName)
             this.loggedInUsers = this.loggedInUsers.set(req.token, user);
+            user.role = req.body.asAdmin? UserRole.ADMIN : UserRole.BUYER;
             return {data: {result: true}};
         }
     }

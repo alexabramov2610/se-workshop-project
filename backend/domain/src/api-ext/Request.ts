@@ -12,6 +12,9 @@ interface OpenStoreRequest extends Request {
 interface SetAdminRequest extends Request {
   body: { newAdminUserName: string};
 }
+interface InitReq extends Request {
+  body: { firstAdminName: string,firstAdminPassword: string};
+}
 
 interface ItemsAdditionRequest extends Request {
   body: { storeName: string, items: Item[] }
@@ -44,13 +47,16 @@ interface AssignStoreManagerRequest extends Request {
 interface RemoveStoreOwnerRequest extends Request {
   body: { storeName: string, usernameToRemove: string }
 }
+interface RemoveStoreManagerRequest extends Request {
+  body: { storeName: string, usernameToRemove: string }
+}
 
 interface RegisterRequest extends Request {
   body: { username: string, password: string }
 }
 
 interface LoginRequest extends Request {
-  body: { username: string, password: string }
+  body: { username: string, password: string, asAdmin?:boolean}
 }
 
 interface LogoutRequest extends Request {
@@ -60,11 +66,15 @@ interface ViewShopPurchasesHistoryRequest extends Request{
   body: {shopName: string}
 }
 
+interface ViewBuyerPurchasesHistoryRequest extends Request{
+  body: {}
+}
+
 interface StoreInfoRequest extends Request{
   body:{storeName:string}
 }
 
 export {RemoveStoreOwnerRequest, Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest};
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest,RemoveStoreManagerRequest};
 
