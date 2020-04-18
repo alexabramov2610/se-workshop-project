@@ -2,16 +2,13 @@ import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser, Buyer} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
-import exp from "constants";
 import {BoolResponse} from "../../../src/api-ext/Response";
-import {Item} from "../../../src/trading_system/data/Item";
 import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
     beforeEach(() => {
         storeManagement = new StoreManagement();
-            //logger.transports.forEach((t) => (t.silent = true));
     });
 
     test("addStore success", () => {
@@ -29,7 +26,7 @@ describe("Store Management Unit Tests", () => {
 
     test("verifyStoreOwner success", () => {
         const store: Store = new Store("name");
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(true);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         expect(storeManagement.verifyStoreOwner(store.storeName, user)).toBeTruthy();
@@ -38,13 +35,13 @@ describe("Store Management Unit Tests", () => {
     test("verifyStoreOwner failure", () => {
         const store: Store = new Store("name");
         jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         expect(storeManagement.verifyStoreOwner(store.storeName, user)).toBeFalsy();
     });
 
     test("verifyStoreManager success", () => {
         const store: Store = new Store("name");
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(true);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         expect(storeManagement.verifyStoreManager(store.storeName, user)).toBeTruthy();
@@ -52,7 +49,7 @@ describe("Store Management Unit Tests", () => {
 
     test("verifyStoreManager failure", () => {
         const store: Store = new Store("name");
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(false);
         expect(storeManagement.verifyStoreManager(store.storeName, user)).toBeFalsy();
     });
@@ -63,7 +60,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(true);
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
 
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         expect(storeManagement.verifyStoreOperation(store.storeName, user)).toBeTruthy();
     });
 
@@ -72,7 +69,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(false);
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
 
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user);
         expect(res.data.result).toBeFalsy();
         expect(res.error).toBeDefined();
@@ -85,7 +82,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(false);
         jest.spyOn(storeManagement, "verifyStoreManager").mockReturnValue(false);
 
-        const user: StoreOwner = new StoreOwner("name","123123");
+        const user: StoreOwner = new StoreOwner("name");
         const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user);
         expect(res.data.result).toBeFalsy();
         expect(res.error).toBeDefined();
@@ -99,8 +96,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -115,8 +112,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -132,8 +129,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -149,8 +146,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreManager(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -165,8 +162,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreManager(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -182,8 +179,8 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
 
-        const alreadyOwner: StoreOwner = new StoreOwner("name1","123123");
-        const ownerToAssign: StoreOwner = new StoreOwner("name2","123123");
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign: StoreOwner = new StoreOwner("name2");
 
         const res: Res.BoolResponse = storeManagement.assignStoreManager(store.storeName, ownerToAssign, alreadyOwner);
 
@@ -193,7 +190,7 @@ describe("Store Management Unit Tests", () => {
 
     test("verifyStoreExists Success", () => {
         const storeName: string = 'mock-store';
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         expect(storeManagement.addStore(storeName, user).data.result).toBeTruthy();
 
         expect(storeManagement.verifyStoreExists(storeName)).toBeTruthy();
@@ -209,7 +206,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ItemReq[] = [{ catalogNumber: 1, id : 1}];
         const mockRes: Res.ItemsAdditionResponse = {data: {result: isSuccessFlow, itemsNotAdded: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"addItems").mockReturnValue(mockRes);
@@ -225,7 +222,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ItemReq[] = [];
         const mockRes: Res.ItemsAdditionResponse = {data: {result: isSuccessFlow, itemsNotAdded: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"addItems").mockReturnValue(mockRes);
@@ -241,7 +238,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ItemReq[] = [];
         const mockRes: Res.ItemsRemovalResponse = {data: {result: isSuccessFlow, itemsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeItems").mockReturnValue(mockRes);
@@ -257,7 +254,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ItemReq[] = [];
         const mockRes: Res.ItemsRemovalResponse = {data: {result: isSuccessFlow, itemsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeItems").mockReturnValue(mockRes);
@@ -273,7 +270,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductWithQuantity[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeProductsWithQuantity").mockReturnValue(mockRes);
@@ -289,7 +286,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductWithQuantity[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeProductsWithQuantity").mockReturnValue(mockRes);
@@ -305,7 +302,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductReq[] = [];
         const mockRes: Res.ProductAdditionResponse = {data: {result: isSuccessFlow, productsNotAdded: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"addNewProducts").mockReturnValue(mockRes);
@@ -321,7 +318,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductReq[] = [];
         const mockRes: Res.ProductAdditionResponse = {data: {result: isSuccessFlow, productsNotAdded: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"addNewProducts").mockReturnValue(mockRes);
@@ -337,7 +334,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductCatalogNumber[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeProductsByCatalogNumber").mockReturnValue(mockRes);
@@ -353,7 +350,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const itemsReq: ProductCatalogNumber[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
         jest.spyOn(store,"removeProductsByCatalogNumber").mockReturnValue(mockRes);
@@ -365,7 +362,7 @@ describe("Store Management Unit Tests", () => {
 
     test("findStoreByName Success", () => {
         const storeName: string = 'mock-store';
-        const user: RegisteredUser = new StoreOwner("usermock", "pwmock");
+        const user: RegisteredUser = new StoreOwner("usermock");
         expect(storeManagement.addStore(storeName, user).data.result).toBeTruthy();
 
         expect(storeManagement.findStoreByName(storeName)).toBeTruthy();
