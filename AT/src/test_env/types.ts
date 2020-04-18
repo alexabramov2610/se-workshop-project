@@ -51,7 +51,7 @@ interface Store {
   name;
 }
 
-interface inventory {
+interface Inventory {
   items: Item[];
   quantities: number[];
 }
@@ -96,7 +96,18 @@ enum RATE {
   FIVE_STARS,
 }
 
+enum PERMISSION {
+  SET_DISCOUNT,
+  REMOVE_SUBSCRIPTION,
+  CLOSE_STORE,
+  WATCH_PURCHASES_HISTORY,
+  WATCH_USER_QUESTIONS,
+  REPLY_USER_QUESTIONS
+}
+
 export {
+  Inventory,
+  PERMISSION,
   User,
   Item,
   Store,

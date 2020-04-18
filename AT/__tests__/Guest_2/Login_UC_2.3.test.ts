@@ -10,7 +10,7 @@ describe("Guest Login, UC: 2.3", () => {
 
     beforeEach(() => {
         _serviceBridge = Driver.makeBridge();
-        _credentials = {userName: "test-username", password: "test-password"};
+        _credentials = {userName: "test-username", password: "test-Password132"};
     });
 
     test("Valid details and registered", () => {
@@ -18,41 +18,30 @@ describe("Guest Login, UC: 2.3", () => {
         _credentials.password = "validPassword123";
         _serviceBridge.register(_credentials);
 
-        const {error} = _serviceBridge.login(_credentials);
+        const {data, error} = _serviceBridge.login(_credentials);
         expect(error).toBeUndefined();
-
-        const {data} = _serviceBridge.getLoggedInUsers();
-        const {users} = data;
-        expect(users.includes(_credentials.userName)).toBeTruthy();
+        expect(data).toBeDefined();
     });
 
     test("Wrong password and registered", () => {
-        const passwordDefect = "234jERFAshb5@#$@#4bjh";
+        const passwordDefect = "234jERFAs$%^hb5@#$@#4bjh";
         _credentials.userName = "validUsername";
         _credentials.password = "wrongPassword123";
         _serviceBridge.register(_credentials);
 
-        _credentials.password += "23423bhj@#$f";
-        const {error} = _serviceBridge.login(_credentials);
-        // expect(error).toBe(INCORRECT_PASSWORD);
+        _credentials.password += passwordDefect;
+        const {data, error} = _serviceBridge.login(_credentials);
+        expect(data).toBeUndefined();
         expect(error).toBeDefined();
-
-        const {data} = _serviceBridge.getLoggedInUsers();
-        const {users} = data;
-        expect(users.includes(_credentials.userName)).toBeFalsy();
     });
 
     test("Valid details and not registered", () => {
-        _credentials.userName = "unregisterdUsername";
+        _credentials.userName = "unregisteredUsername";
         _credentials.password = "validPassword123";
 
-        const {error} = _serviceBridge.login(_credentials);
-        // expect(error).toBe(UNREGISTERED_USER);
-        expect(error).toBeDefined();
-
-        const {data} = _serviceBridge.getLoggedInUsers();
-        const {users} = data;
-        expect(users.includes(_credentials.userName)).toBeFalsy();
+        const {data, error} = _serviceBridge.login(_credentials);
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
     });
 
     test("Valid details and registered and logged in", () => {
@@ -60,14 +49,12 @@ describe("Guest Login, UC: 2.3", () => {
         _credentials.password = "validPassword123";
 
         _serviceBridge.register(_credentials);
-        _serviceBridge.login(_credentials);
+        const res = _serviceBridge.login(_credentials);
+        expect(res.data).toBeDefined();
+        expect(res.error).toBeUndefined();
 
-        const {error} = _serviceBridge.login(_credentials);
-        // expect(error).toBe(ALREADY_LOGGED_IN);
+        const {data, error} = _serviceBridge.login(_credentials);
         expect(error).toBeDefined();
-
-        const {data} = _serviceBridge.getLoggedInUsers();
-        const {users} = data;
-        expect(users.includes(_credentials.userName)).toBeTruthy();
+        expect(data).toBeUndefined();
     });
 });
