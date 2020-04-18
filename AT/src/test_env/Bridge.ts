@@ -7,7 +7,7 @@ import {
   SearchData,
   RATE,
   CreditCard,
-  Discount,
+  Discount, PERMISSION,
 } from "./types";
 import * as DummyTypes from "../../__tests__/dummy_values/dummyValues";
 
@@ -21,7 +21,6 @@ export interface Bridge {
   addItemToStore(store: Store, item: Item): DummyTypes.IResponse;
   viewStore(store: Store): DummyTypes.IStoreResponse;
   viewItem(item: Item): DummyTypes.IItemResponse;
-  getLoggedInUsers(): DummyTypes.IUsersResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;
@@ -40,4 +39,6 @@ export interface Bridge {
     discount: Discount
   ): DummyTypes.IResponse;
   startSession(): DummyTypes.ISessionResponse;
+  assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse;
+  grantPermission(credentials: Credentials, permission: PERMISSION): DummyTypes.IResponse;
 }
