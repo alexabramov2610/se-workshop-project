@@ -12,6 +12,7 @@ class Driver {
   };
   private sessionToken: string;
   private bridge: Bridge;
+
   constructor() {
     this.bridge = Proxy;
   }
@@ -19,9 +20,11 @@ class Driver {
   getBridge(): Bridge {
     return this.bridge;
   }
+
   getSessionToken(): string {
     return this.sessionToken;
   }
+
   getLoginDefaults(): Credentials {
     return this.loginDefCredentials;
   }
@@ -34,31 +37,38 @@ class Driver {
     this.bridge.init(this.initDefCredentials);
     return this;
   }
+
   initWith(cred: Credentials): Driver {
     this.bridge.init(cred);
     return this;
   }
+
   startSession(): Driver {
     this.sessionToken = this.bridge.startSession().data.token;
     this.bridge.setToken(this.sessionToken);
     return this;
   }
+
   loginWith(cred: Credentials): Driver {
     this.bridge.login(cred);
     return this;
   }
+
   loginWithDefaults(): Driver {
     this.bridge.login(this.loginDefCredentials);
     return this;
   }
+
   registerWith(cred: Credentials): Driver {
     this.bridge.register(cred);
     return this;
   }
+
   registerWithDefaults(): Driver {
     this.bridge.register(this.loginDefCredentials);
     return this;
   }
+
   resetState() {
     this.bridge.reset();
     return this;

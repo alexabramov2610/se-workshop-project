@@ -12,6 +12,7 @@ import {
 
 
 describe("Guest buy items, UC: 2.8", () => {
+    let _driver = new Driver();
     let _serviceBridge: Bridge;
     let _testCreditCard: CreditCard;
     let _testDiscount: Discount;
@@ -23,7 +24,7 @@ describe("Guest buy items, UC: 2.8", () => {
     let _testItem3: Item;
 
     beforeEach(() => {
-        _serviceBridge = Driver.makeBridge();
+        _serviceBridge = _driver.initWithDefaults().startSession().getBridge();
 
         _credentials = {userName: "test-name", password: "test-PASS-123"};
         _serviceBridge.register(_credentials);

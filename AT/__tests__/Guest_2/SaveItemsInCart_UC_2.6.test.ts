@@ -8,8 +8,8 @@ import {
 } from "../../src/";
 
 
-
 describe("Guest saves items in the cart, UC: 2.6", () => {
+    let _driver = new Driver();
     let _serviceBridge: Bridge;
     let _credentials: Credentials;
     let _testStore1: Store;
@@ -19,7 +19,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     let _testItem3: Item;
 
     beforeEach(() => {
-        _serviceBridge = Driver.makeBridge();
+        _serviceBridge = _driver.initWithDefaults().startSession().getBridge();
 
         _credentials = {userName: "test-name", password: "test-PASS-123"};
         _serviceBridge.register(_credentials);
