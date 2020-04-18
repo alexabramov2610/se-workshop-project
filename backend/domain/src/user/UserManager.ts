@@ -26,7 +26,7 @@ class UserManager {
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
             return {data: {result: false}, error: {message: errorMsg.E_AT}}
-        } else if (!this.vaildPassword(password)) {
+        } else if (!this.isValidPassword(password)) {
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         } else {
             logger.debug(`${userName} has registered to the system `);
@@ -51,7 +51,7 @@ class UserManager {
         } else {
             logger.info(`${userName} has logged in  `);
             const user = this.getUserByName(userName)
-            this.loggedInUsers = this.loggedInUsers.set(req.token,user);
+            this.loggedInUsers = this.loggedInUsers.set(req.token, user);
             return {data: {result: true}};
         }
     }
@@ -73,15 +73,13 @@ class UserManager {
         return true  // to implement with sequrity ..
     }
 
-    vaildPassword(password: string) {
+    isValidPassword(password: string) {
         return password.length >= 4;
     }
 
     getLoggedInUsers(): RegisteredUser[] {
         return Array.from(this.loggedInUsers.values());
     }
-
-
 
     getRegisteredUsers(): RegisteredUser[] {
         return this.registeredUsers;
@@ -93,11 +91,11 @@ class UserManager {
 
     getUserByToken(token: string): User {
         const user: User = this.loggedInUsers.get(token);
-        return user? user : this.guests.get(token);
+        return user ? user : this.guests.get(token);
     }
 
-    getLoggedInUserByToken(token: string): RegisteredUser{
-       return this.loggedInUsers.get(token);
+    getLoggedInUserByToken(token: string): RegisteredUser {
+        return this.loggedInUsers.get(token);
     }
 
     verifyRegisteredUser(username: string, loggedInCheck: boolean): BoolResponse {
@@ -127,6 +125,7 @@ class UserManager {
         }
         return false;
     }
+
     setAdmin(req: SetAdminRequest): BoolResponse {
         const admin: Admin = this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
@@ -141,43 +140,36 @@ class UserManager {
         return {data: {result: true}};
     }
 
-    /*
-        setUserRole(username: string, role: UserRole): LoginResponse {
-            const userToChange: RegisteredUser = this.getUserByName(username);
-            let error: string;
-            if (userToChange) {
-                const newUser: RegisteredUser = this.duplicateUserByRole(userToChange, role);
-                if (newUser) {
-                    const newRegisteredUsers: RegisteredUser[] = this.registeredUsers.filter(user => user.UUID !== userToChange.UUID);
-                    this.registeredUsers = newRegisteredUsers.concat([newUser]);
-
-                    if (this.isLoggedIn((userToChange))) {
-                        const newRegisteredUsers: RegisteredUser[] = this.loggedInUsers.filter(user => user.UUID !== userToChange.UUID);
-                        this.loggedInUsers = newRegisteredUsers.concat([newUser]);
-                    }
-                    return {data: {result: true, newToken: newUser.UUID}};
-                } else
-                    error = `failed setting user role, invalid user role: ${role}`;
+    setUserRole(username: string, role: UserRole): RegisteredUser {
+        const userToChange: RegisteredUser = this.getUserByName(username);
+        let error: string;
+        if (userToChange) {
+            const newUser: RegisteredUser = this.duplicateUserByRole(userToChange, role);
+            if (newUser) {
+                return newUser;
             } else {
-                error = `failed setting user role, user does not exist: ${username}`;
+                error = `failed setting user role, invalid user role: ${role}`;
             }
-            logger.warn(error);
-            return {data: {result: false}, error: {message: error}};
+        } else {
+            error = `failed setting user role, user does not exist: ${username}`;
         }
-    */
-    /*
+        logger.warn(error);
+        return undefined;
+    }
+
+
     private duplicateUserByRole(userToChange: RegisteredUser, role: UserRole): RegisteredUser {
         switch (role) {
             case UserRole.OWNER: {
-                return new StoreOwner(userToChange.name, userToChange.password, userToChange.UUID);
+                return new StoreOwner(userToChange.name);
             }
             case UserRole.MANAGER: {
-                return new StoreManagement(userToChange.name, userToChange.password, userToChange.UUID);
+                return new StoreManager(userToChange.name);
             }
         }
         return undefined;
     }
-*/
+
     /*
         assignStoreManagerBasicPermissions(username: string): BoolResponse {
             const userToChange: RegisteredUser = this.getUserByName(username);
@@ -196,18 +188,19 @@ class UserManager {
             return {data: {result: true}};
         }
     */
-    addGuestToken(token: string):void {
-        this.guests.set(token,new Guest());
+
+    addGuestToken(token: string): void {
+        this.guests.set(token, new Guest());
     }
 
-    removeGuest(token: string):void {
+    removeGuest(token: string): void {
         this.guests.delete(token);
     }
 
-    private getAdminByToken(token: string) :Admin {
-        const user : RegisteredUser =  this.loggedInUsers.get(token);
-        return !user? user :  this.admins.find((a)=> user.name === a.name)
+    private getAdminByToken(token: string): Admin {
+        const user: RegisteredUser = this.loggedInUsers.get(token);
+        return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 }
 
-export {UserManager};
+export { UserManager };

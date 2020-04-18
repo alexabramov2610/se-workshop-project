@@ -5,8 +5,6 @@ export class RegisteredUser extends User {
     protected _password: string;
     protected _role;
 
-    constructor();
-    constructor(name:string);
     constructor(name?: string, password?: string) {
         super();
         this._name = name;

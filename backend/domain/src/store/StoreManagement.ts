@@ -178,10 +178,10 @@ export class StoreManagement {
         return additionRes;
     }
 
-    addPermissionToManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse{
-
-
-    }
+    // addPermissionToManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser) : BoolResponse{
+    //
+    //
+    // }
 
     findStoreByName(storeName: string): Store {
         for (const store of this._stores) {
