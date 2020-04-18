@@ -1,16 +1,14 @@
-import { Error } from "../api-int/internal_api";
-import {RegisteredUser} from "../user/users/RegisteredUser"
+import {Error} from "../api-int/internal_api";
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {TradingSystemState} from "./Enums";
+import {Receipt} from "../trading_system/internal_api";
+
 
 interface Response {
   data: any;
   error?: Error;
 }
 
-
-interface UserResponse extends Response {
-  data: { user: RegisteredUser};
-}
 
 interface ItemsAdditionResponse extends Response {
   data: {result: boolean, itemsNotAdded: Item[] }
@@ -29,11 +27,28 @@ interface ProductRemovalResponse extends Response {
 }
 
 interface BoolResponse extends Response {
-  data: {result: boolean, value?: any}
+  data: {result: boolean}
+}
+
+interface LoginResponse extends Response {
+  data: {result: boolean, newToken: string}
 }
 
 interface StoreInfoResponse extends Response{
-  data:{result:boolean,info:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
+  data:{result:boolean, info?:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
 }
 
-export { Response, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse };
+interface TradingSystemStateResponse extends Response{
+  data: {state: TradingSystemState}
+}
+
+interface StoreInfoResponse extends Response{
+  data:{result:boolean, info?:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
+}
+
+interface ViewShopPurchasesHistoryResponse  extends Response {
+  data: {purchases: Receipt[]}
+}
+
+export { Response,LoginResponse, BoolResponse, ProductAdditionResponse, StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
+

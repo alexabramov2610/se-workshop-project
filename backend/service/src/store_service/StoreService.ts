@@ -1,4 +1,4 @@
-import { tradingSystem } from "domain_layer/src/api-ext/external_api";
+import {tradingSystem} from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
 
@@ -9,6 +9,10 @@ export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolRespo
 
 export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse => {
    return tradingSystem.addItems(req);
+}
+
+export const viewStoreInfo=(req:Req.StoreInfoRequest):Res.StoreInfoResponse => {
+   return tradingSystem.viewStoreInfo(req);
 }
 
 export const removeItems = (req: Req.ItemsRemovalRequest) : Res.ItemsRemovalResponse => {

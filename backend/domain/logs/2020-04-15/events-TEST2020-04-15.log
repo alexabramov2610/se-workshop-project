@@ -1,0 +1,398 @@
+2020-04-15 11:50:24 [WARN]:	cant connect to one of the external systems.
+2020-04-15 11:50:24 [INFO]:	registering new user : ron 
+2020-04-15 11:50:24 [INFO]:	ron has registed to the system 
+2020-04-15 11:50:24 [INFO]:	registering new user : ron 
+2020-04-15 11:50:24 [INFO]:	fail to register ,ron already exist 
+2020-04-15 11:50:24 [INFO]:	registering new user : ron 
+2020-04-15 11:50:24 [INFO]:	try to login ,ron  
+2020-04-15 11:50:24 [INFO]:	ron has logged in  
+2020-04-15 11:50:24 [INFO]:	try to login ,ron  
+2020-04-15 11:50:24 [WARN]:	fail to login ron ,bad password 
+2020-04-15 11:50:24 [INFO]:	try to login ,ron  
+2020-04-15 11:50:24 [WARN]:	fail to login ron ,bad password 
+2020-04-15 11:50:24 [INFO]:	logging out ron  
+2020-04-15 11:50:24 [INFO]:	logging out ron seccess 
+2020-04-15 11:50:24 [INFO]:	logging out ron  
+2020-04-15 11:50:24 [WARN]:	logging out ron fail, user is not logged in  
+2020-04-15 11:50:24 [WARN]:	failed setting user role, user does not exist: test
+2020-04-15 11:50:24 [WARN]:	failed setting user role, invalid user role: -2
+2020-04-15 11:50:24 [WARN]:	failed setting user role, user does not exist: test
+2020-04-15 11:50:24 [WARN]:	failed setting user role, invalid user role: -2
+2020-04-15 11:50:24 [WARN]:	failed assigning basic permissions, user does not exists: test
+2020-04-15 11:50:24 [WARN]:	failed adding store  to system
+2020-04-15 11:50:24 [WARN]:	user: "423f4ae8-0744-44c3-8013-2e696def13c1" failed to assign user:
+                "3406d7dc-4a11-4243-a0a6-15b963d630af" as an owner in store: "name". error: mock-err
+2020-04-15 11:50:24 [WARN]:	user: "3d0fa905-8826-48e4-9bbc-e852a71f6bb7" failed to assign user:
+                "3ed9b4e3-8e50-41ff-992c-39971d90b94f" as a manager in store: "717b0202-0551-4cc7-a293-381ba7f3a2af". error: Already at this state
+2020-04-15 11:50:24 [WARN]:	user: "ffcdec62-d6b0-4582-8682-ef9588c3c879" failed to assign user:
+                "41cb321b-96e8-479a-b7ed-75f7f63fd498" as a manager in store: "name". error: mock-err
+2020-04-15 11:50:24 [WARN]:	user: "3ee77664-fba5-4da7-b189-340a7b4efbfe" failed to assign user:
+                "dbd5c25f-a2e3-4b58-ab0c-6863e00a98ab" as a manager in store: "92d78b7b-2ed6-4413-a43f-4a8d230c8b47". error: Already at this state
+2020-04-15 11:50:24 [WARN]:	could not verify store storename
+2020-04-15 11:50:24 [WARN]:	user: "fa6db244-0d9f-4d2b-b8e8-0fdc6e046929" is not an owner of store e81cb59e-ef08-478b-8dd1-d4ed3ca8cb8a
+2020-04-15 11:50:24 [WARN]:	user: "49d9908a-d18c-4e4e-a30a-52a836657480" is not an owner of store a6bd1034-9cde-4282-9c19-288621190d39
+2020-04-15 11:50:24 [WARN]:	user: {"_name":"mockname","_password":"mockpw","_UUID":"897e6bf2-f8b8-48ce-a402-4caa63f4bed3","_role":1} is not an owner of store c31aacfb-1e66-414d-ac4d-19577ea182be
+2020-04-15 11:50:24 [WARN]:	user: "1fd15120-f0c3-4e9a-9674-0aaa7573ad88" is not a manager of store 1f05d392-ad93-4cb4-aa9b-d3c0b6a9f8c1
+2020-04-15 11:50:24 [WARN]:	user: "16a66576-dad3-4474-889a-7534958ace4b" is not a manager of store e4abf1d8-5ebb-47e7-b679-5d05654e8e30
+2020-04-15 11:50:24 [WARN]:	user: "596583be-3002-4744-bca3-51ba28739381" is not a manager of store a79877ac-5152-4d91-bee0-89acf7b717e7
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	product: 1 already exists in store
+2020-04-15 11:50:24 [WARN]:	product: 2 already exists in store
+2020-04-15 11:50:24 [WARN]:	product: 3 already exists in store
+2020-04-15 11:50:24 [WARN]:	product: 4 already exists in store
+2020-04-15 11:50:24 [WARN]:	product: 5 already exists in store
+2020-04-15 11:50:24 [WARN]:	failed adding all requested 5 products to store id: 538863cf-0da1-45ce-b44b-0907ab73ab01
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	failed removing all requested 5 products from store id: fc84b88d-ed20-4400-be99-24537d276695
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	failed removing all requested 5 products from store id: 99485cd1-ef40-4563-ac5f-4b9fe468c248
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	failed adding all requested 5 items to store id: 5e9488ef-cb68-4dd8-983c-0f03162cf530
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 6
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 7
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 8
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 9
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 10
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 8
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 9
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 10
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 11
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 12
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 13
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 14
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 15
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 16
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 7
+2020-04-15 11:50:24 [WARN]:	failed removing all requested 10 items from store id: 7364fc8c-201b-4666-a076-8aef462ccb48
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find item with id: 52
+2020-04-15 11:50:24 [WARN]:	could not find item with id: 53
+2020-04-15 11:50:24 [WARN]:	could not find item with id: 54
+2020-04-15 11:50:24 [WARN]:	could not find item with id: 55
+2020-04-15 11:50:24 [WARN]:	could not find item with id: 56
+2020-04-15 11:50:24 [WARN]:	failed removing all requested 5 items from store id: 5dce6636-59bc-4119-b6a5-b0f93966a640
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 1
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 2
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 3
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 4
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 5
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 6
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 7
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 8
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 9
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 10
+2020-04-15 11:50:24 [WARN]:	user: "9d648c8b-0e9b-4929-b97d-74496ebc5842" is not an owner of store 95b95d91-7755-4ca0-9f46-aed7efe39e87
+2020-04-15 11:50:24 [WARN]:	adding user: "21c61436-4a59-46fe-8116-b0b1c2a43007" as an owner of store: 21136e81-8b67-403a-817b-ee0339e238ba FAILED!
+2020-04-15 11:50:24 [WARN]:	user: "e825b744-7d6b-44ce-ae43-e41cd4b232cd" is not a manager of store 3cbbb7f2-effd-48be-973f-aa364dfaa401
+2020-04-15 11:50:24 [WARN]:	adding user: "7e42587f-7d61-468e-850d-b27926ffa0f8" as a manager to store: 77377051-bd2b-4e9e-98be-0feb171a8a85 FAILED!
+2020-04-15 11:50:24 [WARN]:	user: "ed228024-1c0c-45d6-b49e-48f318cd1d1d" is not an owner of store bbd38365-976a-4552-a635-861004fed206
+2020-04-15 11:50:24 [WARN]:	could not find product with catalog number: 6
+2020-04-15 11:50:24 [INFO]:	trying to add items to store: "store" by user: "52fa7829-c5d5-4704-ac76-4415630cee5a"
+2020-04-15 11:50:24 [INFO]:	trying to add items to store: "store" by user: "59f9147b-6f3f-449e-bf40-eff2a927db40"
+2020-04-15 11:50:24 [INFO]:	trying to add items to store: "store" by user: "40f29616-119d-4375-9d8c-798fc794c551"
+2020-04-15 11:50:24 [INFO]:	trying to remove items from store: "store" by user: "4871c794-c0c6-489d-b21b-cf6468ff8e9e"
+2020-04-15 11:50:24 [INFO]:	trying to remove items from store: "store" by user: "6a4ae717-08e1-444e-97a3-d03644a05f61"
+2020-04-15 11:50:24 [INFO]:	trying to remove items from store: "store" by user: "32d9cbf4-590e-4cc7-be3d-6af190d31e6b"
+2020-04-15 11:50:24 [INFO]:	trying to remove items to store: "store" from user: "afcd2210-7441-4900-bd34-a1e42e934fa1"
+2020-04-15 11:50:24 [INFO]:	trying to remove items to store: "store" from user: "c9d7020d-9ff6-48e3-9ff7-fdb144b47131"
+2020-04-15 11:50:24 [INFO]:	trying to remove items to store: "store" from user: "e900f8f3-a909-4ae1-89b3-49c022d5631a"
+2020-04-15 11:50:24 [INFO]:	trying to add products to store: "store" by user: "723430e2-20a0-4f62-85cb-1ea63ab1e260"
+2020-04-15 11:50:24 [INFO]:	trying to add products to store: "store" by user: "fba0970f-d1c6-4eb5-8e4e-db4c3b6d34ea"
+2020-04-15 11:50:24 [INFO]:	trying to add products to store: "store" by user: "94d272c1-eb34-4f90-857e-6cefeb2ed8b3"
+2020-04-15 11:50:24 [INFO]:	trying to remove products from store: "store" by user: "a92a1dd8-2c49-4a61-8989-f44cde47ed40"
+2020-04-15 11:50:24 [INFO]:	trying to remove products from store: "store" by user: "b15d0ac4-7925-4c1f-93cd-9b9462d6a61d"
+2020-04-15 11:50:24 [INFO]:	trying to remove products from store: "store" by user: "570ab813-6fb5-432c-9c66-7aa721c5aec3"
+2020-04-15 11:50:25 [INFO]:	user: "d7eec848-9232-4f22-9caa-7373da29634f" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 11:50:25 [INFO]:	user: "c102cfdc-cfc3-4e3a-ba3c-aa591e3e8c12" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 11:50:25 [INFO]:	user: "ab5d936f-c1c8-4bbe-b212-0765cc66dcd2" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 11:50:25 [INFO]:	user: "37a37362-03a7-4588-8a4d-7923381ff4b8" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 11:50:25 [INFO]:	user: "3e9b09e3-dd4e-4bf7-bce6-51a0a28d865d" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 11:50:25 [INFO]:	user: "3035fc48-ce0b-4cab-9624-47226bfa00ee" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 11:50:25 [INFO]:	Trying to connect to delivery system
+2020-04-15 11:50:25 [INFO]:	Trying to connect to delivery system
+2020-04-15 11:50:25 [INFO]:	Trying to connect to payment system
+2020-04-15 11:50:25 [INFO]:	Trying to connect to payment system
+2020-04-15 11:50:25 [INFO]:	user 1 trying set 123 as an admin
+2020-04-15 11:50:25 [INFO]:	user 1 trying set 123 as an admin
+2020-04-15 11:50:25 [INFO]:	user 1 trying open store: new store
+2020-04-15 11:50:25 [INFO]:	user 1 trying open store: new store
+2020-04-15 16:47:12 [WARN]:	cant connect to one of the external systems.
+2020-04-15 16:47:12 [INFO]:	registering new user : ron 
+2020-04-15 16:47:12 [INFO]:	ron has registed to the system 
+2020-04-15 16:47:12 [INFO]:	registering new user : ron 
+2020-04-15 16:47:12 [INFO]:	fail to register ,ron already exist 
+2020-04-15 16:47:12 [INFO]:	registering new user : ron 
+2020-04-15 16:47:12 [INFO]:	try to login ,ron  
+2020-04-15 16:47:12 [INFO]:	ron has logged in  
+2020-04-15 16:47:12 [INFO]:	try to login ,ron  
+2020-04-15 16:47:12 [WARN]:	fail to login ron ,bad password 
+2020-04-15 16:47:12 [INFO]:	try to login ,ron  
+2020-04-15 16:47:12 [WARN]:	fail to login ron ,bad password 
+2020-04-15 16:47:12 [INFO]:	logging out ron  
+2020-04-15 16:47:12 [INFO]:	logging out ron seccess 
+2020-04-15 16:47:12 [INFO]:	logging out ron  
+2020-04-15 16:47:12 [WARN]:	logging out ron fail, user is not logged in  
+2020-04-15 16:47:12 [WARN]:	failed setting user role, user does not exist: test
+2020-04-15 16:47:12 [WARN]:	failed setting user role, invalid user role: -2
+2020-04-15 16:47:12 [WARN]:	failed setting user role, user does not exist: test
+2020-04-15 16:47:12 [WARN]:	failed setting user role, invalid user role: -2
+2020-04-15 16:47:12 [WARN]:	failed assigning basic permissions, user does not exists: test
+2020-04-15 16:47:12 [WARN]:	failed adding store  to system
+2020-04-15 16:47:12 [WARN]:	user: "d783f22b-186e-4b8e-b9ac-c4f5b91fe413" failed to assign user:
+                "dab9323c-be44-4efa-8a9e-4b7cfb195996" as an owner in store: "name". error: mock-err
+2020-04-15 16:47:12 [WARN]:	user: "8b66e254-bf38-4cab-a6e1-e4779cf8afac" failed to assign user:
+                "c71dc29b-5c8e-4b57-86dc-9a1ed2e85d62" as a manager in store: "2cea458f-646f-4a4a-8d51-7bc5b4880562". error: Already at this state
+2020-04-15 16:47:12 [WARN]:	user: "5c58bc0e-ebbe-41ed-b84c-a5af1806987e" failed to assign user:
+                "22cf57ef-8a84-4a4c-a1b4-b063e6a6900d" as a manager in store: "name". error: mock-err
+2020-04-15 16:47:12 [WARN]:	user: "4f0b6280-a77a-4fef-9884-d096db99cea6" failed to assign user:
+                "6d30b356-a26b-4687-a237-f5e873fc5750" as a manager in store: "f160b6d3-3cd6-4617-bf7a-71b83046c033". error: Already at this state
+2020-04-15 16:47:12 [WARN]:	could not verify store storename
+2020-04-15 16:47:12 [WARN]:	user: "5d8054b8-7251-4146-b07d-3aaa2a5ed8c1" is not an owner of store 2bb810f7-efdb-49e2-ac53-e676be7a44c8
+2020-04-15 16:47:12 [WARN]:	user: "53d738e1-15d3-452b-a5e9-7a1a6d8b737c" is not an owner of store a0ba24e6-bb79-4113-944c-87772773557d
+2020-04-15 16:47:12 [WARN]:	user: {"_name":"mockname","_password":"mockpw","_UUID":"34b47256-fa1b-44e5-9885-9aaa1e5144cc","_role":1} is not an owner of store f2f4d766-969f-4015-9491-b354dae46b16
+2020-04-15 16:47:12 [WARN]:	user: "f09c6172-34b1-4a4d-bc20-27ea0e71a635" is not a manager of store ab1893ac-b41f-499c-a7f7-40f51b243bc3
+2020-04-15 16:47:12 [WARN]:	user: "6558b421-7e21-48e4-b045-a25415caa39e" is not a manager of store f3435608-15d6-4fea-9046-3e8e764ab0f8
+2020-04-15 16:47:12 [WARN]:	user: "604ab236-8437-4527-aba9-151c850ed36d" is not a manager of store 27647045-8e00-4aa5-a703-3d545b12ce52
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	product: 1 already exists in store
+2020-04-15 16:47:12 [WARN]:	product: 2 already exists in store
+2020-04-15 16:47:12 [WARN]:	product: 3 already exists in store
+2020-04-15 16:47:12 [WARN]:	product: 4 already exists in store
+2020-04-15 16:47:12 [WARN]:	product: 5 already exists in store
+2020-04-15 16:47:12 [WARN]:	failed adding all requested 5 products to store id: 4928b03b-24bd-4bf6-be62-e6eb231d856e
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	failed removing all requested 5 products from store id: 47d8e71d-a2f4-478c-8d8a-91f0575febcb
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	failed removing all requested 5 products from store id: 05a9349f-b7f8-4294-8739-032be224a098
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	failed adding all requested 5 items to store id: ce4ad345-41e9-4bee-a182-ab8efcb40f00
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 6
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 7
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 8
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 9
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 10
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 8
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 9
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 10
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 11
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 12
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 13
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 14
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 15
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 16
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 7
+2020-04-15 16:47:12 [WARN]:	failed removing all requested 10 items from store id: 63e7afd0-f030-4680-8c30-fb566294af01
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find item with id: 52
+2020-04-15 16:47:12 [WARN]:	could not find item with id: 53
+2020-04-15 16:47:12 [WARN]:	could not find item with id: 54
+2020-04-15 16:47:12 [WARN]:	could not find item with id: 55
+2020-04-15 16:47:12 [WARN]:	could not find item with id: 56
+2020-04-15 16:47:12 [WARN]:	failed removing all requested 5 items from store id: 1b2e4703-5bd0-44df-a468-96e0907b09de
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 1
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 2
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 3
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 4
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 6
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 7
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 8
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 9
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 10
+2020-04-15 16:47:12 [WARN]:	user: "42245fc8-05ae-4927-8011-a7b781def513" is not an owner of store 0c90b4d3-1dac-4ba1-ac77-6d71e524c323
+2020-04-15 16:47:12 [WARN]:	adding user: "12c8edec-4de3-469e-a0c8-ee9a9454f0b1" as an owner of store: 4b9477de-41cd-432e-82c9-22f16fdb432d FAILED!
+2020-04-15 16:47:12 [WARN]:	user: "159f5a80-ad17-4d40-aeee-baca4b7d88c3" is not a manager of store 65a3d6c0-25f5-40a6-8da7-6ab7b7ddcf0d
+2020-04-15 16:47:12 [WARN]:	adding user: "ec2297c7-517b-4b07-a8bc-764b9bbde5e1" as a manager to store: eb3bd126-8603-4de3-bd41-3323ab38b08f FAILED!
+2020-04-15 16:47:12 [WARN]:	user: "89772005-44ee-4cbb-9aca-f93f6932b3e3" is not an owner of store 148085fe-4282-438c-a7c2-431043b494f5
+2020-04-15 16:47:12 [WARN]:	could not find product with catalog number: 6
+2020-04-15 16:47:12 [INFO]:	trying to add items to store: "store" by user: "b56f5a1d-e336-4b58-8b39-d7936d2846b9"
+2020-04-15 16:47:12 [INFO]:	trying to add items to store: "store" by user: "e72c8384-1d99-410b-9b55-723f78231c27"
+2020-04-15 16:47:12 [INFO]:	trying to add items to store: "store" by user: "b18ad353-e5d6-4e9c-a195-ddf85e7d4815"
+2020-04-15 16:47:12 [INFO]:	trying to remove items from store: "store" by user: "86103ced-efd4-43ce-a05b-f23e28f10b27"
+2020-04-15 16:47:12 [INFO]:	trying to remove items from store: "store" by user: "4df4d1eb-6872-4293-bfff-ce5b26056f98"
+2020-04-15 16:47:12 [INFO]:	trying to remove items from store: "store" by user: "e58ffef8-14b2-4a0f-9aa7-35b413fa394e"
+2020-04-15 16:47:12 [INFO]:	trying to remove items to store: "store" from user: "e6ff4484-61a9-49d6-aed3-4190e7ed394a"
+2020-04-15 16:47:12 [INFO]:	trying to remove items to store: "store" from user: "b8697989-ffef-453e-ac5e-c92566b499bb"
+2020-04-15 16:47:12 [INFO]:	trying to remove items to store: "store" from user: "0a6be7c9-e520-47b8-adce-743db28bbca3"
+2020-04-15 16:47:12 [INFO]:	trying to add products to store: "store" by user: "7f2ddc57-de80-44f6-9adb-b4e394e77e76"
+2020-04-15 16:47:12 [INFO]:	trying to add products to store: "store" by user: "b5cf3bcc-362f-4da1-8dc5-c0bff8116239"
+2020-04-15 16:47:12 [INFO]:	trying to add products to store: "store" by user: "fe0fd053-b36d-4e91-aef6-061488a5850d"
+2020-04-15 16:47:12 [INFO]:	trying to remove products from store: "store" by user: "972a1e08-9b2e-4744-a651-321f6e0e2ede"
+2020-04-15 16:47:12 [INFO]:	trying to remove products from store: "store" by user: "ee8299dd-9385-4d04-ac52-9d39a701073b"
+2020-04-15 16:47:12 [INFO]:	trying to remove products from store: "store" by user: "f2992691-3aab-458a-87ce-bdbe23f1a6bf"
+2020-04-15 16:47:12 [INFO]:	user: "b6a5e548-8dd5-4448-ac82-ef160614818e" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 16:47:12 [INFO]:	user: "d44768f5-9277-4a7a-8951-a173c8e9e092" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 16:47:12 [INFO]:	user: "2f5e4dbb-3306-4289-a836-0a4cdcc457e2" requested to assign user:
+                "user" as an owner in store: "store" 
+2020-04-15 16:47:12 [INFO]:	user: "4ca1a518-5de7-4586-8c83-372d077f5fd0" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 16:47:12 [INFO]:	user: "8b34c58d-7767-4d91-b1f9-deaabecae1da" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 16:47:12 [INFO]:	user: "443087d5-e2ff-42b9-b456-f7c7e93c87bd" requested to assign user:
+                "user" as a manager in store: "store" 
+2020-04-15 16:47:12 [INFO]:	Trying to connect to delivery system
+2020-04-15 16:47:12 [INFO]:	Trying to connect to delivery system
+2020-04-15 16:47:12 [INFO]:	Trying to connect to payment system
+2020-04-15 16:47:12 [INFO]:	Trying to connect to payment system
+2020-04-15 16:47:12 [INFO]:	user 1 trying set 123 as an admin
+2020-04-15 16:47:12 [INFO]:	user 1 trying set 123 as an admin
+2020-04-15 16:47:12 [INFO]:	user 1 trying open store: new store
+2020-04-15 16:47:12 [INFO]:	user 1 trying open store: new store

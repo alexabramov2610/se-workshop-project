@@ -1,12 +1,12 @@
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response"
 import {errorMsg as Error} from "../api-int/Error"
-import { logger } from "../api-int/Logger";
-import {StoreOwner, RegisteredUser} from "../user/internal_api";
-import {UserRole} from "../api-int/Enums";
-import { v4 as uuid } from 'uuid';
+import {logger} from "../api-int/Logger";
+import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
+import {ManagementPermission} from "../api-int/Enums";
+import {v4 as uuid} from 'uuid';
 import {ProductCatalogNumber, Product as ProductReq, ProductWithQuantity} from "../api-ext/CommonInterface";
-import {StoreManager} from "./../user/users/StoreManager";
+import {Receipt} from "../trading_system/data/Receipt";
 
 interface ProductValidator {
     isValid: boolean,
@@ -14,12 +14,12 @@ interface ProductValidator {
 }
 
 export class Store {
-
     private readonly _UUID: string;
     private _products: Map<Product, Item[]>;
     private readonly _storeName: string;
     private _storeOwners: StoreOwner[];
     private _storeManagers: StoreManager[];
+    private _receipts: Receipt[];
 
     constructor(storeName: string) {
         this._UUID = uuid();
@@ -27,11 +27,12 @@ export class Store {
         this._products = new Map();
         this._storeOwners = [];
         this._storeManagers = [];
+        this._receipts = [];
     }
 
-    private getProductByCatalogNumber(catalogNumber: number) : Product {
+    private getProductByCatalogNumber(catalogNumber: number): Product {
         logger.debug(`searching product with catalog number: ${catalogNumber}`);
-        for (let product of this._products.keys()) {
+        for (const product of this._products.keys()) {
             if (product.catalogNumber === catalogNumber) {
                 logger.debug(`found product: ${JSON.stringify(product)}`)
                 return product;
@@ -41,9 +42,9 @@ export class Store {
         return undefined;
     }
 
-    private getItemById(items: Item[], id: number) : Item {
+    private getItemById(items: Item[], id: number): Item {
         logger.debug(`searching item with id: ${id}`);
-        for (let item of items) {
+        for (const item of items) {
             if (item.id === id)
                 logger.debug(`found item: ${JSON.stringify(item)}`)
             return item;
@@ -52,30 +53,28 @@ export class Store {
         return undefined;
     }
 
-    private validateProduct(product: Product): ProductValidator{
+    private validateProduct(product: Product): ProductValidator {
         logger.debug(`validating product: ${JSON.stringify(product)}`)
 
         if (!product)
-            return {isValid: false, error: Error['E_INVALID_PROD']}
+            return {isValid: false, error: Error.E_INVALID_PROD}
 
-        let isNameValid: boolean = product.name && product.name != "";
-        let isIdValid: boolean = product.catalogNumber && product.catalogNumber > 0;
+        const isNameValid: boolean = product.name && product.name !== "";
+        const isIdValid: boolean = product.catalogNumber && product.catalogNumber > 0;
 
         if (isNameValid && isIdValid) {
             logger.debug(`validated successfully product: ${JSON.stringify(product)}`)
             return {
                 isValid: true
             }
-        }
-
-        else {
+        } else {
             logger.warn(`invalid product: ${JSON.stringify(product)}`)
-            let error: string =
+            const error: string =
                 !isIdValid && !isNameValid ? `product name and id are illegal. name: ${product.name}, id: ${product.catalogNumber}` :
                     !isIdValid ? `product id is illegal. id: ${product.catalogNumber}` :
                         !isNameValid ? `product name is illegal. name: ${product.name}` : "";
             return {
-                isValid: false, error: error
+                isValid: false, error
             }
         }
 
@@ -89,20 +88,19 @@ export class Store {
         return undefined;
     }
 
-    addItems(items: Item[]) : Res.ItemsAdditionResponse {
+    addItems(items: Item[]): Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
-        let addedItems: Item[] = [];
-        let notAddedItems: Item[] = [];
+        const addedItems: Item[] = [];
+        const notAddedItems: Item[] = [];
 
-        for (let item of items) {
+        for (const item of items) {
             const catalogNumber = item.catalogNumber;
 
-            let product: Product = this.getProductByCatalogNumber(catalogNumber);
+            const product: Product = this.getProductByCatalogNumber(catalogNumber);
             if (product) {
                 this._products.set(product, this._products.get(product).concat([item]));
                 addedItems.push(item);
-            }
-            else {
+            } else {
                 notAddedItems.push(item);
             }
         }
@@ -110,36 +108,34 @@ export class Store {
         if (addedItems.length === 0) { // failed adding
             logger.warn(`failed adding all requested ${items.length} items to store id: ${this._UUID}`)
             return {
-                data: {result: false, itemsNotAdded: items },
-                error: {message: Error['E_ITEMS_ADD']}
+                data: {result: false, itemsNotAdded: items},
+                error: {message: Error.E_ITEMS_ADD}
             }
-        }
-        else {
+        } else {
             logger.debug(`added ${items.length - notAddedItems.length} of ${items.length} request items to store id: ${this._UUID}`)
             return {
-                data: {result: true, itemsNotAdded: notAddedItems }}
+                data: {result: true, itemsNotAdded: notAddedItems}
             }
+        }
     }
 
-    removeItems(items: Item[]) : Res.ItemsRemovalResponse {
+    removeItems(items: Item[]): Res.ItemsRemovalResponse {
         logger.debug(`removing ${items.length} items from store id: ${this._UUID}`)
-        let notRemovedItems: Item[] = [];
+        const notRemovedItems: Item[] = [];
 
-        for (let item of items) {
+        for (const item of items) {
             const catalogNumber = item.catalogNumber;
 
-            let productInStore: Product = this.getProductByCatalogNumber(catalogNumber);
+            const productInStore: Product = this.getProductByCatalogNumber(catalogNumber);
             if (productInStore) {
-                let productItems: Item[] = this._products.get(productInStore);
-                let itemToRemove: Item = this.getItemById(productItems, item.id);
+                const productItems: Item[] = this._products.get(productInStore);
+                const itemToRemove: Item = this.getItemById(productItems, item.id);
                 if (itemToRemove) {
-                    this._products.set(productInStore, productItems.filter( curr => curr != itemToRemove));
-                }
-                else {
+                    this._products.set(productInStore, productItems.filter(curr => curr !== itemToRemove));
+                } else {
                     notRemovedItems.push(item);
                 }
-            }
-            else {
+            } else {
                 notRemovedItems.push(item);
             }
         }
@@ -147,25 +143,25 @@ export class Store {
         if (notRemovedItems.length === items.length) { // failed removing
             logger.warn(`failed removing all requested ${items.length} items from store id: ${this._UUID}`)
             return {
-                data: {result: false, itemsNotRemoved: items },
-                error: {message: Error['E_ITEMS_REM']}
+                data: {result: false, itemsNotRemoved: items},
+                error: {message: Error.E_ITEMS_REM}
             }
-        }
-        else {
+        } else {
             logger.debug(`removed ${items.length - notRemovedItems.length} of ${items.length} request items from store id: ${this._UUID}`)
             return {
-                data: {result: true, itemsNotRemoved: notRemovedItems }}
+                data: {result: true, itemsNotRemoved: notRemovedItems}
+            }
         }
     }
 
-    removeProductsWithQuantity(products : ProductWithQuantity[]) : Res.ProductRemovalResponse {
+    removeProductsWithQuantity(products: ProductWithQuantity[]): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
-        let notRemovedProducts :ProductCatalogNumber[] = [];
+        const notRemovedProducts: ProductCatalogNumber[] = [];
 
-        for (let product of products) {
-            let productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
+        for (const product of products) {
+            const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
-                let items: Item[] = this._products.get(productInStore);
+                const items: Item[] = this._products.get(productInStore);
 
                 items.length = product.quantity >= items.length ? 0 : items.length - product.quantity;
             } else {
@@ -177,42 +173,40 @@ export class Store {
         if (notRemovedProducts.length === products.length) { // failed removing
             logger.warn(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
             return {
-                data: {result: false, productsNotRemoved: notRemovedProducts },
-                error: {message: Error['E_PROD_REM']}
+                data: {result: false, productsNotRemoved: notRemovedProducts},
+                error: {message: Error.E_PROD_REM}
             }
-        }
-        else {
+        } else {
             logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store id: ${this._UUID}`)
             return {
-                data: {result: true, productsNotRemoved: notRemovedProducts }}
+                data: {result: true, productsNotRemoved: notRemovedProducts}
+            }
         }
 
     }
 
-    addNewProducts(products: Product[]) : Res.ProductAdditionResponse {
+    addNewProducts(products: Product[]): Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store id: ${this._UUID}`)
-        let invalidProducts: ProductReq[] = [];
+        const invalidProducts: ProductReq[] = [];
 
-        for (let product of products) {
-            if (this.getProductByCatalogNumber(product.catalogNumber)){
+        for (const product of products) {
+            if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
-            }
-            else {
-                let productValidator: ProductValidator = this.validateProduct(product);
+            } else {
+                const productValidator: ProductValidator = this.validateProduct(product);
                 productValidator.isValid ? this._products.set(product, []) :
                     invalidProducts.push(product)
             }
         }
 
-        if (invalidProducts.length === products.length) { //failed adding
+        if (invalidProducts.length === products.length) { // failed adding
             logger.warn(`failed adding all requested ${products.length} products to store id: ${this._UUID}`)
             return {
                 data: {result: false, productsNotAdded: invalidProducts},
-                error: {message: Error['E_PROD_ADD']}
+                error: {message: Error.E_PROD_ADD}
             }
-        }
-        else {
+        } else {
             logger.debug(`added ${products.length - invalidProducts.length} of ${products.length} request products to store id: ${this._UUID}`)
             return {
                 data: {result: true, productsNotAdded: invalidProducts}
@@ -220,24 +214,22 @@ export class Store {
         }
     }
 
-    removeProductsByCatalogNumber(products: ProductCatalogNumber[]) : Res.ProductRemovalResponse {
+    removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} items from store id: ${this._UUID}`)
-        let productsNotRemoved: Product[] = [];
+        const productsNotRemoved: Product[] = [];
 
-        for (let catalogNumber of products) {
+        for (const catalogNumber of products) {
             const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             const productValidator: ProductValidator = this.validateProduct(product);
             if (productValidator.isValid) {
-                let productFromStore :Product = this.getProductByCatalogNumber(product.catalogNumber);
+                const productFromStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
                 if (productFromStore) {
                     this._products.delete(productFromStore);
-                }
-                else {
+                } else {
                     logger.warn(`product: ${product.catalogNumber} does not exist in store`)
                     productsNotRemoved.push(product);
                 }
-            }
-            else {
+            } else {
                 productsNotRemoved.push(product);
             }
         }
@@ -245,84 +237,71 @@ export class Store {
         if (productsNotRemoved.length === products.length) {
             logger.warn(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
             return {
-                data: {result: false, productsNotRemoved: productsNotRemoved},
-                error: {message: Error['E_PROD_REM']}
+                data: {result: false, productsNotRemoved},
+                error: {message: Error.E_PROD_REM}
             };
-        }
-        else {
+        } else {
             logger.debug(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store id: ${this._UUID}`)
             return {
-                data: {result: true, productsNotRemoved: productsNotRemoved}
+                data: {result: true, productsNotRemoved}
             };
         }
     }
 
-    verifyIsStoreOwner(user: RegisteredUser) : boolean {
-        logger.debug(`verifying if user is owner: ${JSON.stringify(user.UUID)}`)
-        if (user.getRole() != UserRole.OWNER) {
-            logger.warn(`user: ${JSON.stringify(user)} is not an owner of store ${this._UUID}`)
-            return false;
-        }
-        for (let owner of this._storeOwners) {
-            if (owner.UUID === user.UUID) {
-                logger.debug(`user: ${user} is an owner of store ${this._UUID}`)
+    verifyIsStoreOwner(userName: string): boolean {
+        logger.debug(`verifying if user is owner: ${userName}`)
+        for (const owner of this._storeOwners) {
+            if (owner.name === userName) {
+                logger.debug(`user: ${userName} is an owner of store ${this.storeName}`)
                 return true;
             }
         }
-        logger.warn(`user: ${JSON.stringify(user.UUID)} is not an owner of store ${this._UUID}`)
+        logger.warn(`user: ${JSON.stringify(userName)} is not an owner of store ${this.storeName}`)
         return false;
     }
 
-    verifyIsStoreManager(user: RegisteredUser) : boolean {
-        logger.debug(`verify if user is manager: ${JSON.stringify(user.UUID)}`)
-        if (user.getRole() != UserRole.MANAGER) {
-                       logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
-            return false;
-        }
-        for (let manager of this._storeManagers) {
-            if (manager.UUID === user.UUID) {
-               logger.debug(`user: ${JSON.stringify(user.UUID)} is a manager of store ${this._UUID}`)
-               return true;
+    verifyIsStoreManager(userName: string): boolean {
+        logger.debug(`verify if user is manager: ${userName}`)
+        for (const manager of this._storeManagers) {
+            if (manager.name === userName) {
+                logger.debug(`user: ${userName} is a manager of store ${this.storeName}`)
+                return true;
             }
         }
-        logger.warn(`user: ${JSON.stringify(user.UUID)} is not a manager of store ${this._UUID}`)
+        logger.warn(`user: ${userName} is not a manager of store ${this.storeName}`)
         return false;
     }
 
-    addStoreOwner(user: StoreOwner) : Res.BoolResponse {
-        if (user.getRole() === UserRole.OWNER && !this.verifyIsStoreOwner(user)) {
-            logger.debug(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID}`)
-            this._storeOwners.push(user);
-            return { data: { result:true } }
-        }
-        else {
-            logger.warn(`adding user: ${JSON.stringify(user.UUID)} as an owner of store: ${this._UUID} FAILED!`)
-            return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "owner."} }
-        }
+    viewStoreInfo(): Res.StoreInfoResponse {
+        const productNames = Array.from(this.products.keys()).map((p) => p.name);
+        const storeOwnersNames = this._storeOwners;
+        return {data: {result: true, info: {storeName: this.storeName, storeOwnersNames: this._storeOwners.map((owner)=> owner.name), productNames}}}
     }
 
 
-
-    viewStoreInfo():Res.StoreInfoResponse{
-        let productNames = Array.from( this.products.keys() ).map((p)=>p.name);
-        let storeOwnersNames=this._storeOwners.map((o)=>o.name)
-        return {data:{result:true,info:{storeName:this.storeName,storeOwnersNames,productNames}}}
+    setFirstOwner(user: RegisteredUser): void {
+        this._storeOwners.push(new StoreOwner(user.name));
     }
 
-
-    setFirstOwner(user: StoreOwner) : void {
-        this._storeOwners.push(user);
-    }
-
-    addStoreManager(user: StoreManager) : Res.BoolResponse {
-        if (user.getRole() === UserRole.MANAGER && !this.verifyIsStoreManager(user)) {
-            logger.debug(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID}`)
-            this._storeManagers.push(user);
-            return { data: { result:true } }
+    addStoreManager(storeManager: StoreManager): Res.BoolResponse {
+        if (!this.verifyIsStoreManager(storeManager.name)) {
+            logger.debug(`adding user: ${storeManager.name} as a manager to store: ${this.storeName}`)
+            this._storeManagers.push(storeManager);
+            return {data: {result: true}}
+        } else {
+            logger.warn(`adding user: ${storeManager.name} as a manager to store: ${this.storeName} FAILED!`)
+            return {data: {result: false}, error: {message: Error.E_ASSIGN + "manager."}}
         }
-        else {
-            logger.warn(`adding user: ${JSON.stringify(user.UUID)} as a manager to store: ${this._UUID} FAILED!`)
-            return { data: { result:false }, error: {message: Error['E_ASSIGN'] + "manager."} }
+    }
+
+    addStoreOwner(storeOwner: StoreOwner): Res.BoolResponse {
+        if (!this.verifyIsStoreOwner(storeOwner.name)) {
+            logger.debug(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName}`)
+            this._storeOwners.push(storeOwner);
+            return {data: {result: true}}
+        } else {
+            logger.warn(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName} FAILED!`)
+            return {data: {result: false}, error: {message: Error.E_ASSIGN + "owner."}}
         }
     }
 
@@ -339,7 +318,7 @@ export class Store {
         return this._storeName;
     }
 
-    get products() : Map<Product,Item[]> {
+    get products(): Map<Product, Item[]> {
         return this._products;
     }
 
@@ -347,4 +326,23 @@ export class Store {
         return this._UUID;
     }
 
+    getStoreManager(userName: string): StoreManager {
+        return this._storeManagers.find((manager: StoreManager) => manager.name === userName)
+    }
+
+    getStoreOwner(userName: string): StoreOwner {
+        return this._storeOwners.find((owner: StoreOwner) => owner.name === userName)
+    }
+
+    verifyPermission(userName: string, permission: ManagementPermission): boolean {
+        if (this.verifyIsStoreOwner(userName)) return true;
+        if (this.verifyIsStoreManager(userName)) {
+            return this.getStoreManager(userName).isAllowed(permission);
+        }
+        return false;
+    }
+
+    getPurchasesHistory() {
+        return this._receipts;
+    }
 }

@@ -12,6 +12,7 @@ const errorMsg:ErrorMessages = {
     E_NF: "Not found",
     E_CON: "Connection failed",
     E_AL: "Already at this state",
+    E_BP: "Bad Password",
     E_NAL: "User is not at that state.",
     E_PROD_ADD: "Could not add products.",
     E_PROD_REM: "Could not remove products.",
@@ -25,7 +26,8 @@ const errorMsg:ErrorMessages = {
     E_NOT_AUTHORIZED: "User is not authorized.",
     E_STORE_ADDITION: "Could not add store.",
     E_ASSIGN: "Failed assigning",
-    E_INVALID_PROD: "Invalid product."
+    E_INVALID_PROD: "Invalid product.",
+    E_PERMISSION: "This manager dont have this permission."
 
 
 

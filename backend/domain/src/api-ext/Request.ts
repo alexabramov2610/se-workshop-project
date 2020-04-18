@@ -1,18 +1,16 @@
 import { Item, ProductCatalogNumber, Product, ProductWithQuantity } from "./CommonInterface";
-import {Response} from "./Response";
 
 interface Request {
   body: any;
   token: string;
 }
 
-
 interface OpenStoreRequest extends Request {
   body: { storeName: string};
 }
 
 interface SetAdminRequest extends Request {
-  body: { newAdminUUID: string};
+  body: { newAdminUserName: string};
 }
 
 interface ItemsAdditionRequest extends Request {
@@ -58,7 +56,15 @@ interface LoginRequest extends Request {
 interface LogoutRequest extends Request {
   body: { username: string}
 }
+interface ViewShopPurchasesHistoryRequest extends Request{
+  body: {shopName: string}
+}
 
-export { AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
-  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, RemoveStoreOwnerRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};
+interface StoreInfoRequest extends Request{
+  body:{storeName:string}
+}
+
+export {RemoveStoreOwnerRequest, Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest};
+

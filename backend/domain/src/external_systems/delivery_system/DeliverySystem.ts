@@ -23,7 +23,7 @@ export class DeliverySystem{
             return succ;
          }
          else {
-            return {error: {message: errorMsg['E_CON']+" : " + this.name}, data: {result: this.deliverySys.connect()}};
+            return {error: {message: errorMsg.E_CON+" : " + this.name}, data: {result: this.deliverySys.connect()}};
          }
       }
       else {
