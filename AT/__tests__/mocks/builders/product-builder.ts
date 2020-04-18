@@ -1,6 +1,6 @@
 import { Product, CATEGORY } from "../../../src";
 
-class ProductBuilder {
+export class ProductBuilder {
   private _p: Product;
   constructor() {
     this._p = {

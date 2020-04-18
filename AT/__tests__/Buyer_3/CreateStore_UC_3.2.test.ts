@@ -22,7 +22,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
   });
 
   test("Create Store - Sad Path:  - not logged in user", () => {
-    _serviceBridge.logout();
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
     _storeInformation = { name: "mocked-sad-store" };
     const { error } = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
@@ -44,7 +44,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
   });
 
   test("Create Store - Bad Path:  - not logged in user empty store info", () => {
-    _serviceBridge.logout();
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
     _storeInformation = { name: "" };
     const { error } = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
