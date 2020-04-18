@@ -12,9 +12,3 @@ export enum ExternalSystems  {
    PAYMENT,
    SECURITY
 }
-
-export enum ManagementPermission {
-    WATCH_PURCHASES_HISTORY,
-    WATCH_USER_QUESTIONS,
-    REPLY_USER_QUESTIONS
-}

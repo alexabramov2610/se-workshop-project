@@ -44,6 +44,14 @@ export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Res.Bool
     return tradingSystem.removeStoreManager(req);
 }
 
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return tradingSystem.removeManagerPermissions(req);
+}
+
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return tradingSystem.addManagerPermissions(req);
+}
+
 export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Res.BoolResponse => {
     return tradingSystem.removeStoreOwner(req);
 }

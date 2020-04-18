@@ -86,6 +86,14 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.Boo
     return runIfOpen(req, StoreService.removeStoreManager);
 }
 
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeManagerPermissions);
+}
+
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.addManagerPermissions);
+}
+
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};
     console.log("im here")

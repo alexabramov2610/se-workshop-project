@@ -2,7 +2,8 @@ import * as Responses from "../../../src/api-ext/Response";
 import * as Res from "../../../src/api-ext/Response";
 import {StoreOwner,StoreManager} from "../../../src/user/internal_api";
 import {Item, Product, Store} from "../../../src/trading_system/internal_api";
-import {ProductCatalogNumber, ProductCategory, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+import {ProductCatalogNumber, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+import {ProductCategory} from "../../../src/api-ext/Enums";
 
 
 describe("Store Management Unit Tests", () => {

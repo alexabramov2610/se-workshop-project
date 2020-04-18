@@ -1,5 +1,5 @@
 import {Store} from './internal_api'
-import {logger, BoolResponse, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
+import {logger, BoolResponse, errorMsg, UserRole} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
@@ -11,6 +11,7 @@ import {
 } from "../api-ext/CommonInterface";
 import * as Req from "../api-ext/Request";
 import {Receipt} from "../trading_system/data/Receipt";
+import {ManagementPermission} from "../api-ext/Enums";
 
 export class StoreManagement {
 
@@ -232,6 +233,87 @@ export class StoreManagement {
             userWhoAssignsOwner.removeStoreOwner(userOwnerToRemove);
         return additionRes;
     }
+
+    removeManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
+        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange}
+         in store ${storeName}`)
+        let error: string;
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoChanges.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userManagerToRemove: StoreManager = store.getStoreManager(managerToChange);
+        if (!userManagerToRemove) {   // not store owner
+            error = errorMsg.E_NOT_OWNER;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + managerToChange;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        permissions.forEach(permission => userManagerToRemove.removePermission(permission));
+        return {data: {result: true}};
+    }
+
+    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
+        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange}
+         in store ${storeName}`)
+        let error: string;
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoChanges.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userManagerToRemove: StoreManager = store.getStoreManager(managerToChange);
+        if (!userManagerToRemove) {   // not store owner
+            error = errorMsg.E_NOT_OWNER;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + managerToChange;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        permissions.forEach(permission => userManagerToRemove.addPermission(permission));
+        return {data: {result: true}};
+    }
+
 
     findStoreByName(storeName: string): Store {
         for (const store of this._stores) {

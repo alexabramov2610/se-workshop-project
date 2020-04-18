@@ -26,5 +26,20 @@ export class StoreOwner extends StoreManager {
         this._assignedStoreManagers = this._assignedStoreManagers.filter(currManager => currManager.name !== storeManager.name)
     }
 
+    isAssignerOfManager(storeManager: StoreManager) : boolean {
+        for (let manager of this._assignedStoreManagers) {
+            if (manager.name === storeManager.name)
+                return true;
+        }
+        return false;
+    }
+
+    isAssignerOfOwner(storeOwner: StoreOwner) : boolean {
+        for (let manager of this._assignedStoreOwners) {
+            if (manager.name === storeOwner.name)
+                return true;
+        }
+        return false;
+    }
 
 }
