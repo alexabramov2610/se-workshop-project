@@ -28,6 +28,10 @@ export const Adapter: Partial<Env.Bridge> = {
             : {data: data, error: undefined};
     },
 
+    reset() {
+        ServiceFacade.reset();
+    },
+
     register(credentials: Types.Credentials): DummyTypes.IResponse {
         const reqCred = {
             username: credentials.userName,
