@@ -1,4 +1,4 @@
-// import {Bridge, CATEGORY, Driver, Store, Credentials, Item, CreditCard} from "../../src";
+// import {Bridge, CATEGORY, Driver, Store, Credentials, Item, CreditCard, Product} from "../../src";
 
 // describe("Watch Purchases History, UC: 3.7", () => {
 //   let _serviceBridge: Bridge;
@@ -6,18 +6,15 @@
 //   let _storeInformation: Store;
 //   let _credentials: Credentials;
 //   let _item: Item;
+//   let _prodct: Product;
 
 //   beforeEach(() => {
 //     _serviceBridge = Driver.makeBridge();
 //     _storeInformation = {
 //       name: "some-mock-store",
-//       description: "selling cool items",
-//       id: "id.stores.boom",
 //     };
 //     _credentials = { userName: "ron", password: "ronpwd" };
 //     _item = {
-//       id: "some-id",
-//       name: "some-name",
 //       category: CATEGORY.ELECTRONICS,
 //       description: "some-desc",
 //       price: 999,
@@ -38,7 +35,7 @@
 //     const { receiptId: receiptId } = _serviceBridge.checkout(_testCreditCard).data;
 //     const latestBuy = _serviceBridge
 //       .getPurchaseHistory()
-//       .data.puchases.filter((p) => p.recieptId === receiptId)[0];
+//       .data.purchases.filter((p) => p.recieptId === receiptId)[0];
 //     expect(latestBuy.recieptId).toBe(receiptId);
 //   });
 
