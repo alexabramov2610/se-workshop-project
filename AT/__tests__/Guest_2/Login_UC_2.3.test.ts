@@ -1,60 +1,61 @@
-import {Bridge, Driver, Credentials} from "../../src/";
+import { Bridge, Driver, Credentials } from "../../src/";
 
 // const UNREGISTERED_USER = "RegisteredUser is not registered";
 // const INCORRECT_PASSWORD = "Password is incorrect";
 // const ALREADY_LOGGED_IN = "RegisteredUser is already logged in";
 
 describe("Guest Login, UC: 2.3", () => {
-    let _serviceBridge: Bridge;
-    let _credentials: Credentials;
+  let _serviceBridge: Bridge;
+  let _credentials: Credentials;
+  let _driver: Driver;
+  beforeEach(() => {
+    _driver = new Driver();
+    _serviceBridge = _driver.initWithDefaults().getBridge();
+    _credentials = { userName: "test-username", password: "test-Password132" };
+  });
 
-    beforeEach(() => {
-        _serviceBridge = Driver.makeBridge();
-        _credentials = {userName: "test-username", password: "test-Password132"};
-    });
+  test("Valid details and registered", () => {
+    _credentials.userName = "validUsername";
+    _credentials.password = "validPassword123";
+    _serviceBridge.register(_credentials);
 
-    test("Valid details and registered", () => {
-        _credentials.userName = "validUsername";
-        _credentials.password = "validPassword123";
-        _serviceBridge.register(_credentials);
+    const { data, error } = _serviceBridge.login(_credentials);
+    expect(error).toBeUndefined();
+    expect(data).toBeDefined();
+  });
 
-        const {data, error} = _serviceBridge.login(_credentials);
-        expect(error).toBeUndefined();
-        expect(data).toBeDefined();
-    });
+  test("Wrong password and registered", () => {
+    const passwordDefect = "234jERFAs$%^hb5@#$@#4bjh";
+    _credentials.userName = "validUsername";
+    _credentials.password = "wrongPassword123";
+    _serviceBridge.register(_credentials);
 
-    test("Wrong password and registered", () => {
-        const passwordDefect = "234jERFAs$%^hb5@#$@#4bjh";
-        _credentials.userName = "validUsername";
-        _credentials.password = "wrongPassword123";
-        _serviceBridge.register(_credentials);
+    _credentials.password += passwordDefect;
+    const { data, error } = _serviceBridge.login(_credentials);
+    expect(data).toBeUndefined();
+    expect(error).toBeDefined();
+  });
 
-        _credentials.password += passwordDefect;
-        const {data, error} = _serviceBridge.login(_credentials);
-        expect(data).toBeUndefined();
-        expect(error).toBeDefined();
-    });
+  test("Valid details and not registered", () => {
+    _credentials.userName = "unregisteredUsername";
+    _credentials.password = "validPassword123";
 
-    test("Valid details and not registered", () => {
-        _credentials.userName = "unregisteredUsername";
-        _credentials.password = "validPassword123";
+    const { data, error } = _serviceBridge.login(_credentials);
+    expect(error).toBeUndefined();
+    expect(data).toBeDefined();
+  });
 
-        const {data, error} = _serviceBridge.login(_credentials);
-        expect(error).toBeUndefined();
-        expect(data).toBeDefined();
-    });
+  test("Valid details and registered and logged in", () => {
+    _credentials.userName = "alreadyLoggedInUsername";
+    _credentials.password = "validPassword123";
 
-    test("Valid details and registered and logged in", () => {
-        _credentials.userName = "alreadyLoggedInUsername";
-        _credentials.password = "validPassword123";
+    _serviceBridge.register(_credentials);
+    const res = _serviceBridge.login(_credentials);
+    expect(res.data).toBeDefined();
+    expect(res.error).toBeUndefined();
 
-        _serviceBridge.register(_credentials);
-        const res = _serviceBridge.login(_credentials);
-        expect(res.data).toBeDefined();
-        expect(res.error).toBeUndefined();
-
-        const {data, error} = _serviceBridge.login(_credentials);
-        expect(error).toBeDefined();
-        expect(data).toBeUndefined();
-    });
+    const { data, error } = _serviceBridge.login(_credentials);
+    expect(error).toBeDefined();
+    expect(data).toBeUndefined();
+  });
 });
