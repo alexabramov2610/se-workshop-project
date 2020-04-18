@@ -1,34 +1,36 @@
-import {tradingSystem} from "domain_layer/dist/src/api-ext/external_api";
+import { getInstance,CreateInstance } from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
+let tradingSystem= getInstance();
 
-
-/*
-export const startNewSession = (): string =>{
-    //return new token from the domain
-
+export const reset=():void =>{
+    tradingSystem= CreateInstance();
 }
-*/
-export const systemInit = (initReq: Req.InitReq): Res.BoolResponse => {
-    const registerRequest: Req.RegisterRequest = {body: {username: "Admin", password: "Admin"}, token: initReq.token};
+
+export const startNewSession = (): string =>{
+    return tradingSystem.startNewSession();
+}
+
+export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
+    const registerRequest: Req.RegisterRequest = {body: {username: req.body.firstAdminName, password: req.body.firstAdminPassword}, token: req.token};
     const registerRes: Res.BoolResponse = tradingSystem.register(registerRequest);
     if (registerRes.error) return registerRes;
-    const loginReq: Req.BoolResponse = {body: {username: "Admin", password: "Admin"}, token: initReq.token};
+    const loginReq: Req.BoolResponse = {body: {username: req.body.firstAdminName, password: req.body.firstAdminPassword}, token: req.token};
     const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
-    const newToken: string = loginRes.data.value;
-    if (loginRes.error || !newToken) return loginRes;
-    const setAdminReq: Req.RegisterRequest = {body: {newAdminUUID: newToken}, token: newToken};
+    if (!loginRes.data.result) return loginRes;
+
+    const setAdminReq: Req.RegisterRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
     const setAdminRes: Res.BoolResponse =  tradingSystem.setAdmin(setAdminReq)
     if(setAdminRes.error) return setAdminRes;
-    const connectExtReq: Req.Request = {body: {} ,token: newToken};
+    const connectExtReq: Req.Request = {body: {} ,token: req.token};
     const connectDeliveryRes: Res.BoolResponse = tradingSystem.connectDeliverySys(connectExtReq);
     if (connectDeliveryRes.error) return connectDeliveryRes;
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
-    tradingSystem.OpenTradeSystem({body:{} ,token: newToken})
+    tradingSystem.OpenTradeSystem({body:{} ,token: req.token})
     return {data: {result:true}}
 }
 
@@ -90,6 +92,7 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.Boo
 
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};
-    if(tradingSystem.GetTradeSystemState(isOpenReq).data.state != TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
+    console.log("im here")
+    if(tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
     return fn.call(this,req);
 }
