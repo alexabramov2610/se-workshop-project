@@ -556,7 +556,8 @@ describe("Store Management Unit Tests", () => {
                 getUserByToken: () => user,
                 setUserRole: () => true,
                 assignStoreManagerBasicPermissions: () => true,
-                getLoggedInUserByToken: () => isLoggedIn ? user : undefined
+                getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
+                getUserByName: () => user
             }
         });
     }

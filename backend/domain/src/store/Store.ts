@@ -310,7 +310,7 @@ export class Store {
         if (!storeManagerToRemove)
             return {data: { result:false }, error: {message: Error['E_NAL']}}
 
-        this._storeOwners = this._storeOwners.filter(currOwner => currOwner.UUID != storeManagerToRemove.UUID)
+        this._storeOwners = this._storeOwners.filter(currOwner => currOwner.name !== storeManagerToRemove.name)
         return { data: { result:true}};
     }
 

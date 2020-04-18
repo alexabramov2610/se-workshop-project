@@ -145,7 +145,7 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
+        if (store.verifyIsStoreOwner(userToAssign.name)) {   // already store manager
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
@@ -198,6 +198,41 @@ export class StoreManagement {
         return additionRes;
     }
 
+    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser) : BoolResponse {
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to assign user:
+                ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
+        let error: string;
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userOwnerToRemove: StoreOwner = store.getStoreOwner(userToRemove.name);
+        if (!userOwnerToRemove) {   // not store owner
+            error = errorMsg.E_NOT_OWNER;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        const additionRes: Res.BoolResponse = store.removeStoreOwner(userOwnerToRemove);
+        if (additionRes.data.result)
+            userWhoAssignsOwner.removeStoreOwner(userOwnerToRemove);
+        return additionRes;
+    }
+
     findStoreByName(storeName: string): Store {
         for (const store of this._stores) {
             if (store.storeName === storeName)
@@ -216,6 +251,17 @@ export class StoreManagement {
             return {data:{result:false},error:{message:errorMsg['E_NF']}}
         }
 
+    }
+
+    viewStorePurchaseHistory(user: RegisteredUser, shopName: string): Res.ViewShopPurchasesHistoryResponse {
+        const store: Store = this.findStoreByName(shopName);
+        if (!store) return {data: {purchases: []}, error: {message: errorMsg.E_NF}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY)) return {
+            data: {purchases: []},
+            error: {message: errorMsg.E_PERMISSION}
+        }
+        const receipts: Receipt[] = store.getPurchasesHistory();
+        return {data: {purchases: receipts}}
     }
 
     private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
@@ -238,14 +284,4 @@ export class StoreManagement {
         return items;
     }
 
-    viewStorePurchaseHistory(user: RegisteredUser, shopName: string): Res.ViewShopPurchasesHistoryResponse {
-        const store: Store = this.findStoreByName(shopName);
-        if (!store) return {data: {purchases: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY)) return {
-            data: {purchases: []},
-            error: {message: errorMsg.E_PERMISSION}
-        }
-        const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {purchases: receipts}}
-    }
 }

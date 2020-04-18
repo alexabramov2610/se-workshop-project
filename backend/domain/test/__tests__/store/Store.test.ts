@@ -18,7 +18,7 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-    test("view store info seccess",()=>{
+    test("view store info success",()=>{
         const dor=new StoreOwner("dor")
         const chair=new Product("chair",6,200,ProductCategory.Home)
         store.addStoreOwner(dor)
