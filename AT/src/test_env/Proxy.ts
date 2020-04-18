@@ -1,4 +1,5 @@
 import { Bridge } from "./Bridge";
+import { Adapter } from "./Adapter";
 import {
   Item,
   Response,
@@ -10,112 +11,137 @@ import {
   Cart,
   CreditCard,
   Discount,
+  PERMISSION, Product,
 } from "./types";
-import { DummyValues } from "../../__tests__/dummy_values/dummyValues";
+import {
+  DummyValues,
+  IResponse,
+} from "../../__tests__/mocks/responses";
 
-let real: Bridge;
+let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
+
   setReal(impl: Bridge) {
     real = impl;
   },
-  setToken(token: string): void {
-    return;
+
+  setToken(sessionToken: string): void {
+    return real && real.setToken ? real.setToken(sessionToken) : null;
   },
 
   startSession() {
-    return real && real.startSession
+    return real.startSession
       ? real.startSession()
       : DummyValues.SessionResponse;
   },
 
   removeItem(item: Item) {
-    return real ? real.removeItem(item) : DummyValues.Response;
+    return real.removeItem ? real.removeItem(item) : DummyValues.Response;
   },
 
   removeStore(store: Store) {
-    return real ? real.removeStore(store) : DummyValues.Response;
+    return real.removeStore ? real.removeStore(store) : DummyValues.Response;
   },
 
   createStore(store: Store) {
-    return real ? real.createStore(store) : DummyValues.StoreResponse;
+    return real.createStore
+      ? real.createStore(store)
+      : DummyValues.StoreResponse;
   },
 
-  addItemToStore(store: Store, item: Item) {
-    return real ? real.addItemToStore(store, item) : DummyValues.Response;
+  addItemsToStore(store: Store, items: Item[]) {
+    return real.addItemsToStore
+      ? real.addItemsToStore(store, items)
+      : DummyValues.Response;
   },
 
   viewItem(item: Item) {
-    return real ? real.viewItem(item) : DummyValues.ItemResponse;
+    return real.removeItem ? real.viewItem(item) : DummyValues.ItemResponse;
   },
 
   viewStore(store: Store) {
-    return real ? real.viewStore(store) : DummyValues.StoreResponse;
-  },
-
-  getLoggedInUsers() {
-    return real ? real.getLoggedInUsers() : DummyValues.UsersResponse;
+    return real.viewStore ? real.viewStore(store) : DummyValues.StoreResponse;
   },
 
   removeUser(user: User) {
-    return real ? real.removeUser(user) : DummyValues.Response;
+    return real.removeUser ? real.removeUser(user) : DummyValues.Response;
   },
 
   getUserByName(user: User) {
-    return real ? real.getUserByName(user) : DummyValues.UserResponse;
+    return real.getUserByName
+      ? real.getUserByName(user)
+      : DummyValues.UserResponse;
   },
 
   register(credentials: Credentials) {
-    return real ? real.register(credentials) : DummyValues.Response;
+    return real.register ? real.register(credentials) : DummyValues.Response;
   },
 
   login(credentials: Credentials) {
-    return real ? real.login(credentials) : DummyValues.Response;
+    return real.login ? real.login(credentials) : DummyValues.Response;
   },
 
-  logout() {
-    return real ? real.logout() : DummyValues.Response;
+  logout(userName: string) {
+    return real.logout ? real.logout(userName) : DummyValues.Response;
   },
 
   getPurchaseHistory() {
-    return real
+    return real.getPurchaseHistory
       ? real.getPurchaseHistory()
       : DummyValues.PurchaseHistoryResponse;
   },
 
   search(searchData: SearchData): Response {
-    return real ? real.search(searchData) : DummyValues.SearchResponse;
+    return real.search ? real.search(searchData) : DummyValues.SearchResponse;
   },
 
   rate(toRate: Store | Item, rate: RATE): Response {
-    return real ? real.rate(toRate, rate) : DummyValues.SearchResponse;
+    return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(item: Item) {
-    return real ? real.addToCart(item) : DummyValues.Response;
+  addToCart(product: Product) {
+    return real.addToCart ? real.addToCart(product) : DummyValues.Response;
   },
 
   watchCart() {
-    return real ? real.watchCart() : DummyValues.CartResponse;
+    return real.watchCart ? real.watchCart() : DummyValues.CartResponse;
   },
 
   checkout(creditCard: CreditCard) {
-    return real ? real.checkout(creditCard) : DummyValues.CheckoutResponse;
+    return real.checkout
+      ? real.checkout(creditCard)
+      : DummyValues.CheckoutResponse;
   },
 
   setDiscountToStore(store: Store, discount: Discount) {
-    return real
+    return real.setDiscountToStore
       ? real.setDiscountToStore(store, discount)
       : DummyValues.Response;
   },
-
+  reset() {
+    return real.reset ? real.reset() : null;
+  },
   setDiscountToItem(store: Store, item: Item, discount: Discount) {
-    return real
+    return real.setDiscountToItem
       ? real.setDiscountToItem(store, item, discount)
       : DummyValues.Response;
   },
+
   init(cred: Credentials) {
-    return real && real.init ? real.init(cred) : DummyValues.Response;
+    return real.init ? real.init(cred) : DummyValues.Response;
+  },
+
+  assignManager(store: Store, credentials: Credentials): IResponse {
+    return undefined;
+  },
+
+  grantPermission(credentials: Credentials, permission: PERMISSION): IResponse {
+    return undefined;
+  },
+
+  addProductsToStore(store: Store, products: Product[]): IResponse {
+    return this.real.addProductsToStore ? this.real.addProductsToStore(store, products) : DummyValues.Response;
   },
 };
 

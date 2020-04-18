@@ -1,15 +1,15 @@
-import {tradingSystem} from "domain_layer/dist/src/api-ext/external_api";
+import { getInstance,CreateInstance } from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
-
-export const registerUser = (registerReq: Req.RegisterRequest): Res.BoolResponse => {
-   return tradingSystem.register(registerReq);
+let tradingSystem= getInstance();
+export const registerUser = (req: Req.RegisterRequest): Res.BoolResponse => {
+    return tradingSystem.register(req);
 }
 
-export const loginUser = (loginReq: Req.LoginRequest): Res.BoolResponse => {
-    return tradingSystem.login(loginReq);
+export const loginUser = (req: Req.LoginRequest): Res.BoolResponse => {
+    return tradingSystem.login(req);
  }
 
- export const logoutUser = (logoutReq: Req.LogoutRequest): Res.BoolResponse => {
-    return tradingSystem.logout(logoutReq);
+ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
+    return tradingSystem.logout(req);
  }

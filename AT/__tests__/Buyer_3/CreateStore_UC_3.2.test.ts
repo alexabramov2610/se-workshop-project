@@ -1,21 +1,52 @@
-import { Bridge, Driver, Store, Credentials } from "../../src/";
+import { Bridge, Driver, Store, Credentials } from "../..";
 
 describe("Create Store Buyer, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: Credentials;
+  let _driver: Driver;
   beforeEach(() => {
-    _serviceBridge = Driver.makeBridge();
-    _storeInformation = { name: "some-mock-store" };
-    _credentials = { userName: "ron", password: "ronpwd" };
-    const { token } = _serviceBridge.startSession().data;
-    _serviceBridge.setToken(token);
+    _driver = new Driver()
+      .resetState()
+      .initWithDefaults()
+      .startSession()
+      .registerWithDefaults()
+      .loginWithDefaults();
+    _serviceBridge = _driver.getBridge();
+    _storeInformation = { name: "mock-name-each" };
   });
 
   test("Create Store - Happy Path: valid store information - logged in user", () => {
-    const res = _serviceBridge.register(_credentials);
-    _serviceBridge.login(_credentials);
+    _storeInformation = { name: "some-store" };
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
+  });
+
+  test("Create Store - Sad Path:  - not logged in user", () => {
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _storeInformation = { name: "mocked-sad-store" };
+    const { error } = _serviceBridge.createStore(_storeInformation);
+    expect(error).toBeDefined();
+  });
+
+  test("Create Store - Sad Path:  - logged in user empty store info", () => {
+    _storeInformation = { name: "" };
+    const { error } = _serviceBridge.createStore(_storeInformation);
+    expect(error).toBeDefined();
+  });
+
+  test("Create Store - Sad Path:  - logged in user sore name taken", () => {
+    _storeInformation = { name: "some-store" };
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    _storeInformation = { name: "some-store" };
+    const { error } = _serviceBridge.createStore(_storeInformation);
+    expect(error).toBeDefined();
+  });
+
+  test("Create Store - Bad Path:  - not logged in user empty store info", () => {
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _storeInformation = { name: "" };
+    const { error } = _serviceBridge.createStore(_storeInformation);
+    expect(error).toBeDefined();
   });
 });
