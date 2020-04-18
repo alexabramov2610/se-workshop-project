@@ -79,11 +79,23 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
     const req = { storeName: store.name, products };
     const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
+  },
+
+  removeProductsFromStore(store: Store, products: Product[]) {
+    const catalogNumbers = products.map((p) => {
+      return { catalogNumber: p.catalogNumber };
+    });
+    const removeReq = { store: store.name, products: catalogNumbers };
+    const { data, error } = ServiceFacade.removeProducts(removeReq);
+    return error
+      ? { data: data.productsNotRemoved, error: error }
+      : { data: [], error: undefined };
   },
 };

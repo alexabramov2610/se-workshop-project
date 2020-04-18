@@ -1,6 +1,5 @@
 import {
   Item,
-  Response,
   Store,
   User,
   Credentials,
@@ -21,6 +20,7 @@ export interface Bridge {
   createStore(store: Store): DummyTypes.IStoreResponse;
   addItemsToStore(store: Store, item: Item[]): DummyTypes.IResponse;
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
+  removeProductsFromStore(store: Store, Products: Product[]): DummyTypes.IProductsRemovalResponse;
   viewStore(store: Store): DummyTypes.IStoreResponse;
   viewItem(item: Item): DummyTypes.IItemResponse;
   removeUser(user: User): DummyTypes.IResponse;
@@ -30,7 +30,7 @@ export interface Bridge {
   logout(userName: string): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
   search(input: SearchData): DummyTypes.ISearchResponse;
-  rate(toRate: Store | Item, rate: RATE): DummyTypes.IResponse;
+  rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
   addToCart(product: Product): DummyTypes.IResponse;
   watchCart(): DummyTypes.ICartResponse;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
