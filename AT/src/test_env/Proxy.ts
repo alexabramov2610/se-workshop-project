@@ -11,7 +11,7 @@ import {
   Cart,
   CreditCard,
   Discount,
-  PERMISSION,
+  PERMISSION, Product,
 } from "./types";
 import {
   DummyValues,
@@ -50,9 +50,9 @@ const Proxy: Bridge = {
       : DummyValues.StoreResponse;
   },
 
-  addItemToStore(store: Store, item: Item) {
-    return real.addItemToStore
-      ? real.addItemToStore(store, item)
+  addItemsToStore(store: Store, items: Item[]) {
+    return real.addItemsToStore
+      ? real.addItemsToStore(store, items)
       : DummyValues.Response;
   },
 
@@ -100,8 +100,8 @@ const Proxy: Bridge = {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(item: Item) {
-    return real.addToCart ? real.addToCart(item) : DummyValues.Response;
+  addToCart(product: Product) {
+    return real.addToCart ? real.addToCart(product) : DummyValues.Response;
   },
 
   watchCart() {
@@ -138,6 +138,10 @@ const Proxy: Bridge = {
 
   grantPermission(credentials: Credentials, permission: PERMISSION): IResponse {
     return undefined;
+  },
+
+  addProductsToStore(store: Store, products: Product[]): IResponse {
+    return this.real.addProductsToStore ? this.real.addProductsToStore(store, products) : DummyValues.Response;
   },
 };
 
