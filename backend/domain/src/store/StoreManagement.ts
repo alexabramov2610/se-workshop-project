@@ -69,6 +69,30 @@ export class StoreManagement {
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
+    changeProductName = (user: RegisteredUser, storeName: string, newProductName: string): Res.BoolResponse => {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+
+        if (!operationValid.data.result) {
+            return {data: {result: false}, error: operationValid.error};
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+
+        return store.addItems(items);
+    }
+
+    changeProductPrice = (user: RegisteredUser, storeName: string, newPrice: number): Res.BoolResponse => {
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+
+        if (!operationValid.data.result) {
+            return {data: {result: false}, error: operationValid.error};
+        }
+
+        const store: Store = this.findStoreByName(storeName);
+        const items: Item[] = this.getItemsFromRequest(itemsReq);
+        return store.addItems(items);
+    }
+
     addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 

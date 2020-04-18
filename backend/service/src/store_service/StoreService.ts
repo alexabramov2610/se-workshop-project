@@ -7,6 +7,14 @@ export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolRespo
 
 }
 
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+   return tradingSystem.changeProductName(req);
+}
+
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+   return tradingSystem.changeProductPrice(req);
+}
+
 export const addItems = (req: Req.ItemsAdditionRequest) : Res.ItemsAdditionResponse => {
    return tradingSystem.addItems(req);
 }
