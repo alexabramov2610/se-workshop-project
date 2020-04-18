@@ -16,7 +16,7 @@ import {
 import {
   DummyValues,
   IResponse,
-} from "../../__tests__/dummy_values/dummyValues";
+} from "../../__tests__/mocks/responses";
 
 let real: Partial<Bridge> = Adapter;
 
