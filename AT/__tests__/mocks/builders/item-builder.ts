@@ -1,4 +1,4 @@
-import {Item} from "../../../src";
+import {Item} from "../../..";
 
 export class ItemBuilder {
     private _item: Item;

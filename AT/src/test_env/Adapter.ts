@@ -1,8 +1,8 @@
-import * as Types from "../";
-import * as Env from "../";
+import * as Types from "../..";
+import * as Env from "../..";
 import {ServiceFacade} from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import {Product} from "../";
+import {Product} from "../..";
 
 
 let token;

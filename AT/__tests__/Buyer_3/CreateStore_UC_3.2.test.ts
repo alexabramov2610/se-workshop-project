@@ -1,4 +1,4 @@
-import { Bridge, Driver, Store, Credentials } from "../../src/";
+import { Bridge, Driver, Store, Credentials } from "../..";
 
 describe("Create Store Buyer, UC: 3.2", () => {
   let _serviceBridge: Bridge;

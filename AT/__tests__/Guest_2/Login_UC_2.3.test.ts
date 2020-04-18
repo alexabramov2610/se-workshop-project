@@ -1,4 +1,4 @@
-import { Bridge, Driver, Credentials } from "../../src/";
+import { Bridge, Driver, Credentials } from "../..";
 
 describe("Guest Login, UC: 2.3", () => {
   let _serviceBridge: Bridge;
