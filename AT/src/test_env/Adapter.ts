@@ -1,7 +1,7 @@
 import * as Types from "../";
 import * as Env from "../";
 import { ServiceFacade } from "service_layer";
-import * as DummyTypes from "../../__tests__/dummy_values/dummyValues";
+import * as DummyTypes from "../../__tests__/mocks/responses";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };

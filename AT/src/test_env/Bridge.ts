@@ -10,7 +10,7 @@ import {
   Discount,
   PERMISSION,
 } from "./types";
-import * as DummyTypes from "../../__tests__/dummy_values/dummyValues";
+import * as DummyTypes from "../../__tests__/mocks/responses";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
