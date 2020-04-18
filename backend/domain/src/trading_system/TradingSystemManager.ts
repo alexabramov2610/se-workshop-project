@@ -158,4 +158,7 @@ export class TradingSystemManager {
         return res;
     }
 
+    viewStoreInfo(req:Req.StoreInfoRequest){
+        return this.storeManager.viewStoreInfo(req.body.storeName);
+    }
 }

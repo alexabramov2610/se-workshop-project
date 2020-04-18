@@ -54,9 +54,13 @@ interface LogoutRequest extends Request {
 }
 interface ViewShopPurchasesHistoryRequest extends Request{
   body: {shopName: string}
-
 }
+
+interface StoreInfoRequest extends Request{
+  body:{storeName:string}
+}
+
 export { Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
-  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
   RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest};
 

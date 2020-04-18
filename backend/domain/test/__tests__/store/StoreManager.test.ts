@@ -378,10 +378,7 @@ describe("Store Management Unit Tests", () => {
         const res:Responses.StoreInfoResponse=storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
         expect(res.error.message).toEqual(errorMsg['E_NF']);
-
-
-
-    })
+    });
 
 
     function mockVerifyStoreOperation(isSuccess: boolean) {

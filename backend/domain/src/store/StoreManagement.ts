@@ -207,6 +207,17 @@ export class StoreManagement {
         return undefined;
     }
 
+    viewStoreInfo(storeName:string): Res.StoreInfoResponse{
+        const store=this.findStoreByName(storeName);
+        if(store) {
+            return store.viewStoreInfo();
+        }
+        else{   //store not found
+            return {data:{result:false},error:{message:errorMsg['E_NF']}}
+        }
+
+    }
+
     private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
         const products: Product[] = [];
         for (const productReq of productsReq) {

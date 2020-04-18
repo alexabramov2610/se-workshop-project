@@ -42,10 +42,13 @@ interface TradingSystemStateResponse extends Response{
   data: {state: TradingSystemState}
 }
 
+interface StoreInfoResponse extends Response{
+  data:{result:boolean, info?:{storeName:string,storeOwnersNames:string[],productNames:string[]}}
+}
 
 interface ViewShopPurchasesHistoryResponse  extends Response {
   data: {purchases: Receipt[]}
 }
 
-export { Response,LoginResponse, BoolResponse, ProductAdditionResponse,StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
+export { Response,LoginResponse, BoolResponse, ProductAdditionResponse, StoreInfoResponse, ProductRemovalResponse, ItemsAdditionResponse, ItemsRemovalResponse,TradingSystemStateResponse,ViewShopPurchasesHistoryResponse };
 
