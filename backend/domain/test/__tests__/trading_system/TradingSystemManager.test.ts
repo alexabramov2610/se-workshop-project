@@ -27,6 +27,30 @@ describe("Store Management Unit Tests", () => {
         mocked(StoreManagement).mockClear();
     });
 
+
+    // test("add new items IT",()=>{
+    //     const tradingSystemManager = new TradingSystemManager();
+    //     const token = tradingSystemManager.startNewSession();
+    //     const storeName = 'storename';
+    //
+    //     const regReq: Req.RegisterRequest = {body: { username: 'username', password: 'pw1234'}, token: token};
+    //     expect(tradingSystemManager.register(regReq)).toBeTruthy();
+    //
+    //     const loginReq: Req.LoginRequest = {body: { username: 'username', password: 'pw1234'}, token: token};
+    //     expect(tradingSystemManager.login(loginReq)).toBeTruthy();
+    //
+    //     const openStoreReq: Req.OpenStoreRequest = {body: { storeName: storeName}, token: token};
+    //     expect(tradingSystemManager.createStore(openStoreReq)).toBeTruthy();
+    //
+    //     const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
+    //     const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+    //     const products: ProductReq[] = [product1, product2];
+    //     const addProductsReq: Req.AddProductsRequest = {body: { storeName: storeName, products: products}, token: token};
+    //     expect(tradingSystemManager.addNewProducts(addProductsReq)).toBeTruthy();
+    //
+    // })
+
+
     function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
