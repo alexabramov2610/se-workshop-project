@@ -10,14 +10,17 @@ import {
   SearchData,
   Cart,
   CreditCard,
-  Discount, PERMISSION,
+  Discount,
+  PERMISSION,
 } from "./types";
-import {DummyValues, IResponse} from "../../__tests__/dummy_values/dummyValues";
+import {
+  DummyValues,
+  IResponse,
+} from "../../__tests__/dummy_values/dummyValues";
 
 let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
-
   setReal(impl: Bridge) {
     real = impl;
   },
@@ -40,11 +43,15 @@ const Proxy: Bridge = {
   },
 
   createStore(store: Store) {
-    return real.createStore ? real.createStore(store) : DummyValues.StoreResponse;
+    return real.createStore
+      ? real.createStore(store)
+      : DummyValues.StoreResponse;
   },
 
   addItemToStore(store: Store, item: Item) {
-    return real.addItemToStore ? real.addItemToStore(store, item) : DummyValues.Response;
+    return real.addItemToStore
+      ? real.addItemToStore(store, item)
+      : DummyValues.Response;
   },
 
   viewItem(item: Item) {
@@ -60,7 +67,9 @@ const Proxy: Bridge = {
   },
 
   getUserByName(user: User) {
-    return real.getUserByName ? real.getUserByName(user) : DummyValues.UserResponse;
+    return real.getUserByName
+      ? real.getUserByName(user)
+      : DummyValues.UserResponse;
   },
 
   register(credentials: Credentials) {
@@ -98,7 +107,9 @@ const Proxy: Bridge = {
   },
 
   checkout(creditCard: CreditCard) {
-    return real.checkout ? real.checkout(creditCard) : DummyValues.CheckoutResponse;
+    return real.checkout
+      ? real.checkout(creditCard)
+      : DummyValues.CheckoutResponse;
   },
 
   setDiscountToStore(store: Store, discount: Discount) {
@@ -106,7 +117,9 @@ const Proxy: Bridge = {
       ? real.setDiscountToStore(store, discount)
       : DummyValues.Response;
   },
-
+  reset() {
+    return real.reset ? real.reset() : null;
+  },
   setDiscountToItem(store: Store, item: Item, discount: Discount) {
     return real.setDiscountToItem
       ? real.setDiscountToItem(store, item, discount)
@@ -124,7 +137,6 @@ const Proxy: Bridge = {
   grantPermission(credentials: Credentials, permission: PERMISSION): IResponse {
     return undefined;
   },
-
 };
 
 export { Proxy };

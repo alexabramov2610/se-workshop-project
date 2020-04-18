@@ -59,6 +59,10 @@ class Driver {
     this.bridge.register(this.loginDefCredentials);
     return this;
   }
+  resetState() {
+    this.bridge.reset();
+    return this;
+  }
 }
 
 export { Driver };
