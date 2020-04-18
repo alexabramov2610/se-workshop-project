@@ -10,7 +10,7 @@ describe("Guest Login, UC: 2.3", () => {
   let _driver: Driver;
   beforeEach(() => {
     _driver = new Driver();
-    _serviceBridge = _driver.initWithDefaults().getBridge();
+    _serviceBridge = _driver.initWithDefaults().startSession().getBridge();
     _credentials = { userName: "test-username", password: "test-Password132" };
   });
 
