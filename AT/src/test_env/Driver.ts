@@ -26,7 +26,7 @@ class Driver {
     return this.loginDefCredentials;
   }
 
-  initDefaults(): Credentials {
+  getInitDefaults(): Credentials {
     return this.initDefCredentials;
   }
 
@@ -47,7 +47,7 @@ class Driver {
     this.bridge.login(cred);
     return this;
   }
-  loginDefaults(): Driver {
+  loginWithDefaults(): Driver {
     this.bridge.login(this.loginDefCredentials);
     return this;
   }
@@ -55,7 +55,7 @@ class Driver {
     this.bridge.register(cred);
     return this;
   }
-  registerDefaults(): Driver {
+  registerWithDefaults(): Driver {
     this.bridge.register(this.loginDefCredentials);
     return this;
   }
