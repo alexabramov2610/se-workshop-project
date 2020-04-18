@@ -7,7 +7,7 @@ describe("Guest Login, UC: 2.3", () => {
 
   beforeEach(() => {
     _driver = new Driver();
-    _serviceBridge = _driver.initWithDefaults().startSession().getBridge();
+    _serviceBridge = _driver.resetState().initWithDefaults().startSession().getBridge();
     _credentials = { userName: "test-username", password: "test-Password132" };
   });
 

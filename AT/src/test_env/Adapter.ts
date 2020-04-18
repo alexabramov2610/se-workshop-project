@@ -79,6 +79,7 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
     const req = { storeName: store.name, products };
     const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));

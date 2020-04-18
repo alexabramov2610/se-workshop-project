@@ -1,11 +1,11 @@
 import {
     Bridge,
     Driver,
-    CATEGORY,
     Item,
     Store,
     Cart, Product
-} from "../../src/";
+} from "../../";
+
 import {ProductBuilder} from "../mocks/builders/product-builder";
 import {ItemBuilder} from "../mocks/builders/item-builder";
 
@@ -20,6 +20,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     let _testProduct3: Product;
     let _testItem1: Item;
     let _testItem2: Item;
+    let _testItem3: Item;
 
     beforeEach(() => {
         _serviceBridge = _driver
@@ -31,10 +32,11 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
 
         _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
         _testProduct2 = new ProductBuilder().withName("testProduct2").withCatalogNumber(456).getProduct();
-        _testProduct2 = new ProductBuilder().withName("testProduct2").withCatalogNumber(789).getProduct();
+        _testProduct3 = new ProductBuilder().withName("testProduct3").withCatalogNumber(789).getProduct();
 
-        _testItem1 = new ItemBuilder().withCatalogNumber(_testProduct1.catalogNumber).getItem();;
-        _testItem2 = new ItemBuilder().withCatalogNumber(_testProduct2.catalogNumber).getItem();;
+        _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
+        _testItem2 = new ItemBuilder().withId(2).withCatalogNumber(_testProduct2.catalogNumber).getItem();
+        _testItem3 = new ItemBuilder().withId(3).withCatalogNumber(_testProduct1.catalogNumber).getItem();
 
         _testStore1 = {name: "testStore1Name"};
         _testStore2 = {name: "testStore2Name"};
@@ -46,9 +48,9 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         _serviceBridge.addProductsToStore(_testStore2, [_testProduct1, _testProduct2]);
 
         _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
-        _serviceBridge.addItemsToStore(_testStore2, [_testItem1, _testItem2]);
+        _serviceBridge.addItemsToStore(_testStore2, [_testItem3, _testItem2]);
 
-        //logout
+        //TODO:: logout after change in domain
     });
 
     test("Valid insertion, item doesn't exist in cart", () => {
@@ -79,8 +81,9 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         expect(data1).toBeDefined();
 
         const cart: Cart = _serviceBridge.watchCart().data.cart;
-        const pIdx = cart.products.indexOf({product: _testProduct1, amount: 1});
-        expect(pIdx).toBeGreaterThan(-1);
+        const filteredCart = cart.products.filter(p => p.product.catalogNumber === _testProduct1.catalogNumber);
+        expect(filteredCart.length).toBe(1);
+        const amountBefore = filteredCart[0].amount;
 
         const res2 = _serviceBridge.addToCart(_testProduct1);
         const data2 = res2.data;
@@ -89,7 +92,9 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         expect(data2).toBeDefined();
 
         const cartAfter: Cart = _serviceBridge.watchCart().data.cart;
-        const pIdxAfter = cartAfter.products.indexOf({product: _testProduct1, amount: 2});
-        expect(pIdxAfter).toBeGreaterThan(-1);
+        const filteredCartAfter = cartAfter.products.filter(p => p.product.catalogNumber === _testProduct1.catalogNumber);
+        expect(filteredCartAfter.length).toBe(1);
+        const amountAfter = filteredCart[0].amount;
+        expect(amountAfter).toEqual(amountBefore + 1);
     });
 });

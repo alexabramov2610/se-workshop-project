@@ -1,4 +1,4 @@
-import {Response, CATEGORY, Cart} from "../../src/test_env/types";
+import {Response, CATEGORY, Cart, Product} from "../../src/test_env/types";
 
 export interface IResponse extends Response {
     data: any;
@@ -98,34 +98,29 @@ const PurchaseHistoryResponse: IPurchaseHistoryResponse = {
 
 export interface ISearchResponse extends Response {
     data: {
-        items: {
-            name: string;
-            category: CATEGORY;
-            description: string;
-            price: number;
-        }[];
+        products: Product[];
     };
 }
 
 const SearchResponse: ISearchResponse = {
     data: {
-        items: [
+        products: [
             {
                 name: "-name1",
                 category: CATEGORY.ELECTRONICS,
-                description: "-description1",
+                catalogNumber: 123,
                 price: 20,
             },
             {
                 name: "-name2",
                 category: CATEGORY.ELECTRONICS,
-                description: "-description2",
+                catalogNumber: 456,
                 price: 20,
             },
             {
                 name: "-name3",
                 category: CATEGORY.ELECTRONICS,
-                description: "-description3",
+                catalogNumber: 789,
                 price: 20,
             },
         ],
