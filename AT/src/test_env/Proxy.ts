@@ -21,9 +21,11 @@ import {
 let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
+
   setReal(impl: Bridge) {
     real = impl;
   },
+
   setToken(sessionToken: string): void {
     return real && real.setToken ? real.setToken(sessionToken) : null;
   },
@@ -127,7 +129,7 @@ const Proxy: Bridge = {
   },
 
   init(cred: Credentials) {
-    return real.init && real.init ? real.init(cred) : DummyValues.Response;
+    return real.init ? real.init(cred) : DummyValues.Response;
   },
 
   assignManager(store: Store, credentials: Credentials): IResponse {

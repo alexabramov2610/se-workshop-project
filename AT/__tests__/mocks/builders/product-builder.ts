@@ -2,6 +2,7 @@ import { Product, CATEGORY } from "../../../src";
 
 export class ProductBuilder {
   private _p: Product;
+
   constructor() {
     this._p = {
       catalogNumber: 123,

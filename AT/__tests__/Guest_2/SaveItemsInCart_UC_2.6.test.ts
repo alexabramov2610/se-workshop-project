@@ -8,7 +8,6 @@ import {
 } from "../../src/";
 
 
-
 describe("Guest saves items in the cart, UC: 2.6", () => {
     let _serviceBridge: Bridge;
     let _credentials: Credentials;
