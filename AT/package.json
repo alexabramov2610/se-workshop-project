@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "test": "tsc && SILENT=1 jest",
-    "test:watch": "npm t -- --watch"
+    "test": "SILENT=1 jest",
+    "test:watch": "tsc && npm t -- --watch"
   },
   "author": "",
   "license": "ISC",
