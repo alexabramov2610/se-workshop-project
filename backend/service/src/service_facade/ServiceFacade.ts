@@ -44,6 +44,8 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
     tradingSystem.OpenTradeSystem({body: {}, token: req.token})
+    const logout: Res.BoolResponse = tradingSystem.logout({body:{} , token: req.token});
+    if (!logout.data.result) return logout;
     return {data: {result: true}}
 }
 
