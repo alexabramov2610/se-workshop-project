@@ -2,6 +2,7 @@ import * as Types from "../";
 import * as Env from "../";
 import {ServiceFacade} from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
+import {Product} from "../";
 
 
 let token;
@@ -69,5 +70,10 @@ export const Adapter: Partial<Env.Bridge> = {
         if (error || !data.result) return error;
         else if (data.result) return {data: {name: store.name}};
     },
+
+    // addProduct(product: Product) {
+    //
+    //     ServiceFacade.addNewProducts();
+    // }
 
 };

@@ -6,10 +6,6 @@ interface ProductCatalogNumber {
   catalogNumber: number;
 }
 
-interface ProductCatalogNumber {
-  catalogNumber: number;
-}
-
 interface Item extends ProductCatalogNumber {
   id: number;
 }
@@ -29,7 +25,7 @@ interface CreditCard {
 }
 
 interface Cart {
-  items: { product: Product; amount: number }[];
+  products: { product: Product; amount: number }[];
 }
 
 interface Discount {

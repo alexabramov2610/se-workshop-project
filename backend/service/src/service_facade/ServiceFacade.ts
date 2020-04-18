@@ -38,11 +38,9 @@ export const registerUser = (req: Req.RegisterRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.registerUser);
 }
 
-
 export const createStore = (req: Req.OpenStoreRequest): Res.BoolResponse => {
     return runIfOpen(req,StoreService.createStore)
 }
-
 
 export const loginUser = (req: Req.LoginRequest): Res.BoolResponse => {
     return runIfOpen(req,UserService.loginUser);
@@ -51,7 +49,6 @@ export const loginUser = (req: Req.LoginRequest): Res.BoolResponse => {
 export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req,UserService.logoutUser)
 }
-
 
 export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
     return runIfOpen(req,StoreService.addItems);
@@ -88,7 +85,6 @@ export const viewStoreInfo=(req:Req.StoreInfoRequest):Res.StoreInfoResponse =>{
 export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeStoreManager);
 }
-
 
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};
