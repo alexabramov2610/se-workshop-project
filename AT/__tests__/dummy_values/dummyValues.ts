@@ -41,11 +41,11 @@ const InitResponse: IInitResponse = {
 };
 
 export interface IStoreResponse extends Response {
-  data: { name: string; description: string };
+  data: { name: string };
 }
 
 const StoreResponse: IStoreResponse = {
-  data: { name: "Store", description: "Description" },
+  data: { name: "Store" },
 };
 
 export interface IUsersResponse extends Response {
@@ -187,7 +187,5 @@ const DummyValues = {
   SessionResponse,
   CartResponse,
 };
-
-
 
 export { DummyValues };

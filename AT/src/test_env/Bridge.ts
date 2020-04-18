@@ -7,7 +7,8 @@ import {
   SearchData,
   RATE,
   CreditCard,
-  Discount, PERMISSION,
+  Discount,
+  PERMISSION,
 } from "./types";
 import * as DummyTypes from "../../__tests__/dummy_values/dummyValues";
 
@@ -40,5 +41,9 @@ export interface Bridge {
   ): DummyTypes.IResponse;
   startSession(): DummyTypes.ISessionResponse;
   assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse;
-  grantPermission(credentials: Credentials, permission: PERMISSION): DummyTypes.IResponse;
+  grantPermission(
+    credentials: Credentials,
+    permission: PERMISSION
+  ): DummyTypes.IResponse;
+  reset(): void;
 }
