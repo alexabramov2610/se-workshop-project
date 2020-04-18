@@ -13,6 +13,8 @@ const errorMsg:ErrorMessages = {
     E_CON: "Connection failed",
     E_AL: "Already at this state",
     E_BP: "Bad Password",
+    E_NAL: "User is not at that state.",
+    E_NOT_OWNER: "User is not owner of that store.",
     E_PROD_ADD: "Could not add products.",
     E_PROD_REM: "Could not remove products.",
     E_PROD_EXISTS: "Product already exists in store.",

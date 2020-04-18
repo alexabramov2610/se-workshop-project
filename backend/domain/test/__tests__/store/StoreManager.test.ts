@@ -189,6 +189,34 @@ describe("Store Management Unit Tests", () => {
         expect(res.error).toBeDefined();
     });
 
+
+    test("removeStoreOwner success", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result:true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const ownerToRemove: StoreOwner = new StoreOwner("name2");
+
+        jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
+        jest.spyOn(store, "getStoreOwner").mockReturnValue(alreadyOwner);
+        jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+
+        let res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeTruthy();
+
+        res = storeManagement.removeStoreOwner(store.storeName, ownerToRemove, alreadyOwner);
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure - store doesn't exist or invalid store owner", () => {
+            //TODO:
+    });
+
+    test("removeStoreOwner failure - not assigner of owner", () => {
+        //TODO:
+    });
+
+
     test("verifyStoreExists Success", () => {
         const storeName: string = 'mock-store';
         const user: RegisteredUser = new StoreOwner("usermock");

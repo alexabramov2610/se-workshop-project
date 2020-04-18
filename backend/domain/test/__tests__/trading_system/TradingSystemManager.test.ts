@@ -382,6 +382,59 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    function prepareRemoveStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                removeStoreOwner: () => operationResMock
+            }
+        });
+    }
+
+    test("removeStoreOwner success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: mockToken, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure - not logged in", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: mockToken, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("removeStoreOwner failure", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareRemoveStoreOwnerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreOwnerRequest = { token: mockToken, body: {storeName: store.storeName, usernameToRemove: 'user'}};
+        let res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+
+
+
     test("connectDeliverySys success", () => {
         const connectSystemRes: Res.BoolResponse = {data: {result: true }};
         mocked(ExternalSystemsManager).mockImplementation(() :any => {
@@ -503,7 +556,8 @@ describe("Store Management Unit Tests", () => {
                 getUserByToken: () => user,
                 setUserRole: () => true,
                 assignStoreManagerBasicPermissions: () => true,
-                getLoggedInUserByToken: () => isLoggedIn ? user : undefined
+                getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
+                getUserByName: () => user
             }
         });
     }

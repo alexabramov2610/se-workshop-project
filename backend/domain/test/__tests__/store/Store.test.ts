@@ -18,7 +18,7 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-    test("view store info seccess",()=>{
+    test("view store info success",()=>{
         const dor=new StoreOwner("dor")
         const chair=new Product("chair",6,200,ProductCategory.Home)
         store.addStoreOwner(dor)
@@ -386,6 +386,16 @@ describe("Store Management Unit Tests", () => {
         let res: Res.BoolResponse = store.addStoreManager(storeManager);
         expect(res.data.result).toBeTruthy();
         res = store.addStoreManager(storeOwner);
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("removeStoreOwner success", () => {
+        const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
+        expect(store.removeStoreOwner(storeOwner).data.result).toBeTruthy();
+    });
+
+    test("removeStoreOwner failure", () => {
+        const res: Res.BoolResponse = store.removeStoreOwner(storeOwner);
         expect(res.data.result).toBeFalsy();
     });
 

@@ -83,6 +83,10 @@ export const viewStoreInfo=(req:Req.StoreInfoRequest):Res.StoreInfoResponse =>{
     return runIfOpen(req,StoreService.viewStoreInfo);
 }
 
+export const removeStoreManager = (req: Req.AssignStoreManagerRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeStoreManager);
+}
+
 
 const runIfOpen = (req: Req.Request, fn: any) :any =>{
     const isOpenReq: Req.Request = {body:{} , token: req.token};

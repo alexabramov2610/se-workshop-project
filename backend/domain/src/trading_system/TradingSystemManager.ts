@@ -109,20 +109,28 @@ export class TradingSystemManager {
         logger.info(`requested to assign user as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!usernameWhoAssigns) return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        const usernameToAssign: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        const usernameToAssign: RegisteredUser = this.userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign) return  {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const res: Res.BoolResponse = this.storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
-        return res;
+        return this.storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
     }
 
     assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
         logger.info(`requested to assign user as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!usernameWhoAssigns) return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        const usernameToAssign: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        const usernameToAssign: RegisteredUser = this.userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign) return  {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const res: Res.BoolResponse = this.storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
-        return res;
+        return this.storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+    }
+
+    removeStoreOwner(req: Req.RemoveStoreOwnerRequest) : Res.BoolResponse {
+        logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
+                ${JSON.stringify(req.body.usernameToRemove)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
+        const usernameWhoRemoves: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!usernameWhoRemoves) return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        const usernameToRemove: RegisteredUser = this.userManager.getUserByName(req.body.usernameToRemove)
+        if (!usernameToRemove) return  {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        return this.storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
     }
 
     connectDeliverySys(req: Req.Request): Res.BoolResponse {
