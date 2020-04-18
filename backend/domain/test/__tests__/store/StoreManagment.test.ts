@@ -3,8 +3,16 @@ import * as Responses from "../../../src/api-ext/Response";
 import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
 import {BoolResponse, StoreInfoResponse} from "../../../src/api-ext/Response";
-import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
+import {
+    Product as ProductReq,
+    ProductCatalogNumber,
+    ProductWithQuantity,
+    Item as ItemReq,
+    Purchase
+} from "../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../src/api-int/Error";
+import {Receipt} from "../../../src/trading_system/data/Receipt";
+import {Item} from "../../../src/trading_system/data/Item";
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
@@ -209,11 +217,11 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreOwner failure - store doesn't exist or invalid store owner", () => {
-            //TODO:
+            // TODO:
     });
 
     test("removeStoreOwner failure - not assigner of owner", () => {
-        //TODO:
+        // TODO:
     });
 
 
@@ -397,6 +405,30 @@ describe("Store Management Unit Tests", () => {
         expect(storeManagement.findStoreByName(storeName)).toBeTruthy();
     });
 
+    test("viewStorePurchaseHistory Success", () => {
+        const storeName: string = 'mock-store';
+        const user: RegisteredUser = new StoreOwner("usermock");
+        const store:Store = new Store(storeName);
+        const purchases: Purchase[] = [{item: new Item(5,10),price:10}]
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store)
+        jest.spyOn(store,"verifyPermission").mockReturnValue(true)
+        jest.spyOn(store,"getPurchasesHistory").mockReturnValue([new Receipt(purchases)]);
+        expect(storeManagement.viewStorePurchaseHistory(user,storeName).data.receipts).toHaveLength(1)
+
+    });
+    test("viewStorePurchaseHistory Failure", () => {
+        const storeName: string = 'mock-store';
+        const user: RegisteredUser = new StoreOwner("usermock");
+        const store:Store = new Store(storeName);
+        const purchases: Purchase[] = [{item: new Item(5,10),price:10}]
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store)
+        jest.spyOn(store,"verifyPermission").mockReturnValue(false)
+        jest.spyOn(store,"getPurchasesHistory").mockReturnValue([new Receipt(purchases)]);
+        expect(storeManagement.viewStorePurchaseHistory(user,storeName).data.receipts).toHaveLength(0)
+
+    });
+
+
     test("findStoreByName Failure", () => {
         expect(storeManagement.findStoreByName('storename')).toBeFalsy();
     });
@@ -405,7 +437,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement,'findStoreByName').mockReturnValueOnce(undefined);
         const res:Responses.StoreInfoResponse=storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
-        expect(res.error.message).toEqual(errorMsg['E_NF']);
+        expect(res.error.message).toEqual(errorMsg.E_NF);
     });
 
     test('viewStoreInfo Success ',()=>{
