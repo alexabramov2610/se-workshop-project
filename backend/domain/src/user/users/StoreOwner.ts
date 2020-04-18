@@ -1,9 +1,20 @@
-import { RegisteredUser } from "../internal_api"
-import { UserRole } from "../../api-int/internal_api"
+import {RegisteredUser, StoreManager} from "../internal_api"
 
-export class StoreOwner extends RegisteredUser {
-    constructor(name: string, password: string, uuid?: string) {
-        super(name, password, uuid);
-        this.setRole(UserRole.OWNER);
+export class StoreOwner extends StoreManager {
+    private _assignedStoreManagers: RegisteredUser[];
+    private _assignedStoreOwners: RegisteredUser[];
+
+    constructor(name: string) {
+        super(name);
+        this._assignedStoreOwners = [];
+        this._assignedStoreManagers = [];
+    }
+
+    assignStoreOwner(storeOwner: StoreOwner) : void {
+        this._assignedStoreOwners = this._assignedStoreOwners.concat(storeOwner);
+    }
+
+    assignStoreManager(storeManager: StoreManager) : void {
+        this._assignedStoreManagers = this._assignedStoreManagers.concat(storeManager);
     }
 }

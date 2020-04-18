@@ -10,12 +10,8 @@ jest.mock("../../../src/external_systems/delivery_system/DeliverySystem");
 jest.mock('../../../src/external_systems/payment_system/PaymentSystem');
 jest.mock('../../../src/external_systems/security_system/SecuritySystem');
 describe("External System Unit Tests", () => {
-    let externalSystemManager: ExternalSystemsManager;
-
-
     beforeEach(() => {
         this.externalSystemManager = new ExternalSystemsManager();
-
 
     });
 

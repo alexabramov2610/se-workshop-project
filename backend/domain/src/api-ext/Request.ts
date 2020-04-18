@@ -5,13 +5,12 @@ interface Request {
   token: string;
 }
 
-
 interface OpenStoreRequest extends Request {
   body: { storeName: string};
 }
 
 interface SetAdminRequest extends Request {
-  body: { newAdminUUID: string};
+  body: { newAdminUserName: string};
 }
 
 interface ItemsAdditionRequest extends Request {
@@ -53,11 +52,15 @@ interface LoginRequest extends Request {
 interface LogoutRequest extends Request {
   body: { username: string}
 }
+interface ViewShopPurchasesHistoryRequest extends Request{
+  body: {shopName: string}
+}
 
 interface StoreInfoRequest extends Request{
   body:{storeName:string}
 }
 
-export { Request,AssignStoreOwnerRequest,StoreInfoRequest, SetAdminRequest, AssignStoreManagerRequest,
-  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest};
+export { Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
+  OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
+  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest};
+

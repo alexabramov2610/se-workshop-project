@@ -3,9 +3,13 @@
     "extends": [
         "tslint:recommended"
     ],
-    "jsRules": {},
+    "jsRules": {
+        "no-trailing-whitespace": false
+    },
     "rules": {
-        "no-console": false
-      },
+        "no-console": false,
+        "unified-signatures": false,
+        "no-trailing-whitespace": false
+    },
     "rulesDirectory": []
 }

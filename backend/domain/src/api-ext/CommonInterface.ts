@@ -1,6 +1,5 @@
-export interface Item {
-    id: number,
-    catalogNumber: number
+export interface Item extends ProductCatalogNumber{
+    id: number
 }
 
 export interface ProductCatalogNumber {
@@ -18,6 +17,7 @@ export interface ProductWithQuantity extends ProductCatalogNumber {
 }
 
 export enum ProductCategory {
+    General,
     Electronics,
     Hobbies,
     Home
