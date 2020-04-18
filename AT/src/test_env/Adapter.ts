@@ -31,6 +31,14 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+  logout(userName: string): DummyTypes.IResponse {
+    const { data, error } = ServiceFacade.logoutUser(
+      wrapWithToken({ username: userName })
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
   createStore(store: Types.Store): DummyTypes.IStoreResponse {
     const req = wrapWithToken({ storeName: store.name });
     const { error, data } = ServiceFacade.createStore(req);
