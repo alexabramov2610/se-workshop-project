@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/index.js",
-    "test": "jest",
+    "test": "tsc && SILENT=1 jest",
     "test:watch": "npm t -- --watch"
   },
   "author": "",

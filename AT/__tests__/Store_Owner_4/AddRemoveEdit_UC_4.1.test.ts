@@ -19,13 +19,15 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _storeInformation = { name: "some-store" };
   });
 
-  test("Create Store - Happy Path: add product to new store", () => {
+  test("Add product - Happy Path: add product to new store", () => {
+    console.log('printed from test!@#!@#!@#')
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     const productToAdd = new ProductBuilder().getProduct();
     const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
       productToAdd,
-    ]).data.result;
+    ]).data;
+    console.log(resProduct)
     expect(resProduct).toBe(true);
     const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
       { id: 123, catalogNumber: productToAdd.catalogNumber },
@@ -33,19 +35,57 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(resItem).toBe(true);
   });
 
-  test("Create Store - Sad Path: add product to new store user logged out", () => {
+  xtest("Add product - Sad Path: add product to new store user logged out", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
     const productToAdd = new ProductBuilder().getProduct();
     const resErrorProduct = _serviceBridge.addProductsToStore(
       _storeInformation,
       [productToAdd]
     ).error;
-    expect(resErrorProduct).toBe(true);
-    const resErrorItem = _serviceBridge.addItemsToStore(_storeInformation, [
-      { id: 123, catalogNumber: productToAdd.catalogNumber },
-    ]).data.result;
-    expect(resErrorItem).toBe(true);
+    expect(resErrorProduct).toBeDefined();
   });
 
+  xtest("Add product - Sad Path: add product to new store user doesnt have permissions", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    const newUser: Credentials = {
+      userName: "fakeUser",
+      password: "fakePwd123",
+    };
+    _serviceBridge.register(newUser);
+    _serviceBridge.login(newUser);
+    const productToAdd = new ProductBuilder().getProduct();
+    const resErrorProduct = _serviceBridge.addProductsToStore(
+      _storeInformation,
+      [productToAdd]
+    ).error;
+    expect(resErrorProduct).toBeDefined();
+  });
+
+  xtest("Remove product - Happy Path: remove existing product", () => {
+    expect(true).toBe(false);
+  });
+
+  xtest("Remove product - Happy Path: remove existing product user logged out", () => {
+    expect(true).toBe(false);
+  });
+
+  xtest("Remove product - Happy Path: remove non-existing product user logged in", () => {
+    expect(true).toBe(false);
+  });
+
+  xtest("Edit product - Happy Path: remove existing product", () => {
+    expect(true).toBe(false);
+  });
+
+  xtest("Edit product - Happy Path: remove existing product user logged out", () => {
+    expect(true).toBe(false);
+  });
+
+  xtest("Edit product - Happy Path: remove non-existing product user logged in", () => {
+    expect(true).toBe(false);
+  });
 });
