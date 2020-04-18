@@ -1,4 +1,4 @@
-import { Bridge, Proxy } from "../";
+import { Bridge, Proxy } from "../..";
 import { Credentials } from "./types";
 
 class Driver {

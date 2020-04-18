@@ -1,4 +1,4 @@
-import { Product, CATEGORY } from "../../../src";
+import { Product, CATEGORY } from "../../..";
 
 export class ProductBuilder {
   private _p: Product;
