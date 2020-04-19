@@ -180,16 +180,6 @@ describe("Store Management Unit Tests", () => {
 
     });
 
-    test("addItems failure - product not in store", () => {
-        const numberOfItems: number = 5;
-
-        const items: Item[] = generateValidItems(numberOfItems, 0, numberOfItems, 0);
-
-        const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
-        expect(addItemsRes.data.result).toBeFalsy();
-        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
-    });
-
     test("addItems success - some in store", () => {
         const numberOfItems: number = 5;
         const products: Product[] = generateValidProducts(numberOfItems);
@@ -203,6 +193,36 @@ describe("Store Management Unit Tests", () => {
         const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
         expect(addItemsRes.data.result).toBeTruthy();
         expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
+
+    });
+
+    test("addItems failure - product not in store", () => {
+        const numberOfItems: number = 5;
+
+        const items: Item[] = generateValidItems(numberOfItems, 0, numberOfItems, 0);
+
+        const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
+        expect(addItemsRes.data.result).toBeFalsy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
+    });
+
+    test("addItems failure - duplicate items", () => {
+        const numberOfItems: number = 5;
+        const products: Product[] = generateValidProducts(numberOfItems);
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+        const items: Item[] = generateValidItems(numberOfItems*2, 0, numberOfItems, 0);
+
+        let addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
+        expect(addItemsRes.data.result).toBeTruthy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
+
+        addItemsRes = store.addItems(items);
+        expect(addItemsRes.data.result).toBeFalsy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(items.length);
 
     });
 

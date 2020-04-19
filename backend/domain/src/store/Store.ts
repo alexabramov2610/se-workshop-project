@@ -89,6 +89,10 @@ export class Store {
         return undefined;
     }
 
+    private containsItem(product: Product, item: Item): boolean {
+        return this._products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
+    }
+
     addItems(items: Item[]): Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
         const addedItems: Item[] = [];
@@ -98,7 +102,7 @@ export class Store {
             const catalogNumber = item.catalogNumber;
 
             const product: Product = this.getProductByCatalogNumber(catalogNumber);
-            if (product) {
+            if (product && !this.containsItem(product, item)) {
                 this._products.set(product, this._products.get(product).concat([item]));
                 addedItems.push(item);
             } else {
