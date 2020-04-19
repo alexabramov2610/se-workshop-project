@@ -1,85 +1,52 @@
 import {
     Bridge,
     Driver,
-    CATEGORY,
     Item,
-    Store, Credentials,
-} from "../../src/";
-
+    Store, Product,
+} from "../../";
+import {ProductBuilder} from "../mocks/builders/product-builder";
+import {ItemBuilder} from "../mocks/builders/item-builder";
 
 
 describe("Guest watch cart, UC: 2.7", () => {
+    let _driver = new Driver();
     let _serviceBridge: Bridge;
-    let _credentials: Credentials;
     let _testStore1: Store;
-    let _testStore2: Store;
+    let _testProduct1: Product;
     let _testItem1: Item;
-    let _testItem2: Item;
-    let _testItem3: Item;
 
     beforeEach(() => {
-        _serviceBridge = Driver.makeBridge();
+        _serviceBridge = _driver
+            .resetState()
+            .initWithDefaults()
+            .startSession()
+            .loginWithDefaults()
+            .getBridge();
 
-        _credentials = {userName: "testUsername", password: "testPassword"};
-        _serviceBridge.register(_credentials);
-        _serviceBridge.login(_credentials);
-
-        _testItem1 = {
-            id: "test-id1",
-            name: "test-item1",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.ELECTRONICS,
-        };
-        _testItem2 = {
-            id: "test-id2",
-            name: "test-item2",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.ELECTRONICS,
-        };
-        _testItem3 = {
-            id: "test-id3",
-            name: "test-item3",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.CLOTHING,
-        };
-
-        _testStore1 = {
-            id: "test-store-id1",
-            name: "test-store1",
-            description: "lovely-test-store"
-        };
-        _testStore2 = {
-            id: "test-store-id2",
-            name: "test-store2",
-            description: "lovely-test-store"
-        };
+        _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
+        _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
+        _testStore1 = {name: "testStore1Name"};
 
         _serviceBridge.createStore(_testStore1);
-        _serviceBridge.createStore(_testStore2);
+        _serviceBridge.addProductsToStore(_testStore1, [_testProduct1]);
+        _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
 
-        _serviceBridge.addItemToStore(_testStore1, _testItem1);
-        _serviceBridge.addItemToStore(_testStore1, _testItem3);
-        _serviceBridge.addItemToStore(_testStore2, _testItem2);
-
-        _serviceBridge.logout();
+        //TODO:: logout after change in domain
     });
 
     test("Non empty cart", () => {
-        _serviceBridge.addToCart(_testItem2);
+        _serviceBridge.addToCart(_testProduct1);
 
         const {data, error} = _serviceBridge.watchCart();
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        const {cart} = data;
-        expect(cart).toBeDefined();
-        expect(cart.items.includes(_testItem2)).toBeTruthy();
+        let {cart} = data;
+        cart.products = cart.products.filter(p => p.product.catalogNumber === _testProduct1.catalogNumber);
+        expect(cart.products.length).toBe(1);
 
-        const testItem2Idx = cart.items.indexOf(_testItem2);
-        expect(cart.quantities[testItem2Idx]).toBe(1);
+        const product = cart.products[0];
+        expect(product.amount).toBe(1);
     });
 
     test("Empty cart", () => {
@@ -89,7 +56,6 @@ describe("Guest watch cart, UC: 2.7", () => {
 
         const {cart} = data;
         expect(cart).toBeDefined();
-        expect(cart.items.length === 0).toBeTruthy();
-        expect(cart.quantities.length === 0).toBeTruthy();
+        expect(cart.products.length === 0).toBeTruthy();
     });
 });

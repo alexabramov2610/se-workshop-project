@@ -11,19 +11,21 @@ import {
   Cart,
   CreditCard,
   Discount,
-  PERMISSION,
+  PERMISSION, Product,
 } from "./types";
 import {
-  DummyValues,
+  DummyValues, IProductsRemovalResponse,
   IResponse,
 } from "../../__tests__/mocks/responses";
 
 let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
+
   setReal(impl: Bridge) {
     real = impl;
   },
+
   setToken(sessionToken: string): void {
     return real && real.setToken ? real.setToken(sessionToken) : null;
   },
@@ -48,9 +50,9 @@ const Proxy: Bridge = {
       : DummyValues.StoreResponse;
   },
 
-  addItemToStore(store: Store, item: Item) {
-    return real.addItemToStore
-      ? real.addItemToStore(store, item)
+  addItemsToStore(store: Store, items: Item[]) {
+    return real.addItemsToStore
+      ? real.addItemsToStore(store, items)
       : DummyValues.Response;
   },
 
@@ -94,12 +96,12 @@ const Proxy: Bridge = {
     return real.search ? real.search(searchData) : DummyValues.SearchResponse;
   },
 
-  rate(toRate: Store | Item, rate: RATE): Response {
+  rate(toRate: Store | Product, rate: RATE): Response {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(item: Item) {
-    return real.addToCart ? real.addToCart(item) : DummyValues.Response;
+  addToCart(product: Product) {
+    return real.addToCart ? real.addToCart(product) : DummyValues.Response;
   },
 
   watchCart() {
@@ -117,9 +119,11 @@ const Proxy: Bridge = {
       ? real.setDiscountToStore(store, discount)
       : DummyValues.Response;
   },
+
   reset() {
     return real.reset ? real.reset() : null;
   },
+
   setDiscountToItem(store: Store, item: Item, discount: Discount) {
     return real.setDiscountToItem
       ? real.setDiscountToItem(store, item, discount)
@@ -127,7 +131,7 @@ const Proxy: Bridge = {
   },
 
   init(cred: Credentials) {
-    return real.init && real.init ? real.init(cred) : DummyValues.Response;
+    return real.init ? real.init(cred) : DummyValues.Response;
   },
 
   assignManager(store: Store, credentials: Credentials): IResponse {
@@ -137,6 +141,15 @@ const Proxy: Bridge = {
   grantPermission(credentials: Credentials, permission: PERMISSION): IResponse {
     return undefined;
   },
+
+  addProductsToStore(store: Store, products: Product[]): IResponse {
+    return real.addProductsToStore ? real.addProductsToStore(store, products) : DummyValues.Response;
+  },
+
+  removeProductsFromStore(store: Store, products: Product[]): IProductsRemovalResponse {
+    return real.removeProductsFromStore ? real.removeProductsFromStore(store, products) : DummyValues.ProductsRemovalResponse;
+  },
+
 };
 
 export { Proxy };

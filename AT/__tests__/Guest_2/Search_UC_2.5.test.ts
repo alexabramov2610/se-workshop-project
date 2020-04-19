@@ -1,59 +1,69 @@
-import {Bridge, Driver, Filters, CATEGORY, RATE, Item, PriceRange, Credentials, SearchData, Store} from "../../src/";
+import {
+    Bridge,
+    Driver,
+    Filters,
+    CATEGORY,
+    RATE,
+    Item,
+    PriceRange,
+    Credentials,
+    SearchData,
+    Store,
+    Product
+} from "../../";
+import {ProductBuilder} from "../mocks/builders/product-builder";
+import {ItemBuilder} from "../mocks/builders/item-builder";
 
 const LOW = 25;
 const HIGH = 100;
 
 describe("Guest Search, UC: 2.5", () => {
+    let _driver = new Driver();
     let _serviceBridge: Bridge;
-    let _credentials: Credentials;
     let _testStore1: Store;
     let _testStore2: Store;
+    let _testProduct1: Product;
+    let _testProduct2: Product;
+    let _testProduct3: Product;
     let _testItem1: Item;
     let _testItem2: Item;
     let _testItem3: Item;
     let _testSearchData: SearchData;
     let _testFilters: Filters;
     let _priceRange: PriceRange;
+    let _credentials: Credentials;
+
 
     beforeEach(() => {
-        _serviceBridge = Driver.makeBridge();
+        _serviceBridge = _driver
+            .resetState()
+            .initWithDefaults()
+            .startSession()
+            .loginWithDefaults()
+            .getBridge();
 
-        _credentials = {userName: "test-name", password: "test-PASS-123"};
-        _serviceBridge.register(_credentials);
-        _serviceBridge.login(_credentials);
+        _credentials = {userName: "", password: "",};
+        _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
+        _testProduct2 = new ProductBuilder().withName("testProduct2").withCatalogNumber(456).getProduct();
+        _testProduct3 = new ProductBuilder().withName("testProduct3").withCatalogNumber(789).getProduct();
 
-        _testItem1 = {
-            id: "test-id1",
-            name: "test-item",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.ELECTRONICS,
-        };
-        _testItem2 = {
-            id: "test-id2",
-            name: "test-item",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.ELECTRONICS,
-        };
-        _testItem3 = {
-            id: "test-id3",
-            name: "test-item3",
-            price: 999,
-            description: "lovely-test-store",
-            category: CATEGORY.CLOTHING,
-        };
+        _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
+        _testItem2 = new ItemBuilder().withId(2).withCatalogNumber(_testProduct2.catalogNumber).getItem();
+        _testItem3 = new ItemBuilder().withId(3).withCatalogNumber(_testProduct1.catalogNumber).getItem();
 
-        _testStore1 = {
-            id: "test-store-id1",
-            name: "test-store1",
-            description: "lovely-test-store"
-        };
-        _testStore2 = {
-            id: "test-store-id2",
-            name: "test-store2",
-            description: "lovely-test-store"
-        };
+        _testStore1 = {name: "testStore1Name"};
+        _testStore2 = {name: "testStore2Name"};
+
+        _serviceBridge.createStore(_testStore1);
+        _serviceBridge.createStore(_testStore2);
+
+        _serviceBridge.addProductsToStore(_testStore1, [_testProduct1, _testProduct3]);
+        _serviceBridge.addProductsToStore(_testStore2, [_testProduct1, _testProduct2]);
+
+        _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
+        _serviceBridge.addItemsToStore(_testStore2, [_testItem2, _testItem3]);
+
+        //TODO:: logout after change in domain
 
         _priceRange = {low: 0, high: Number.MAX_SAFE_INTEGER};
         _testFilters = {
@@ -66,43 +76,32 @@ describe("Guest Search, UC: 2.5", () => {
             input: "test-input",
             filters: _testFilters,
         }
-
-        _serviceBridge.createStore(_testStore1);
-        _serviceBridge.createStore(_testStore2);
-
-        _serviceBridge.addItemToStore(_testStore1, _testItem1);
-        _serviceBridge.addItemToStore(_testStore1, _testItem3);
-        _serviceBridge.addItemToStore(_testStore2, _testItem2);
-
-        _serviceBridge.logout();
     });
 
     test("Valid search input, not filters", () => {
         _testSearchData.filters = undefined;
-        _testSearchData.input = _testItem1.name;
+        _testSearchData.input = _testProduct1.name;
 
         const {data, error} = _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        const {items} = data;
-        expect(items.filter(item => item.name === _testItem1.name).length === 2).toBeTruthy();
+        const {products} = data;
+        expect(products.filter(product => product.name === _testProduct1.name).length > 0).toBeTruthy();
     });
 
     test("Valid search input, input is category, no filters", () => {
-        _testItem1.category = CATEGORY.HOME_AND_OFFICE;
-
         _testSearchData.filters = undefined;
-        _testSearchData.input = "Electronics";
+        _testSearchData.input = "Clothing";
 
         const {data, error} = _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        const {items} = data;
-        expect(items.length === 2).toBeTruthy();
+        const {products} = data;
+        expect(products.length > 0).toBeTruthy();
 
-        const allSameCategory = items.reduce((acc, curr) => acc && curr.category === CATEGORY.ELECTRONICS, true);
+        const allSameCategory = products.reduce((acc, curr) => acc && curr.category === CATEGORY.CLOTHING, true);
         expect(allSameCategory).toBeTruthy();
     });
 
@@ -125,8 +124,8 @@ describe("Guest Search, UC: 2.5", () => {
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
-        const {items} = data;
-        const areBetweenPriceRange = items.reduce((acc, curr) => acc && curr.price <= HIGH && curr.price >= LOW, true);
+        const {products} = data;
+        const areBetweenPriceRange = products.reduce((acc, curr) => acc && curr.price <= HIGH && curr.price >= LOW, true);
         expect(areBetweenPriceRange).toBeTruthy();
     });
 
@@ -136,7 +135,7 @@ describe("Guest Search, UC: 2.5", () => {
             priceRange: {low: LOW, high: HIGH},
             itemRate: RATE.ONE_STAR
         };
-        _testSearchData.input = _testItem1.name;
+        _testSearchData.input = _testProduct1.name;
 
         _credentials.userName = "new test user";
         _serviceBridge.register(_credentials);
@@ -146,7 +145,7 @@ describe("Guest Search, UC: 2.5", () => {
         _serviceBridge.rate(_testItem2, RATE.ONE_STAR);
         _serviceBridge.rate(_testItem3, RATE.TWO_STARS);
 
-        _serviceBridge.logout();
+        // TODO:: logout
 
         const {data, error} = _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();

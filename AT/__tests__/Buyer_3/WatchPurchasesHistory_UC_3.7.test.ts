@@ -1,4 +1,4 @@
-import { Bridge, Driver, Item, CreditCard, Product } from "../../src";
+import { Bridge, Driver, Item, CreditCard, Product } from "../..";
 import { ProductBuilder } from "../mocks/builders/product-builder";
 
 describe("Watch Purchases History, UC: 3.7", () => {
@@ -20,15 +20,15 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _item = { id: 123, catalogNumber: _prodct.catalogNumber };
   });
 
-  test("Happy Path: logged in user with history", () => {
-    _serviceBridge.addToCart(_item);
-    const { data } = _serviceBridge.checkout(_testCreditCard);
-    expect(data).toBeDefined();
-    const latestBuy = _serviceBridge
-      .getPurchaseHistory()
-      .data.purchases.filter((p) => p.productName === _prodct.name)[0];
-    expect(latestBuy.productName).toBe(_prodct.name);
-  });
+  // test("Happy Path: logged in user with history", () => {
+  //   _serviceBridge.addToCart(_item);
+  //   const { data } = _serviceBridge.checkout(_testCreditCard);
+  //   expect(data).toBeDefined();
+  //   const latestBuy = _serviceBridge
+  //     .getPurchaseHistory()
+  //     .data.purchases.filter((p) => p.productName === _prodct.name)[0];
+  //   expect(latestBuy.productName).toBe(_prodct.name);
+  // });
 
   test("Happy Path: logged in user no history", () => {
     const { purchases: purchases } = _serviceBridge.getPurchaseHistory().data;

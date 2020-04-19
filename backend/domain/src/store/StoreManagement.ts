@@ -62,10 +62,11 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser): BoolResponse {
-        const error: string = !this.verifyStoreExists(storeName) ? errorMsg.E_INVALID_STORE :
-            !this.verifyStoreOwner(storeName, user) ? errorMsg.E_NOT_AUTHORIZED :
-                !this.verifyStoreManager(storeName, user) ? errorMsg.E_NOT_AUTHORIZED : undefined;
-
+        let error:string = undefined;
+        if (!this.verifyStoreExists(storeName))
+            error = errorMsg.E_INVALID_STORE;
+        else if (!this.verifyStoreOwner(storeName, user) && !this.verifyStoreManager(storeName, user))
+             error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -263,6 +264,7 @@ export class StoreManagement {
         return {data: {receipts}}
     }
 
+
     viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store) return {data: {messages: []}, error: {message: errorMsg.E_NF}}
@@ -273,10 +275,11 @@ export class StoreManagement {
         const messages: ContactUsMessage[] = store.getContactUsMessages();
         return {data: {messages}}
     }
-    
-    private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
+
+    private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
+
         const products: Product[] = [];
-        for (const productReq of productsReq) {
+        for (const productReq of productsReqs) {
             const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }

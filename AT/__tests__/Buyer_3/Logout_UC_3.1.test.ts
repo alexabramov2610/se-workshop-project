@@ -1,4 +1,4 @@
-import { Bridge, Driver, Credentials } from "../../src";
+import { Bridge, Driver, Credentials } from "../..";
 
 describe("Guest Buyer, UC: 3.1", () => {
   let _serviceBridge: Bridge;

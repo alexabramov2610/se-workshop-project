@@ -1,16 +1,13 @@
-import { Bridge, Driver, Credentials } from "../../src/";
-
-// const UNREGISTERED_USER = "RegisteredUser is not registered";
-// const INCORRECT_PASSWORD = "Password is incorrect";
-// const ALREADY_LOGGED_IN = "RegisteredUser is already logged in";
+import { Bridge, Driver, Credentials } from "../..";
 
 describe("Guest Login, UC: 2.3", () => {
   let _serviceBridge: Bridge;
   let _credentials: Credentials;
   let _driver: Driver;
+
   beforeEach(() => {
     _driver = new Driver();
-    _serviceBridge = _driver.initWithDefaults().startSession().getBridge();
+    _serviceBridge = _driver.resetState().initWithDefaults().startSession().getBridge();
     _credentials = { userName: "test-username", password: "test-Password132" };
   });
 

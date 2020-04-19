@@ -1,7 +1,8 @@
-import { Product, CATEGORY } from "../../../src";
+import { Product, CATEGORY } from "../../..";
 
 export class ProductBuilder {
   private _p: Product;
+
   constructor() {
     this._p = {
       catalogNumber: 123,
