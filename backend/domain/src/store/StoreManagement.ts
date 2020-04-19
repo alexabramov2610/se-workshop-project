@@ -1,7 +1,7 @@
 import {Store} from './internal_api'
 import {logger, BoolResponse, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
-import {Item, Product} from "../trading_system/internal_api";
+import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import {
     Product as ProductReq,
@@ -62,10 +62,11 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser): BoolResponse {
-        const error: string = !this.verifyStoreExists(storeName) ? errorMsg.E_INVALID_STORE :
-            !this.verifyStoreOwner(storeName, user) ? errorMsg.E_NOT_AUTHORIZED :
-                !this.verifyStoreManager(storeName, user) ? errorMsg.E_NOT_AUTHORIZED : undefined;
-
+        let error:string = undefined;
+        if (!this.verifyStoreExists(storeName))
+            error = errorMsg.E_INVALID_STORE;
+        else if (!this.verifyStoreOwner(storeName, user) && !this.verifyStoreManager(storeName, user))
+             error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -234,7 +235,7 @@ export class StoreManagement {
         return additionRes;
     }
 
-    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser) : BoolResponse {
+    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to assign user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
@@ -278,31 +279,43 @@ export class StoreManagement {
         return undefined;
     }
 
-    viewStoreInfo(storeName:string): Res.StoreInfoResponse{
-        const store=this.findStoreByName(storeName);
-        if(store) {
+    viewStoreInfo(storeName: string): Res.StoreInfoResponse {
+        const store = this.findStoreByName(storeName);
+        if (store) {
             return store.viewStoreInfo();
-        }
-        else{   //store not found
-            return {data:{result:false},error:{message:errorMsg['E_NF']}}
+        } else {   // store not found
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
 
     }
 
-    viewStorePurchaseHistory(user: RegisteredUser, shopName: string): Res.ViewShopPurchasesHistoryResponse {
-        const store: Store = this.findStoreByName(shopName);
-        if (!store) return {data: {purchases: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY)) return {
-            data: {purchases: []},
+    viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) return {data: {receipts: []}, error: {message: errorMsg.E_NF}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN)) return {
+            data: {receipts: []},
             error: {message: errorMsg.E_PERMISSION}
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {purchases: receipts}}
+        return {data: {receipts}}
     }
 
-    private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
+
+    viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) return {data: {messages: []}, error: {message: errorMsg.E_NF}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_USER_QUESTIONS) && (user.role !== UserRole.ADMIN)) return {
+            data: {messages: []},
+            error: {message: errorMsg.E_PERMISSION}
+        }
+        const messages: ContactUsMessage[] = store.getContactUsMessages();
+        return {data: {messages}}
+    }
+
+    private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
+
         const products: Product[] = [];
-        for (const productReq of productsReq) {
+        for (const productReq of productsReqs) {
             const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
@@ -319,5 +332,6 @@ export class StoreManagement {
 
         return items;
     }
+
 
 }
