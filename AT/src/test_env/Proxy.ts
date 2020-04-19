@@ -56,8 +56,8 @@ const Proxy: Bridge = {
       : DummyValues.Response;
   },
 
-  viewProduct(product: Product) {
-    return real.removeItem ? real.viewProduct(product) : DummyValues.ProductResponse;
+  viewProduct(store: Store, product: Product) {
+    return real.viewProduct ? real.viewProduct(store, product) : DummyValues.ProductResponse;
   },
 
   viewStore(store: Store) {

@@ -104,5 +104,12 @@ export const Adapter: Partial<Env.Bridge> = {
     return error
       ? {data: undefined, error: error}
       : {data: data.info, error: undefined};
-  }
+  },
+
+  // viewProduct(store: Store, product: Product) {
+  //   const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
+  //   return error
+  //       ? {data: undefined, error: error}
+  //       : {data: data.info, error: undefined};
+  // }
 };
