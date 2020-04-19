@@ -18,11 +18,19 @@ const BoolResponse: IBoolResponse = {
 };
 
 export interface IProductResponse extends Response {
-    data: { name: string; price: number; };
+    data: { info: Product };
 }
 
 const ProductResponse: IProductResponse = {
-    data: {name: "Item", price: 33.5},
+    data: {info: {name: "Item", price: 33.5, catalogNumber: 123, category: CATEGORY.CLOTHING}},
+};
+
+export interface IViewProductResponse extends Response {
+    data: { info: Product };
+}
+
+const ViewProductResponse: IViewProductResponse = {
+    data: {info: {name: "Item", price: 33.5, catalogNumber: 123, category: CATEGORY.CLOTHING}},
 };
 
 export interface ISessionResponse extends Response {
@@ -42,11 +50,19 @@ const InitResponse: IInitResponse = {
 };
 
 export interface IStoreResponse extends Response {
-    data: { storeName: string, storeOwnersNames: string[], productNames: string[] };
+    data: { name: string };
 }
 
 const StoreResponse: IStoreResponse = {
-    data: { storeName: "store", storeOwnersNames: ["avishai", "ron"], productNames: ["Bamba", "Laptop"] },
+    data: {name: "store"}
+};
+
+export interface IViewStoreResponse extends Response {
+    data: { storeName: string, storeOwnersNames: string[], productNames: string[] };
+}
+
+const ViewStoreResponse: IViewStoreResponse = {
+    data: {storeName: "store", storeOwnersNames: ["avishai", "ron"], productNames: ["Bamba", "Laptop"]},
 };
 
 export interface IUsersResponse extends Response {
@@ -191,6 +207,8 @@ const DummyValues = {
     SessionResponse,
     ProductsRemovalResponse,
     CartResponse,
+    ViewStoreResponse,
+    ViewProductResponse
 };
 
 export {DummyValues};
