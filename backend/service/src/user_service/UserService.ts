@@ -14,3 +14,7 @@ export const loginUser = (req: Req.LoginRequest, ts: TS): Res.BoolResponse => {
 export const logoutUser = (req: Req.LogoutRequest, ts: TS): Res.BoolResponse => {
     return ts.logout(req);
 }
+
+ export const saveProductToCart = (req:Req.SaveToCartRequest,ts: TS):Res.BoolResponse =>{
+    return ts.saveProductToCart(req);
+}

@@ -1,6 +1,6 @@
 import {Error} from "../api-int/internal_api";
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
-import {TradingSystemState} from "./Enums";
+import {ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
 
 
@@ -54,6 +54,13 @@ interface ViewUsersContactUsMessagesResponse extends Response {
     data: { messages: ContactUsMessage[] }
 }
 
+interface ProductInfoResponse extends Response{
+  data:{result:boolean, info?:{name:string,catalogNumber:number,price:number,catagory:ProductCategory}}
+
+}
+
+
+
 export {
     Response,
     LoginResponse,
@@ -65,6 +72,7 @@ export {
     ItemsRemovalResponse,
     TradingSystemStateResponse,
     ViewShopPurchasesHistoryResponse,
+    ProductInfoResponse,
     ViewUsersContactUsMessagesResponse
 };
 

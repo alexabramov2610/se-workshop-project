@@ -7,6 +7,8 @@ import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {ExternalSystems, logger, UserRole,} from "../api-int/internal_api";
 import {TradingSystemState} from "../api-ext/Enums";
 import {v4 as uuid} from 'uuid';
+import {User} from "../user/users/User";
+import {Product} from "./data/Product";
 
 export class TradingSystemManager {
     private userManager: UserManager;
@@ -65,18 +67,20 @@ export class TradingSystemManager {
     }
 
     changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
-        logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);;
+        logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
+        ;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this.storeManager.changeProductName(user, req.body.catalogNumber ,req.body.storeName, req.body.newName);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
     changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
-        logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);;
+        logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
+        ;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this.storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
 
@@ -85,7 +89,7 @@ export class TradingSystemManager {
         logger.info(`trying to add items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return  {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+            return {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         if (!user) return {
             data: {result: false, itemsNotAdded: req.body.items},
             error: {message: errorMsg.E_NOT_AUTHORIZED}
@@ -194,27 +198,28 @@ export class TradingSystemManager {
         return res;
     }
 
-   // @TODO RETURN VALUE?
+    // @TODO RETURN VALUE?
     viewStoreInfo(req: Req.StoreInfoRequest) {
         return this.storeManager.viewStoreInfo(req.body.storeName);
     }
 
-    removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
         logger.info(`trying to remove user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this.storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);;
+        return this.storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
+        ;
     }
 
-    addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
         logger.info(`trying to add user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this.storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);;
+        return this.storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
+        ;
     }
-
 
 
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
@@ -223,5 +228,34 @@ export class TradingSystemManager {
         const res: Res.ViewUsersContactUsMessagesResponse = this.storeManager.viewUsersContactUsMessages(user, req.body.storeName);
         return res;
     }
+
+    viewProductInfo(req: Req.ProductInfoRequest): Res.BoolResponse {
+        logger.info(`view product info request for store ${req.body.storeName} product number ${req.body.catalogNumber} `)
+        const user: User = this.userManager.getUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        return this.storeManager.viewProductInfo(req);
+    }
+
+    saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
+        logger.info(`saving product: ${req.body.catalogNumber} to ${req.token}  cart `)
+        const user = this.userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const store = this.storeManager.findStoreByName(req.body.storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}
+        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        if (!product)
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+        const inStock: boolean = store.isProductInStock(req.body.catalogNumber);
+        if (!inStock)
+            return {data: {result: false}, error: {message: errorMsg.E_STOCK}};
+
+        logger.debug(` product: ${req.body.catalogNumber} added to ${req.token}  cart `)
+        this.userManager.addProductToCart(user, product);
+        return {data: {result: true}}
+    }
+
 
 }
