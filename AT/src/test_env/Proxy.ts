@@ -57,11 +57,11 @@ const Proxy: Bridge = {
   },
 
   viewProduct(store: Store, product: Product) {
-    return real.viewProduct ? real.viewProduct(store, product) : DummyValues.ProductResponse;
+    return real.viewProduct ? real.viewProduct(store, product) : DummyValues.ViewProductResponse;
   },
 
   viewStore(store: Store) {
-    return real.viewStore ? real.viewStore(store) : DummyValues.StoreResponse;
+    return real.viewStore ? real.viewStore(store) : DummyValues.ViewStoreResponse;
   },
 
   removeUser(user: User) {
@@ -100,8 +100,8 @@ const Proxy: Bridge = {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(product: Product) {
-    return real.addToCart ? real.addToCart(product) : DummyValues.Response;
+  addToCart(store: Store, product: Product) {
+    return real.addToCart ? real.addToCart(store, product) : DummyValues.Response;
   },
 
   watchCart() {

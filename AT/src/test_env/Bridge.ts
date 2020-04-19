@@ -21,8 +21,8 @@ export interface Bridge {
   addItemsToStore(store: Store, item: Item[]): DummyTypes.IResponse;
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
   removeProductsFromStore(store: Store, Products: Product[]): DummyTypes.IProductsRemovalResponse;
-  viewStore(store: Store): DummyTypes.IStoreResponse;
-  viewProduct(store: Store, product: Product): DummyTypes.IProductResponse;
+  viewStore(store: Store): DummyTypes.IViewStoreResponse;
+  viewProduct(store: Store, product: Product): DummyTypes.IViewProductResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;
@@ -31,7 +31,7 @@ export interface Bridge {
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
   search(input: SearchData): DummyTypes.ISearchResponse;
   rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
-  addToCart(product: Product): DummyTypes.IResponse;
+  addToCart(store: Store, product: Product): DummyTypes.IResponse;
   watchCart(): DummyTypes.ICartResponse;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
