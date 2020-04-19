@@ -1,22 +1,29 @@
+import {Purchase} from "../../api-ext/CommonInterface";
 
 export class Receipt {
 
-    private readonly _id: number;
-    private readonly _catalogNumber: number;
+    private _purchases: Purchase[];
+    private readonly _date: Date;
 
-    constructor(id: number, catalogNumber: number) {
-        this._catalogNumber = catalogNumber;
-        this._id = id;
+    constructor(purchases: Purchase[]) {
+        this._purchases = purchases
+        this._date = new Date();
     }
 
-    get id(): number {
-        return this._id;
+    get purchases(): Purchase[] {
+        return this._purchases;
     }
 
-    get catalogNumber(): number {
-        return this._catalogNumber;;
+    get date(): Date {
+        return this._date;
     }
 
+    addPurchase(newPurchase: Purchase): void {
+        this._purchases = this._purchases.concat([newPurchase]);
+    }
 
+    removePurchase(purchaseToRemove: Purchase): void {
+        this._purchases = this._purchases.filter((p) => p.item.id !== purchaseToRemove.item.id);
+    }
 
 }

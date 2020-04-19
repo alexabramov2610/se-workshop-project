@@ -1,8 +1,9 @@
 import * as Responses from "../../../src/api-ext/Response";
 import * as Res from "../../../src/api-ext/Response";
-import {StoreOwner,StoreManager} from "../../../src/user/internal_api";
+import {StoreManager, StoreOwner} from "../../../src/user/internal_api";
 import {Item, Product, Store} from "../../../src/trading_system/internal_api";
 import {ProductCatalogNumber, ProductCategory, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+import {ManagementPermission} from "../../../src/api-int/Enums";
 
 
 describe("Store Management Unit Tests", () => {
@@ -398,11 +399,30 @@ describe("Store Management Unit Tests", () => {
         const res: Res.BoolResponse = store.removeStoreOwner(storeOwner);
         expect(res.data.result).toBeFalsy();
     });
+    test("verifyPermission success owner", () => {
+        jest.spyOn(store,"verifyIsStoreOwner").mockReturnValue(true)
+
+        expect(store.verifyPermission("tal",ManagementPermission.WATCH_PURCHASES_HISTORY)).toBeTruthy();
+    });
+    test("verifyPermission success manager", () => {
+        jest.spyOn(store,"verifyIsStoreOwner").mockReturnValue(false)
+        jest.spyOn(store,"verifyIsStoreManager").mockReturnValue(true)
+        jest.spyOn(store,"getStoreManager").mockReturnValue(new StoreManager("tal"))
+
+        expect(store.verifyPermission("tal",ManagementPermission.WATCH_PURCHASES_HISTORY)).toBeTruthy();
+    });
+
+    test("verifyPermission failure", () => {
+        jest.spyOn(store,"verifyIsStoreOwner").mockReturnValue(false)
+        jest.spyOn(store,"verifyIsStoreManager").mockReturnValue(false)
+
+        expect(store.verifyPermission("tal",ManagementPermission.WATCH_PURCHASES_HISTORY)).toBeFalsy();
+    });
 
     test("view store info seccess",()=>{
-        let product1=new Product('product1',1,1,ProductCategory.Home)
-        let product2=new Product('product2',2,2,ProductCategory.Home)
-        let products: Product[] = [product1,product2];
+        const product1=new Product('product1',1,1,ProductCategory.Home)
+        const product2=new Product('product2',2,2,ProductCategory.Home)
+        const products: Product[] = [product1,product2];
 
         store.addNewProducts(products);
         store.addStoreOwner(storeOwner);

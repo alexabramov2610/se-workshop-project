@@ -3,7 +3,7 @@ import {ProductInfoResponse} from "../../api-ext/Response";
 
 export class Product {
     private readonly _catalogNumber: number;
-    private readonly _name: string;
+    private _name: string;
     private _price: number;
     private _category: ProductCategory;
 
@@ -15,22 +15,25 @@ export class Product {
     }
 
     viewProductInfo():ProductInfoResponse{
-        return{  data:{result:true, info:{name:this.name,catalogNumber:this.catalogNumber,price:this.price,catagory:this._category}}
+        return{  data:{result:true, info:{name:this._name,catalogNumber:this._catalogNumber,price:this._price,catagory:this._category}}
         }
     }
 
-
-    set price(newPrice: number) {
-        this.price = newPrice;
+    set price(price: number) {
+        this._price = price;
     }
-
     get price(): number {
         return this._price;
+    }
+
+    set name(value: string) {
+        this._name = value;
     }
 
     get name(): string {
         return this._name;
     }
+
     get category(): ProductCategory {
         return this._category;
     }
