@@ -28,6 +28,30 @@ describe("Store Management Unit Tests", () => {
         mocked(StoreManagement).mockClear();
     });
 
+
+    // test("add new items IT",()=>{
+    //     const tradingSystemManager = new TradingSystemManager();
+    //     const token = tradingSystemManager.startNewSession();
+    //     const storeName = 'storename';
+    //
+    //     const regReq: Req.RegisterRequest = {body: { username: 'username', password: 'pw1234'}, token: token};
+    //     expect(tradingSystemManager.register(regReq)).toBeTruthy();
+    //
+    //     const loginReq: Req.LoginRequest = {body: { username: 'username', password: 'pw1234'}, token: token};
+    //     expect(tradingSystemManager.login(loginReq)).toBeTruthy();
+    //
+    //     const openStoreReq: Req.OpenStoreRequest = {body: { storeName: storeName}, token: token};
+    //     expect(tradingSystemManager.createStore(openStoreReq)).toBeTruthy();
+    //
+    //     const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
+    //     const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+    //     const products: ProductReq[] = [product1, product2];
+    //     const addProductsReq: Req.AddProductsRequest = {body: { storeName: storeName, products: products}, token: token};
+    //     expect(tradingSystemManager.addNewProducts(addProductsReq)).toBeTruthy();
+    //
+    // })
+
+
     function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
@@ -501,6 +525,80 @@ describe("Store Management Unit Tests", () => {
             body: {storeName: store.storeName, usernameToRemove: 'user'}
         };
         const res: Res.BoolResponse = tradingSystemManager.removeStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    function prepareChangeProductPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                changeProductPrice: () => operationResMock
+            }
+        });
+    }
+
+    test("changeProductPrice success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareChangeProductPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductPriceRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductPrice failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareChangeProductPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductPriceRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    function prepareChangeProductNameMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                changeProductName: () => operationResMock
+            }
+        });
+    }
+
+    test("changeProductName success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareChangeProductNameMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductNameRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductName failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareChangeProductNameMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeProductNameRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}};
+        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
 
         expect(res.data.result).toBeFalsy();
     });

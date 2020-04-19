@@ -65,6 +65,14 @@ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.logoutUser)
 }
 
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+    return runIfOpen(req, StoreService.changeProductName);
+}
+
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+    return runIfOpen(req, StoreService.changeProductPrice);
+}
+
 export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
     return runIfOpen(req, StoreService.addItems);
 }

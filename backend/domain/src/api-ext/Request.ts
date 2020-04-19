@@ -77,6 +77,14 @@ interface StoreInfoRequest extends Request {
     body: { storeName: string }
 }
 
+interface ChangeProductPriceRequest extends Request {
+  body:{storeName:string, catalogNumber: number, newPrice: number}
+}
+
+interface ChangeProductNameRequest extends Request {
+  body:{storeName:string, catalogNumber: number, newName: string}
+}
+
 interface ViewUsersContactUsMessagesRequest extends Request {
     body: { storeName: string }
 }
@@ -100,6 +108,8 @@ export {
     LogoutRequest,
     ViewShopPurchasesHistoryRequest,
     RemoveStoreManagerRequest,
-    ViewUsersContactUsMessagesRequest
+    ViewUsersContactUsMessagesRequest,
+    ChangeProductPriceRequest,
+    ChangeProductNameRequest
 };
 

@@ -70,6 +70,48 @@ export class StoreManagement {
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
+    changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
+        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
+            to ${newProductName}`);
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+
+        if (!operationValid.data.result)
+            return {data: {result: false}, error: operationValid.error};
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+
+        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        if (!product)
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+
+        product.name = newProductName;
+        logger.debug(`changeProductName: successfully changed name`);
+        return {data: {result: true}};
+    }
+
+    changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
+        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
+            to ${newPrice}`);
+        const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
+
+        if (!operationValid.data.result)
+            return {data: {result: false}, error: operationValid.error};
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+
+        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        if (!product)
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+
+        product.price = newPrice;
+        logger.debug(`changeProductName: successfully changed price`);
+        return {data: {result: true}};
+    }
+
     addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 

@@ -11,6 +11,7 @@ import {
     Purchase
 } from "../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../src/api-int/Error";
+import {Product} from "../../../src/trading_system/data/Product";
 import {Receipt} from "../../../src/trading_system/data/Receipt";
 import {Item} from "../../../src/trading_system/data/Item";
 
@@ -236,6 +237,186 @@ describe("Store Management Unit Tests", () => {
     test("verifyStoreExists Failure", () => {
         expect(storeManagement.verifyStoreExists('storename')).toBeFalsy();
     });
+
+
+    test("changeProductName - Success", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const product: Product = new Product('name', catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newName: string = "newProductName";
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getProductByCatalogNumber").mockReturnValue(product);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductName(user, product.catalogNumber, store.storeName, newName);
+        expect(actualRes.data.result).toBe(true);
+        expect(product.name).toBe(newName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductName - Failure: not authorized", () => {
+        const isSuccessVerify: boolean = false;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newName: string = "newProductName";
+
+        mockVerifyStoreOperation(isSuccessVerify);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductName(user, product.catalogNumber, store.storeName, newName);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductName - Failure: invalid store", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newName: string = "newProductName";
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(undefined);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductName(user, product.catalogNumber, store.storeName, newName);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductName - Failure: invalid product", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newName: string = "newProductName";
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getProductByCatalogNumber").mockReturnValue(undefined);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductName(user, product.catalogNumber, store.storeName, newName);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+
+    test("changeProductPrice - Success", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mockname";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newPrice: number = 20;
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getProductByCatalogNumber").mockReturnValue(product);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductPrice(user, product.catalogNumber, store.storeName, newPrice);
+        expect(actualRes.data.result).toBe(true);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(newPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductPrice - Failure: not authorized", () => {
+        const isSuccessVerify: boolean = false;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newPrice: number = 20;
+
+        mockVerifyStoreOperation(isSuccessVerify);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductPrice(user, product.catalogNumber, store.storeName, newPrice);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductPrice - Failure: invalid store", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newPrice: number = 20;
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(undefined);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductPrice(user, product.catalogNumber, store.storeName, newPrice);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
+    test("changeProductPrice - Failure: invalid product", () => {
+        const isSuccessVerify: boolean = true;
+        const prodPrice: number = 5;
+        const catalogNumber: number = 5;
+        const category: number = 5;
+        const prodName: string = "mock-name";
+        const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
+        const store: Store = new Store("store-mock");
+        const user: StoreOwner = new StoreOwner("storeOwner-mock");
+        const newPrice: number = 20;
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getProductByCatalogNumber").mockReturnValue(undefined);
+
+        const actualRes: Res.BoolResponse = storeManagement.changeProductPrice(user, product.catalogNumber, store.storeName, newPrice);
+        expect(actualRes.data.result).toBe(false);
+        expect(product.name).toBe(prodName);
+        expect(product.catalogNumber).toBe(catalogNumber);
+        expect(product.price).toBe(prodPrice);
+        expect(product.category).toBe(category);
+    });
+
 
     test("addItems Success", () => {
         const isSuccessVerify: boolean = true;

@@ -15,6 +15,14 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest, ts: TS): Res.StoreInfoR
     return ts.viewStoreInfo(req);
 }
 
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+   return ts.changeProductName(req);
+}
+
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+   return ts.changeProductPrice(req);
+}
+
 export const removeItems = (req: Req.ItemsRemovalRequest, ts: TS): Res.ItemsRemovalResponse => {
     return ts.removeItems(req);
 }
