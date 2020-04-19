@@ -50,11 +50,11 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
         _serviceBridge.addItemsToStore(_testStore2, [_testItem3, _testItem2]);
 
-        //TODO:: logout after change in domain
+        _serviceBridge.logout();
     });
 
     test("Valid insertion, item doesn't exist in cart", () => {
-        const {data, error} = _serviceBridge.addToCart(_testProduct1);
+        const {data, error} = _serviceBridge.addToCart(_testStore1, _testProduct1);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -64,7 +64,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     });
 
     test("Valid insertion, item isn't in stock", () => {
-        const {data, error} = _serviceBridge.addToCart(_testProduct3);
+        const {data, error} = _serviceBridge.addToCart(_testStore1, _testProduct3);
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
 
@@ -74,7 +74,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     });
 
     test("Valid insertion, item already exists in cart", () => {
-        const res1 = _serviceBridge.addToCart(_testProduct1);
+        const res1 = _serviceBridge.addToCart(_testStore1, _testProduct1);
         const data1 = res1.data;
         const error1 = res1.error;
         expect(error1).toBeUndefined();
@@ -85,7 +85,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         expect(filteredCart.length).toBe(1);
         const amountBefore = filteredCart[0].amount;
 
-        const res2 = _serviceBridge.addToCart(_testProduct1);
+        const res2 = _serviceBridge.addToCart(_testStore2, _testProduct1);
         const data2 = res2.data;
         const error2 = res2.error;
         expect(error2).toBeUndefined();

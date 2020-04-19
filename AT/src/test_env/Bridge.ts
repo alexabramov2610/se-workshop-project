@@ -7,7 +7,8 @@ import {
   RATE,
   CreditCard,
   Discount,
-  PERMISSION, Product,
+  PERMISSION,
+  Product,
 } from "./types";
 import * as DummyTypes from "../../__tests__/mocks/responses";
 
@@ -20,18 +21,21 @@ export interface Bridge {
   createStore(store: Store): DummyTypes.IStoreResponse;
   addItemsToStore(store: Store, item: Item[]): DummyTypes.IResponse;
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
-  removeProductsFromStore(store: Store, Products: Product[]): DummyTypes.IProductsRemovalResponse;
-  viewStore(store: Store): DummyTypes.IStoreResponse;
-  viewItem(item: Item): DummyTypes.IItemResponse;
+  removeProductsFromStore(
+    store: Store,
+    Products: Product[]
+  ): DummyTypes.IProductsRemovalResponse;
+  viewStore(store: Store): DummyTypes.IViewStoreResponse;
+  viewProduct(store: Store, product: Product): DummyTypes.IViewProductResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;
   register(credentials: Credentials): DummyTypes.IResponse;
-  logout(userName: string): DummyTypes.IResponse;
+  logout(): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
   search(input: SearchData): DummyTypes.ISearchResponse;
   rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
-  addToCart(product: Product): DummyTypes.IResponse;
+  addToCart(store: Store, product: Product): DummyTypes.IResponse;
   watchCart(): DummyTypes.ICartResponse;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
@@ -47,4 +51,5 @@ export interface Bridge {
     permission: PERMISSION
   ): DummyTypes.IResponse;
   reset(): void;
+  assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
 }

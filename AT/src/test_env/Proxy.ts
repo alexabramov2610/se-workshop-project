@@ -11,17 +11,18 @@ import {
   Cart,
   CreditCard,
   Discount,
-  PERMISSION, Product,
+  PERMISSION,
+  Product,
 } from "./types";
 import {
-  DummyValues, IProductsRemovalResponse,
+  DummyValues,
+  IProductsRemovalResponse,
   IResponse,
 } from "../../__tests__/mocks/responses";
 
 let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
-
   setReal(impl: Bridge) {
     real = impl;
   },
@@ -56,12 +57,16 @@ const Proxy: Bridge = {
       : DummyValues.Response;
   },
 
-  viewItem(item: Item) {
-    return real.removeItem ? real.viewItem(item) : DummyValues.ItemResponse;
+  viewProduct(store: Store, product: Product) {
+    return real.viewProduct
+      ? real.viewProduct(store, product)
+      : DummyValues.ViewProductResponse;
   },
 
   viewStore(store: Store) {
-    return real.viewStore ? real.viewStore(store) : DummyValues.StoreResponse;
+    return real.viewStore
+      ? real.viewStore(store)
+      : DummyValues.ViewStoreResponse;
   },
 
   removeUser(user: User) {
@@ -82,8 +87,8 @@ const Proxy: Bridge = {
     return real.login ? real.login(credentials) : DummyValues.Response;
   },
 
-  logout(userName: string) {
-    return real.logout ? real.logout(userName) : DummyValues.Response;
+  logout() {
+    return real.logout ? real.logout() : DummyValues.Response;
   },
 
   getPurchaseHistory() {
@@ -100,8 +105,10 @@ const Proxy: Bridge = {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(product: Product) {
-    return real.addToCart ? real.addToCart(product) : DummyValues.Response;
+  addToCart(store: Store, product: Product) {
+    return real.addToCart
+      ? real.addToCart(store, product)
+      : DummyValues.Response;
   },
 
   watchCart() {
@@ -143,13 +150,24 @@ const Proxy: Bridge = {
   },
 
   addProductsToStore(store: Store, products: Product[]): IResponse {
-    return real.addProductsToStore ? real.addProductsToStore(store, products) : DummyValues.Response;
+    return real.addProductsToStore
+      ? real.addProductsToStore(store, products)
+      : DummyValues.Response;
   },
 
-  removeProductsFromStore(store: Store, products: Product[]): IProductsRemovalResponse {
-    return real.removeProductsFromStore ? real.removeProductsFromStore(store, products) : DummyValues.ProductsRemovalResponse;
+  removeProductsFromStore(
+    store: Store,
+    products: Product[]
+  ): IProductsRemovalResponse {
+    return real.removeProductsFromStore
+      ? real.removeProductsFromStore(store, products)
+      : DummyValues.ProductsRemovalResponse;
   },
-
+  assignStoreOwner(store: Store, user: User): IResponse {
+    return real.assignStoreOwner
+      ? real.assignStoreOwner(store, user)
+      : { data: {} };
+  },
 };
 
 export { Proxy };

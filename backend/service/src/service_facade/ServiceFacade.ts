@@ -108,6 +108,14 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse 
 export const removeStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeStoreManager);
 }
+
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeManagerPermissions);
+}
+
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.addManagerPermissions);
+}
 export const saveProductToCart = (req:Req.SaveToCartRequest): Res.BoolResponse=>{
     return runIfOpen(req,UserService.saveProductToCart);
 }
@@ -124,16 +132,11 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 }
 
 
-
-
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {
-        data: {},
-        error: {message: "Trading system is closed!"}
-    }
+    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
+        return { data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
-
 }
 
 

@@ -1,5 +1,5 @@
 import {RegisteredUser} from "../internal_api"
-import {ManagementPermission} from "../../api-int/internal_api";
+import {ManagementPermission} from "../../api-ext/Enums";
 
 export class StoreManager extends RegisteredUser {
 
@@ -7,7 +7,7 @@ export class StoreManager extends RegisteredUser {
 
     constructor(name: string) {
         super(name);
-        this._permissions = [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS];
+        this._permissions = [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS];
     }
 
     addPermission(permission: ManagementPermission) {

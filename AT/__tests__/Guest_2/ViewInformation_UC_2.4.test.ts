@@ -1,96 +1,77 @@
-// import {Bridge, Driver, Item, CATEGORY, Store, Credentials} from "../../src/";
-//
-// // const ITEM_NOT_FOUND = "Item not found";
-// // const STORE_NOT_FOUND = "Store not found";
-//
-// describe("Guest - View Information, UC: 2.4", () => {
-//     let _serviceBridge: Bridge;
-//     let _testItem: Item;
-//     let _testStore: Store;
-//     let _credentials: Credentials;
-//
-//     beforeEach(() => {
-//         _serviceBridge = Driver.makeBridge();
-//         _credentials = {userName: "test-name", password: "test-PASS-123"};
-//
-//         _testStore = {
-//             name: "some-mock-store",
-//             description: "selling cool items",
-//             id: "id.stores.boom",
-//         };
-//         _testItem = {
-//             id: "some-id",
-//             name: "some-name",
-//             category: CATEGORY.ELECTRONICS,
-//             description: "some-desc",
-//             price: 999,
-//         };
-//     });
-//
-//     test("View valid item", () => {
-//         _testItem.id = "validItemID";
-//         _testItem.name = "itemTestName";
-//         _testItem.description = "itemTestDesc";
-//         _testItem.price = 33.5;
-//
-//         _testStore.id = "validStoreID";
-//         _testStore.name = "storeTestName";
-//         _testStore.description = "storeTestDesc";
-//
-//         _serviceBridge.register(_credentials);
-//         _serviceBridge.login(_credentials);
-//
-//         _serviceBridge.createStore(_testStore);
-//         _serviceBridge.addItemToStore(_testStore, _testItem);
-//
-//         _serviceBridge.logout();
-//
-//         const {data, error} = _serviceBridge.viewItem(_testItem);
-//         const {name, price, description} = data;
-//         expect(error).toBeUndefined();
-//         expect(name).toEqual(_testItem.name);
-//         expect(price).toEqual(_testItem.price);
-//         expect(description).toEqual(_testItem.description);
-//     });
-//
-//     test("View invalid item", () => {
-//         _testItem.id = "invalidItemID";
-//         _testItem.name = "itemTestName";
-//         _testItem.description = "itemTestDesc";
-//         _testItem.price = 33.5;
-//
-//         const {data, error} = _serviceBridge.viewItem(_testItem);
-//         expect(data).toBeUndefined();
-//         expect(error).toBeDefined();
-//     });
-//
-//     test("View valid store", () => {
-//         _testStore.id = "validStoreID";
-//         _testStore.name = "storeTestName";
-//         _testStore.description = "storeTestDesc";
-//
-//         _serviceBridge.register(_credentials);
-//         _serviceBridge.login(_credentials);
-//
-//         _serviceBridge.createStore(_testStore);
-//
-//         _serviceBridge.logout();
-//
-//         const {data, error} = _serviceBridge.viewStore(_testItem);
-//         const {name, description} = data;
-//         expect(error).toBeUndefined();
-//         expect(name).toEqual(_testStore.name);
-//         expect(description).toEqual(_testStore.description);
-//     });
-//
-//     test("View invalid store", () => {
-//         _testStore.id = "invalidStoreID";
-//         _testStore.name = "storeTestName";
-//         _testStore.description = "storeTestDesc";
-//
-//         const {data, error} = _serviceBridge.viewStore(_testStore);
-//         expect(data).toBeUndefined();
-//         expect(error).toBeDefined();
-//     });
-// });
-//
+import {Bridge, Driver, Item, CATEGORY, Store, Credentials, Product} from "../../";
+import {ItemBuilder} from "../mocks/builders/item-builder";
+import {ProductBuilder} from "../mocks/builders/product-builder";
+
+// const ITEM_NOT_FOUND = "Item not found";
+// const STORE_NOT_FOUND = "Store not found";
+
+describe("Guest - View Information, UC: 2.4", () => {
+    let _driver = new Driver();
+    let _serviceBridge: Bridge;
+    let _testProduct: Product;
+    let _testItem: Item;
+    let _testStore: Store;
+
+    beforeEach(() => {
+        _serviceBridge = _driver
+            .resetState()
+            .initWithDefaults()
+            .startSession()
+            .registerWithDefaults()
+            .loginWithDefaults()
+            .getBridge();
+
+        _testStore = {name: "some-mock-store"};
+        _testProduct = new ProductBuilder().withCatalogNumber(123).getProduct();
+        _testItem = new ItemBuilder().withId(1).withCatalogNumber(123).getItem();
+
+    });
+
+    test("View valid item", () => {
+        _serviceBridge.createStore(_testStore);
+        _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
+        _serviceBridge.addItemsToStore(_testStore, [_testItem]);
+
+        _serviceBridge.logout();
+
+        const {data, error} = _serviceBridge.viewProduct(_testStore, _testProduct);
+        const product = data.info;
+        expect(error).toBeUndefined();
+        expect(product.name).toEqual(_testProduct.name);
+        expect(product.price).toEqual(_testProduct.price);
+        expect(product.catalogNumber).toEqual(_testProduct.catalogNumber);
+    });
+
+    test("View invalid product", () => {
+        _serviceBridge.createStore(_testStore);
+        _serviceBridge.logout();
+
+        const {data, error} = _serviceBridge.viewProduct(_testStore, _testProduct);
+        expect(data).toBeUndefined();
+        expect(error).toBeDefined();
+    });
+
+    test("View valid store", () => {
+        _serviceBridge.createStore(_testStore);
+        _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
+        _serviceBridge.logout();
+
+        const {data, error} = _serviceBridge.viewStore(_testStore);
+        const {storeName, storeOwnersNames, productNames} = data;
+        expect(error).toBeUndefined();
+        expect(storeName).toEqual(_testStore.name);
+        expect(productNames[0]).toEqual(_testProduct.name);
+    });
+
+    test("View invalid store", () => {
+        _serviceBridge.logout();
+
+        const {data, error} = _serviceBridge.viewStore(_testStore);
+        expect(data).toBeUndefined();
+        expect(error).toBeDefined();
+    });
+});
+
+
+
+
