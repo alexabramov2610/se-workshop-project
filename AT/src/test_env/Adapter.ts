@@ -2,7 +2,7 @@ import * as Types from "../..";
 import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import { Product, Store, Item } from "../..";
+import { Product, Store, Item, User } from "../..";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -57,9 +57,7 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   logout(): DummyTypes.IResponse {
-    const { data, error } = ServiceFacade.logoutUser(
-      wrapWithToken({})
-    );
+    const { data, error } = ServiceFacade.logoutUser(wrapWithToken({}));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
@@ -100,12 +98,22 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   viewStore(store: Store) {
-    const {data, error} = ServiceFacade.viewStoreInfo(wrapWithToken({storeName: store.name}));
+    const { data, error } = ServiceFacade.viewStoreInfo(
+      wrapWithToken({ storeName: store.name })
+    );
     return error
-      ? {data: undefined, error: error}
-      : {data: data.info, error: undefined};
+      ? { data: undefined, error: error }
+      : { data: data.info, error: undefined };
   },
 
+  assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
+    const { data, error } = ServiceFacade.assignStoreOwner(
+      wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data.info, error: undefined };
+  },
   // viewProduct(store: Store, product: Product) {
   //   const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
   //   return error
