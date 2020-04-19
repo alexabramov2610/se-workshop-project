@@ -17,12 +17,12 @@ const BoolResponse: IBoolResponse = {
     data: {result: true},
 };
 
-export interface IItemResponse extends Response {
-    data: { name: string; price: number; description: string };
+export interface IProductResponse extends Response {
+    data: { name: string; price: number; };
 }
 
-const ItemResponse: IItemResponse = {
-    data: {name: "Item", price: 33.5, description: "Description"},
+const ProductResponse: IProductResponse = {
+    data: {name: "Item", price: 33.5},
 };
 
 export interface ISessionResponse extends Response {
@@ -42,11 +42,11 @@ const InitResponse: IInitResponse = {
 };
 
 export interface IStoreResponse extends Response {
-    data: { name: string };
+    data: { storeName: string, storeOwnersNames: string[], productNames: string[] };
 }
 
 const StoreResponse: IStoreResponse = {
-    data: {name: "Store"},
+    data: { storeName: "store", storeOwnersNames: ["avishai", "ron"], productNames: ["Bamba", "Laptop"] },
 };
 
 export interface IUsersResponse extends Response {
@@ -180,7 +180,7 @@ export interface IProductsRemovalResponse extends Response {
 
 const DummyValues = {
     Response,
-    ItemResponse,
+    ProductResponse,
     StoreResponse,
     UsersResponse,
     UserResponse,
