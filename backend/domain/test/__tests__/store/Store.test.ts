@@ -441,7 +441,7 @@ describe("Store Management Unit Tests", () => {
         const items: Item[] = generateValidItems(5*2, 0, 5, 0);
         store.addItems(items);
 
-        const res=store.productInStock(1);
+        const res=store.isProductInStock(1);
         expect(res).toBeTruthy();
 
     })
@@ -450,7 +450,7 @@ describe("Store Management Unit Tests", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
 
-        const res=store.productInStock(1);
+        const res=store.isProductInStock(1);
         expect(res).toBeFalsy();
 
     })

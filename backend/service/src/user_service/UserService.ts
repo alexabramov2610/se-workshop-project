@@ -15,6 +15,6 @@ export const logoutUser = (req: Req.LogoutRequest, ts: TS): Res.BoolResponse => 
     return ts.logout(req);
 }
 
- export const saveProductTocart = (req:Req.SaveToCartRequest,ts: TS):Res.BoolResponse =>{
+ export const saveProductToCart = (req:Req.SaveToCartRequest,ts: TS):Res.BoolResponse =>{
     return ts.saveProductToCart(req);
 }
