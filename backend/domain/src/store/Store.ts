@@ -38,7 +38,6 @@ export class Store {
                 return product;
             }
         }
-        logger.warn(`could not find product with catalog number: ${catalogNumber}`);
         return undefined;
     }
 
