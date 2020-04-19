@@ -117,13 +117,6 @@ export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) :
     return runIfOpen(req, StoreService.addManagerPermissions);
 }
 
-const runIfOpen = (req: Req.Request, fn: any) :any =>{
-    const isOpenReq: Req.Request = {body:{} , token: req.token};
-    console.log("im here")
-    if(tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
-    return fn.call(this,req);
-
-
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
     return runIfOpen(req, StoreService.viewStorePurchasesHistory);
 }
