@@ -20,12 +20,12 @@ export class Product {
     }
 
 
-    set price(price: number) {
-        this.price = price;
+    set price(newPrice: number) {
+        this.price = newPrice;
     }
 
     get price(): number {
-        return this.price;
+        return this._price;
     }
 
     get name(): string {

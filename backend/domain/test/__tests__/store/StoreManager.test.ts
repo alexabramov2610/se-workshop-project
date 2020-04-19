@@ -1,10 +1,18 @@
 import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Responses from "../../../src/api-ext/Response";
-import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
 import * as Res from "../../../src/api-ext/Response";
 import {BoolResponse, StoreInfoResponse} from "../../../src/api-ext/Response";
-import {Product as ProductReq, ProductCatalogNumber, ProductWithQuantity, Item as ItemReq} from "../../../src/api-ext/CommonInterface";
+import {RegisteredUser, StoreOwner} from "../../../src/user/internal_api";
+import {
+    Item as ItemReq,
+    Product as ProductReq,
+    ProductCatalogNumber,
+    ProductCategory,
+    ProductWithQuantity
+} from "../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../src/api-int/Error";
+import {Product} from "../../../src/trading_system/data/Product";
+import {ProductInfoRequest} from "../../../src/api-ext/Request";
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
@@ -418,6 +426,27 @@ describe("Store Management Unit Tests", () => {
         const res:Responses.StoreInfoResponse = storeManagement.viewStoreInfo(storeName);
         expect(res).toBe(response);
     });
+
+    test('viewProductInfo seccess test',()=>{
+        const p =new Product('my product',12345,15.90,ProductCategory.General)
+        const store=new Store('my store')
+        store.addNewProducts([p]);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValueOnce(store);
+        const res=storeManagement.viewProductInfo({body:{storeName:'my store',catalogNumber:12345},token:"lala"})
+        expect(res.data.result).toBeTruthy()
+        expect(res.data).toEqual({result:true,info:{name:p.name,catalogNumber:p.catalogNumber,price:p.price,catagory:p.category}})
+
+    })
+
+    test('viewProductInfo fail test',()=>{
+        const p =new Product('my product',12345,15.90,ProductCategory.General)
+        const store=new Store('my store')
+        //store.addNewProducts([p]); --not adding the product this time
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValueOnce(store);
+        const res=storeManagement.viewProductInfo({body:{storeName:'my store',catalogNumber:12345},token:"lala"})
+        expect(res.data.result).toBeFalsy()
+
+    })
 
 
     function mockVerifyStoreOperation(isSuccess: boolean) {
