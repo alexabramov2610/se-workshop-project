@@ -50,7 +50,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
         _serviceBridge.addItemsToStore(_testStore2, [_testItem3, _testItem2]);
 
-        //TODO:: logout after change in domain
+        _serviceBridge.logout();
     });
 
     test("Valid insertion, item doesn't exist in cart", () => {

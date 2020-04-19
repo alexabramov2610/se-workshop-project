@@ -59,6 +59,14 @@ export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryReque
     return ts.viewStorePurchasesHistory(req);
 }
 
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return ts.removeManagerPermissions(req);
+}
+
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return ts.addManagerPermissions(req);
+}
+
 export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest, ts: TS): Res.ViewUsersContactUsMessagesResponse => {
     return ts.viewUsersContactUsMessages(req);
 }

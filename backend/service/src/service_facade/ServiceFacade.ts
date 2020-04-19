@@ -109,6 +109,19 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest): Res.Bool
     return runIfOpen(req, StoreService.removeStoreManager);
 }
 
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeManagerPermissions);
+}
+
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.addManagerPermissions);
+}
+
+const runIfOpen = (req: Req.Request, fn: any) :any =>{
+    const isOpenReq: Req.Request = {body:{} , token: req.token};
+    console.log("im here")
+    if(tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {data: {} ,error:{message:"Trading system is closed!"}}
+    return fn.call(this,req);
 
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
@@ -121,10 +134,7 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {
-        data: {},
-        error: {message: "Trading system is closed!"}
-    }
+    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
+        return { data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
-
 }

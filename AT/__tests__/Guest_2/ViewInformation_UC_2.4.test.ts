@@ -1,30 +1,28 @@
-// import {Bridge, Driver, Item, CATEGORY, Store, Credentials} from "../../src/";
+// import {Bridge, Driver, Item, CATEGORY, Store, Credentials, Product} from "../../";
+// import {ItemBuilder} from "../mocks/builders/item-builder";
+// import {ProductBuilder} from "../mocks/builders/product-builder";
 //
 // // const ITEM_NOT_FOUND = "Item not found";
 // // const STORE_NOT_FOUND = "Store not found";
 //
 // describe("Guest - View Information, UC: 2.4", () => {
+//     let _driver = new Driver();
 //     let _serviceBridge: Bridge;
+//     let _testProduct: Product;
 //     let _testItem: Item;
 //     let _testStore: Store;
 //     let _credentials: Credentials;
 //
 //     beforeEach(() => {
-//         _serviceBridge = Driver.makeBridge();
-//         _credentials = {userName: "test-name", password: "test-PASS-123"};
+//         _serviceBridge = _driver
+//             .resetState()
+//             .initWithDefaults()
+//             .startSession()
+//             .getBridge();
 //
-//         _testStore = {
-//             name: "some-mock-store",
-//             description: "selling cool items",
-//             id: "id.stores.boom",
-//         };
-//         _testItem = {
-//             id: "some-id",
-//             name: "some-name",
-//             category: CATEGORY.ELECTRONICS,
-//             description: "some-desc",
-//             price: 999,
-//         };
+//         _testStore = {name: "some-mock-store"};
+//         _testProduct = new ProductBuilder().withCatalogNumber(123).getProduct();
+//         _testItem = new ItemBuilder().withId(1).withCatalogNumber(123).getItem();
 //     });
 //
 //     test("View valid item", () => {

@@ -566,7 +566,6 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
-
     function prepareChangeProductNameMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
@@ -599,6 +598,79 @@ describe("Store Management Unit Tests", () => {
 
         const req: Req.ChangeProductNameRequest = { token: mockToken, body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}};
         let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+    function prepareAddManagerPermissionsPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                addManagerPermissions: () => operationResMock
+            }
+        });
+    }
+
+    test("changeProductPrice success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareAddManagerPermissionsPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
+        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductPrice failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareAddManagerPermissionsPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
+        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    function prepareRemoveManagerPermissionsPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                removeManagerPermissions: () => operationResMock
+            }
+        });
+    }
+
+    test("changeProductPrice success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareRemoveManagerPermissionsPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
+        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("changeProductPrice failure", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = false;
+
+        prepareRemoveManagerPermissionsPriceMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
+        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
 
         expect(res.data.result).toBeFalsy();
     });
