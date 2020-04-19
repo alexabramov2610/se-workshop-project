@@ -1,15 +1,14 @@
 import {Store} from './internal_api'
-import {logger, BoolResponse, errorMsg, UserRole} from '../api-int/internal_api'
-import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
+import {BoolResponse, errorMsg, logger} from '../api-int/internal_api'
+import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import {
+    Item as ItemReq,
     Product as ProductReq,
     ProductCatalogNumber,
-    ProductWithQuantity,
-    Item as ItemReq
+    ProductWithQuantity
 } from "../api-ext/CommonInterface";
-import * as Req from "../api-ext/Request";
 import {Receipt} from "../trading_system/data/Receipt";
 import {ManagementPermission} from "../api-ext/Enums";
 
@@ -270,12 +269,19 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
+        if (!this.verifyPermissions(permissions)) {
+            error = errorMsg.E_INVALID_PERM;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${userWhoChanges}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
         permissions.forEach(permission => userManagerToRemove.removePermission(permission));
         return {data: {result: true}};
     }
 
-    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
-        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange}
+    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
+        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to add permissions from user: ${usernameToChange}
          in store ${storeName}`)
         let error: string;
 
@@ -283,7 +289,7 @@ export class StoreManagement {
         if (!store) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
-                ${managerToChange}. error: ${error}`);
+                ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
@@ -291,29 +297,35 @@ export class StoreManagement {
         if (!userWhoAssignsOwner) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
-                ${managerToChange}. error: ${error}`);
+                ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        const userManagerToRemove: StoreManager = store.getStoreManager(managerToChange);
-        if (!userManagerToRemove) {   // not store owner
+        const userManagerToAdd: StoreManager = store.getStoreManager(usernameToChange);
+        if (!userManagerToAdd) {   // not store owner
             error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
-                ${managerToChange}. error: ${error}`);
+                ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToRemove)) {
-            error = errorMsg.E_NOT_ASSIGNER + managerToChange;
+        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToAdd)) {
+            error = errorMsg.E_NOT_ASSIGNER + usernameToChange;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
-                ${managerToChange}. error: ${error}`);
+                ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        permissions.forEach(permission => userManagerToRemove.addPermission(permission));
+        if (!this.verifyPermissions(permissions)) {
+            error = errorMsg.E_INVALID_PERM;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${usernameToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        permissions.forEach(permission => userManagerToAdd.addPermission(permission));
         return {data: {result: true}};
     }
-
 
     findStoreByName(storeName: string): Store {
         for (const store of this._stores) {
@@ -344,6 +356,10 @@ export class StoreManagement {
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
         return {data: {purchases: receipts}}
+    }
+
+    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
     private getProductsFromRequest(productsReq: ProductReq[]): Product[] {

@@ -323,6 +323,27 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(true);
     });
 
+    test("addManagerPermissions - Failure: invalid permission", () => {
+        const isSuccessVerify: boolean = true;
+        const store: Store = new Store("store-mock");
+        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
+        const storeManager: StoreManager = new StoreManager("storeManager-mock");
+        const permissionToRemove: ManagementPermission = -2;
+        const permissions: ManagementPermission[] = [permissionToRemove];
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getStoreOwner").mockReturnValue(storeOwner);
+        jest.spyOn(store,"getStoreManager").mockReturnValue(storeManager);
+        jest.spyOn(storeOwner,"isAssignerOfManager").mockReturnValue(true);
+
+
+        const actualRes: Res.BoolResponse = storeManagement.removeManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
+        expect(actualRes.data.result).toBe(false);
+        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
+        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
+    });
+
 
     test("addManagerPermissions - Success", () => {
         const isSuccessVerify: boolean = true;
@@ -429,6 +450,26 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
     });
 
+    test("addManagerPermissions - Failure: invalid permission", () => {
+        const isSuccessVerify: boolean = true;
+        const store: Store = new Store("store-mock");
+        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
+        const storeManager: StoreManager = new StoreManager("storeManager-mock");
+        const permissionToRemove: ManagementPermission = -2;
+        const permissions: ManagementPermission[] = [permissionToRemove];
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement,"findStoreByName").mockReturnValue(store);
+        jest.spyOn(store,"getStoreOwner").mockReturnValue(storeOwner);
+        jest.spyOn(store,"getStoreManager").mockReturnValue(storeManager);
+        jest.spyOn(storeOwner,"isAssignerOfManager").mockReturnValue(true);
+
+
+        const actualRes: Res.BoolResponse = storeManagement.addManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
+        expect(actualRes.data.result).toBe(false);
+        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
+        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
+    });
 
 
     test("verifyStoreExists Success", () => {
