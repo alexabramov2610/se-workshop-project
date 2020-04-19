@@ -22,7 +22,7 @@ export interface Bridge {
   addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
   removeProductsFromStore(store: Store, Products: Product[]): DummyTypes.IProductsRemovalResponse;
   viewStore(store: Store): DummyTypes.IStoreResponse;
-  viewItem(item: Item): DummyTypes.IItemResponse;
+  viewProduct(store: Store, product: Product): DummyTypes.IProductResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;
