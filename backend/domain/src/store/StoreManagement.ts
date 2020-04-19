@@ -265,9 +265,9 @@ export class StoreManagement {
         return {data: {purchases: receipts}}
     }
 
-    private getProductsFromRequest(productsReq: ProductReq[]): Product[] {
+    private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
         const products: Product[] = [];
-        for (const productReq of productsReq) {
+        for (const productReq of productsReqs) {
             const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
