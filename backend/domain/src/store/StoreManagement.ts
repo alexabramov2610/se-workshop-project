@@ -1,8 +1,9 @@
 import {Store} from './internal_api'
-import {logger, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
+import {logger, errorMsg, UserRole} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
+import * as Req from "../api-ext/Request";
 import {
     Item as ItemReq,
     Product as ProductReq,

@@ -1,5 +1,5 @@
-import {ProductCategory} from "../../api-ext/CommonInterface";
 import {ProductInfoResponse} from "../../api-ext/Response";
+import {ProductCategory} from "../../api-ext/Enums";
 
 export class Product {
     private readonly _catalogNumber: number;

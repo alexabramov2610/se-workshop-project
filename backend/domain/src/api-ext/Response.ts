@@ -1,6 +1,6 @@
 import {Error} from "../api-int/internal_api";
-import {Item, ProductCatalogNumber, Product, ProductWithQuantity, ProductCategory} from "./CommonInterface";
-import {TradingSystemState} from "./Enums";
+import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
 
 
