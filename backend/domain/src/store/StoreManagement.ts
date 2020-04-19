@@ -71,6 +71,8 @@ export class StoreManagement {
     }
 
     changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
+        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
+            to ${newProductName}`);
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 
         if (!operationValid.data.result)
@@ -85,10 +87,13 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
 
         product.name = newProductName;
+        logger.debug(`changeProductName: successfully changed name`);
         return {data: {result: true}};
     }
 
     changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
+        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
+            to ${newPrice}`);
         const operationValid: BoolResponse = this.verifyStoreOperation(storeName, user);
 
         if (!operationValid.data.result)
@@ -103,6 +108,7 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
 
         product.price = newPrice;
+        logger.debug(`changeProductName: successfully changed price`);
         return {data: {result: true}};
     }
 

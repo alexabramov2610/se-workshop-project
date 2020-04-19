@@ -108,6 +108,8 @@ export {
     LogoutRequest,
     ViewShopPurchasesHistoryRequest,
     RemoveStoreManagerRequest,
-    ViewUsersContactUsMessagesRequest
+    ViewUsersContactUsMessagesRequest,
+    ChangeProductPriceRequest,
+    ChangeProductNameRequest
 };
 
