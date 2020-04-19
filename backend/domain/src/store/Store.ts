@@ -223,13 +223,7 @@ export class Store {
             const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             const productValidator: ProductValidator = this.validateProduct(product);
             if (productValidator.isValid) {
-                const productFromStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
-                if (productFromStore) {
-                    this._products.delete(productFromStore);
-                } else {
-                    logger.warn(`product: ${product.catalogNumber} does not exist in store`)
-                    productsNotRemoved.push(product);
-                }
+                    this._products.delete(product);
             } else {
                 productsNotRemoved.push(product);
             }

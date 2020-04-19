@@ -132,6 +132,7 @@ describe("Store Management Unit Tests", () => {
         expect(resRemove.data.productsNotRemoved.length).toBe(numOfProducts);
     });
 
+
     test("removeProducts failure - all invalid products", () => {
         const numOfProducts: number = 5;
 
