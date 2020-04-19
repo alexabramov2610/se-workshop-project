@@ -62,10 +62,11 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser): BoolResponse {
-        const error: string = !this.verifyStoreExists(storeName) ? errorMsg.E_INVALID_STORE :
-            !this.verifyStoreOwner(storeName, user) ? errorMsg.E_NOT_AUTHORIZED :
-                !this.verifyStoreManager(storeName, user) ? errorMsg.E_NOT_AUTHORIZED : undefined;
-
+        let error:string = undefined;
+        if (!this.verifyStoreExists(storeName))
+            error = errorMsg.E_INVALID_STORE;
+        else if (!this.verifyStoreOwner(storeName, user) && !this.verifyStoreManager(storeName, user))
+             error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
