@@ -1,3 +1,5 @@
+import {ProductCategory} from "./Enums";
+
 export interface Item extends ProductCatalogNumber{
     id: number
 }
@@ -19,11 +21,4 @@ export interface Purchase {
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number
-}
-
-export enum ProductCategory {
-    General,
-    Electronics,
-    Hobbies,
-    Home
 }

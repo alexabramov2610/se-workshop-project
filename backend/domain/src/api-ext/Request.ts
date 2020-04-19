@@ -1,4 +1,5 @@
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {ManagementPermission} from "./Enums";
 
 interface Request {
     body: any;
@@ -76,6 +77,9 @@ interface ViewBuyerPurchasesHistoryRequest extends Request {
 interface StoreInfoRequest extends Request {
     body: { storeName: string }
 }
+interface ChangeManagerPermissionRequest extends Request {
+  body: {managerToChange: string, storeName:string, permissions: ManagementPermission[]}
+}
 
 interface ChangeProductPriceRequest extends Request {
   body:{storeName:string, catalogNumber: number, newPrice: number}
@@ -99,7 +103,7 @@ export {
     OpenStoreRequest,
     ItemsAdditionRequest,
     ItemsRemovalRequest,
-    StoreInfoRequest,
+    StoreInfoRequest, ChangeManagerPermissionRequest,
     RemoveProductsWithQuantity,
     AddProductsRequest,
     ProductRemovalRequest,
