@@ -15,11 +15,11 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest, ts: TS): Res.StoreInfoR
     return ts.viewStoreInfo(req);
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+export const changeProductName = (req: Req.ChangeProductNameRequest, ts: TS): Res.ChangeProductNameResponse => {
    return ts.changeProductName(req);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest, ts: TS): Res.ChangeProductPriceResponse => {
    return ts.changeProductPrice(req);
 }
 
@@ -59,11 +59,11 @@ export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryReque
     return ts.viewStorePurchasesHistory(req);
 }
 
-export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS) : Res.BoolResponse => {
     return ts.removeManagerPermissions(req);
 }
 
-export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS) : Res.BoolResponse => {
     return ts.addManagerPermissions(req);
 }
 
