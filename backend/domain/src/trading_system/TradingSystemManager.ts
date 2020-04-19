@@ -215,8 +215,6 @@ export class TradingSystemManager {
         return this.storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);;
     }
 
-
-
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user) return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}

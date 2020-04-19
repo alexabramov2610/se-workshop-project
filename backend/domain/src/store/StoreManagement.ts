@@ -430,7 +430,6 @@ export class StoreManagement {
             const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
             items.push(item);
         }
-
         return items;
     }
 
