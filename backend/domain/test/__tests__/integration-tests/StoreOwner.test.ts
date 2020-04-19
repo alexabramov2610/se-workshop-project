@@ -3,7 +3,7 @@ import {Store} from "../../../src/store/Store";
 import {StoreOwner} from "../../../src/user/users/StoreOwner";
 import * as Res from "../../../src/api-ext/Response";
 import * as Req from "../../../src/api-ext/Request";
-import {Product as ProductReq, ProductCatalogNumber, ProductCategory, Item as ItemReq} from "../../../src/api-ext/external_api";
+import {Product as ProductReq, Item as ItemReq} from "../../../src/api-ext/external_api";
 import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
 
 describe("Store Owner Integration Tests", () => {
@@ -141,7 +141,6 @@ describe("Store Owner Integration Tests", () => {
         expect(itemsAdditionRes.error).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded.length).toBe(items.length);
-
     });
 
 
