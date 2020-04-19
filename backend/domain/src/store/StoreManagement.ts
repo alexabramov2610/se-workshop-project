@@ -47,8 +47,8 @@ export class StoreManagement {
         return false;
     }
 
-    verifyStore(store: Store) {
-        return store.storeName && store.storeName !== '' && store.UUID && store.UUID !== '';
+    isStoreLegal(store: Store) : boolean {
+        return store.storeName.length > 0 && store.UUID && store.UUID.length > 0;
     }
 
     verifyStoreOwner(storeName: string, user: RegisteredUser): boolean {
@@ -176,7 +176,7 @@ export class StoreManagement {
         if (!store) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
@@ -184,14 +184,14 @@ export class StoreManagement {
         if (!userWhoAssignsOwner) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
         if (store.verifyIsStoreOwner(userToAssign.name)) {   // already store manager
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
@@ -213,7 +213,7 @@ export class StoreManagement {
         if (!store) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
@@ -221,14 +221,14 @@ export class StoreManagement {
         if (!userWhoAssignsOwner) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
         if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${store.UUID}. error: ${error}`);
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
@@ -250,7 +250,7 @@ export class StoreManagement {
         if (!store) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
-                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
@@ -258,7 +258,7 @@ export class StoreManagement {
         if (!userWhoAssignsOwner) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
-                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
@@ -266,7 +266,7 @@ export class StoreManagement {
         if (!userOwnerToRemove) {   // not store owner
             error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
-                ${userToRemove.name} as an owner in store: ${store.UUID}. error: ${error}`);
+                ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
@@ -416,13 +416,11 @@ export class StoreManagement {
     }
 
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
-
         const products: Product[] = [];
         for (const productReq of productsReqs) {
             const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
-
         return products;
     }
 
