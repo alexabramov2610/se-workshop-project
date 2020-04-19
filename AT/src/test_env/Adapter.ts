@@ -56,9 +56,9 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  logout(userName: string): DummyTypes.IResponse {
+  logout(): DummyTypes.IResponse {
     const { data, error } = ServiceFacade.logoutUser(
-      wrapWithToken({ username: userName })
+      wrapWithToken({})
     );
     return error
       ? { data: undefined, error: error }

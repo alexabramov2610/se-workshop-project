@@ -82,8 +82,8 @@ const Proxy: Bridge = {
     return real.login ? real.login(credentials) : DummyValues.Response;
   },
 
-  logout(userName: string) {
-    return real.logout ? real.logout(userName) : DummyValues.Response;
+  logout() {
+    return real.logout ? real.logout() : DummyValues.Response;
   },
 
   getPurchaseHistory() {

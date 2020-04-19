@@ -31,7 +31,7 @@ describe("Guest watch cart, UC: 2.7", () => {
         _serviceBridge.addProductsToStore(_testStore1, [_testProduct1]);
         _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
 
-        //TODO:: logout after change in domain
+        _serviceBridge.logout();
     });
 
     test("Non empty cart", () => {
