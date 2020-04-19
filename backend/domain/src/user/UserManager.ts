@@ -60,13 +60,12 @@ class UserManager {
     }
 
     logout(req: LogoutRequest): BoolResponse {
-        const username = req.body.username;
-        logger.debug(`logging out ${username}  `);
-        if (!this.isLoggedIn(username)) { // user not logged in
-            logger.warn(`logging out ${username} fail, user is not logged in  `);
-            return {data: {result: false}, error: {message: errorMsg.E_AL}}
+        const user:RegisteredUser = this.getLoggedInUserByToken(req.token);
+        if (!user) { // user not logged in
+            logger.warn(`logging out fail, user is not logged in  `);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         } else {
-            logger.debug(`logging out ${username} success`);
+            logger.debug(`logging out ${user.name} success`);
             this.loggedInUsers.delete(req.token)
             return {data: {result: true}}
         }

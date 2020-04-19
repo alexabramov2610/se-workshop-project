@@ -12,6 +12,11 @@ export interface Product extends ProductCatalogNumber {
     category: ProductCategory
 }
 
+export interface Purchase {
+    item: Item,
+    price: number;
+}
+
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number
 }
