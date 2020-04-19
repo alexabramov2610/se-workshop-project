@@ -1,5 +1,12 @@
 import {Store} from './internal_api'
-import {logger, BoolResponse, errorMsg, UserRole, ManagementPermission} from '../api-int/internal_api'
+import {
+    logger,
+    BoolResponse,
+    errorMsg,
+    UserRole,
+    ManagementPermission,
+    ProductInfoResponse, ProductInfoRequest
+} from '../api-int/internal_api'
 import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
@@ -253,6 +260,17 @@ export class StoreManagement {
         }
 
     }
+
+    viewProductInfo(req:ProductInfoRequest):BoolResponse {
+        const store = this.findStoreByName(req.body.storeName);
+        const product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        if (product) {
+            return product.viewProductInfo()
+        } else {
+            return {data: {result: false}}
+        }
+    }
+
 
     viewStorePurchaseHistory(user: RegisteredUser, shopName: string): Res.ViewShopPurchasesHistoryResponse {
         const store: Store = this.findStoreByName(shopName);

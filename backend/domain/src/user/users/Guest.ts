@@ -1,5 +1,6 @@
+import {User} from "./User";
 
-export class Guest {
+export class Guest extends User{
 
-    //CART
+    
 }

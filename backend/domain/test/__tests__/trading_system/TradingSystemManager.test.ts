@@ -1,18 +1,21 @@
 import {Store, StoreManagement} from "../../../src/store/internal_api";
 import * as Res from "../../../src/api-ext/Response";
-import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
-import { TradingSystemManager } from "../../../src/trading_system/TradingSystemManager";
+import {RegisteredUser, StoreOwner} from "../../../src/user/internal_api";
+import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
 import {Item, Product} from "../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from '../../../src/external_systems/ExternalSystemsManager'
 import {UserManager} from '../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
 import * as Req from "../../../src/api-ext/Request";
+import {SaveToCartRequest} from "../../../src/api-ext/Request";
 import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
+
 jest.mock('../../../src/user/UserManager');
 jest.mock('../../../src/store/StoreManagement');
 jest.mock('../../../src/external_systems/ExternalSystemsManager');
 jest.mock('../../../src/user/UserManager');
+
 
 describe("Store Management Unit Tests", () => {
     let tradingSystemManager: TradingSystemManager;
@@ -533,6 +536,69 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+
+    test("saveProductToCart seccess test",()=>{
+        prepareMockToSaveProduct()
+        tradingSystemManager = new TradingSystemManager();
+        const p:Product=new Product('prod',12,5,ProductCategory.Home)
+        jest.spyOn(store,'productInStock').mockReturnValueOnce(true);
+        jest.spyOn(store,'getProductByCatalogNumber').mockReturnValueOnce(p)
+
+        const req:SaveToCartRequest={body:{storeName:store.storeName,catalogNumber:1},token:'whatever'}
+        const res=tradingSystemManager.saveProductToCart(req);
+
+        expect(user.cart).toEqual([p]);
+        expect(res.data.result).toBeTruthy()
+
+    })
+
+    test("saveProductToCart fail-not in stock test",()=>{
+        prepareMockToSaveProduct()
+        tradingSystemManager = new TradingSystemManager();
+        const p:Product=new Product('prod',12,5,ProductCategory.Home)
+        jest.spyOn(store,'productInStock').mockReturnValueOnce(false);
+        jest.spyOn(store,'getProductByCatalogNumber').mockReturnValueOnce(p)
+
+        const req:SaveToCartRequest={body:{storeName:store.storeName,catalogNumber:1},token:'whatever'}
+        const res=tradingSystemManager.saveProductToCart(req);
+
+        expect(user.cart.length).toEqual(0);
+        expect(res.data.result).toBeFalsy()
+
+    })
+
+    test("saveProductToCart fail-not such product test",()=>{
+        prepareMockToSaveProduct()
+        tradingSystemManager = new TradingSystemManager();
+        const p:Product=new Product('prod',12,5,ProductCategory.Home)
+        jest.spyOn(store,'productInStock').mockReturnValueOnce(false);
+
+        const req:SaveToCartRequest={body:{storeName:store.storeName,catalogNumber:p.catalogNumber},token:'whatever'}
+        const res=tradingSystemManager.saveProductToCart(req);
+
+        expect(user.cart.length).toEqual(0);
+        expect(res.data.result).toBeFalsy()
+
+    })
+
+
+
+    function prepareMockToSaveProduct(){
+        mocked(UserManager).mockImplementation(() :any => {
+            return {
+                getUserByToken: () => user
+            }
+        });
+
+
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return { findStoreByName: () => store}
+        });
+
+
+
+
+    }
 
     function prepereMocksForCreateStore(succ: boolean){
         const getUserByToken: RegisteredUser= new RegisteredUser("tal","tal123");

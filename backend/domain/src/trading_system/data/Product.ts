@@ -1,4 +1,5 @@
 import {ProductCategory} from "../../api-ext/CommonInterface";
+import {ProductInfoResponse} from "../../api-ext/Response";
 
 export class Product {
     private readonly _catalogNumber: number;
@@ -13,6 +14,10 @@ export class Product {
         this._price = price;
     }
 
+    viewProductInfo():ProductInfoResponse{
+        return{  data:{result:true, info:{name:this.name,catalogNumber:this.catalogNumber,price:this.price,catagory:this._category}}
+        }
+    }
 
 
     set price(price: number) {

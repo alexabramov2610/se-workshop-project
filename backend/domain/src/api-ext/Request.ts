@@ -74,7 +74,15 @@ interface StoreInfoRequest extends Request{
   body:{storeName:string}
 }
 
+interface ProductInfoRequest extends Request{
+  body:{storeName:string,catalogNumber:number}
+}
+
+interface SaveToCartRequest extends Request{
+  body:{catalogNumber:number,storeName:string}
+}
+
 export {RemoveStoreOwnerRequest, Request,AssignStoreOwnerRequest, SetAdminRequest, AssignStoreManagerRequest,
   OpenStoreRequest, ItemsAdditionRequest, ItemsRemovalRequest, StoreInfoRequest,
-  RemoveProductsWithQuantity, AddProductsRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,LogoutRequest,ViewShopPurchasesHistoryRequest,RemoveStoreManagerRequest};
+  RemoveProductsWithQuantity, AddProductsRequest,ProductInfoRequest, ProductRemovalRequest,RegisterRequest,LoginRequest ,SaveToCartRequest,LogoutRequest,ViewShopPurchasesHistoryRequest,RemoveStoreManagerRequest};
 

@@ -1,5 +1,5 @@
 import {RegisteredUser, UserManager} from "../user/internal_api";
-import {StoreManagement} from '../store/internal_api';
+import {Store, StoreManagement} from '../store/internal_api';
 import * as Res from "../api-ext/Response"
 import * as Req from "../api-ext/Request"
 import {errorMsg} from "../api-int/Error";
@@ -13,6 +13,8 @@ import {TradingSystemState} from "../api-ext/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {BoolResponse} from "../api-ext/Response";
+import {mocked} from "ts-jest/utils";
+import {ProductInfoRequest} from "../api-ext/Request";
 
 export class TradingSystemManager {
     private userManager: UserManager;
@@ -169,4 +171,32 @@ export class TradingSystemManager {
     viewStoreInfo(req:Req.StoreInfoRequest){
         return this.storeManager.viewStoreInfo(req.body.storeName);
     }
+
+    // getUserByToken(token:string):User{
+    //    return this.userManager.getUserByToken(token);
+    // }
+    //
+    // findStoreByName(storeName:string):Store{
+    //     return this.storeManager.findStoreByName(storeName);
+    // }
+
+    viewProductInfo(req:ProductInfoRequest):BoolResponse {
+        return this.storeManager.viewProductInfo(req);
+    }
+
+    saveProductToCart(req:Req.SaveToCartRequest):Res.BoolResponse{
+        logger.info(`saving product: ${req.body.catalogNumber} to ${req.token}  cart `)
+        const user=this.userManager.getUserByToken(req.token);
+        const store=this.storeManager.findStoreByName(req.body.storeName);
+        if(store.productInStock(req.body.catalogNumber)){
+            logger.info(` product: ${req.body.catalogNumber} added to ${req.token}  cart `)
+            user.addProductToCart(store.getProductByCatalogNumber(req.body.catalogNumber));
+            return {data:{result:true}}
+        }
+        return {data:{result:false},error:{message:errorMsg['E_NF']}}
+
+
+    }
+
+
 }

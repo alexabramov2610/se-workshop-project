@@ -30,7 +30,7 @@ export class Store {
         this._receipts = [];
     }
 
-    private getProductByCatalogNumber(catalogNumber: number): Product {
+     getProductByCatalogNumber(catalogNumber: number): Product {
         logger.debug(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this._products.keys()) {
             if (product.catalogNumber === catalogNumber) {
@@ -277,7 +277,6 @@ export class Store {
         return {data: {result: true, info: {storeName: this.storeName, storeOwnersNames: this._storeOwners.map((owner)=> owner.name), productNames}}}
     }
 
-
     setFirstOwner(user: RegisteredUser): void {
         this._storeOwners.push(new StoreOwner(user.name));
     }
@@ -312,6 +311,15 @@ export class Store {
         this._storeOwners = this._storeOwners.filter(currOwner => currOwner.name !== storeManagerToRemove.name)
         return { data: { result:true}};
     }
+
+    productInStock(catalogNumber:number):boolean{
+        const product=this.getProductByCatalogNumber(catalogNumber)
+        if(product) {
+            return this.products.get(product).length > 0;
+        }
+        return false;
+    }
+
 
     get storeName(): string {
         return this._storeName;

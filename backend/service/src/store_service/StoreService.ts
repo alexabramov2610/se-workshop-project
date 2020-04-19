@@ -1,6 +1,8 @@
 import {getInstance, CreateInstance} from "domain_layer/dist/src/api-ext/external_api";
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
+import {ProductInfoRequest} from "domain_layer/src/api-ext/Request";
+import {BoolResponse} from "domain_layer/src/api-ext/Response";
 
 let tradingSystem = getInstance();
 export const createStore = (createStoreReq: Req.OpenStoreRequest): Res.BoolResponse => {
@@ -14,6 +16,10 @@ export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionRespon
 
 export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse => {
     return tradingSystem.viewStoreInfo(req);
+}
+
+export const viewProductInfo = (req:ProductInfoRequest):BoolResponse => {
+    return tradingSystem.viewProductInfo(req);
 }
 
 export const removeItems = (req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse => {
