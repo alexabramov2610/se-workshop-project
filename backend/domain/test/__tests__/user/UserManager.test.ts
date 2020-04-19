@@ -76,13 +76,14 @@ describe("RegisteredUser Management Unit Tests", () => {
 
     test("logout Success Test", () => {
         jest.spyOn(userManager,"isLoggedIn").mockReturnValue(true);
-        const res: Responses.BoolResponse = userManager.logout({body: {username: 'ron'}, token: "token"})
+        jest.spyOn(userManager,"getLoggedInUserByToken").mockReturnValue(new RegisteredUser("ron", "ron123"));
+        const res: Responses.BoolResponse = userManager.logout({body:{}, token: "token"})
         expect(res.data.result).toBeTruthy();
     });
 
     test("logout already out fail Test", () => {
-        jest.spyOn(userManager,"getLoggedInUsers").mockReturnValue([new RegisteredUser('bob','1111111')]);
-        const res: Responses.BoolResponse = userManager.logout({body: {username: 'ron'}, token: "token"})
+        jest.spyOn(userManager,"getLoggedInUserByToken").mockReturnValue(undefined);
+        const res: Responses.BoolResponse = userManager.logout({body: {}, token: "token"})
         expect(res.data.result).toBeFalsy();
     });
 
@@ -127,7 +128,7 @@ describe("RegisteredUser Management Unit Tests", () => {
     });
 
 
-    //TODO: fix setUserRole tests
+    // TODO: fix setUserRole tests
 
     // test("setUserRole - Owner, logged in - Success", () => {
     //     const isLoggedIn: boolean = true;
