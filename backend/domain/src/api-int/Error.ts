@@ -32,7 +32,9 @@ const errorMsg:ErrorMessages = {
     E_INVALID_PROD: "Invalid product.",
     E_PERMISSION: "This manager dont have this permission.",
     E_INVALID_PERM: "Invalid permissions.",
-    E_NOT_ASSIGNER: "Not assigner of user "
+    E_NOT_ASSIGNER: "Not assigner of user ",
+    E_STOCK: "This product not in stock."
+
 
 
 

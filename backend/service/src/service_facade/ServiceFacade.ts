@@ -116,6 +116,12 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
     return runIfOpen(req, StoreService.addManagerPermissions);
 }
+export const saveProductToCart = (req:Req.SaveToCartRequest): Res.BoolResponse=>{
+    return runIfOpen(req,UserService.saveProductToCart);
+}
+export const viewProductInfo=(req:Req.ProductInfoRequest):Res.BoolResponse =>{
+    return runIfOpen(req,StoreService.viewProductInfo);
+}
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
     return runIfOpen(req, StoreService.viewStorePurchasesHistory);
@@ -125,9 +131,12 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
     return runIfOpen(req, StoreService.viewUsersContactUsMessages);
 }
 
+
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
     if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
         return { data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
 }
+
+
