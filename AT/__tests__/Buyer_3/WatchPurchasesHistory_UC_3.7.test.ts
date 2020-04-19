@@ -1,4 +1,4 @@
-import { Bridge, Driver, Item, CreditCard, Product } from "../..";
+import { Bridge, Driver, Item, CreditCard, Product, Store } from "../..";
 import { ProductBuilder } from "../mocks/builders/product-builder";
 
 describe("Watch Purchases History, UC: 3.7", () => {
@@ -7,7 +7,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
   let _driver: Driver;
   let _item: Item;
   let _prodct: Product;
-
+  let _store: Store;
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
@@ -15,13 +15,14 @@ describe("Watch Purchases History, UC: 3.7", () => {
       .startSession()
       .registerWithDefaults()
       .loginWithDefaults();
+    _store = { name: "stor-e-tell" };
     _serviceBridge = _driver.getBridge();
     _prodct = new ProductBuilder().getProduct();
     _item = { id: 123, catalogNumber: _prodct.catalogNumber };
   });
 
   test("Happy Path: logged in user with history", () => {
-    _serviceBridge.addToCart(_prodct);
+    _serviceBridge.addToCart(_store, _prodct);
     const { data } = _serviceBridge.checkout(_testCreditCard);
     expect(data).toBeDefined();
     const latestBuy = _serviceBridge
@@ -36,7 +37,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
   });
 
   test("Sad Path: not-logged in user", () => {
-    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _serviceBridge.logout();
     const error = _serviceBridge.getPurchaseHistory().error;
     expect(error).toBeDefined();
   });

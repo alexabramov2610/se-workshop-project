@@ -42,7 +42,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   test("Add product - Sad Path: add product to new store user logged out", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
-    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _serviceBridge.logout();
     const productToAdd = new ProductBuilder().getProduct();
     const resErrorProduct = _serviceBridge.addProductsToStore(
       _storeInformation,
@@ -54,7 +54,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   test("Add product - Sad Path: add product to new store user doesnt have permissions", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
-    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _serviceBridge.logout();
     const newUser: Credentials = {
       userName: "fakeUser",
       password: "fakePwd123",
@@ -90,7 +90,6 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       [productToAdd]
     ).data;
     expect(removeResult).toBe(true);
-
   });
 
   xtest("Remove product - Happy Path: remove existing product user logged out", () => {
