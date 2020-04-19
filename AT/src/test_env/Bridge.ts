@@ -27,7 +27,7 @@ export interface Bridge {
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;
   register(credentials: Credentials): DummyTypes.IResponse;
-  logout(userName: string): DummyTypes.IResponse;
+  logout(): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
   search(input: SearchData): DummyTypes.ISearchResponse;
   rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
