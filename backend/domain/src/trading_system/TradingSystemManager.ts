@@ -64,9 +64,28 @@ export class TradingSystemManager {
         return res;
     }
 
+    changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
+        logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);;
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.changeProductName(user, req.body.catalogNumber ,req.body.storeName, req.body.newName);
+    }
+
+    changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
+        logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);;
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return  {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
+    }
+
+
     addItems(req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse {
         logger.info(`trying to add items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return  {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         if (!user) return {
             data: {result: false, itemsNotAdded: req.body.items},
             error: {message: errorMsg.E_NOT_AUTHORIZED}
@@ -179,6 +198,24 @@ export class TradingSystemManager {
     viewStoreInfo(req: Req.StoreInfoRequest) {
         return this.storeManager.viewStoreInfo(req.body.storeName);
     }
+
+    removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+        logger.info(`trying to remove user: ${req.body.managerToChange} permissions`);
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);;
+    }
+
+    addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+        logger.info(`trying to add user: ${req.body.managerToChange} permissions`);
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this.storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);;
+    }
+
+
 
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)

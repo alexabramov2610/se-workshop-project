@@ -3,10 +3,10 @@ import * as Res from "../api-ext/Response"
 import {errorMsg as Error} from "../api-int/Error"
 import {logger} from "../api-int/Logger";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
-import {ManagementPermission} from "../api-int/Enums";
 import {v4 as uuid} from 'uuid';
 import {ProductCatalogNumber, Product as ProductReq, ProductWithQuantity} from "../api-ext/CommonInterface";
 import {Receipt, ContactUsMessage} from "../trading_system/internal_api";
+import {ManagementPermission} from "../api-ext/Enums";
 
 interface ProductValidator {
     isValid: boolean,
@@ -31,7 +31,7 @@ export class Store {
         this._receipts = [];
     }
 
-    private getProductByCatalogNumber(catalogNumber: number): Product {
+    getProductByCatalogNumber(catalogNumber: number): Product {
         logger.debug(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this._products.keys()) {
             if (product.catalogNumber === catalogNumber) {

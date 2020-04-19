@@ -65,6 +65,14 @@ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.logoutUser)
 }
 
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+    return runIfOpen(req, StoreService.changeProductName);
+}
+
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+    return runIfOpen(req, StoreService.changeProductPrice);
+}
+
 export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
     return runIfOpen(req, StoreService.addItems);
 }
@@ -101,7 +109,13 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest): Res.Bool
     return runIfOpen(req, StoreService.removeStoreManager);
 }
 
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeManagerPermissions);
+}
 
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+    return runIfOpen(req, StoreService.addManagerPermissions);
+}
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
     return runIfOpen(req, StoreService.viewStorePurchasesHistory);
@@ -113,10 +127,7 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN) return {
-        data: {},
-        error: {message: "Trading system is closed!"}
-    }
+    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
+        return { data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
-
 }
