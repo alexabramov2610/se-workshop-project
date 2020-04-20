@@ -12,15 +12,17 @@ import {
 } from "../api-ext/CommonInterface";
 import {Receipt} from "../trading_system/data/Receipt";
 import {ManagementPermission} from "../api-ext/Enums";
+import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 
 export class StoreManagement {
 
     private _stores: Store[];
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
+    private _externalSystems: ExternalSystemsManager;
 
-
-    constructor() {
+    constructor(externalSystems: ExternalSystemsManager) {
+        this._externalSystems = externalSystems;
         this._stores = [];
         this._storeManagerAssigners = new Map();
         this._storeOwnerAssigners = new Map();
@@ -48,7 +50,7 @@ export class StoreManagement {
         return false;
     }
 
-    isStoreLegal(store: Store) : boolean {
+    isStoreLegal(store: Store): boolean {
         return store.storeName.length > 0 && store.UUID && store.UUID.length > 0;
     }
 
@@ -63,11 +65,11 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser): Res.BoolResponse {
-        let error:string;
+        let error: string;
         if (!this.verifyStoreExists(storeName))
             error = errorMsg.E_INVALID_STORE;
         else if (!this.verifyStoreOwner(storeName, user) && !this.verifyStoreManager(storeName, user))
-             error = errorMsg.E_NOT_AUTHORIZED;
+            error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -92,7 +94,7 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
-    changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number):Res.BoolResponse => {
+    changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
@@ -277,7 +279,7 @@ export class StoreManagement {
         return additionRes;
     }
 
-    removeManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
+    removeManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]): Res.BoolResponse => {
         logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange}
          in store ${storeName}`)
         let error: string;
@@ -324,7 +326,7 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
-    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]) : Res.BoolResponse => {
+    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]): Res.BoolResponse => {
         logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to add permissions from user: ${usernameToChange}
          in store ${storeName}`)
         let error: string;
@@ -401,7 +403,7 @@ export class StoreManagement {
         return {data: {receipts}}
     }
 
-    viewProductInfo(req:Req.ProductInfoRequest):Res.BoolResponse {
+    viewProductInfo(req: Req.ProductInfoRequest): Res.BoolResponse {
         const store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
@@ -412,7 +414,8 @@ export class StoreManagement {
             return {data: {result: false}}
         }
     }
-    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+
+    private verifyPermissions(permissions: ManagementPermission[]): boolean {
         return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 

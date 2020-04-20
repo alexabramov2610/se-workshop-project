@@ -6,14 +6,18 @@ import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import * as Req from "../api-ext/Request";
 import * as Res from "../api-ext/Response";
+import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
+import has = Reflect.has;
 
 class UserManager {
     private registeredUsers: RegisteredUser[];
     private loggedInUsers: Map<string, RegisteredUser>;
     private guests: Map<string, Guest>;
     private admins: Admin[];
+    private _externalSystems: ExternalSystemsManager;
 
-    constructor() {
+    constructor(externalSystems: ExternalSystemsManager) {
+        this._externalSystems = externalSystems;
         this.registeredUsers = [];
         this.loggedInUsers = new Map<string, RegisteredUser>();
         this.guests = new Map<string, Guest>();
@@ -23,6 +27,7 @@ class UserManager {
     register(req: RegisterRequest): BoolResponse {
         const userName = req.body.username;
         const password = req.body.password;
+        const hashed = this._externalSystems.securitySystem.encryptPassword(password);
         // user already in system
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
@@ -31,7 +36,7 @@ class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         } else {
             logger.debug(`${userName} has registered to the system `);
-            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, password)]);
+            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
             return {data: {result: true}};
         }
     }
@@ -43,7 +48,7 @@ class UserManager {
         if (!user) {
             logger.warn(`fail to login ,${userName} not found `);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
-        } else if (!this.verifyPassword(userName, password)) {
+        } else if (!this.verifyPassword(userName, password, user.password)) {
             logger.warn(`fail to login ${userName} ,bad password `);
             return {data: {result: false}, error: {message: errorMsg.E_BP}} // bad pass
         } else if (this.isLoggedIn(userName)) { // already logged in
@@ -72,8 +77,8 @@ class UserManager {
         }
     }
 
-    verifyPassword(userName: string, password: string): boolean {
-        return true  // to implement with sequrity ..
+    verifyPassword(userName: string, password: string, hashed:string): boolean {
+        return this._externalSystems.securitySystem.comparePassword(password,hashed);
     }
 
     isValidPassword(password: string) {

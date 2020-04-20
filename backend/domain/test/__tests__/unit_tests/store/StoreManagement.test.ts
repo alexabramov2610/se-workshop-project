@@ -12,12 +12,13 @@ import {
 import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory} from "../../../../src/api-ext/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
+import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
     beforeEach(() => {
-        storeManagement = new StoreManagement();
+        storeManagement = new StoreManagement(new ExternalSystemsManager());
     });
 
 

@@ -532,7 +532,7 @@ describe("Store Management Unit Tests", () => {
             token: mockToken,
             body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}
         };
-        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+        const res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -577,7 +577,7 @@ describe("Store Management Unit Tests", () => {
             token: mockToken,
             body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}
         };
-        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+        const res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -616,7 +616,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -629,7 +629,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
 
         expect(res.data.result).toBeFalsy();
     });
@@ -653,7 +653,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -666,7 +666,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
 
         expect(res.data.result).toBeFalsy();
     });
