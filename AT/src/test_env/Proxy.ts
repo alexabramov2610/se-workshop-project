@@ -142,11 +142,15 @@ const Proxy: Bridge = {
   },
 
   assignManager(store: Store, credentials: Credentials): IResponse {
-    return undefined;
+    return real.assignManager
+        ? real.assignManager(store, credentials)
+        : DummyValues.Response;
   },
 
-  grantPermission(credentials: Credentials, permission: PERMISSION): IResponse {
-    return undefined;
+  grantPermissions(credentials: Credentials, store: Store, permission: PERMISSION[]): IResponse {
+    return real.grantPermissions
+        ? real.grantPermissions(credentials, store, permission)
+        : DummyValues.Response;
   },
 
   addProductsToStore(store: Store, products: Product[]): IResponse {
