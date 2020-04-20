@@ -194,8 +194,9 @@ export class TradingSystemManager {
     }
 
     viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
+        logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {data: {receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (!user) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewShopPurchasesHistoryResponse = this.storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
     }

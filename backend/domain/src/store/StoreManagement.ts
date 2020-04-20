@@ -393,13 +393,13 @@ export class StoreManagement {
 
     viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
         const store: Store = this.findStoreByName(storeName);
-        if (!store) return {data: {receipts: []}, error: {message: errorMsg.E_NF}}
+        if (!store) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
         if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN)) return {
-            data: {receipts: []},
+            data: {result: false, receipts: []},
             error: {message: errorMsg.E_PERMISSION}
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {receipts}}
+        return {data: {result: true, receipts: receipts}}
     }
 
     viewProductInfo(req:Req.ProductInfoRequest):Res.BoolResponse {
