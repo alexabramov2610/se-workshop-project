@@ -412,9 +412,6 @@ export class StoreManagement {
             return {data: {result: false}}
         }
     }
-    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
-        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
-    }
 
     viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
         const store: Store = this.findStoreByName(storeName);
@@ -443,6 +440,10 @@ export class StoreManagement {
             items.push(item);
         }
         return items;
+    }
+
+    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
 
