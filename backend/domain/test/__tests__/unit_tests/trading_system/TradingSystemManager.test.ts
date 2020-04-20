@@ -754,7 +754,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("Create store success", () => {
-        prepereMocksForStoreManagment(true);
+        prepareMocksForStoreManagement(true);
         const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
@@ -763,7 +763,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("Create store failure", () => {
-        prepereMocksForStoreManagment(false);
+        prepareMocksForStoreManagement(false);
         const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
@@ -772,7 +772,7 @@ describe("Store Management Unit Tests", () => {
 
     test("viewStorePurchasesHistory success", () => {
         prepereMocksForLoggedinUser(true);
-        prepereMocksForStoreManagment(true);
+        prepareMocksForStoreManagement(true);
         const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewShopPurchasesHistoryResponse = tradingSystemManager.viewStorePurchasesHistory(req);
@@ -781,7 +781,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("viewStorePurchasesHistory failure", () => {
-        prepereMocksForStoreManagment(false);
+        prepareMocksForStoreManagement(false);
         prepereMocksForLoggedinUser(false);
         const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
@@ -791,7 +791,7 @@ describe("Store Management Unit Tests", () => {
 
     test("viewUsersContactUsMessages success", () => {
         prepereMocksForLoggedinUser(true);
-        prepereMocksForStoreManagment(true);
+        prepareMocksForStoreManagement(true);
         const req: Req.ViewUsersContactUsMessagesRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewUsersContactUsMessagesResponse = tradingSystemManager.viewUsersContactUsMessages(req);
@@ -800,7 +800,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("viewUsersContactUsMessages failure", () => {
-        prepereMocksForStoreManagment(false);
+        prepareMocksForStoreManagement(false);
         prepereMocksForLoggedinUser(false);
         const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
@@ -886,11 +886,12 @@ describe("Store Management Unit Tests", () => {
 
     }
 
-    function prepereMocksForStoreManagment(succ: boolean) {
+    function prepareMocksForStoreManagement(succ: boolean) {
         const createStoreRes: Res.BoolResponse = {data: {result: succ}};
         const item: Item = new Item(5, 10);
         const viewShopPurchasesHistoryResponse: Res.ViewShopPurchasesHistoryResponse = {
             data: {
+                result: succ,
                 receipts: succ ? [new Receipt([{
                     item,
                     price: 30
