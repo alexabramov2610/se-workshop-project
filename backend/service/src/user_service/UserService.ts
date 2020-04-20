@@ -18,3 +18,7 @@ export const logoutUser = (req: Req.LogoutRequest, ts: TS): Res.BoolResponse => 
  export const saveProductToCart = (req:Req.SaveToCartRequest,ts: TS):Res.BoolResponse =>{
     return ts.saveProductToCart(req);
 }
+
+export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq,ts: TS): Res.ViewRUserPurchasesHistoryRes => {
+    return ts.viewRegisteredUserPurchasesHistory(req);
+}

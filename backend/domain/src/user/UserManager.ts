@@ -77,8 +77,8 @@ class UserManager {
         }
     }
 
-    verifyPassword(userName: string, password: string, hashed:string): boolean {
-        return this._externalSystems.securitySystem.comparePassword(password,hashed);
+    verifyPassword(userName: string, password: string, hashed: string): boolean {
+        return this._externalSystems.securitySystem.comparePassword(password, hashed);
     }
 
     isValidPassword(password: string) {
@@ -193,6 +193,10 @@ class UserManager {
 
     addProductToCart(user: User, product: Product): void {
         user.addProductToCart(product);
+    }
+
+    viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
+        return {data: {receipts: user.receipts}}
     }
 }
 
