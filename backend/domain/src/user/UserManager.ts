@@ -28,7 +28,6 @@ class UserManager {
         const userName = req.body.username;
         const password = req.body.password;
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-        // user already in system
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
             return {data: {result: false}, error: {message: errorMsg.E_BU}}
