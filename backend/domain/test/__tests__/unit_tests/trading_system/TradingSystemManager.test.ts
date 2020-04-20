@@ -789,6 +789,25 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.receipts).toHaveLength(0)
     });
 
+    test("viewRegisteredUserPurchasesHistory success", () => {
+        prepereMocksForLoggedinUser(true);
+        prepareMocksForStoreManagement(true);
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(1);
+
+    });
+
+    test("viewRegisteredUserPurchasesHistory failure", () => {
+        prepareMocksForStoreManagement(false);
+        prepereMocksForLoggedinUser(false);
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(0)
+    });
+
     test("viewUsersContactUsMessages success", () => {
         prepereMocksForLoggedinUser(true);
         prepareMocksForStoreManagement(true);
@@ -810,12 +829,25 @@ describe("Store Management Unit Tests", () => {
 
     function prepereMocksForLoggedinUser(succ: boolean) {
         const getUserByToken: RegisteredUser = new RegisteredUser("tal", "tal123");
+        const item: Item = new Item(5, 10);
+        const viewRUserPurchasesHistoryRes: Res.ViewRUserPurchasesHistoryRes = {
+            data: {
+                result: succ,
+                receipts: succ ? [new Receipt([{
+                    item,
+                    price: 30
+                }])] : []
+            }
+        };
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getLoggedInUserByToken: () => getUserByToken,
                 isLoggedIn: () => succ,
                 addProductToCart: (u: User, product: Product) => {
-                    u.addProductToCart(product);
+                    return 5+5
+                },
+                viewRegisteredUserPurchasesHistory: () =>{
+                    return viewRUserPurchasesHistoryRes
                 }
             }
         });

@@ -13,6 +13,7 @@ const errorMsg:ErrorMessages = {
     E_CON: "Connection failed",
     E_AL: "Already at this state",
     E_BU: "The username is already taken.",
+    E_BAD_OPERATION: "This operation is not allowed in this user state.",
     E_NA: "This user is not an Admin.",
     E_BP: "Bad Password",
     E_NAL: "User is not at that state.",

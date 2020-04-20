@@ -45,6 +45,11 @@ export class TradingSystemManager {
 
     register(req: Req.RegisterRequest): Res.BoolResponse {
         logger.info(`registering new user: ${req.body.username} `);
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        if (user) {
+            logger.debug(`logged in user cant register `);
+            return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}};
+        }
         const res = this._userManager.register(req);
         return res;
     }
@@ -256,6 +261,20 @@ export class TradingSystemManager {
         logger.debug(` product: ${req.body.catalogNumber} added to ${req.token}  cart `)
         this._userManager.addProductToCart(user, product);
         return {data: {result: true}}
+    }
+
+    viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
+        if (!userToView)
+            return {data: {result: false ,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const isAdminReq: boolean = req.body.userName && user.role === UserRole.ADMIN;
+        if (userToView.name !== user.name && !isAdminReq)
+            return {data: {result: false,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
+        return res;
     }
 
 

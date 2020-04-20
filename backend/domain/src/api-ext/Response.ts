@@ -59,7 +59,9 @@ interface ProductInfoResponse extends Response{
 
 }
 
-
+interface ViewRUserPurchasesHistoryRes extends Response{
+    data:{result:boolean, receipts: Receipt[]}
+}
 
 export {
     Response,
@@ -73,6 +75,7 @@ export {
     TradingSystemStateResponse,
     ViewShopPurchasesHistoryResponse,
     ProductInfoResponse,
-    ViewUsersContactUsMessagesResponse
+    ViewUsersContactUsMessagesResponse,
+    ViewRUserPurchasesHistoryRes
 };
 

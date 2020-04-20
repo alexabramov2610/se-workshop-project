@@ -28,7 +28,6 @@ class UserManager {
         const userName = req.body.username;
         const password = req.body.password;
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-        // user already in system
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
             return {data: {result: false}, error: {message: errorMsg.E_BU}}
@@ -77,8 +76,8 @@ class UserManager {
         }
     }
 
-    verifyPassword(userName: string, password: string, hashed:string): boolean {
-        return this._externalSystems.securitySystem.comparePassword(password,hashed);
+    verifyPassword(userName: string, password: string, hashed: string): boolean {
+        return this._externalSystems.securitySystem.comparePassword(password, hashed);
     }
 
     isValidPassword(password: string) {
@@ -193,6 +192,10 @@ class UserManager {
 
     addProductToCart(user: User, product: Product): void {
         user.addProductToCart(product);
+    }
+
+    viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
+        return {data: {result: true, receipts: user.receipts}}
     }
 }
 
