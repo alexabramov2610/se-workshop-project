@@ -1,7 +1,7 @@
-import * as Responses from "../../../src/api-int/internal_api";
-import {logger, UserRole} from "../../../src/api-int/internal_api";
-import {UserManager} from "../../../src/user/UserManager";
-import {RegisteredUser, StoreManager} from "../../../src/user/internal_api";
+import * as Responses from "../../../../src/api-int/internal_api";
+import {logger, UserRole} from "../../../../src/api-int/internal_api";
+import {UserManager} from "../../../../src/user/UserManager";
+import {RegisteredUser, StoreManager} from "../../../../src/user/internal_api";
 import exp from "constants";
 
 describe("RegisteredUser Management Unit Tests", () => {

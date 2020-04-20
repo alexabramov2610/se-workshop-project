@@ -89,6 +89,10 @@ export class Store {
         return undefined;
     }
 
+    private containsItem(product: Product, item: Item): boolean {
+        return this._products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
+    }
+
     addItems(items: Item[]): Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
         const addedItems: Item[] = [];
@@ -98,7 +102,7 @@ export class Store {
             const catalogNumber = item.catalogNumber;
 
             const product: Product = this.getProductByCatalogNumber(catalogNumber);
-            if (product) {
+            if (product && !this.containsItem(product, item)) {
                 this._products.set(product, this._products.get(product).concat([item]));
                 addedItems.push(item);
             } else {
@@ -223,13 +227,7 @@ export class Store {
             const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             const productValidator: ProductValidator = this.validateProduct(product);
             if (productValidator.isValid) {
-                const productFromStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
-                if (productFromStore) {
-                    this._products.delete(productFromStore);
-                } else {
-                    logger.warn(`product: ${product.catalogNumber} does not exist in store`)
-                    productsNotRemoved.push(product);
-                }
+                    this._products.delete(product);
             } else {
                 productsNotRemoved.push(product);
             }
