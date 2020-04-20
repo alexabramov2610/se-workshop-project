@@ -85,7 +85,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
 
         const user: StoreOwner = new StoreOwner("name");
-        expect(storeManagement.verifyStoreOperation(store.storeName, user)).toBeTruthy();
+        expect(storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY)).toBeTruthy();
     });
 
     test("verifyStoreOperation failure - store doesn't exist", () => {
@@ -94,7 +94,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
 
         const user: StoreOwner = new StoreOwner("name");
-        const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user);
+        const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY);
         expect(res.data.result).toBeFalsy();
         expect(res.error).toBeDefined();
 
@@ -107,7 +107,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "verifyStoreManager").mockReturnValue(false);
 
         const user: StoreOwner = new StoreOwner("name");
-        const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user);
+        const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY);
         expect(res.data.result).toBeFalsy();
         expect(res.error).toBeDefined();
     });

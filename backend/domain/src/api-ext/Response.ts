@@ -47,7 +47,7 @@ interface StoreInfoResponse extends Response {
 }
 
 interface ViewShopPurchasesHistoryResponse extends Response {
-    data: { receipts: Receipt[] }
+    data: { result: boolean, receipts: Receipt[] }
 }
 
 interface ViewUsersContactUsMessagesResponse extends Response {

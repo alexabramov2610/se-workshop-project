@@ -1,6 +1,6 @@
 import {Store} from './internal_api'
-import {logger, errorMsg, UserRole} from '../api-int/internal_api'
-import {RegisteredUser, StoreOwner, StoreManager} from "../user/internal_api";
+import {errorMsg, logger, UserRole} from '../api-int/internal_api'
+import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
@@ -62,11 +62,12 @@ export class StoreManagement {
         return store ? store.verifyIsStoreManager(user.name) : false;
     }
 
-    verifyStoreOperation(storeName: string, user: RegisteredUser): Res.BoolResponse {
+    verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission): Res.BoolResponse {
         let error:string;
-        if (!this.verifyStoreExists(storeName))
+        let store: Store = this.findStoreByName(storeName);
+        if (!store)
             error = errorMsg.E_INVALID_STORE;
-        else if (!this.verifyStoreOwner(storeName, user) && !this.verifyStoreManager(storeName, user))
+        else if (!store.verifyPermission(user.name, permission))
              error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
@@ -74,7 +75,7 @@ export class StoreManagement {
     changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
 
         if (!operationValid.data.result)
             return {data: {result: false}, error: operationValid.error};
@@ -95,7 +96,7 @@ export class StoreManagement {
     changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number):Res.BoolResponse => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
 
         if (!operationValid.data.result)
             return {data: {result: false}, error: operationValid.error};
@@ -114,7 +115,7 @@ export class StoreManagement {
     }
 
     addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
 
         if (!operationValid.data.result) {
             return {data: {result: false, itemsNotAdded: itemsReq}, error: operationValid.error};
@@ -126,7 +127,7 @@ export class StoreManagement {
     }
 
     removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (operationValid.error) {
             return {data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error};
         }
@@ -138,7 +139,7 @@ export class StoreManagement {
     }
 
     removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]): Res.ProductRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (operationValid.error) {
             return {data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error};
         }
@@ -148,7 +149,7 @@ export class StoreManagement {
     }
 
     addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (operationValid.error) {
             return {data: {result: false, productsNotAdded: productsReq}, error: operationValid.error};
         }
@@ -159,7 +160,7 @@ export class StoreManagement {
     }
 
     removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user);
+        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (operationValid.error) {
             return {data: {result: false, productsNotRemoved: products}, error: operationValid.error};
         }
@@ -392,13 +393,13 @@ export class StoreManagement {
 
     viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
         const store: Store = this.findStoreByName(storeName);
-        if (!store) return {data: {receipts: []}, error: {message: errorMsg.E_NF}}
+        if (!store) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
         if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN)) return {
-            data: {receipts: []},
+            data: {result: false, receipts: []},
             error: {message: errorMsg.E_PERMISSION}
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {receipts}}
+        return {data: {result: true, receipts: receipts}}
     }
 
     viewProductInfo(req:Req.ProductInfoRequest):Res.BoolResponse {
@@ -411,9 +412,6 @@ export class StoreManagement {
         } else {
             return {data: {result: false}}
         }
-    }
-    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
-        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
     viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
@@ -443,6 +441,10 @@ export class StoreManagement {
             items.push(item);
         }
         return items;
+    }
+
+    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
 
