@@ -26,10 +26,10 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     };
     const registerRes: Res.BoolResponse = tradingSystem.register(registerRequest);
     if (registerRes.error) return registerRes;
-    const loginReq: Req.BoolResponse = {
+    const loginReq: Req.LoginRequest = {
         body: {
             username: req.body.firstAdminName,
-            password: req.body.firstAdminPassword
+            password: req.body.firstAdminPassword,
         }, token: req.token
     };
     const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
