@@ -28,6 +28,7 @@
     "winston": "^3.2.1"
   },
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "uuid": "^7.0.3",
     "winston-daily-rotate-file": "^4.4.2"
   }

@@ -532,7 +532,7 @@ describe("Store Management Unit Tests", () => {
             token: mockToken,
             body: {storeName: store.storeName, catalogNumber: 5, newPrice: 5}
         };
-        let res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
+        const res: Res.BoolResponse = tradingSystemManager.changeProductPrice(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -577,7 +577,7 @@ describe("Store Management Unit Tests", () => {
             token: mockToken,
             body: {storeName: store.storeName, catalogNumber: 5, newName: 'string'}
         };
-        let res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
+        const res: Res.BoolResponse = tradingSystemManager.changeProductName(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -616,7 +616,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -629,7 +629,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.addManagerPermissions(req)
 
         expect(res.data.result).toBeFalsy();
     });
@@ -653,7 +653,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
 
         expect(res.data.result).toBeTruthy();
     });
@@ -666,7 +666,7 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager = new TradingSystemManager();
 
         const req: Req.ChangeManagerPermissionRequest = { token: mockToken, body: {storeName: store.storeName, managerToChange: 'mockname', permissions: []}};
-        let res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
+        const res: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(req)
 
         expect(res.data.result).toBeFalsy();
     });
@@ -789,6 +789,25 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.receipts).toHaveLength(0)
     });
 
+    test("viewRegisteredUserPurchasesHistory success", () => {
+        prepereMocksForLoggedinUser(true);
+        prepareMocksForStoreManagement(true);
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(1);
+
+    });
+
+    test("viewRegisteredUserPurchasesHistory failure", () => {
+        prepareMocksForStoreManagement(false);
+        prepereMocksForLoggedinUser(false);
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(0)
+    });
+
     test("viewUsersContactUsMessages success", () => {
         prepereMocksForLoggedinUser(true);
         prepareMocksForStoreManagement(true);
@@ -810,12 +829,25 @@ describe("Store Management Unit Tests", () => {
 
     function prepereMocksForLoggedinUser(succ: boolean) {
         const getUserByToken: RegisteredUser = new RegisteredUser("tal", "tal123");
+        const item: Item = new Item(5, 10);
+        const viewRUserPurchasesHistoryRes: Res.ViewRUserPurchasesHistoryRes = {
+            data: {
+                result: succ,
+                receipts: succ ? [new Receipt([{
+                    item,
+                    price: 30
+                }])] : []
+            }
+        };
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getLoggedInUserByToken: () => getUserByToken,
                 isLoggedIn: () => succ,
                 addProductToCart: (u: User, product: Product) => {
-                    u.addProductToCart(product);
+                    return 5+5
+                },
+                viewRegisteredUserPurchasesHistory: () =>{
+                    return viewRUserPurchasesHistoryRes
                 }
             }
         });

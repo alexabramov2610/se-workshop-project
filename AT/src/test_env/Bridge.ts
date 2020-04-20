@@ -46,9 +46,10 @@ export interface Bridge {
   ): DummyTypes.IResponse;
   startSession(): DummyTypes.ISessionResponse;
   assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse;
-  grantPermission(
+  grantPermissions(
     credentials: Credentials,
-    permission: PERMISSION
+    store: Store,
+    permissions: PERMISSION[]
   ): DummyTypes.IResponse;
   reset(): void;
   assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
