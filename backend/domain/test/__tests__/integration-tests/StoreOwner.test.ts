@@ -5,6 +5,7 @@ import * as Res from "../../../src/api-ext/Response";
 import * as Req from "../../../src/api-ext/Request";
 import {Product as ProductReq, Item as ItemReq} from "../../../src/api-ext/external_api";
 import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
+import utils from "./utils"
 
 describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
@@ -25,20 +26,15 @@ describe("Store Owner Integration Tests", () => {
         storeOwner = new StoreOwner(storeOwnerName);
         tradingSystemManager = new TradingSystemManager();
 
-        token = tradingSystemManager.startNewSession();
-
-        const regReq: Req.RegisterRequest = {body: { username: storeOwnerName, password: storeOwnerPassword}, token: token};
-        expect(tradingSystemManager.register(regReq).data.result).toBeTruthy();
-
-        const loginReq: Req.LoginRequest = {body: { username: storeOwnerName, password: storeOwnerPassword}, token: token};
-        expect(tradingSystemManager.login(loginReq).data.result).toBeTruthy();
+        token = utils.registeredUserLogin(tradingSystemManager, storeOwnerName, storeOwnerPassword);
+        expect(token).toBeDefined();
 
         const openStoreReq: Req.OpenStoreRequest = {body: { storeName: storeName}, token: token};
         expect(tradingSystemManager.createStore(openStoreReq).data.result).toBeTruthy();
     });
 
 
-    test("add new products",() => {
+    it("add new products",() => {
         let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
         let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
         let products: ProductReq[] = [product1, product2];
@@ -74,7 +70,7 @@ describe("Store Owner Integration Tests", () => {
         expect(productAdditionRes.data.productsNotAdded.length).toBe(1);
     });
 
-    test("add new items",() => {
+    it("add new items",() => {
         let item1: ItemReq = {catalogNumber: 1, id: 6};
         let item2: ItemReq = {catalogNumber: 2, id: 5};
         let items: ItemReq[] = [item1, item2];

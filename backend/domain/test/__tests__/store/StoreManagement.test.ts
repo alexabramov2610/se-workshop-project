@@ -11,8 +11,6 @@ import {
 } from "../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory} from "../../../src/api-ext/Enums";
-import {Product} from "../../../src/trading_system/data/Product";
-import {ManagementPermission, ProductCategory} from "../../../src/api-ext/Enums";
 import {Product} from "../../../src/trading_system/internal_api";
 
 

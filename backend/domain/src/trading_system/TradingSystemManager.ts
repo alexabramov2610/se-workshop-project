@@ -44,13 +44,13 @@ export class TradingSystemManager {
     }
 
     register(req: Req.RegisterRequest): Res.BoolResponse {
-        logger.info(`registering new user : ${req.body.username} `);
+        logger.info(`registering new user: ${req.body.username} `);
         const res = this.userManager.register(req);
         return res;
     }
 
     login(req: Req.LoginRequest): Res.BoolResponse {
-        logger.info(`try to login ,${req.body.username} `);
+        logger.info(`logging in user: ${req.body.username} `);
         const res = this.userManager.login(req);
         if (res.data.result) {
             this.userManager.removeGuest(req.token);
@@ -59,9 +59,13 @@ export class TradingSystemManager {
     }
 
     logout(req: Req.LogoutRequest): Res.BoolResponse {
+        logger.info(`logging out user... `);
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token);
         const res = this.userManager.logout(req);
-        if (!res.data.result) {
-            this.userManager.addGuestToken(req.token)
+        if (res.data.result) {
+            this.userManager.addGuestToken(req.token);
+            if (user)
+                logger.info(`logged out user: ${user.name}`);
         }
         return res;
     }
