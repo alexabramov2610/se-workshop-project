@@ -44,13 +44,13 @@ export class TradingSystemManager {
     }
 
     register(req: Req.RegisterRequest): Res.BoolResponse {
-        logger.info(`registering new user : ${req.body.username} `);
+        logger.info(`registering new user: ${req.body.username} `);
         const res = this.userManager.register(req);
         return res;
     }
 
     login(req: Req.LoginRequest): Res.BoolResponse {
-        logger.info(`try to login ,${req.body.username} `);
+        logger.info(`logging in user: ${req.body.username} `);
         const res = this.userManager.login(req);
         if (res.data.result) {
             this.userManager.removeGuest(req.token);
@@ -59,16 +59,19 @@ export class TradingSystemManager {
     }
 
     logout(req: Req.LogoutRequest): Res.BoolResponse {
+        logger.info(`logging out user... `);
+        const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token);
         const res = this.userManager.logout(req);
-        if (!res.data.result) {
-            this.userManager.addGuestToken(req.token)
+        if (res.data.result) {
+            this.userManager.addGuestToken(req.token);
+            if (user)
+                logger.info(`logged out user: ${user.name}`);
         }
         return res;
     }
 
     changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
         logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
-        ;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -77,7 +80,6 @@ export class TradingSystemManager {
 
     changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
         logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
-        ;
         const user: RegisteredUser = this.userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -209,7 +211,6 @@ export class TradingSystemManager {
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this.storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
-        ;
     }
 
     addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
@@ -218,7 +219,6 @@ export class TradingSystemManager {
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this.storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
-        ;
     }
 
 

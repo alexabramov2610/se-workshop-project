@@ -1,10 +1,10 @@
-import * as Responses from "../../../src/api-ext/Response";
-import * as Res from "../../../src/api-ext/Response";
-import {StoreManager, StoreOwner} from "../../../src/user/internal_api";
-import {Item, Product, Store} from "../../../src/trading_system/internal_api";
-import {ProductCatalogNumber, ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
-import {ProductCategory} from "../../../src/api-ext/Enums";
-import {ManagementPermission} from "../../../src/api-ext/Enums"
+import * as Responses from "../../../../src/api-ext/Response";
+import * as Res from "../../../../src/api-ext/Response";
+import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
+import {Item, Product, Store} from "../../../../src/trading_system/internal_api";
+import {ProductCatalogNumber, ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
+import {ProductCategory} from "../../../../src/api-ext/Enums";
+import {ManagementPermission} from "../../../../src/api-ext/Enums"
 
 describe("Store Management Unit Tests", () => {
     let store: Store;
@@ -30,6 +30,23 @@ describe("Store Management Unit Tests", () => {
         // expect(res.data.info).toStrictEqual({storeName:store.storeName,storeOwnersNames:['dor'],productNames:['chair']})
     })
 
+    test("view store info success",()=>{
+        const product1=new Product('product1',1,1,ProductCategory.Home)
+        const product2=new Product('product2',2,2,ProductCategory.Home)
+        const products: Product[] = [product1,product2];
+
+        store.addNewProducts(products);
+        store.addStoreOwner(storeOwner);
+
+        const res=store.viewStoreInfo();
+        expect(res.data.info.storeName).toEqual(store.storeName);
+        expect(res.data.info.productNames).toContain(product1.name);
+        expect(res.data.info.productNames).toContain(product2.name);
+        expect(res.data.info.storeOwnersNames).toContain(storeOwner.name)
+
+    })
+
+
     test("verifyIsStoreOwner success", () => {
         const res: Responses.BoolResponse = store.addStoreOwner(storeOwner);
         expect(res.data.result).toBeTruthy();
@@ -44,6 +61,7 @@ describe("Store Management Unit Tests", () => {
     test("verifyIsStoreOwner failure - not store owner", () => {
         expect(store.verifyIsStoreOwner('mockname')).toBeFalsy();
     })
+
 
     test("verifyIsStoreManager success", () => {
         const res: Responses.BoolResponse = store.addStoreManager(storeOwner);
@@ -60,10 +78,12 @@ describe("Store Management Unit Tests", () => {
         expect(store.verifyIsStoreManager('mockname')).toBeFalsy();
     })
 
+
     test("setFirstOwner", () => {
         store.setFirstOwner(storeOwner);
         expect(store.verifyIsStoreOwner(storeOwner.name)).toBeTruthy();
     })
+
 
     test("addNewProducts success", () => {
         const products: Product[] = generateValidProducts(5);
@@ -89,6 +109,7 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.productsNotAdded.length).toBe(numOfProducts);
 
     });
+
 
     test("removeProductsByCatalogNumber success", () => {
         const numOfProducts: number = 5;
@@ -142,6 +163,7 @@ describe("Store Management Unit Tests", () => {
         expect(resRemove.data.productsNotRemoved.length).toBe(numOfProducts);
     });
 
+
     test("addItems success", () => {
         const numberOfItems: number = 5;
         const products: Product[] = generateValidProducts(numberOfItems);
@@ -156,16 +178,6 @@ describe("Store Management Unit Tests", () => {
         expect(addItemsRes.data.result).toBeTruthy();
         expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
 
-    });
-
-    test("addItems failure - product not in store", () => {
-        const numberOfItems: number = 5;
-
-        const items: Item[] = generateValidItems(numberOfItems, 0, numberOfItems, 0);
-
-        const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
-        expect(addItemsRes.data.result).toBeFalsy();
-        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
     });
 
     test("addItems success - some in store", () => {
@@ -183,6 +195,37 @@ describe("Store Management Unit Tests", () => {
         expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
 
     });
+
+    test("addItems failure - product not in store", () => {
+        const numberOfItems: number = 5;
+
+        const items: Item[] = generateValidItems(numberOfItems, 0, numberOfItems, 0);
+
+        const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
+        expect(addItemsRes.data.result).toBeFalsy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(numberOfItems);
+    });
+
+    test("addItems failure - duplicate items", () => {
+        const numberOfItems: number = 5;
+        const products: Product[] = generateValidProducts(numberOfItems);
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+        const items: Item[] = generateValidItems(numberOfItems*2, 0, numberOfItems, 0);
+
+        let addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
+        expect(addItemsRes.data.result).toBeTruthy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
+
+        addItemsRes = store.addItems(items);
+        expect(addItemsRes.data.result).toBeFalsy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(items.length);
+
+    });
+
 
     test("removeItems success - all removed", () => {
         const numberOfItems: number = 5;
@@ -262,6 +305,7 @@ describe("Store Management Unit Tests", () => {
         expect(removeItemsRes.data.itemsNotRemoved.length).toBe(numberOfItems);
         expect(removeItemsRes.error).toBeDefined();
     });
+
 
     test("removeProductsWithQuantity success", () => {
         const numberOfItems: number = 5;
@@ -365,6 +409,41 @@ describe("Store Management Unit Tests", () => {
         }
     });
 
+    test("removeProductsWithQuantity failure - all products fail", () => {
+        const numberOfItems: number = 5;
+        let products: Product[] = generateValidProducts(numberOfItems);
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+        const numOfProductsInStore : number = store.products.size;
+        expect(numOfProductsInStore).toBe(numberOfItems);
+
+        const items: Item[] = generateValidItems(numberOfItems * 4, 0, numberOfItems, 0);
+
+        const addItemsRes: Responses.ItemsAdditionResponse = store.addItems(items);
+        expect(addItemsRes.data.result).toBeTruthy();
+        expect(addItemsRes.data.itemsNotAdded.length).toBe(0);
+
+        products = generateValidProducts(numberOfItems*2);
+
+        const removeProducts :ProductWithQuantity[] = [];
+
+        for (let i = numberOfItems ; i< products.length; i++){
+            const prodToRemove: ProductWithQuantity = { catalogNumber: products[i].catalogNumber, quantity: i }
+            removeProducts.push(prodToRemove);
+        }
+
+        const removeProdRes: Responses.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts);
+        expect(removeProdRes.data.result).toBeFalsy();
+        expect(removeProdRes.data.productsNotRemoved.length).toBe(removeProducts.length);
+
+        const productsInStore: Map<Product, Item[]> = store.products;
+        expect(productsInStore.size).toBe(numOfProductsInStore);
+    });
+
+
+
     test("addStoreOwner success", () => {
        const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
        expect(res.data.result).toBeTruthy();
@@ -376,6 +455,7 @@ describe("Store Management Unit Tests", () => {
         res = store.addStoreOwner(storeOwner);
         expect(res.data.result).toBeFalsy();
     });
+
 
     test("addStoreManager success", () => {
         const res: Res.BoolResponse = store.addStoreManager(storeManager);
@@ -390,6 +470,7 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+
     test("removeStoreOwner success", () => {
         const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
         expect(store.removeStoreOwner(storeOwner).data.result).toBeTruthy();
@@ -399,11 +480,14 @@ describe("Store Management Unit Tests", () => {
         const res: Res.BoolResponse = store.removeStoreOwner(storeOwner);
         expect(res.data.result).toBeFalsy();
     });
+
+
     test("verifyPermission success owner", () => {
         jest.spyOn(store,"verifyIsStoreOwner").mockReturnValue(true)
 
         expect(store.verifyPermission("tal",ManagementPermission.WATCH_PURCHASES_HISTORY)).toBeTruthy();
     });
+
     test("verifyPermission success manager", () => {
         jest.spyOn(store,"verifyIsStoreOwner").mockReturnValue(false)
         jest.spyOn(store,"verifyIsStoreManager").mockReturnValue(true)
@@ -419,21 +503,7 @@ describe("Store Management Unit Tests", () => {
         expect(store.verifyPermission("tal",ManagementPermission.WATCH_PURCHASES_HISTORY)).toBeFalsy();
     });
 
-    test("view store info seccess",()=>{
-        const product1=new Product('product1',1,1,ProductCategory.Home)
-        const product2=new Product('product2',2,2,ProductCategory.Home)
-        const products: Product[] = [product1,product2];
 
-        store.addNewProducts(products);
-        store.addStoreOwner(storeOwner);
-
-        const res=store.viewStoreInfo();
-        expect(res.data.info.storeName).toEqual(store.storeName);
-        expect(res.data.info.productNames).toContain(product1.name);
-        expect(res.data.info.productNames).toContain(product2.name);
-        expect(res.data.info.storeOwnersNames).toContain(storeOwner.name)
-
-    })
 
     test("productInStock seccess test",()=>{
         const products: Product[] = generateValidProducts(5);
