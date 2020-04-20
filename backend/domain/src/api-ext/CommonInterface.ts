@@ -1,5 +1,5 @@
 import {ProductCategory} from "./Enums";
-
+export {ProductCategory}
 export interface Item extends ProductCatalogNumber{
     id: number
 }

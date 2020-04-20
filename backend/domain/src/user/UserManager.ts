@@ -1,9 +1,11 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
-import {LoginRequest, LogoutRequest, RegisterRequest} from "../api-ext/external_api"
+import {LoginRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
+import * as Req from "../api-ext/Request";
+import * as Res from "../api-ext/Response";
 
 class UserManager {
     private registeredUsers: RegisteredUser[];
@@ -47,20 +49,19 @@ class UserManager {
         } else if (this.isLoggedIn(userName)) { // already logged in
             logger.warn(`fail to login ,${userName} is allredy logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        } else if(req.body.asAdmin && !this.isAdmin(user)) {
+        } else if (req.body.asAdmin && !this.isAdmin(user)) {
             logger.warn(`fail to login ,${userName} as Admin- this user dont have admin privileges `);
             return {data: {result: false}, error: {message: errorMsg.E_NA}}
-        }
-        else{
+        } else {
             logger.info(`${userName} has logged in  `);
             this.loggedInUsers = this.loggedInUsers.set(req.token, user);
-            user.role = req.body.asAdmin? UserRole.ADMIN : UserRole.BUYER;
+            user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
             return {data: {result: true}};
         }
     }
 
     logout(req: LogoutRequest): BoolResponse {
-        const user:RegisteredUser = this.getLoggedInUserByToken(req.token);
+        const user: RegisteredUser = this.getLoggedInUserByToken(req.token);
         if (!user) { // user not logged in
             logger.warn(`logging out fail, user is not logged in  `);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -183,6 +184,10 @@ class UserManager {
     private getAdminByToken(token: string): Admin {
         const user: RegisteredUser = this.loggedInUsers.get(token);
         return !user ? user : this.admins.find((a) => user.name === a.name)
+    }
+
+    addProductToCart(user: User, product: Product): void {
+        user.addProductToCart(product);
     }
 }
 

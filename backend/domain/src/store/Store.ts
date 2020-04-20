@@ -320,6 +320,15 @@ export class Store {
         return {data: {result: true}};
     }
 
+    isProductInStock(catalogNumber:number):boolean{
+        const product=this.getProductByCatalogNumber(catalogNumber)
+        if(product) {
+            return this.products.get(product).length > 0;
+        }
+        return false;
+    }
+
+
     get storeName(): string {
         return this._storeName;
     }

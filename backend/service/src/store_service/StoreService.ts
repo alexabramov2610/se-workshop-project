@@ -15,11 +15,11 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest, ts: TS): Res.StoreInfoR
     return ts.viewStoreInfo(req);
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest, ts: TS): Res.ChangeProductNameResponse => {
+export const changeProductName = (req: Req.ChangeProductNameRequest,ts: TS): Res.ChangeProductNameResponse => {
    return ts.changeProductName(req);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest, ts: TS): Res.ChangeProductPriceResponse => {
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest,ts: TS): Res.ChangeProductPriceResponse => {
    return ts.changeProductPrice(req);
 }
 
@@ -33,6 +33,9 @@ export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity, 
 
 export const addNewProducts = (req: Req.AddProductsRequest, ts: TS): Res.ProductAdditionResponse => {
     return ts.addNewProducts(req);
+}
+export const viewProductInfo = (req:Req.ProductInfoRequest, ts: TS):Res.BoolResponse => {
+    return ts.viewProductInfo(req);
 }
 
 export const removeProducts = (req: Req.ProductRemovalRequest, ts: TS): Res.ProductRemovalResponse => {

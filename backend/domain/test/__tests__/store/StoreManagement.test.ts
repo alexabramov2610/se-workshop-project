@@ -12,6 +12,9 @@ import {
 import {errorMsg} from "../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory} from "../../../src/api-ext/Enums";
 import {Product} from "../../../src/trading_system/data/Product";
+import {ManagementPermission, ProductCategory} from "../../../src/api-ext/Enums";
+import {Product} from "../../../src/trading_system/internal_api";
+
 
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
@@ -124,7 +127,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "addStoreOwner").mockReturnValue(isOperationValid);
 
         const res: Res.BoolResponse = storeManagement.assignStoreOwner(store.storeName, ownerToAssign, alreadyOwner);
-        
+
         expect(res.data.result).toBeTruthy();
         expect(store.addStoreOwner).toBeCalledTimes(1);
         expect(alreadyOwner.isAssignerOfOwner(ownerToAssign)).toBe(true);
@@ -962,6 +965,12 @@ describe("Store Management Unit Tests", () => {
         expect(storeManagement.findStoreByName('storename')).toBeFalsy();
     });
 
+    test('viewStoreInfo cant find store Fail ', () => {
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
+        const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
+        expect(res.data.result).toBeFalsy();
+        expect(res.error.message).toEqual(errorMsg.E_NF);
+    });
 
     test('viewStoreInfo Success ', () => {
         const storeName: string = 'mock-store';
@@ -973,6 +982,35 @@ describe("Store Management Unit Tests", () => {
         const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo(storeName);
         expect(res).toBe(response);
     });
+
+    test('viewProductInfo seccess test', () => {
+        const p = new Product('my product', 12345, 15.90, ProductCategory.General)
+        const store = new Store('my store')
+        store.addNewProducts([p]);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(store);
+        const res = storeManagement.viewProductInfo({
+            body: {storeName: 'my store', catalogNumber: 12345},
+            token: "lala"
+        })
+        expect(res.data.result).toBeTruthy()
+        expect(res.data).toEqual({
+            result: true,
+            info: {name: p.name, catalogNumber: p.catalogNumber, price: p.price, catagory: p.category}
+        })
+
+    })
+
+    test('viewProductInfo fail test', () => {
+        const p = new Product('my product', 12345, 15.90, ProductCategory.General)
+        const store = new Store('my store')
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(store);
+        const res = storeManagement.viewProductInfo({
+            body: {storeName: 'my store', catalogNumber: 12345},
+            token: "lala"
+        })
+        expect(res.data.result).toBeFalsy()
+
+    })
 
     test('viewStoreInfo cant find store Fail ', () => {
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);

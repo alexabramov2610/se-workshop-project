@@ -1,6 +1,7 @@
 import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 
+
 interface Request {
     body: any;
     token: string;
@@ -70,6 +71,10 @@ interface ViewShopPurchasesHistoryRequest extends Request {
     body: { storeName: string }
 }
 
+interface ChangeManagerPermissionRequest extends Request {
+    body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
+}
+
 interface ViewBuyerPurchasesHistoryRequest extends Request {
     body: {}
 }
@@ -77,16 +82,25 @@ interface ViewBuyerPurchasesHistoryRequest extends Request {
 interface StoreInfoRequest extends Request {
     body: { storeName: string }
 }
+
 interface ChangeManagerPermissionRequest extends Request {
-  body: {managerToChange: string, storeName:string, permissions: ManagementPermission[]}
+    body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
+}
+
+interface ProductInfoRequest extends Request {
+    body: { storeName: string, catalogNumber: number }
+}
+
+interface SaveToCartRequest extends Request {
+    body: { storeName: string, catalogNumber: number }
 }
 
 interface ChangeProductPriceRequest extends Request {
-  body:{storeName:string, catalogNumber: number, newPrice: number}
+    body: { storeName: string, catalogNumber: number, newPrice: number }
 }
 
 interface ChangeProductNameRequest extends Request {
-  body:{storeName:string, catalogNumber: number, newName: string}
+    body: { storeName: string, catalogNumber: number, newName: string }
 }
 
 interface ViewUsersContactUsMessagesRequest extends Request {
@@ -97,6 +111,8 @@ interface ViewUsersContactUsMessagesRequest extends Request {
 export {
     RemoveStoreOwnerRequest,
     Request,
+    SaveToCartRequest,
+    ProductInfoRequest,
     AssignStoreOwnerRequest,
     SetAdminRequest,
     AssignStoreManagerRequest,
