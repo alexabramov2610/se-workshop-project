@@ -1,17 +1,17 @@
-import {Store, StoreManagement} from "../../../src/store/internal_api";
-import * as Responses from "../../../src/api-ext/Response";
-import * as Res from "../../../src/api-ext/Response";
-import {BoolResponse, StoreInfoResponse} from "../../../src/api-ext/Response";
-import {RegisteredUser, StoreManager, StoreOwner} from "../../../src/user/internal_api";
+import {Store, StoreManagement} from "../../../../src/store/internal_api";
+import * as Responses from "../../../../src/api-ext/Response";
+import * as Res from "../../../../src/api-ext/Response";
+import {BoolResponse, StoreInfoResponse} from "../../../../src/api-ext/Response";
+import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
     Item as ItemReq,
     Product as ProductReq,
     ProductCatalogNumber,
     ProductWithQuantity
-} from "../../../src/api-ext/CommonInterface";
-import {errorMsg} from "../../../src/api-int/Error";
-import {ManagementPermission, ProductCategory} from "../../../src/api-ext/Enums";
-import {Product} from "../../../src/trading_system/internal_api";
+} from "../../../../src/api-ext/CommonInterface";
+import {errorMsg} from "../../../../src/api-int/Error";
+import {ManagementPermission, ProductCategory} from "../../../../src/api-ext/Enums";
+import {Product} from "../../../../src/trading_system/internal_api";
 
 
 describe("Store Management Unit Tests", () => {

@@ -1,20 +1,20 @@
-import {Store, StoreManagement} from "../../../src/store/internal_api";
-import * as Res from "../../../src/api-ext/Response";
-import * as Req from "../../../src/api-ext/Request";
-import {StoreOwner, RegisteredUser} from "../../../src/user/internal_api";
-import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
-import {ContactUsMessage, Item, Product, Receipt} from "../../../src/trading_system/internal_api";
-import {ExternalSystemsManager} from '../../../src/external_systems/ExternalSystemsManager'
-import {UserManager} from '../../../src/user/UserManager';
+import {Store, StoreManagement} from "../../../../src/store/internal_api";
+import * as Res from "../../../../src/api-ext/Response";
+import * as Req from "../../../../src/api-ext/Request";
+import {StoreOwner, RegisteredUser} from "../../../../src/user/internal_api";
+import {TradingSystemManager} from "../../../../src/trading_system/TradingSystemManager";
+import {ContactUsMessage, Item, Product, Receipt} from "../../../../src/trading_system/internal_api";
+import {ExternalSystemsManager} from '../../../../src/external_systems/ExternalSystemsManager'
+import {UserManager} from '../../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
-import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../src/api-ext/external_api";
-import {ProductWithQuantity} from "../../../src/api-ext/CommonInterface";
-import {User} from "../../../src/user/users/User";
+import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../../src/api-ext/external_api";
+import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
+import {User} from "../../../../src/user/users/User";
 
-jest.mock('../../../src/user/UserManager');
-jest.mock('../../../src/store/StoreManagement');
-jest.mock('../../../src/external_systems/ExternalSystemsManager');
-jest.mock('../../../src/user/UserManager');
+jest.mock('../../../../src/user/UserManager');
+jest.mock('../../../../src/store/StoreManagement');
+jest.mock('../../../../src/external_systems/ExternalSystemsManager');
+jest.mock('../../../../src/user/UserManager');
 
 describe("Store Management Unit Tests", () => {
     let tradingSystemManager: TradingSystemManager;
