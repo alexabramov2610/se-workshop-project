@@ -832,6 +832,7 @@ describe("Store Management Unit Tests", () => {
         const item: Item = new Item(5, 10);
         const viewRUserPurchasesHistoryRes: Res.ViewRUserPurchasesHistoryRes = {
             data: {
+                result: succ,
                 receipts: succ ? [new Receipt([{
                     item,
                     price: 30

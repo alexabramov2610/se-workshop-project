@@ -266,13 +266,13 @@ export class TradingSystemManager {
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return {data: {receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+            return {data: {result: false,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
-            return {data: {receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+            return {data: {result: false ,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const isAdminReq: boolean = req.body.userName && user.role === UserRole.ADMIN;
         if (userToView.name !== user.name && !isAdminReq)
-            return {data: {receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+            return {data: {result: false,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
         return res;
     }

@@ -195,7 +195,7 @@ class UserManager {
     }
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
-        return {data: {receipts: user.receipts}}
+        return {data: {result: true, receipts: user.receipts}}
     }
 }
 
