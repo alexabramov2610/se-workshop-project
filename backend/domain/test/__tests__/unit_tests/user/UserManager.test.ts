@@ -3,12 +3,13 @@ import {logger, UserRole} from "../../../../src/api-int/internal_api";
 import {UserManager} from "../../../../src/user/UserManager";
 import {RegisteredUser, StoreManager} from "../../../../src/user/internal_api";
 import exp from "constants";
+import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 
 describe("RegisteredUser Management Unit Tests", () => {
     let userManager: UserManager;
 
     beforeEach(() => {
-        userManager = new UserManager();
+        userManager = new UserManager(new ExternalSystemsManager());
     });
 
 
@@ -45,7 +46,9 @@ describe("RegisteredUser Management Unit Tests", () => {
 
     test("Login Success Test", () => {
         jest.spyOn(userManager, "getUserByName").mockReturnValue(new RegisteredUser('ron','123456'));
-        jest.spyOn(userManager, "isValidPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(false)
+
         const res: Responses.BoolResponse = userManager.login({
             body: {username: 'ron', password: '123456'},
             token: "token"

@@ -19,7 +19,7 @@ describe("Registered User Integration Tests", () => {
 
 
     it("logout",() => {
-        const logoutReq : Req.LogoutRequest = {token: token, body: {}};
+        const logoutReq : Req.LogoutRequest = {token, body: {}};
         const logoutRes: Res.BoolResponse = tradingSystemManager.logout(logoutReq);
         expect(logoutRes.data.result).toBe(true);
     });

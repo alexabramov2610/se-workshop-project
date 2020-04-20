@@ -1,32 +1,28 @@
-import { BoolResponse,errorMsg } from "../../api-int/internal_api";
+import bcrypt from 'bcrypt'
+import {BoolResponse} from "../../api-ext/Response";
+import {errorMsg} from "../../api-int/Error";
 
-export class SecuritySystem{
-   private securitySys : any;
-   private name: string;
+export class SecuritySystem {
+    private _securitySys: any;
+    private _name: string;
 
-   constructor(){
-      this.name = "Security System"
-      this.securitySys=null;
-   }
+    constructor() {
+        this._name = "Security System"
+        this._securitySys = bcrypt;
+    }
 
-   setSecuritySys(real: any){
-      this.securitySys=real;
-   }
+    encryptPassword(password: string) {
+        const hash = bcrypt.hashSync(password, 10);
+        return hash;
+    }
 
-   connect():BoolResponse{
-      const succ: BoolResponse = { data: {result: true}};
-      if(this.securitySys) {
-         const isConnected = this.securitySys.connect();
-         if(isConnected) 
-         {
-            return succ;
-         }
-         else {
-               return {error: {message: errorMsg['E_CON']+" : " + this.name}, data: {result: this.securitySys.connect()}};}
-      }
-      else{
-         return succ;
-      }
-   }
+    comparePassword(password: string, hash: string): boolean {
+        return bcrypt.compareSync(password, hash);
+    }
 
+    connect(): BoolResponse {
+        const succ: BoolResponse = {data: {result: true}};
+        return succ;
+    }
 }
+

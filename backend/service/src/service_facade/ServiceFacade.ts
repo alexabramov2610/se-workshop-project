@@ -26,10 +26,10 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     };
     const registerRes: Res.BoolResponse = tradingSystem.register(registerRequest);
     if (registerRes.error) return registerRes;
-    const loginReq: Req.BoolResponse = {
+    const loginReq: Req.LoginRequest = {
         body: {
             username: req.body.firstAdminName,
-            password: req.body.firstAdminPassword
+            password: req.body.firstAdminPassword,
         }, token: req.token
     };
     const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
@@ -44,7 +44,7 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
     tradingSystem.OpenTradeSystem({body: {}, token: req.token})
-    const logout: Res.BoolResponse = tradingSystem.logout({body:{} , token: req.token});
+    const logout: Res.BoolResponse = tradingSystem.logout({body: {}, token: req.token});
     if (!logout.data.result) return logout;
     return {data: {result: true}}
 }
@@ -109,18 +109,18 @@ export const removeStoreManager = (req: Req.AssignStoreManagerRequest): Res.Bool
     return runIfOpen(req, StoreService.removeStoreManager);
 }
 
-export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeManagerPermissions);
 }
 
-export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest) : Res.BoolResponse => {
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.addManagerPermissions);
 }
-export const saveProductToCart = (req:Req.SaveToCartRequest): Res.BoolResponse=>{
-    return runIfOpen(req,UserService.saveProductToCart);
+export const saveProductToCart = (req: Req.SaveToCartRequest): Res.BoolResponse => {
+    return runIfOpen(req, UserService.saveProductToCart);
 }
-export const viewProductInfo=(req:Req.ProductInfoRequest):Res.BoolResponse =>{
-    return runIfOpen(req,StoreService.viewProductInfo);
+export const viewProductInfo = (req: Req.ProductInfoRequest): Res.BoolResponse => {
+    return runIfOpen(req, StoreService.viewProductInfo);
 }
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
@@ -135,7 +135,7 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
     if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
-        return { data: {}, error: {message: "Trading system is closed!"}}
+        return {data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
 }
 
