@@ -46,16 +46,16 @@ class UserManager {
         const password = req.body.password;
         const user = this.getUserByName(userName)
         if (!user) {
-            logger.warn(`fail to login ,${userName} not found `);
+            logger.warn(`fail to login ${userName}, user not found `);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
         } else if (!this.verifyPassword(userName, password, user.password)) {
-            logger.warn(`fail to login ${userName} ,bad password `);
+            logger.warn(`fail to login ${userName}, bad password `);
             return {data: {result: false}, error: {message: errorMsg.E_BP}} // bad pass
         } else if (this.isLoggedIn(userName)) { // already logged in
-            logger.warn(`fail to login ,${userName} is allredy logged in `);
+            logger.warn(`fail to login ${userName}, user is already logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
         } else if (req.body.asAdmin && !this.isAdmin(user)) {
-            logger.warn(`fail to login ,${userName} as Admin- this user dont have admin privileges `);
+            logger.warn(`fail to login ${userName} as Admin- this user doesn't have admin privileges `);
             return {data: {result: false}, error: {message: errorMsg.E_NA}}
         } else {
             logger.info(`${userName} has logged in  `);
