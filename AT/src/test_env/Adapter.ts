@@ -90,8 +90,8 @@ export const Adapter: Partial<Env.Bridge> = {
         const catalogNumbers = products.map((p) => {
             return {catalogNumber: p.catalogNumber};
         });
-        const removeReq = {store: store.name, products: catalogNumbers};
-        const {data, error} = ServiceFacade.removeProducts(removeReq);
+        const removeReq = {storeName: store.name, products: catalogNumbers};
+        const {data, error} = ServiceFacade.removeProducts(wrapWithToken(removeReq));
         return error
             ? {data: data.productsNotRemoved, error: error}
             : {data: [], error: undefined};
