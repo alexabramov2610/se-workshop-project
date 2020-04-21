@@ -20,7 +20,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
   });
-
+ 
   test("Create Store - Sad Path:  - not logged in user", () => {
     _serviceBridge.logout();
     _storeInformation = { name: "mocked-sad-store" };

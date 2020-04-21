@@ -39,7 +39,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(res).toBe(true);
   });
 
-  test("Add product - Sad Path: add product to new store user logged out", () => {
+  test("Add product - add product to new store user logged out", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     _serviceBridge.logout();
@@ -51,7 +51,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(resErrorProduct).toBeDefined();
   });
 
-  test("Add product - Sad Path: add product to new store user doesnt have permissions", () => {
+  test("Add product - add product to new store user doesnt have permissions", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     _serviceBridge.logout();
@@ -69,8 +69,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(resErrorProduct).toBeDefined();
   });
 
-  test("Remove product - Happy Path: remove existing product", () => {
-    console.log("printed from test!@#!@#!@#");
+  test("Remove product - remove existing product", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     const productToAdd = new ProductBuilder()
@@ -92,8 +91,26 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(removeResult).toBe(true);
   });
 
-  xtest("Remove product - Happy Path: remove existing product user logged out", () => {
-    expect(true).toBe(false);
+  test("Remove product - remove existing product user logged out", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
+      productToAdd,
+    ]).data;
+    expect(resProduct.result).toBe(true);
+    const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
+      { id: 123, catalogNumber: productToAdd.catalogNumber },
+    ]).data.result;
+    expect(resItem).toBe(true);
+
+    const removeResult = _serviceBridge.removeProductsFromStore(
+      _storeInformation,
+      [productToAdd]
+    ).data;
+    expect(removeResult).toBe(true);
   });
 
   xtest("Remove product - Happy Path: remove non-existing product user logged in", () => {
