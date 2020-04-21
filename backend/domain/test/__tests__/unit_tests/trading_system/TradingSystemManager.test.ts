@@ -10,6 +10,7 @@ import {mocked} from "ts-jest/utils";
 import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
 import {User} from "../../../../src/user/users/User";
+import {RemoveProductRequest} from "../../../../src/api-ext/Request";
 
 jest.mock('../../../../src/user/UserManager');
 jest.mock('../../../../src/store/StoreManagement');
@@ -899,6 +900,7 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy()
 
     })
+
 
     function prepareMockToSaveProduct() {
         mocked(UserManager).mockImplementation((): any => {

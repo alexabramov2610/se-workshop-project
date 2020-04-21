@@ -115,6 +115,10 @@ interface ViewRUserPurchasesHistoryReq extends Request {
     body: { userName?: string }
 }
 
+interface ViewCartReq extends Request {
+    body: {}
+}
+
 
 export {
     RemoveStoreOwnerRequest,
@@ -140,6 +144,7 @@ export {
     ChangeProductPriceRequest,
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
-    RemoveProductRequest
+    RemoveProductRequest,
+    ViewCartReq
 };
 

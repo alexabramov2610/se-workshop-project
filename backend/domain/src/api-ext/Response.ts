@@ -63,6 +63,10 @@ interface ViewRUserPurchasesHistoryRes extends Response{
     data:{result:boolean, receipts: Receipt[]}
 }
 
+interface ViewCartRes extends Response{
+    data:{result:boolean, cart: Product[]}
+}
+
 export {
     Response,
     LoginResponse,
@@ -76,6 +80,7 @@ export {
     ViewShopPurchasesHistoryResponse,
     ProductInfoResponse,
     ViewUsersContactUsMessagesResponse,
-    ViewRUserPurchasesHistoryRes
+    ViewRUserPurchasesHistoryRes,
+    ViewCartRes
 };
 

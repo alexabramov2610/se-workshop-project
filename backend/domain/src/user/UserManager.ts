@@ -1,6 +1,6 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
-import {LoginRequest,RemoveProductRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
+import {LoginRequest,RemoveProductRequest,ViewCartReq, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -211,9 +211,22 @@ class UserManager {
         return {data:{result:true}}
     }
 
-
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}
+    }
+
+    viewCart(req:ViewCartReq):Res.ViewCartRes{
+        logger.info(` viewing : ${req.token} cart `)
+        const user=this.getUserByToken(req.token)
+        if(!user){
+            return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        }
+        const cart=user.cart
+        if(!cart){
+            return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NF}}
+        }
+        return {data:{result:true,cart:cart}}
+
     }
 }
 

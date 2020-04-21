@@ -141,9 +141,14 @@ export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHi
     return runIfOpen(req, UserService.viewRegisteredUserPurchasesHistory);
 }
 
+ export const viewCart = (req:Req.ViewCartReq):Res.ViewCartRes => {
+    return runIfOpen(req,UserService.viewCart);
+ }
 
 
-const runIfOpen = (req: Req.Request, fn: any): any => {
+
+
+    const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
     if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}

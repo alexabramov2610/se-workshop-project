@@ -1,9 +1,10 @@
 import * as Responses from "../../../../src/api-int/internal_api";
-import {logger, UserRole} from "../../../../src/api-int/internal_api";
+import {UserRole} from "../../../../src/api-int/internal_api";
 import {UserManager} from "../../../../src/user/UserManager";
-import {RegisteredUser,User, StoreManager} from "../../../../src/user/internal_api";
-import exp from "constants";
+import {RegisteredUser, User} from "../../../../src/user/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
+import {Product} from "../../../../src/trading_system/data/Product";
+import {ProductCategory} from "../../../../src/api-ext/Enums";
 
 describe("RegisteredUser Management Unit Tests", () => {
     let userManager: UserManager;
@@ -130,6 +131,19 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(userChangedInLoggedIn).toBeUndefined();
     });
 
+    test("removeProductFromCart seccess",()=>{
+        const u:User=new RegisteredUser('dor','12345');
+        jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+        const p=new Product('table',5,120,ProductCategory.Home);
+        userManager.addProductToCart(u,p);
+        expect(u.cart).toEqual([p]);
+        const res:Responses.BoolResponse=userManager.removeProductFromCart({body:{catalogNumber:p.catalogNumber},token:"whatever"})
+        expect(res.data.result).toBeTruthy();
+        expect(u.cart).toEqual([])
+
+    });
+
+
     test("removeProductFromCart fail product not in cart",()=>{
         const u:User=new RegisteredUser('dor','12345');
         jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
@@ -139,7 +153,27 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(res.error.message).toEqual("This cart dont contain this product" )
         expect(u.cart).toEqual([])
 
-    } )
+    });
+
+
+    test('view cart  seccess test',()=>{
+        const u:User=new RegisteredUser('dor','12345');
+        jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+        const p=new Product('table',15,120,ProductCategory.Home);
+
+        const res:Responses.ViewCartRes=userManager.viewCart({body:{},token:'whatever'});
+        expect(res.data.cart).toEqual(u.cart);
+        expect(res.data.result).toBeTruthy();
+
+        u.addProductToCart(p);
+
+        const res2:Responses.ViewCartRes=userManager.viewCart({body:{},token:'whatever'});
+        expect(res2.data.cart).toEqual(u.cart);
+        expect(res2.data.result).toBeTruthy();
+
+
+
+    })
 
     // TODO: fix setUserRole tests
 

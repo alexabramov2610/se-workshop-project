@@ -9,6 +9,7 @@ import {TradingSystemState} from "../api-ext/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
+import {ViewCartReq} from "../api-ext/Request";
 
 export class TradingSystemManager {
     private _userManager: UserManager;
@@ -282,5 +283,10 @@ export class TradingSystemManager {
         return res;
     }
 
+    viewCart(req:ViewCartReq):Res.ViewCartRes{
+        return this._userManager.viewCart(req);
+    }
 
-}
+
+
+    }
