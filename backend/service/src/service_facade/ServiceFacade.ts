@@ -121,6 +121,10 @@ export const saveProductToCart = (req: Req.SaveToCartRequest): Res.BoolResponse 
     return runIfOpen(req, UserService.saveProductToCart);
 }
 
+export const removeProductFromCart = (req:Req.RemoveProductRequest): Res.BoolResponse=>{
+    return runIfOpen(req,UserService.removeProductFromCart);
+}
+
 export const viewProductInfo = (req: Req.ProductInfoRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.viewProductInfo);
 }
@@ -136,6 +140,8 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes => {
     return runIfOpen(req, UserService.viewRegisteredUserPurchasesHistory);
 }
+
+
 
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};

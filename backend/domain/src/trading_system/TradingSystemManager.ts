@@ -263,6 +263,11 @@ export class TradingSystemManager {
         return {data: {result: true}}
     }
 
+    removeProductFromCart(req:Req.RemoveProductRequest): Res.BoolResponse {
+        return this._userManager.removeProductFromCart(req);
+    }
+
+
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)

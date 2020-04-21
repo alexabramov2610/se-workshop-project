@@ -1,6 +1,6 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
-import {LoginRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
+import {LoginRequest,RemoveProductRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -193,6 +193,24 @@ class UserManager {
     addProductToCart(user: User, product: Product): void {
         user.addProductToCart(product);
     }
+
+    removeProductFromCart(req:RemoveProductRequest): BoolResponse {
+        logger.info(` removing product: ${req.body.catalogNumber}  from ${req.token}  cart `)
+        const user=this.getUserByToken(req.token);
+        if(!user){
+
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        }
+        const productToRemove=user.cart.find((p)=>p.catalogNumber===req.body.catalogNumber)
+        if (!productToRemove){
+            return {data:{result:false},error:{message:errorMsg['E_NOT_IN_CART']}}
+        }
+
+        user.removeProductFromCart(productToRemove)
+        logger.info(`  product: ${req.body.catalogNumber} has removed  from ${req.token}  cart `)
+        return {data:{result:true}}
+    }
+
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}

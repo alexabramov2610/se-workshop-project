@@ -10,7 +10,7 @@ export abstract class User {
     }
 
     addProductToCart(product:Product):void{
-        this.cart=this.cart.concat(product);
+        this.cart=this.cart.concat([product]);
     }
 
     removeProductFromCart(product:Product):void{
