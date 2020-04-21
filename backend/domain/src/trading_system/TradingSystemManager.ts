@@ -76,7 +76,7 @@ export class TradingSystemManager {
     }
 
     changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
-        logger.info(`trying change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
+        logger.info(`trying to change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -84,7 +84,7 @@ export class TradingSystemManager {
     }
 
     changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
-        logger.info(`trying change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
+        logger.info(`trying to change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -206,8 +206,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    // @TODO RETURN VALUE?
-    viewStoreInfo(req: Req.StoreInfoRequest) {
+    viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
@@ -227,7 +226,6 @@ export class TradingSystemManager {
         return this._storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
-
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user) return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -235,7 +233,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    viewProductInfo(req: Req.ProductInfoRequest): Res.BoolResponse {
+    viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
         logger.info(`view product info request for store ${req.body.storeName} product number ${req.body.catalogNumber} `)
         const user: User = this._userManager.getUserByToken(req.token)
         if (!user)

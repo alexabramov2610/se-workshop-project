@@ -404,7 +404,7 @@ export class StoreManagement {
         return {data: {result: true, receipts: receipts}}
     }
 
-    viewProductInfo(req: Req.ProductInfoRequest): Res.BoolResponse {
+    viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
         const store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
