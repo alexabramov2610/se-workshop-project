@@ -20,7 +20,6 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
   test("Add product - Happy Path: add product to new store", () => {
-    console.log("printed from test!@#!@#!@#");
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     const productToAdd = new ProductBuilder()
@@ -84,11 +83,11 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     ]).data.result;
     expect(resItem).toBe(true);
 
-    const removeResult = _serviceBridge.removeProductsFromStore(
+    const { result } = _serviceBridge.removeProductsFromStore(
       _storeInformation,
       [productToAdd]
     ).data;
-    expect(removeResult).toBe(true);
+    expect(result).toBe(true);
   });
 
   test("Remove product - remove existing product user logged out", () => {
@@ -105,16 +104,30 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       { id: 123, catalogNumber: productToAdd.catalogNumber },
     ]).data.result;
     expect(resItem).toBe(true);
-
-    const removeResult = _serviceBridge.removeProductsFromStore(
+    const res = _serviceBridge.logout();
+    expect(res.data).toBeDefined();
+    const { error } = _serviceBridge.removeProductsFromStore(
       _storeInformation,
       [productToAdd]
-    ).data;
-    expect(removeResult).toBe(true);
+    );
+    expect(error).toBeDefined();
   });
 
-  xtest("Remove product - Happy Path: remove non-existing product user logged in", () => {
-    expect(true).toBe(false);
+  test("Remove product - Happy Path: remove non-existing product user logged in", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const {
+      data,
+      error,
+    } = _serviceBridge.removeProductsFromStore(_storeInformation, [
+      productToAdd,
+    ]);
+
+    expect(data[0]).toBeUndefined();
+    expect(error).toBeDefined();
   });
 
   xtest("Edit product - Happy Path: remove existing product", () => {
