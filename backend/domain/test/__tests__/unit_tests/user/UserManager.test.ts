@@ -1,7 +1,7 @@
 import * as Responses from "../../../../src/api-int/internal_api";
 import {logger, UserRole} from "../../../../src/api-int/internal_api";
 import {UserManager} from "../../../../src/user/UserManager";
-import {RegisteredUser, StoreManager} from "../../../../src/user/internal_api";
+import {RegisteredUser,User, StoreManager} from "../../../../src/user/internal_api";
 import exp from "constants";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 
@@ -130,6 +130,16 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(userChangedInLoggedIn).toBeUndefined();
     });
 
+    test("removeProductFromCart fail product not in cart",()=>{
+        const u:User=new RegisteredUser('dor','12345');
+        jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+
+        const res:Responses.BoolResponse=userManager.removeProductFromCart({body:{catalogNumber:5},token:"whatever"})
+        expect(res.data.result).toBeFalsy();
+        expect(res.error.message).toEqual("This cart dont contain this product" )
+        expect(u.cart).toEqual([])
+
+    } )
 
     // TODO: fix setUserRole tests
 
