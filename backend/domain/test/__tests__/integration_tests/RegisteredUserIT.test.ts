@@ -45,11 +45,19 @@ describe("Registered User Integration Tests", () => {
         expect(res.data.info.productNames).toEqual(["p"]);
     });
 
-    it("logout",() => {
-        const logoutReq : Req.LogoutRequest = {token, body: {}};
+    it("logout IT test", () => {
+        const logoutReq: Req.LogoutRequest = {token, body: {}};
         const logoutRes: Res.BoolResponse = tradingSystemManager.logout(logoutReq);
         expect(logoutRes.data.result).toBe(true);
     });
 
+    it("create store IT test", () => {
+        const storeName: string = "store name";
+        const req: Req.StoreInfoRequest = {body: {storeName}, token};
+        let res: Res.BoolResponse = tradingSystemManager.createStore(req)
+        expect(res.data.result).toBe(true);
+        res = tradingSystemManager.createStore(req)
+        expect(res.data.result).toBe(false);
+    });
 });
 

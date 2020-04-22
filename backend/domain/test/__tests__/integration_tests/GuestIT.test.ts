@@ -42,7 +42,7 @@ describe("Guest Integration Tests", () => {
         expect(res.data.result).toBeDefined();
     });
 
-    it("View store information test", () => {
+    it("View store information IT test", () => {
         const ownerToken: string = utils.registeredUserLogin(tradingSystemManager, username, password)
         const storeName: string = "store name";
         utils.createStore(tradingSystemManager, storeName, ownerToken);
@@ -66,7 +66,7 @@ describe("Guest Integration Tests", () => {
     });
 
     // TODO
-    it("View product information test", () => {
+    it("View product information IT test", () => {
         expect(true)
     });
 
