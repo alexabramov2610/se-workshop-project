@@ -4,7 +4,8 @@ import * as Res from "../api-ext/Response"
 import * as Req from "../api-ext/Request"
 import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {ExternalSystems, logger, UserRole,} from "../api-int/internal_api";
+import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
+const logger = loggerW(__filename)
 import {TradingSystemState} from "../api-ext/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";

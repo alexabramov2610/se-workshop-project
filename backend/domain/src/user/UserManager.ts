@@ -1,5 +1,6 @@
 import {UserRole} from "../api-int/Enums";
-import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
+import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+const logger = loggerW(__filename)
 import {LoginRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";

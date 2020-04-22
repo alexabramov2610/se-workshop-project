@@ -11,8 +11,8 @@ import {
 } from "../../../src/api-ext/external_api";
 import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
 import utils from "./utils"
-import {logger} from "../../../src/api-int/Logger";
-
+import {loggerW} from "../../../src/api-int/Logger";
+const logger = loggerW(__filename)
 describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
     const storeOwnerPassword: string = "store-owner-pw";

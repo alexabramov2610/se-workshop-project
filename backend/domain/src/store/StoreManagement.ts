@@ -1,5 +1,6 @@
 import {Store} from './internal_api'
-import {errorMsg, logger, UserRole} from '../api-int/internal_api'
+import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
