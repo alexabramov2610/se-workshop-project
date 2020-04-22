@@ -3,6 +3,7 @@ import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
+import { changeProductName } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -26,7 +27,7 @@ export const Adapter: Partial<Env.Bridge> = {
     };
     const { data, error } = ServiceFacade.systemInit(wrapWithToken(initReq));
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
@@ -41,7 +42,7 @@ export const Adapter: Partial<Env.Bridge> = {
     };
     const response = ServiceFacade.registerUser(wrapWithToken(reqCred));
     return response.error
-      ? { data: undefined, error: response.error }
+      ? { data: undefined, error: response.error.message }
       : { data: response.data };
   },
 
@@ -52,21 +53,21 @@ export const Adapter: Partial<Env.Bridge> = {
     };
     const { data, error } = ServiceFacade.loginUser(wrapWithToken(reqCred));
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
   logout(): DummyTypes.IResponse {
     const { data, error } = ServiceFacade.logoutUser(wrapWithToken({}));
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
   createStore(store: Types.Store): DummyTypes.IStoreResponse {
     const req = wrapWithToken({ storeName: store.name });
     const { error, data } = ServiceFacade.createStore(req);
-    if (error || !data.result) return error;
+    if (error || !data.result) return { data: undefined, error: error.message };
     else if (data.result) return { data: { name: store.name } };
   },
 
@@ -74,7 +75,7 @@ export const Adapter: Partial<Env.Bridge> = {
     const req = { storeName: store.name, items };
     const { data, error } = ServiceFacade.addItems(wrapWithToken(req));
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
@@ -82,7 +83,7 @@ export const Adapter: Partial<Env.Bridge> = {
     const req = { storeName: store.name, products: products };
     const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
@@ -94,9 +95,7 @@ export const Adapter: Partial<Env.Bridge> = {
     const { data, error } = ServiceFacade.removeProducts(
       wrapWithToken(removeReq)
     );
-    return error
-      ? { data: data.productsNotRemoved, error: error }
-      : { data, error: undefined };
+    return error ? { data, error: error.message } : { data, error: undefined };
   },
 
   viewStore(store: Store) {
@@ -104,7 +103,7 @@ export const Adapter: Partial<Env.Bridge> = {
       wrapWithToken({ storeName: store.name })
     );
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data.info, error: undefined };
   },
 
@@ -113,8 +112,8 @@ export const Adapter: Partial<Env.Bridge> = {
       wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
     );
     return error
-      ? { data: undefined, error: error }
-      : { data: data.info, error: undefined };
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
   },
 
   // viewProduct(store: Store, product: Product) {
@@ -133,7 +132,7 @@ export const Adapter: Partial<Env.Bridge> = {
       wrapWithToken(req)
     );
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
@@ -151,7 +150,22 @@ export const Adapter: Partial<Env.Bridge> = {
       wrapWithToken(req)
     );
     return error
-      ? { data: undefined, error: error }
+      ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
+  changeProductName(
+    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.changeProductName(wrapWithToken(req.body));
+  },
+  changeProductPrice(
+    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  },
+
+// watchPermissions(store: Store, credentials: Credentials) {
+//
+// }
+
 };

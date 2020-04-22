@@ -1,4 +1,5 @@
 import { Bridge } from "./Bridge";
+import { ServiceFacade } from "service_layer";
 import { Adapter } from "./Adapter";
 import {
   Item,
@@ -143,14 +144,18 @@ const Proxy: Bridge = {
 
   assignManager(store: Store, credentials: Credentials): IResponse {
     return real.assignManager
-        ? real.assignManager(store, credentials)
-        : DummyValues.Response;
+      ? real.assignManager(store, credentials)
+      : DummyValues.Response;
   },
 
-  grantPermissions(credentials: Credentials, store: Store, permission: PERMISSION[]): IResponse {
+  grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permission: PERMISSION[]
+  ): IResponse {
     return real.grantPermissions
-        ? real.grantPermissions(credentials, store, permission)
-        : DummyValues.Response;
+      ? real.grantPermissions(credentials, store, permission)
+      : DummyValues.Response;
   },
 
   addProductsToStore(store: Store, products: Product[]): IResponse {
@@ -167,11 +172,33 @@ const Proxy: Bridge = {
       ? real.removeProductsFromStore(store, products)
       : DummyValues.ProductsRemovalResponse;
   },
+
   assignStoreOwner(store: Store, user: User): IResponse {
     return real.assignStoreOwner
       ? real.assignStoreOwner(store, user)
       : { data: {} };
   },
+
+  changeProductName(
+    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return real.changeProductName
+      ? real.changeProductName(req)
+      : { data: { result: true } };
+  },
+  changeProductPrice(
+    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return real.changeProductName
+      ? real.changeProductPrice(req)
+      : { data: { result: true } };
+  },
+
+  watchPermissions(store: Store, credentials: Credentials) {
+    return real.watchPermissions(store, credentials)
+        ? real.watchPermissions(store, credentials)
+        : DummyValues.PermissionsResponse;
+  }
 };
 
 export { Proxy };

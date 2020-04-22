@@ -34,9 +34,11 @@ describe("Perform authorized operations, UC: 5.1", () => {
         _serviceBridge.addProductsToStore(_testStore,[_testProduct]);
         _serviceBridge.addItemsToStore(_testStore, [_testItem]);
 
-        // _serviceBridge.logout(); // logging out so that manager can register
+         _serviceBridge.logout(); // logging out so that manager can register
 
         _serviceBridge.register(_storeManagerCredentials); // store manager registers
+
+        _driver.loginWithDefaults(); // Owner is logging in again
         _serviceBridge.assignManager(_testStore, _storeManagerCredentials);
     });
 
@@ -44,10 +46,13 @@ describe("Perform authorized operations, UC: 5.1", () => {
         _serviceBridge.logout() // Owner signs out
         _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
 
-        //TODO: check if default permissions granted
-        // const {data, error} = _serviceBridge.setDiscountToStore(_testStore, _testDiscount);
-        // expect(data).toBeUndefined();
-        // expect(error).toBeDefined();
+        const {data, error} = _serviceBridge.watchPermissions(_testStore, _storeManagerCredentials);
+        expect(data).toBeDefined();
+        expect(error).toBeUndefined();
+
+        expect(data.permissions.includes(PERMISSION.WATCH_USER_QUESTIONS)).toBeTruthy();
+        expect(data.permissions.includes(PERMISSION.REPLY_USER_QUESTIONS)).toBeTruthy();
+        expect(data.permissions.includes(PERMISSION.WATCH_PURCHASES_HISTORY)).toBeTruthy();
     });
 
     test("Act, no permissions", () => {

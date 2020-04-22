@@ -11,6 +11,7 @@ import {
   Product,
 } from "./types";
 import * as DummyTypes from "../../__tests__/mocks/responses";
+import { ServiceFacade } from "service_layer";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
@@ -53,4 +54,11 @@ export interface Bridge {
   ): DummyTypes.IResponse;
   reset(): void;
   assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
+  changeProductName(
+    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
+  ): ServiceFacade.Res.BoolResponse;
+  changeProductPrice(
+    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
+  ): ServiceFacade.Res.BoolResponse;
+  watchPermissions(store: Store, credentials: Credentials): DummyTypes.IPermissionsResponse;
 }
