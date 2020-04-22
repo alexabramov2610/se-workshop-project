@@ -13,6 +13,7 @@ import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory} from "../../../../src/api-ext/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
+import exp from "constants";
 
 
 describe("Store Management Unit Tests", () => {
@@ -991,12 +992,11 @@ describe("Store Management Unit Tests", () => {
             body: {storeName: 'my store', catalogNumber: 12345},
             token: "lala"
         })
-        expect(res.data.result).toBeTruthy()
-        expect(res.data).toEqual({
-            result: true,
-            info: {name: p.name, catalogNumber: p.catalogNumber, price: p.price, catagory: p.category}
-        })
-
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.info.catalogNumber).toBe(12345);
+        expect(res.data.info.price).toBe(15.90);
+        expect(res.data.info.category).toBe(ProductCategory.General);
+        expect(res.data.info.quantity).toBe(0);
     })
 
     test('viewProductInfo fail test', () => {

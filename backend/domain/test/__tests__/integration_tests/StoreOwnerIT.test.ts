@@ -3,10 +3,14 @@ import {Store} from "../../../src/store/Store";
 import {StoreOwner} from "../../../src/user/users/StoreOwner";
 import * as Res from "../../../src/api-ext/Response";
 import * as Req from "../../../src/api-ext/Request";
-import {Product as ProductReq, Item as ItemReq, ProductCategory} from "../../../src/api-ext/external_api";
+import {
+    Item as ItemReq,
+    Product as ProductReq,
+    ProductCategory,
+    ProductWithQuantity
+} from "../../../src/api-ext/external_api";
 import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
 import utils from "./utils"
-import {Product} from "../../../src/trading_system/data/Product";
 import {logger} from "../../../src/api-int/Logger";
 
 describe("Store Owner Integration Tests", () => {
@@ -75,6 +79,8 @@ describe("Store Owner Integration Tests", () => {
 
     it("add new items",() => {
         logger.info("starting IT: add new items");
+
+        // products don't exist
         let item1: ItemReq = {catalogNumber: 1, id: 6};
         let item2: ItemReq = {catalogNumber: 2, id: 5};
         let items: ItemReq[] = [item1, item2];
@@ -178,7 +184,7 @@ describe("Store Owner Integration Tests", () => {
         let viewStoreRes: Res.ProductInfoResponse = tradingSystemManager.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
-        expect(viewStoreRes.data.info.catagory).toBe(category1);
+        expect(viewStoreRes.data.info.category).toBe(category1);
         expect(viewStoreRes.data.info.catalogNumber).toBe(catalogNumber1);
         expect(viewStoreRes.data.info.price).toBe(oldPrice1);
         expect(viewStoreRes.data.info.name).toBe(newName1);
@@ -187,7 +193,7 @@ describe("Store Owner Integration Tests", () => {
         viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
-        expect(viewStoreRes.data.info.catagory).toBe(category2);
+        expect(viewStoreRes.data.info.category).toBe(category2);
         expect(viewStoreRes.data.info.catalogNumber).toBe(catalogNumber2);
         expect(viewStoreRes.data.info.price).toBe(oldPrice2);
         expect(viewStoreRes.data.info.name).toBe(oldName2);
@@ -203,7 +209,7 @@ describe("Store Owner Integration Tests", () => {
         viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
-        expect(viewStoreRes.data.info.catagory).toBe(category1);
+        expect(viewStoreRes.data.info.category).toBe(category1);
         expect(viewStoreRes.data.info.catalogNumber).toBe(catalogNumber1);
         expect(viewStoreRes.data.info.price).toBe(oldPrice1);
         expect(viewStoreRes.data.info.name).toBe(newName1);
@@ -212,7 +218,7 @@ describe("Store Owner Integration Tests", () => {
         viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
-        expect(viewStoreRes.data.info.catagory).toBe(category2);
+        expect(viewStoreRes.data.info.category).toBe(category2);
         expect(viewStoreRes.data.info.catalogNumber).toBe(catalogNumber2);
         expect(viewStoreRes.data.info.price).toBe(newPrice2);
         expect(viewStoreRes.data.info.name).toBe(oldName2);
@@ -318,7 +324,7 @@ describe("Store Owner Integration Tests", () => {
         expect(removeProductsRes.data.productsNotRemoved.length).toBe(products.length);
 
         // add valid products
-        const addProductsReq: Req.AddProductsRequest = {body: { storeName: storeName, products: products}, token: token};
+        let addProductsReq: Req.AddProductsRequest = {body: { storeName: storeName, products: products}, token: token};
         let productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
 
         expect(productAdditionRes.data.result).toBeTruthy();
@@ -339,13 +345,22 @@ describe("Store Owner Integration Tests", () => {
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
-
         // remove some invalid products
-        product1 = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        product2 = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
-        const product3 = {name: 'mock3', catalogNumber: -15, price: 1123, category: 2};
-        const product4 = {name: 'mock4', catalogNumber: 15, price: -1123, category: 2};
-        const product5 = {name: 'mock5', catalogNumber: 15, price: 1123, category: -2};
+        const price1: number = 123;
+        const catalog1: number = 5;
+        const category1: ProductCategory = ProductCategory.Electronics;
+        const name1: string = "mock1";
+
+        const price2: number = 1123;
+        const catalog2: number = 15;
+        const category2: ProductCategory = ProductCategory.Electronics;
+        const name2: string = "mock2";
+
+        product1 = {name: name1, catalogNumber: catalog1, price: price1, category: category1};
+        product2 = {name: name2, catalogNumber: catalog2, price: price2, category: category2};
+        let product3: ProductReq = {name: 'mock3', catalogNumber: -15, price: 1123, category: 2};
+        let product4: ProductReq = {name: 'mock4', catalogNumber: 15, price: -1123, category: 2};
+        let product5: ProductReq = {name: 'mock5', catalogNumber: 15, price: 1123, category: -2};
 
         products = [product1, product2, product3, product4, product5];
         removeProductsReq = {body: { storeName: storeName, products: products}, token: token};
@@ -355,7 +370,65 @@ describe("Store Owner Integration Tests", () => {
         expect(removeProductsRes.data.productsNotRemoved).toBeDefined();
         expect(removeProductsRes.data.productsNotRemoved.length).toBe(3);
 
+        // add 2 valid products
+        products = [product1, product2];
+        addProductsReq = {body: { storeName: storeName, products: products}, token: token};
+        productAdditionRes = tradingSystemManager.addNewProducts(addProductsReq);
+
+        expect(productAdditionRes.data.result).toBe(true);
+        expect(productAdditionRes.data.productsNotAdded).toBeDefined();
+        expect(productAdditionRes.data.productsNotAdded).toHaveLength(0);
+
+        // product 1 and 2 are added, add items
+        const item1: ItemReq = {catalogNumber: catalog1, id: 1};
+        const item2: ItemReq = {catalogNumber: catalog1, id: 2};
+        const item3: ItemReq = {catalogNumber: catalog1, id: 3};
+        const item4: ItemReq = {catalogNumber: catalog1, id: 4};
+        const item5: ItemReq = {catalogNumber: catalog2, id: 1};
+        const item6: ItemReq = {catalogNumber: catalog2, id: 2};
+        const item7: ItemReq = {catalogNumber: catalog2, id: 3};
+        const item8: ItemReq = {catalogNumber: catalog2, id: 4};
+        const items: ItemReq[] = [item1, item2, item3, item4, item5, item6, item7, item8];
+
+        const quantityToRemove1: number = 2;
+        const quantityToRemove2: number = 4;
+
+        const addItemsReq: Req.ItemsAdditionRequest = {body: { storeName: storeName, items: items}, token: token};
+        const itemsAdditionRes: Res.ItemsAdditionResponse = tradingSystemManager.addItems(addItemsReq);
+        expect(itemsAdditionRes.data.result).toBeTruthy();
+        expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
+        expect(itemsAdditionRes.data.itemsNotAdded).toHaveLength(0);
+
+        const prodToRemove: ProductWithQuantity[] = [{quantity: quantityToRemove1, catalogNumber: catalog1}, {quantity: quantityToRemove2, catalogNumber: catalog2}];
+        const removeProductsWithQuantityReq: Req.RemoveProductsWithQuantity = {body: { storeName: storeName, products:prodToRemove}, token};
+        const removeProductsWithQuantityRes: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(removeProductsWithQuantityReq);
+
+        expect(removeProductsWithQuantityRes.data.result).toBeTruthy();
+        expect(removeProductsWithQuantityRes.data.productsNotRemoved).toBeDefined();
+        expect(removeProductsWithQuantityRes.data.productsNotRemoved).toHaveLength(0);
+
+        let viewStoreReq: Req.ProductInfoRequest = {body: {storeName: storeName, catalogNumber: catalog1}, token};
+        let viewStoreRes: Res.ProductInfoResponse = tradingSystemManager.viewProductInfo(viewStoreReq);
+
+        expect(viewStoreRes.data.result).toBe(true);
+        expect(viewStoreRes.data.info.category).toBe(category1);
+        expect(viewStoreRes.data.info.catalogNumber).toBe(catalog1);
+        expect(viewStoreRes.data.info.price).toBe(price1);
+        expect(viewStoreRes.data.info.name).toBe(name1);
+        expect(viewStoreRes.data.info.quantity).toBe(4-quantityToRemove1);
+
+        viewStoreReq = {body: {storeName: storeName, catalogNumber: catalog2}, token};
+        viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
+
+        expect(viewStoreRes.data.result).toBe(true);
+        expect(viewStoreRes.data.info.category).toBe(category2);
+        expect(viewStoreRes.data.info.catalogNumber).toBe(catalog2);
+        expect(viewStoreRes.data.info.price).toBe(price2);
+        expect(viewStoreRes.data.info.name).toBe(name2);
+        expect(viewStoreRes.data.info.quantity).toBe(4-quantityToRemove2);
+
     });
+
 
 
 });
