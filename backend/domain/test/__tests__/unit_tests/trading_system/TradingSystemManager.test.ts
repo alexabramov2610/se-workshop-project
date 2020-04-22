@@ -924,7 +924,7 @@ describe("Store Management Unit Tests", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
         const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
-        jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(true);
+        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(true);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
         const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
@@ -939,7 +939,7 @@ describe("Store Management Unit Tests", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
         const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
-        jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(false);
+        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(false);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
         const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
@@ -953,7 +953,7 @@ describe("Store Management Unit Tests", () => {
     test("saveProductToCart no such product-Fail test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
-        jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(false);
+        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(false);
 
         const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
         const res = tradingSystemManager.saveProductToCart(req);

@@ -272,7 +272,7 @@ export class TradingSystemManager {
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        const inStock: boolean = store.isProductInStock(req.body.catalogNumber, req.body.amount);
+        const inStock: boolean = store.isProductAmountInStock(req.body.catalogNumber, req.body.amount);
         if (!inStock)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK}};
         logger.debug(` product: ${req.body.catalogNumber} added to cart`)

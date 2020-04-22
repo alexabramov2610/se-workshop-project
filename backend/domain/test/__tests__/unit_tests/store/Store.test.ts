@@ -519,15 +519,15 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-    test("productInStock seccess test", () => {
+    test("productInStock success test", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
         const items: Item[] = generateValidItems(10, 0, 1, 0);
-        const res = store.isProductInStock(1, 3);
+        const res = store.isProductAmountInStock(1, 3);
         expect(res).toBeFalsy();
 
         store.addItems(items);
-        const resAfter = store.isProductInStock(1, 3);
+        const resAfter = store.isProductAmountInStock(1, 3);
         expect(resAfter).toBeTruthy();
     })
 
@@ -537,7 +537,7 @@ describe("Store Management Unit Tests", () => {
         for (let i = 1; i < numOfItems +1; i ++)
             products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
 
-        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+        const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
         expect(res.data.result).toBeTruthy();
         expect(res.data.productsNotAdded.length).toBe(0);
@@ -565,7 +565,7 @@ describe("Store Management Unit Tests", () => {
         for (let i = 1; i < numOfItems +1; i ++)
             products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
 
-        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+        const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
         expect(res.data.result).toBeTruthy();
         expect(res.data.productsNotAdded.length).toBe(0);
@@ -590,7 +590,7 @@ describe("Store Management Unit Tests", () => {
         for (let i = 1; i < numOfItems +1; i ++)
             products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
 
-        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+        const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
         expect(res.data.result).toBeTruthy();
         expect(res.data.productsNotAdded.length).toBe(0);
@@ -631,7 +631,7 @@ describe("Store Management Unit Tests", () => {
         for (let i = 1; i < numOfItems +1; i ++)
             products.push(new Product("name" + i, i, 20*i, category1));
 
-        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+        const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
         expect(res.data.result).toBeTruthy();
         expect(res.data.productsNotAdded.length).toBe(0);
