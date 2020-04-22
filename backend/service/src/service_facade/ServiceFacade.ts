@@ -136,6 +136,7 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes => {
     return runIfOpen(req, UserService.viewRegisteredUserPurchasesHistory);
 }
+export {Req,Res};
 
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
@@ -143,5 +144,4 @@ const runIfOpen = (req: Req.Request, fn: any): any => {
         return {data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
 }
-
 
