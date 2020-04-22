@@ -15,11 +15,11 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest, ts: TS): Res.StoreInfoR
     return ts.viewStoreInfo(req);
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest,ts: TS): Res.ChangeProductNameResponse => {
+export const changeProductName = (req: Req.ChangeProductNameRequest,ts: TS): Res.BoolResponse => {
    return ts.changeProductName(req);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest,ts: TS): Res.ChangeProductPriceResponse => {
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest,ts: TS): Res.BoolResponse => {
    return ts.changeProductPrice(req);
 }
 

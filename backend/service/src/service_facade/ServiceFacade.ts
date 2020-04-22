@@ -65,11 +65,11 @@ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.logoutUser)
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.changeProductName);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.changeProductPrice);
 }
 
