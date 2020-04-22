@@ -7,7 +7,7 @@ describe("Guest Login, UC: 2.3", () => {
 
   beforeEach(() => {
     _driver = new Driver();
-    _serviceBridge = _driver.resetState().initWithDefaults().startSession().getBridge();
+    _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
     _credentials = { userName: "test-username", password: "test-Password132" };
   });
 
@@ -38,8 +38,8 @@ describe("Guest Login, UC: 2.3", () => {
     _credentials.password = "validPassword123";
 
     const { data, error } = _serviceBridge.login(_credentials);
-    expect(error).toBeUndefined();
-    expect(data).toBeDefined();
+    expect(data).toBeUndefined();
+    expect(error).toBeDefined();
   });
 
   test("Valid details and registered and logged in", () => {
