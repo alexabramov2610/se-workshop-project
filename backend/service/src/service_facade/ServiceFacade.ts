@@ -35,7 +35,7 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
     if (!loginRes.data.result) return loginRes;
 
-    const setAdminReq: Req.RegisterRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
+    const setAdminReq: Req.SetAdminRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
     const setAdminRes: Res.BoolResponse = tradingSystem.setAdmin(setAdminReq)
     if (setAdminRes.error) return setAdminRes;
     const connectExtReq: Req.Request = {body: {}, token: req.token};
