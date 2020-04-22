@@ -35,7 +35,7 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     const loginRes: Res.BoolResponse = tradingSystem.login(loginReq);
     if (!loginRes.data.result) return loginRes;
 
-    const setAdminReq: Req.RegisterRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
+    const setAdminReq: Req.SetAdminRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
     const setAdminRes: Res.BoolResponse = tradingSystem.setAdmin(setAdminReq)
     if (setAdminRes.error) return setAdminRes;
     const connectExtReq: Req.Request = {body: {}, token: req.token};
@@ -65,11 +65,11 @@ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.logoutUser)
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest): Res.ChangeProductNameResponse => {
+export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.changeProductName);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.ChangeProductPriceResponse => {
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.changeProductPrice);
 }
 

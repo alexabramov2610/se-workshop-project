@@ -135,6 +135,7 @@ export {
     ViewUsersContactUsMessagesRequest,
     ChangeProductPriceRequest,
     ChangeProductNameRequest,
-    ViewRUserPurchasesHistoryReq
+    ViewRUserPurchasesHistoryReq,
+    InitReq
 };
 

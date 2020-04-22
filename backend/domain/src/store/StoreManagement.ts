@@ -1,5 +1,6 @@
 import {Store} from './internal_api'
-import {errorMsg, logger, UserRole} from '../api-int/internal_api'
+import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
@@ -29,16 +30,19 @@ export class StoreManagement {
     }
 
     addStore(storeName: string, owner: RegisteredUser): Res.BoolResponse {
-        if (storeName !== '') {
-            const newStore = new Store(storeName);
-            newStore.setFirstOwner(owner);
-            this._stores.push(newStore);
-            logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
-            return {data: {result: true}}
-        } else {
+        if (this.verifyStoreExists(storeName)) {
+            return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+        }
+        if (!storeName || storeName === '') {
             logger.warn(`failed adding store ${storeName} to system`)
             return {data: {result: false}, error: {message: errorMsg.E_STORE_ADDITION}}
         }
+        const newStore = new Store(storeName);
+        newStore.setFirstOwner(owner);
+        this._stores.push(newStore);
+        logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
+        return {data: {result: true}}
+
     }
 
     verifyStoreExists(storeName: string): boolean {
@@ -46,7 +50,7 @@ export class StoreManagement {
             if (store.storeName === storeName)
                 return true;
         }
-        logger.warn(`could not verify store ${storeName}`);
+        logger.warn(`store ${storeName} doesn't exist`);
         return false;
     }
 
@@ -65,12 +69,12 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission): Res.BoolResponse {
-        let error:string;
-        let store: Store = this.findStoreByName(storeName);
+        let error: string;
+        const store: Store = this.findStoreByName(storeName);
         if (!store)
             error = errorMsg.E_INVALID_STORE;
         else if (!store.verifyPermission(user.name, permission))
-             error = errorMsg.E_NOT_AUTHORIZED;
+            error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -246,7 +250,7 @@ export class StoreManagement {
     }
 
     removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
-        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to assign user:
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
 
@@ -258,8 +262,8 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
-        if (!userWhoAssignsOwner) {
+        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
+        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
@@ -274,9 +278,58 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
+        if (!userWhoRemovesOwner.isAssignerOfOwner(userOwnerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + userOwnerToRemove.name;
+            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove owner:
+                ${userOwnerToRemove.name}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
         const additionRes: Res.BoolResponse = store.removeStoreOwner(userOwnerToRemove);
         if (additionRes.data.result)
-            userWhoAssignsOwner.removeStoreOwner(userOwnerToRemove);
+            userWhoRemovesOwner.removeStoreOwner(userOwnerToRemove);
+        return additionRes;
+    }
+
+    removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
+                ${JSON.stringify(userToRemove.name)} as a manager in store: ${JSON.stringify(storeName)} `)
+        let error: string;
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
+        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userManagerToRemove: StoreManager = store.getStoreManager(userToRemove.name);
+        if (!userManagerToRemove) {   // not store owner
+            error = errorMsg.E_NOT_OWNER;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!userWhoRemovesOwner.isAssignerOfManager(userManagerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + userManagerToRemove.name;
+            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove manager:
+                ${userManagerToRemove.name}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        const additionRes: Res.BoolResponse = store.removeStoreManager(userManagerToRemove);
+        if (additionRes.data.result)
+            userWhoRemovesOwner.removeStoreManager(userManagerToRemove);
         return additionRes;
     }
 
@@ -401,16 +454,26 @@ export class StoreManagement {
             error: {message: errorMsg.E_PERMISSION}
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {result: true, receipts: receipts}}
+        return {data: {result: true, receipts}}
     }
 
-    viewProductInfo(req: Req.ProductInfoRequest): Res.BoolResponse {
+    viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
         const store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (product) {
-            return product.viewProductInfo()
+            const quantity: number = store.getProductQuantity(product.catalogNumber);
+            return {data: {result: true,
+                    info: {
+                        name: product.name,
+                        catalogNumber: product.catalogNumber,
+                        price: product.price,
+                        category: product.category,
+                        quantity
+                    }
+                }
+            }
         } else {
             return {data: {result: false}}
         }
@@ -445,7 +508,7 @@ export class StoreManagement {
         return items;
     }
 
-    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+    private verifyPermissions(permissions: ManagementPermission[]): boolean {
         return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
