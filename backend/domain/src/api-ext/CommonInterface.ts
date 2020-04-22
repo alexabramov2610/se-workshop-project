@@ -19,6 +19,12 @@ export interface Purchase {
     price: number;
 }
 
+export interface BagItem {
+    product: Product,
+    amount: number;
+}
+
+
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number
 }

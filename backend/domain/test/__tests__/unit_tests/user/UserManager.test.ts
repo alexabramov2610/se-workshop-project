@@ -1,10 +1,14 @@
 import * as Responses from "../../../../src/api-int/internal_api";
-import {loggerW, UserRole} from "../../../../src/api-int/internal_api";
+import {loggerW, UserRole,RemoveFromCartRequest} from "../../../../src/api-int/internal_api";
 const logger = loggerW(__filename)
 import {UserManager} from "../../../../src/user/UserManager";
-import {RegisteredUser, StoreManager} from "../../../../src/user/internal_api";
+import {RegisteredUser,User, StoreManager} from "../../../../src/user/internal_api";
 import exp from "constants";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
+import { ProductCategory } from "../../../../src/api-ext/CommonInterface";
+import { Product } from "../../../../src/trading_system/data/Product";
+import { Store } from "../../../../src/store/Store";
+
 
 describe("RegisteredUser Management Unit Tests", () => {
     let userManager: UserManager;
@@ -130,6 +134,55 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(userChangedInRegistered).toBeUndefined();
         expect(userChangedInLoggedIn).toBeUndefined();
     });
+
+    test("removeProductFromCart seccess",()=>{
+        const u:User=new RegisteredUser('dor','12345');
+         jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+         const p:Product=new Product('table',5,120,ProductCategory.Home);
+         userManager.saveProductToCart(u,'store',p,5);
+         expect(u.cart.get('store')).toEqual([{product:p,amount:5}])
+    
+         const req:RemoveFromCartRequest={body:{storeName:'store',catalogNumber:p.catalogNumber,amount:4},token:"whatever"}
+         const res:Responses.BoolResponse=userManager.removeProductFromCart(req);
+         expect(res.data.result).toBeTruthy();
+         expect(u.cart.get('store')).toEqual([{product:p,amount:1}])
+
+         const req2:RemoveFromCartRequest={body:{storeName:'store',catalogNumber:p.catalogNumber,amount:3},token:"whatever"}
+         const res2:Responses.BoolResponse=userManager.removeProductFromCart(req);
+         expect(res.data.result).toBeTruthy();
+         expect(u.cart.get('store')).toBeFalsy()
+
+
+    })
+
+    test("removeProductFromCart fail no such store",()=>{
+            const u:User=new RegisteredUser('dor','12345');
+            const p:Product=new Product('table',5,120,ProductCategory.Home);
+            jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+            const res:Responses.BoolResponse=userManager.removeProductFromCart({body:{storeName:'store',catalogNumber:5,amount:1},token:"whatever"})
+            expect(res.data.result).toBeFalsy();
+            expect(res.error.message).toEqual("Store does not exist." )
+        
+        });
+
+    test('view cart  seccess test',()=>{
+        const u:User=new RegisteredUser('dor','12345');
+        jest.spyOn(userManager,"getUserByToken").mockReturnValue(u);
+        const p=new Product('table',15,120,ProductCategory.Home);
+    
+        const res:Responses.ViewCartRes=userManager.viewCart({body:{},token:'whatever'});
+        expect(res.data.cart).toEqual(u.cart);
+        expect(res.data.result).toBeTruthy();
+    
+        u.saveProductToCart('store',p,3);
+        const res2:Responses.ViewCartRes=userManager.viewCart({body:{},token:'whatever'});
+        expect(res2.data.cart).toEqual(u.cart);
+        expect(u.cart.get('store').length).toBe(3)
+        expect(res2.data.result).toBeTruthy();
+    
+    
+    
+    })
 
 
     // TODO: fix setUserRole tests

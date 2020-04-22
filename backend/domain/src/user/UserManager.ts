@@ -1,7 +1,7 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
 const logger = loggerW(__filename)
-import {LoginRequest, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
+import {LoginRequest, LogoutRequest, Product, RegisterRequest,BagItem} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -191,9 +191,43 @@ class UserManager {
         return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
-    addProductToCart(user: User, product: Product): void {
-        user.addProductToCart(product);
+    saveProductToCart(user:User,storeName:string,product:Product,amount:number): void {
+        user.saveProductToCart(storeName,product,amount);
     }
+
+    removeProductFromCart(req:Req.RemoveFromCartRequest): BoolResponse {
+
+        const user = this.getUserByToken(req.token);
+        if (!user) {
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        }
+        const storeCart: BagItem[] = user.cart.get(req.body.storeName);
+        if (!storeCart) {
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
+        }
+        const oldBag = storeCart.find((b) => b.product.catalogNumber === req.body.catalogNumber);    
+        if (!oldBag) {
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_PRODUCT}}
+        }
+        user.removeProductFromCart(req)
+        return {
+            data: {result: true}
+        }
+
+    
+    }
+
+    viewCart(req:Req.ViewCartReq):Res.ViewCartRes{
+        const user=this.getUserByToken(req.token)
+
+        if(!user){
+            return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        }
+        const cart=user.cart
+        return {data:{result:true,cart}}
+    }
+
+   
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}
