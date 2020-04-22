@@ -130,5 +130,4 @@
 //         const last4 = _testCreditCard.number.substring(start);
 //         expect(transaction.ccLast4).toEqual(last4);
 //     });
-//
 // });
