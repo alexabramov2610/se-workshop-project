@@ -27,8 +27,8 @@ export default {
         expect(tradingSystemManager.createStore(req).data.result).toBe(true);
     },
 
-    addNewProducts(tradingSystemManager: TradingSystemManager, storeName: string, products: Product[], token:string): void{
-        expect(tradingSystemManager.addNewProducts({body: {storeName, products}, token}).data.result).toBe(true);
+    addNewProducts(tradingSystemManager: TradingSystemManager, storeName: string, products: Product[], token:string, expectedRes: boolean): void{
+        expect(tradingSystemManager.addNewProducts({body: {storeName, products}, token}).data.result).toBe(expectedRes);
     },
 
     removeProducts(tradingSystemManager: TradingSystemManager, storeName: string, products: Product[], token:string): void{
