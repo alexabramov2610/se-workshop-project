@@ -430,21 +430,33 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("assign and remove store owners", () => {
-        const newUsername: string = "new-assign-mock";
+        const newUsername1: string = "new-assign-mock1";
+        const newUsername2: string = "new-assign-mock2";
         const newPassword: string = "new-assign-mock-pw";
-        const newUser: RegisteredUser = new RegisteredUser(newUsername, newPassword);
-        // const storeOwnerToAssign: StoreOwner = new StoreOwner(newUsername);
+        const newUser1: RegisteredUser = new RegisteredUser(newUsername1, newPassword);
+        const newUser2: RegisteredUser = new RegisteredUser(newUsername2, newPassword);
 
-        utils.registerNewUser(tradingSystemManager, newUser, token, true);
-        utils.loginExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
+        utils.registerNewUser(tradingSystemManager, newUser1, token, true);
+        utils.registerNewUser(tradingSystemManager, newUser2, token, false);
+        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
 
         // assign valid store owner
-        let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: newUser.name}, token};
+        let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: newUser1.name}, token};
         let assignStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
+        // assign circular store owner
+        utils.loginAsExistingUser(tradingSystemManager, newUser1, token, true);
+
+        assignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: storeOwnerRegisteredUser.name}, token};
+        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(false);
+
         // assign invalid store owner
+        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+
         assignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: "invalid-username"}, token};
         assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
 
@@ -456,19 +468,86 @@ describe("Store Owner Integration Tests", () => {
 
         expect(assignStoreOwnerResponse.data.result).toBe(false);
 
-        // store owner tries to remove himself //todo - bug!
-        // let removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: storeOwner.name}, token};
-        // let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
-        //
-        // expect(removeStoreOwnerResponse.data.result).toBe(false);
+        // store owner tries to remove himself
+        let removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: storeOwner.name}, token};
+        let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+
+        expect(removeStoreOwnerResponse.data.result).toBe(false);
 
         // store owner tries to remove not assigned by him store owner //todo: add new store owner in same store , in another
-        //
-        //
-        // let removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: storeOwner.name}, token};
-        // let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
-        //
-        // expect(assignStoreOwnerResponse.data.result).toBe(false);
+        // same store
+        // assign user2 by user1
+        utils.loginAsExistingUser(tradingSystemManager, newUser1, token, true);
+
+        assignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: newUser2.name}, token};
+        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        // remove user2 by storeOwner
+        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+
+        removeStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: newUser2.name}, token};
+        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+
+        expect(removeStoreOwnerResponse.data.result).toBe(false);
+
+
+        // another store
+        // user2 creates new store
+        const storeName2: string = "new-store-name-user-2";
+        utils.loginAsExistingUser(tradingSystemManager, newUser2, token, true);
+        utils.createStore(tradingSystemManager, storeName2, token);
+
+        // user2 assigns user1
+        assignStoreOwnerRequest = {body: {storeName: storeName2, usernameToAssign: newUser1.name}, token};
+        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        // storeOwner tries to remove user1, user2 from storeName2
+        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+
+        removeStoreOwnerRequest = {body: {storeName: storeName2, usernameToRemove: newUser1.name}, token};
+        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+
+        expect(removeStoreOwnerResponse.data.result).toBe(false);
+
+        removeStoreOwnerRequest = {body: {storeName: storeName2, usernameToRemove: newUser2.name}, token};
+        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+
+        expect(removeStoreOwnerResponse.data.result).toBe(false);
+
+    });
+
+    it("assign, remove store managers and change permissions", () => {
+        const newUsername1: string = "new-assign-mock1";
+        const newUsername2: string = "new-assign-mock2";
+        const newPassword: string = "new-assign-mock-pw";
+        const newUser1: RegisteredUser = new RegisteredUser(newUsername1, newPassword);
+        const newUser2: RegisteredUser = new RegisteredUser(newUsername2, newPassword);
+
+        utils.registerNewUser(tradingSystemManager, newUser1, token, true);
+        utils.registerNewUser(tradingSystemManager, newUser2, token, false);
+        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
+
+        // assign valid store manager
+        let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: newUser1.name}, token};
+        let assignStoreManagerResponse: Res.BoolResponse = tradingSystemManager.assignStoreManager(assignStoreManagerRequest);
+
+        expect(assignStoreManagerResponse.data.result).toBe(true);
+
+        assignStoreManagerRequest = {body: {storeName: storeName, usernameToAssign: newUser2.name}, token};
+        assignStoreManagerResponse = tradingSystemManager.assignStoreManager(assignStoreManagerRequest);
+
+        expect(assignStoreManagerResponse.data.result).toBe(true);
+
+        // remove store manager1
+        let removeStoreManagerRequest: Req.RemoveStoreManagerRequest = {body: {storeName: storeName, usernameToRemove: newUser1.name}, token};
+        let removeStoreManagerResponse: Res.BoolResponse = tradingSystemManager.removeStoreManager(removeStoreManagerRequest);
+
+        expect(removeStoreManagerResponse.data.result).toBe(true);
+
 
     });
 

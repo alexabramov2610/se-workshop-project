@@ -24,15 +24,15 @@ export default {
 
     createStore(tradingSystemManager: TradingSystemManager, storeName: string, token:string): void{
         const req: Req.StoreInfoRequest = {body: {storeName}, token};
-        tradingSystemManager.createStore(req)
+        expect(tradingSystemManager.createStore(req).data.result).toBe(true);
     },
 
     addNewProducts(tradingSystemManager: TradingSystemManager, storeName: string, products: Product[], token:string): void{
-        tradingSystemManager.addNewProducts({body:{storeName,products},token});
+        expect(tradingSystemManager.addNewProducts({body: {storeName, products}, token}).data.result).toBe(true);
     },
 
     removeProducts(tradingSystemManager: TradingSystemManager, storeName: string, products: Product[], token:string): void{
-        tradingSystemManager.removeProducts({body:{storeName,products},token});
+        expect(tradingSystemManager.removeProducts({body: {storeName, products}, token}).data.result).toBe(true);
     },
 
     registerNewUser(tradingSystemManager: TradingSystemManager, user: RegisteredUser, token:string, isLoggedInNow: boolean): void {
@@ -46,7 +46,7 @@ export default {
 
     },
 
-    loginExistingUser(tradingSystemManager: TradingSystemManager, user: RegisteredUser, token:string, isLoggedInNow: boolean): void {
+    loginAsExistingUser(tradingSystemManager: TradingSystemManager, user: RegisteredUser, token:string, isLoggedInNow: boolean): void {
         if (isLoggedInNow) {
             const logoutReq: Req.LogoutRequest = {body: {}, token};
             expect(tradingSystemManager.logout(logoutReq).data.result).toBe(isLoggedInNow);

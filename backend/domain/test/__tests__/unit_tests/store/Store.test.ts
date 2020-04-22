@@ -473,11 +473,24 @@ describe("Store Management Unit Tests", () => {
 
     test("removeStoreOwner success", () => {
         const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
+        expect(res.data.result).toBe(true);
         expect(store.removeStoreOwner(storeOwner).data.result).toBeTruthy();
     });
 
     test("removeStoreOwner failure", () => {
         const res: Res.BoolResponse = store.removeStoreOwner(storeOwner);
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    test("removeStoreManager success", () => {
+        const res: Res.BoolResponse = store.addStoreManager(storeManager);
+        expect(res.data.result).toBe(true);
+        expect(store.removeStoreManager(storeOwner).data.result).toBeTruthy();
+    });
+
+    test("removeStoreManager failure", () => {
+        const res: Res.BoolResponse = store.removeStoreManager(storeManager);
         expect(res.data.result).toBeFalsy();
     });
 
