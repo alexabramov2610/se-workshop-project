@@ -96,6 +96,14 @@ export class Store {
         return undefined;
     }
 
+    private getStoreManagerByName(username: string): StoreManager {
+        for (const storeManager of this._storeManagers) {
+            if (storeManager.name === username)
+                return storeManager;
+        }
+        return undefined;
+    }
+
     private containsItem(product: Product, item: Item): boolean {
         return this._products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
     }
@@ -323,6 +331,15 @@ export class Store {
             return {data: {result: false}, error: {message: Error.E_NAL}}
 
         this._storeOwners = this._storeOwners.filter(currOwner => currOwner.name !== storeManagerToRemove.name);
+        return {data: {result: true}};
+    }
+
+    removeStoreManager(user: StoreManager): Res.BoolResponse {
+        const storeManagerToRemove: StoreManager = this.getStoreManagerByName(user.name);
+        if (!storeManagerToRemove)
+            return {data: {result: false}, error: {message: Error.E_NAL}}
+
+        this._storeManagers = this._storeManagers.filter(currManager => currManager.name !== storeManagerToRemove.name);
         return {data: {result: true}};
     }
 

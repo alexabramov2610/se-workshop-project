@@ -50,7 +50,7 @@ export class StoreManagement {
             if (store.storeName === storeName)
                 return true;
         }
-        logger.warn(`could not verify store ${storeName}`);
+        logger.warn(`store ${storeName} doesn't exist`);
         return false;
     }
 
@@ -250,7 +250,7 @@ export class StoreManagement {
     }
 
     removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
-        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to assign user:
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
 
@@ -262,8 +262,8 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
-        if (!userWhoAssignsOwner) {
+        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
+        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
@@ -278,9 +278,58 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
+        if (!userWhoRemovesOwner.isAssignerOfOwner(userOwnerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + userOwnerToRemove.name;
+            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove owner:
+                ${userOwnerToRemove.name}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
         const additionRes: Res.BoolResponse = store.removeStoreOwner(userOwnerToRemove);
         if (additionRes.data.result)
-            userWhoAssignsOwner.removeStoreOwner(userOwnerToRemove);
+            userWhoRemovesOwner.removeStoreOwner(userOwnerToRemove);
+        return additionRes;
+    }
+
+    removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
+        logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
+                ${JSON.stringify(userToRemove.name)} as a manager in store: ${JSON.stringify(storeName)} `)
+        let error: string;
+
+        const store: Store = this.findStoreByName(storeName);
+        if (!store) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
+        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userManagerToRemove: StoreManager = store.getStoreManager(userToRemove.name);
+        if (!userManagerToRemove) {   // not store owner
+            error = errorMsg.E_NOT_OWNER;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
+                ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!userWhoRemovesOwner.isAssignerOfManager(userManagerToRemove)) {
+            error = errorMsg.E_NOT_ASSIGNER + userManagerToRemove.name;
+            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove manager:
+                ${userManagerToRemove.name}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        const additionRes: Res.BoolResponse = store.removeStoreManager(userManagerToRemove);
+        if (additionRes.data.result)
+            userWhoRemovesOwner.removeStoreManager(userManagerToRemove);
         return additionRes;
     }
 

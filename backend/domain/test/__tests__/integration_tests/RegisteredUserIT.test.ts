@@ -26,7 +26,7 @@ describe("Registered User Integration Tests", () => {
         const ownerToken: string = utils.initSessionRegisterLogin(tradingSystemManager, usernameOwner, passwordOwner)
         const storeName: string = "store name";
         utils.createStore(tradingSystemManager, storeName, ownerToken);
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, true);
         const req: Req.StoreInfoRequest = {body: {storeName}, token};
         let res: Res.StoreInfoResponse = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
@@ -37,8 +37,8 @@ describe("Registered User Integration Tests", () => {
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
         expect(res.data.info.productNames).toEqual([]);
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, true);
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, false);
         res = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
