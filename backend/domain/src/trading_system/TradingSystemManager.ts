@@ -163,7 +163,7 @@ export class TradingSystemManager {
     }
 
     removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Res.BoolResponse {
-        logger.info(`user: ${JSON.stringify(req.token)} requested to assign user:
+        logger.info(`user: ${JSON.stringify(req.token)} requested to remove user:
                 ${JSON.stringify(req.body.usernameToRemove)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!usernameWhoRemoves) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};

@@ -32,7 +32,7 @@ describe("Store Owner Integration Tests", () => {
         storeOwner = new StoreOwner(storeOwnerName);
         tradingSystemManager = new TradingSystemManager();
 
-        token = utils.registeredUserLogin(tradingSystemManager, storeOwnerName, storeOwnerPassword);
+        token = utils.initSessionRegisterLogin(tradingSystemManager, storeOwnerName, storeOwnerPassword);
         expect(token).toBeDefined();
 
         const openStoreReq: Req.OpenStoreRequest = {body: { storeName: storeName}, token: token};
@@ -429,7 +429,48 @@ describe("Store Owner Integration Tests", () => {
 
     });
 
+    it("assign and remove store owners", () => {
+        const newUsername: string = "new-assign-mock";
+        const newPassword: string = "new-assign-mock-pw";
+        const newUser: RegisteredUser = new RegisteredUser(newUsername, newPassword);
+        // const storeOwnerToAssign: StoreOwner = new StoreOwner(newUsername);
 
+        utils.registerNewUser(tradingSystemManager, newUser, token, true);
+        utils.loginExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
+
+        // assign valid store owner
+        let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: newUser.name}, token};
+        let assignStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        // assign invalid store owner
+        assignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: "invalid-username"}, token};
+        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(false);
+
+        // store owner tries to assign himself
+        assignStoreOwnerRequest = {body: {storeName: storeName, usernameToAssign: storeOwner.name}, token};
+        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+
+        expect(assignStoreOwnerResponse.data.result).toBe(false);
+
+        // store owner tries to remove himself //todo - bug!
+        // let removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: storeOwner.name}, token};
+        // let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        //
+        // expect(removeStoreOwnerResponse.data.result).toBe(false);
+
+        // store owner tries to remove not assigned by him store owner //todo: add new store owner in same store , in another
+        //
+        //
+        // let removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName: storeName, usernameToRemove: storeOwner.name}, token};
+        // let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        //
+        // expect(assignStoreOwnerResponse.data.result).toBe(false);
+
+    });
 
 });
 

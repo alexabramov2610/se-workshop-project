@@ -43,7 +43,7 @@ describe("Guest Integration Tests", () => {
     });
 
     it("View store information test", () => {
-        const ownerToken: string = utils.registeredUserLogin(tradingSystemManager, username, password)
+        const ownerToken: string = utils.initSessionRegisterLogin(tradingSystemManager, username, password)
         const storeName: string = "store name";
         utils.createStore(tradingSystemManager, storeName, ownerToken);
         utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)

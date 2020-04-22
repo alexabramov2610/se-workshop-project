@@ -13,7 +13,7 @@ describe("Registered User Integration Tests", () => {
 
     beforeEach(() => {
         tradingSystemManager = new TradingSystemManager();
-        token = utils.registeredUserLogin(tradingSystemManager, username, password);
+        token = utils.initSessionRegisterLogin(tradingSystemManager, username, password);
         expect(token).toBeDefined();
     });
 

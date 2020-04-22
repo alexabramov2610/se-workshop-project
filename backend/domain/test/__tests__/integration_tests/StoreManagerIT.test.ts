@@ -17,7 +17,7 @@ describe("Store Manager Integration Tests", () => {
 
     beforeEach(() => {
         tradingSystemManager = new TradingSystemManager();
-        token = utils.registeredUserLogin(tradingSystemManager, storeManagerName, storeManagerPassword);
+        token = utils.initSessionRegisterLogin(tradingSystemManager, storeManagerName, storeManagerPassword);
         expect(token).toBeDefined();
 
         storeManager = new StoreManager(storeManagerName);
