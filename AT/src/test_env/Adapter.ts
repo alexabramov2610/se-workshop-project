@@ -1,140 +1,157 @@
 import * as Types from "../..";
 import * as Env from "../..";
-import {ServiceFacade} from "service_layer";
+import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import {Product, Store, Item, User, Credentials, PERMISSION} from "../..";
+import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 
 let token;
 const wrapWithToken = (req: any) => {
-    return {body: {...req}, token};
+  return { body: { ...req }, token };
 };
 
 export const Adapter: Partial<Env.Bridge> = {
-    setToken(sessionToken: string): void {
-        token = sessionToken;
-    },
+  setToken(sessionToken: string): void {
+    token = sessionToken;
+  },
 
-    startSession() {
-        const token: string = ServiceFacade.startNewSession();
-        return {data: {token: token}};
-    },
+  startSession() {
+    const token: string = ServiceFacade.startNewSession();
+    return { data: { token: token } };
+  },
 
-    init(credentials: Types.Credentials): DummyTypes.IResponse {
-        const initReq = {
-            firstAdminName: credentials.userName,
-            firstAdminPassword: credentials.password,
-        };
-        const {data, error} = ServiceFacade.systemInit(wrapWithToken(initReq));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  init(credentials: Types.Credentials): DummyTypes.IResponse {
+    const initReq = {
+      firstAdminName: credentials.userName,
+      firstAdminPassword: credentials.password,
+    };
+    const { data, error } = ServiceFacade.systemInit(wrapWithToken(initReq));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    reset() {
-        ServiceFacade.reset();
-    },
+  reset() {
+    ServiceFacade.reset();
+  },
 
-    register(credentials: Types.Credentials): DummyTypes.IResponse {
-        const reqCred = {
-            username: credentials.userName,
-            password: credentials.password,
-        };
-        const response = ServiceFacade.registerUser(wrapWithToken(reqCred));
-        return response.error
-            ? {data: undefined, error: response.error}
-            : {data: response.data};
-    },
+  register(credentials: Types.Credentials): DummyTypes.IResponse {
+    const reqCred = {
+      username: credentials.userName,
+      password: credentials.password,
+    };
+    const response = ServiceFacade.registerUser(wrapWithToken(reqCred));
+    return response.error
+      ? { data: undefined, error: response.error }
+      : { data: response.data };
+  },
 
-    login(credentials: Types.Credentials): DummyTypes.IResponse {
-        const reqCred = {
-            username: credentials.userName,
-            password: credentials.password,
-        };
-        const {data, error} = ServiceFacade.loginUser(wrapWithToken(reqCred));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  login(credentials: Types.Credentials): DummyTypes.IResponse {
+    const reqCred = {
+      username: credentials.userName,
+      password: credentials.password,
+    };
+    const { data, error } = ServiceFacade.loginUser(wrapWithToken(reqCred));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    logout(): DummyTypes.IResponse {
-        const {data, error} = ServiceFacade.logoutUser(wrapWithToken({}));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  logout(): DummyTypes.IResponse {
+    const { data, error } = ServiceFacade.logoutUser(wrapWithToken({}));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    createStore(store: Types.Store): DummyTypes.IStoreResponse {
-        const req = wrapWithToken({storeName: store.name});
-        const {error, data} = ServiceFacade.createStore(req);
-        if (error || !data.result) return error;
-        else if (data.result) return {data: {name: store.name}};
-    },
+  createStore(store: Types.Store): DummyTypes.IStoreResponse {
+    const req = wrapWithToken({ storeName: store.name });
+    const { error, data } = ServiceFacade.createStore(req);
+    if (error || !data.result) return error;
+    else if (data.result) return { data: { name: store.name } };
+  },
 
-    addItemsToStore(store: Store, items: Item[]): DummyTypes.IResponse {
-        const req = {storeName: store.name, items};
-        const {data, error} = ServiceFacade.addItems(wrapWithToken(req));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  addItemsToStore(store: Store, items: Item[]): DummyTypes.IResponse {
+    const req = { storeName: store.name, items };
+    const { data, error } = ServiceFacade.addItems(wrapWithToken(req));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
-        const req = {storeName: store.name, products: products};
-        const {data, error} = ServiceFacade.addNewProducts(wrapWithToken(req));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
+    const req = { storeName: store.name, products: products };
+    const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    removeProductsFromStore(store: Store, products: Product[]) {
-        const catalogNumbers = products.map((p) => {
-            return {catalogNumber: p.catalogNumber};
-        });
-        const removeReq = {store: store.name, products: catalogNumbers};
-        const {data, error} = ServiceFacade.removeProducts(removeReq);
-        return error
-            ? {data: data.productsNotRemoved, error: error}
-            : {data: [], error: undefined};
-    },
+  removeProductsFromStore(store: Store, products: Product[]) {
+    const catalogNumbers = products.map((p) => {
+      return { catalogNumber: p.catalogNumber };
+    });
+    const removeReq = { storeName: store.name, products: catalogNumbers };
+    const { data, error } = ServiceFacade.removeProducts(
+      wrapWithToken(removeReq)
+    );
+    return error
+      ? { data: data.productsNotRemoved, error: error }
+      : { data, error: undefined };
+  },
 
-    viewStore(store: Store) {
-        const {data, error} = ServiceFacade.viewStoreInfo(
-            wrapWithToken({storeName: store.name})
-        );
-        return error
-            ? {data: undefined, error: error}
-            : {data: data.info, error: undefined};
-    },
+  viewStore(store: Store) {
+    const { data, error } = ServiceFacade.viewStoreInfo(
+      wrapWithToken({ storeName: store.name })
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data.info, error: undefined };
+  },
 
-    assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
-        const {data, error} = ServiceFacade.assignStoreOwner(
-            wrapWithToken({storeName: store.name, usernameToAssign: user.username})
-        );
-        return error
-            ? {data: undefined, error: error}
-            : {data: data.info, error: undefined};
-    },
+  assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
+    const { data, error } = ServiceFacade.assignStoreOwner(
+      wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data.info, error: undefined };
+  },
 
-    // viewProduct(store: Store, product: Product) {
-    //   const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
-    //   return error
-    //       ? {data: undefined, error: error}
-    //       : {data: data.info, error: undefined};
-    // },
+  // viewProduct(store: Store, product: Product) {
+  //   const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
+  //   return error
+  //       ? {data: undefined, error: error}
+  //       : {data: data.info, error: undefined};
+  // },
 
-    assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
-        const req = {storeName: store.name, usernameToAssign: credentials.userName};
-        const {data, error} = ServiceFacade.assignStoreManager(wrapWithToken(req));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    },
+  assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
+    const req = {
+      storeName: store.name,
+      usernameToAssign: credentials.userName,
+    };
+    const { data, error } = ServiceFacade.assignStoreManager(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-    grantPermissions(credentials: Credentials, store: Store, permissions: PERMISSION[]): DummyTypes.IResponse {
-        const req = { managerToChange: credentials.userName, storeName: store.name, permissions: permissions };
-        const {data, error} = ServiceFacade.assignStoreManager(wrapWithToken(req));
-        return error
-            ? {data: undefined, error: error}
-            : {data: data, error: undefined};
-    }
+  grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): DummyTypes.IResponse {
+    const req = {
+      managerToChange: credentials.userName,
+      storeName: store.name,
+      permissions: permissions,
+    };
+    const { data, error } = ServiceFacade.assignStoreManager(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 };
