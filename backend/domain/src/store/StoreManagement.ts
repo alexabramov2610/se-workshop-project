@@ -29,16 +29,19 @@ export class StoreManagement {
     }
 
     addStore(storeName: string, owner: RegisteredUser): Res.BoolResponse {
-        if (storeName !== '') {
-            const newStore = new Store(storeName);
-            newStore.setFirstOwner(owner);
-            this._stores.push(newStore);
-            logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
-            return {data: {result: true}}
-        } else {
+        if (this.verifyStoreExists(storeName)) {
+            return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+        }
+        if (!storeName || storeName === '') {
             logger.warn(`failed adding store ${storeName} to system`)
             return {data: {result: false}, error: {message: errorMsg.E_STORE_ADDITION}}
         }
+        const newStore = new Store(storeName);
+        newStore.setFirstOwner(owner);
+        this._stores.push(newStore);
+        logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
+        return {data: {result: true}}
+
     }
 
     verifyStoreExists(storeName: string): boolean {
@@ -65,12 +68,12 @@ export class StoreManagement {
     }
 
     verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission): Res.BoolResponse {
-        let error:string;
-        let store: Store = this.findStoreByName(storeName);
+        let error: string;
+        const store: Store = this.findStoreByName(storeName);
         if (!store)
             error = errorMsg.E_INVALID_STORE;
         else if (!store.verifyPermission(user.name, permission))
-             error = errorMsg.E_NOT_AUTHORIZED;
+            error = errorMsg.E_NOT_AUTHORIZED;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -401,7 +404,7 @@ export class StoreManagement {
             error: {message: errorMsg.E_PERMISSION}
         }
         const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {result: true, receipts: receipts}}
+        return {data: {result: true, receipts}}
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
@@ -411,9 +414,17 @@ export class StoreManagement {
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (product) {
             const quantity: number = store.getProductQuantity(product.catalogNumber);
-            return { data: { result:true, info: { name: product.name, catalogNumber: product.catalogNumber, price: product.price, category: product.category, quantity: quantity }}}
-        }
-        else {
+            return {data: {result: true,
+                    info: {
+                        name: product.name,
+                        catalogNumber: product.catalogNumber,
+                        price: product.price,
+                        category: product.category,
+                        quantity
+                    }
+                }
+            }
+        } else {
             return {data: {result: false}}
         }
     }
@@ -447,7 +458,7 @@ export class StoreManagement {
         return items;
     }
 
-    private verifyPermissions(permissions: ManagementPermission[]) : boolean {
+    private verifyPermissions(permissions: ManagementPermission[]): boolean {
         return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
