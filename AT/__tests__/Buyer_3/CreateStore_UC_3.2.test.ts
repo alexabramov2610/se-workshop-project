@@ -20,17 +20,17 @@ describe("Create Store Buyer, UC: 3.2", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
   });
-
+ 
   test("Create Store - Sad Path:  - not logged in user", () => {
-    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _serviceBridge.logout();
     _storeInformation = { name: "mocked-sad-store" };
-    const { error } = _serviceBridge.createStore(_storeInformation);
+    const error = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
   });
 
   test("Create Store - Sad Path:  - logged in user empty store info", () => {
     _storeInformation = { name: "" };
-    const { error } = _serviceBridge.createStore(_storeInformation);
+    const error = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
   });
 
@@ -39,14 +39,14 @@ describe("Create Store Buyer, UC: 3.2", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
     expect(name).toBe(_storeInformation.name);
     _storeInformation = { name: "some-store" };
-    const { error } = _serviceBridge.createStore(_storeInformation);
+    const error = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
   });
 
   test("Create Store - Bad Path:  - not logged in user empty store info", () => {
-    _serviceBridge.logout(_driver.getLoginDefaults().userName);
+    _serviceBridge.logout();
     _storeInformation = { name: "" };
-    const { error } = _serviceBridge.createStore(_storeInformation);
+    const error = _serviceBridge.createStore(_storeInformation);
     expect(error).toBeDefined();
   });
 });
