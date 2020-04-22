@@ -172,11 +172,13 @@ const Proxy: Bridge = {
       ? real.removeProductsFromStore(store, products)
       : DummyValues.ProductsRemovalResponse;
   },
+
   assignStoreOwner(store: Store, user: User): IResponse {
     return real.assignStoreOwner
       ? real.assignStoreOwner(store, user)
       : { data: {} };
   },
+
   changeProductName(
     req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
   ): ServiceFacade.Res.BoolResponse {
@@ -191,6 +193,12 @@ const Proxy: Bridge = {
       ? real.changeProductPrice(req)
       : { data: { result: true } };
   },
+
+  watchPermissions(store: Store, credentials: Credentials) {
+    return real.watchPermissions(store, credentials)
+        ? real.watchPermissions(store, credentials)
+        : DummyValues.PermissionsResponse;
+  }
 };
 
 export { Proxy };

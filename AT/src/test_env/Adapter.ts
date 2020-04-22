@@ -163,6 +163,9 @@ export const Adapter: Partial<Env.Bridge> = {
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
+
+// watchPermissions(store: Store, credentials: Credentials) {
+//
+// }
+
 };
-
-

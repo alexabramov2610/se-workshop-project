@@ -60,5 +60,5 @@ export interface Bridge {
   changeProductPrice(
     req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
   ): ServiceFacade.Res.BoolResponse;
+  watchPermissions(store: Store, credentials: Credentials): DummyTypes.IPermissionsResponse;
 }
-

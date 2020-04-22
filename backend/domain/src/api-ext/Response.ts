@@ -59,6 +59,7 @@ interface ProductInfoResponse extends Response{
 
 }
 
+
 interface ViewRUserPurchasesHistoryRes extends Response{
     data:{result:boolean, receipts: Receipt[]}
 }
