@@ -5,6 +5,7 @@ import * as Res from "../../../src/api-ext/Response";
 import * as Req from "../../../src/api-ext/Request";
 import {
     Item as ItemReq,
+    ManagementPermission,
     Product as ProductReq,
     ProductCategory,
     ProductWithQuantity
@@ -12,6 +13,7 @@ import {
 import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
 import utils from "./utils"
 import {loggerW} from "../../../src/api-int/Logger";
+
 const logger = loggerW(__filename)
 describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
@@ -548,7 +550,23 @@ describe("Store Owner Integration Tests", () => {
 
         expect(removeStoreManagerResponse.data.result).toBe(true);
 
+        const permission1: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
+        const permission2: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
+        const permission3: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
 
+        const permissionsToChange: ManagementPermission[] = [permission1, permission2, permission3];
+
+        let changeManagerPermissionReq: Req.ChangeManagerPermissionRequest = { body: {managerToChange: newUser2.name, storeName: storeName, permissions: permissionsToChange}, token };
+        let changeManagerPermissionRes: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(changeManagerPermissionReq);
+
+        expect(changeManagerPermissionRes.data.result).toBe(true);
+
+        changeManagerPermissionReq = { body: {managerToChange: newUser2.name, storeName: storeName, permissions: permissionsToChange}, token };
+        changeManagerPermissionRes = tradingSystemManager.addManagerPermissions(changeManagerPermissionReq);
+
+        expect(changeManagerPermissionRes.data.result).toBe(true);
+
+        //todo: once get all permissions by user is implemented we can verify permissions were changed
     });
 
 });
