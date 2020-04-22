@@ -14,9 +14,9 @@ describe("Perform authorized operations, UC: 5.1", () => {
         _serviceBridge = _driver
             .resetState()
             .initWithDefaults()
+            .startSession()
             .registerWithDefaults()
             .loginWithDefaults()
-            .startSession()
             .getBridge();
 
         _testProduct = new ProductBuilder()
@@ -25,7 +25,6 @@ describe("Perform authorized operations, UC: 5.1", () => {
             .withCategory(CATEGORY.CLOTHING)
             .withCatalogNumber(789)
             .getProduct();
-
         _testItem = new ItemBuilder()
             .withId(123)
             .withCatalogNumber(789)

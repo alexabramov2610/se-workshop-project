@@ -20,6 +20,7 @@ describe("Guest watch cart, UC: 2.7", () => {
             .resetState()
             .initWithDefaults()
             .startSession()
+            .registerWithDefaults()
             .loginWithDefaults()
             .getBridge();
 
