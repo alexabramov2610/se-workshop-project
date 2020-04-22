@@ -1,60 +1,54 @@
-import {Product,BagItem} from "../../api-ext/CommonInterface";
-import {BoolResponse} from "../../api-ext/Response";	
+import {Product, BagItem} from "../../api-ext/CommonInterface";
+import {BoolResponse} from "../../api-ext/Response";
 import {errorMsg} from "../../api-int/Error";
 import {RemoveFromCartRequest} from "../../api-ext/Request";
 import {loggerW} from "../../api-int/Logger";
+
 const logger = loggerW(__filename)
 
 
 export abstract class User {
 
-    private _cart: Map<string, BagItem[ ]>;
+    private _cart: Map<string, BagItem[]>;
 
-    constructor(){
-        this._cart=new Map();
+    constructor() {
+        this._cart = new Map();
     }
 
-    
 
-    removeProductFromCart(req:RemoveFromCartRequest):void {
-        const storeName=req.body.storeName;
-        const amount=req.body.amount;
-        const catalogNumber=req.body.catalogNumber;
-        const storeCart:BagItem[]=this.cart.get(storeName);
-        const oldBag: BagItem = storeCart.find((b) => b.product.catalogNumber === catalogNumber);
-        const newBag = {product: oldBag.product, amount: oldBag.amount - amount}
+    removeProductFromCart(storeName: string, product: Product, amount: number): void {
+        const storeCart: BagItem[] = this.cart.get(storeName);
+        const oldBagItem: BagItem = storeCart.find((b) => b.product.catalogNumber === product.catalogNumber);
+        const newBagItem = {product: oldBagItem.product, amount: oldBagItem.amount - amount}
 
-        const filteredCart=storeCart.filter((b) => b.product.catalogNumber !== catalogNumber)
-        if(newBag.amount>0){
-             const newCart=filteredCart.concat(newBag);
-            this.cart.delete(storeName);
-            this._cart.set(storeName,newCart)
-        }
-        else{
-            this.cart.delete(storeName); 
-            filteredCart!=[]?this.cart.delete(storeName):this._cart
+        const filteredBag = storeCart.filter((b) => b.product.catalogNumber !== product.catalogNumber)
+        if (newBagItem.amount > 0) {
+            this._cart.set(storeName, filteredBag.concat([newBagItem]))
+        } else {
+            this._cart.set(storeName, filteredBag)
         }
     }
 
 
-    saveProductToCart(storeName:string,product:Product,amount:number):void{
-        logger.info(`saving ${amount} products to cart`)
-        const storeCart:BagItem[]=this.cart.get(storeName);
-        if(!storeCart){
-            const newBag:BagItem={product,amount};
-            this.cart.set(storeName,[newBag]);
+    saveProductToCart(storeName: string, product: Product, amount: number): void {
+        logger.debug(`saving ${amount} of product ${product.name} to cart`)
+        const storeBag: BagItem[] = this.cart.get(storeName);
+        if (!storeBag) {
+            logger.debug(`new bag for store ${storeName}`)
+            const newBag: BagItem = {product, amount};
+            this._cart.set(storeName, [newBag]);
             return
         }
-        const oldBag= storeCart.find((b) => b.product.catalogNumber === product.catalogNumber)
-        const newBag=oldBag?{product,amount:oldBag.amount + amount}:{product,amount}
-        const newStoreCart=storeCart.filter((b) => b.product.catalogNumber === product.catalogNumber).concat(newBag);
-        this.cart.set(storeName,newStoreCart)
+        logger.debug(`add bag item to existing bag in store ${storeName}`)
+        const oldBagItem = storeBag.find((b) => b.product.catalogNumber === product.catalogNumber)
+        const newBagItem = oldBagItem ? {product, amount: oldBagItem.amount + amount} : {product, amount}
+        const newStoreBag = storeBag.filter((b) => b.product.catalogNumber !== product.catalogNumber).concat([newBagItem]);
+        this.cart.set(storeName, newStoreBag)
     }
 
-    get cart(){
+    get cart() {
         return this._cart;
     }
-
 
 
 }

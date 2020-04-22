@@ -1,7 +1,8 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+
 const logger = loggerW(__filename)
-import {LoginRequest, LogoutRequest, Product, RegisterRequest,BagItem} from "../api-ext/external_api"
+import {LoginRequest, LogoutRequest, Product, RegisterRequest, BagItem} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -191,43 +192,38 @@ class UserManager {
         return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
-    saveProductToCart(user:User,storeName:string,product:Product,amount:number): void {
-        user.saveProductToCart(storeName,product,amount);
+    saveProductToCart(user: User, storeName: string, product: Product, amount: number): void {
+        user.saveProductToCart(storeName, product, amount);
     }
 
-    removeProductFromCart(req:Req.RemoveFromCartRequest): BoolResponse {
-
-        const user = this.getUserByToken(req.token);
-        if (!user) {
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+    removeProductFromCart(user: User, storeName: string, product: Product, amountToRemove: number): BoolResponse {
+        const storeBag: BagItem[] = user.cart.get(storeName);
+        if (!storeBag) {
+            return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}
         }
-        const storeCart: BagItem[] = user.cart.get(req.body.storeName);
-        if (!storeCart) {
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
+        const oldBagItem = storeBag.find((b) => b.product.catalogNumber === product.catalogNumber);
+        if (!oldBagItem) {
+            return {data: {result: false}, error: {message: errorMsg.E_ITEM_NOT_EXISTS}}
         }
-        const oldBag = storeCart.find((b) => b.product.catalogNumber === req.body.catalogNumber);    
-        if (!oldBag) {
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_PRODUCT}}
+        if (oldBagItem.amount - amountToRemove < 0) {
+            return {data: {result: false}, error: {message: errorMsg.E_BAG_BAD_AMOUNT}}
         }
-        user.removeProductFromCart(req)
+        user.removeProductFromCart(storeName, product, amountToRemove)
         return {
             data: {result: true}
         }
-
-    
     }
 
-    viewCart(req:Req.ViewCartReq):Res.ViewCartRes{
-        const user=this.getUserByToken(req.token)
+    viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
+        const user = this.getUserByToken(req.token)
 
-        if(!user){
-            return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (!user) {
+            return {data: {result: false, cart: undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const cart=user.cart
-        return {data:{result:true,cart}}
+        const cart = user.cart
+        return {data: {result: true, cart}}
     }
 
-   
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}

@@ -37,7 +37,9 @@ const errorMsg:ErrorMessages = {
     E_NOT_ASSIGNER: "Not assigner of user ",
     E_STOCK: "This product not in stock.",
     E_NOT_IN_CART:"This cart dont contain this product",
-    E_INVALID_PRODUCT:"item does not exist"
+    E_ITEM_NOT_EXISTS:"Item does not exist in this store bag",
+    E_BAG_NOT_EXISTS:"This store bag is not exist",
+    E_BAG_BAD_AMOUNT:"This bag don't have the requested amount"
 
 
 
