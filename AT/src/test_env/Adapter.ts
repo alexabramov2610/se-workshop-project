@@ -146,23 +146,28 @@ export const Adapter: Partial<Env.Bridge> = {
       storeName: store.name,
       permissions: permissions,
     };
-    const { data, error } = ServiceFacade.assignStoreManager(
+    const { data, error } = ServiceFacade.addManagerPermissions(
       wrapWithToken(req)
     );
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
+
   changeProductName(
     req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.changeProductName(wrapWithToken(req.body));
   },
+
   changeProductPrice(
     req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
+
+// watchPermissions(store: Store, credentials: Credentials) {
+//
+// }
+
 };
-
-

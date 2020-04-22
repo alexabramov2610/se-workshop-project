@@ -927,45 +927,42 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(true);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
-        const req: Req.SaveToCartRequest = {body: {storeName: store.storeName, catalogNumber: 1}, token: 'whatever'}
+        const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
         const res = tradingSystemManager.saveProductToCart(req);
 
-        expect(user.cart).toEqual([p]);
+        expect(user.cart.get(store.storeName)).toEqual([{product:p,amount:req.body.amount}]);
         expect(res.data.result).toBeTruthy()
 
     })
 
-    test("saveProductToCart fail-not in stock test", () => {
+    test("saveProductToCart not in stock-Fail test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
         const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
         jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(false);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
-        const req: Req.SaveToCartRequest = {body: {storeName: store.storeName, catalogNumber: 1}, token: 'whatever'}
+        const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
         const res = tradingSystemManager.saveProductToCart(req);
 
-        expect(user.cart.length).toEqual(0);
+        expect(user.cart.get(store.storeName)).toBeFalsy();
         expect(res.data.result).toBeFalsy()
 
     })
 
-    test("saveProductToCart fail-not such product test", () => {
+    test("saveProductToCart no such product-Fail test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
-        const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
         jest.spyOn(store, 'isProductInStock').mockReturnValueOnce(false);
 
-        const req: Req.SaveToCartRequest = {
-            body: {storeName: store.storeName, catalogNumber: p.catalogNumber},
-            token: 'whatever'
-        }
+        const req: Req.SaveToCartRequest = {body:{storeName:store.storeName,catalogNumber: 12,amount:3}, token: 'whatever'}
         const res = tradingSystemManager.saveProductToCart(req);
 
-        expect(user.cart.length).toEqual(0);
+        expect(user.cart.get(store.storeName)).toBeFalsy();
         expect(res.data.result).toBeFalsy()
 
     })
+
 
 
     function prepareSearchMock(isSuccess: boolean) : Res.BoolResponse {
@@ -992,9 +989,10 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getUserByToken: () => user,
-                addProductToCart: (u: User, product: Product)=> {
-                    u.addProductToCart(product);
-                }
+                saveProductToCart:(user:User,storeName:string,product:Product,amount:number)=>
+                user.saveProductToCart(storeName,product,amount)
+
+
             }
         });
 

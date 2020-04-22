@@ -99,8 +99,14 @@ interface ProductInfoRequest extends Request {
 }
 
 interface SaveToCartRequest extends Request {
-    body: { storeName: string, catalogNumber: number }
+    body: { storeName: string, catalogNumber: number,amount:number }
 }
+
+interface RemoveFromCartRequest extends  Request{
+    body:{storeName:string,catalogNumber:number,amount:number}
+}
+
+
 
 interface ChangeProductPriceRequest extends Request {
     body: { storeName: string, catalogNumber: number, newPrice: number }
@@ -118,6 +124,11 @@ interface ViewRUserPurchasesHistoryReq extends Request {
     body: { userName?: string }
 }
 
+interface ViewCartReq extends Request {
+    body: {}
+}
+
+
 interface SearchRequest extends Request {
     body: {filters: SearchFilters, searchQuery: SearchQuery}
 }
@@ -128,6 +139,7 @@ export {
     RemoveStoreOwnerRequest,
     Request,
     SaveToCartRequest,
+    RemoveFromCartRequest,
     ProductInfoRequest,
     AssignStoreOwnerRequest,
     SetAdminRequest,
@@ -148,6 +160,7 @@ export {
     ChangeProductPriceRequest,
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
-    InitReq
+    InitReq,
+    ViewCartReq
 };
 
