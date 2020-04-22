@@ -1,9 +1,10 @@
 import {Bridge, Driver, Store, Credentials, Item, CATEGORY, PERMISSION, Discount, Product} from "../../";
+import {ProductBuilder} from "../mocks/builders/product-builder";
+import {ItemBuilder} from "../mocks/builders/item-builder";
 
 describe("Perform authorized operations, UC: 5.1", () => {
     let _driver = new Driver;
     let _serviceBridge: Bridge;
-    let _testDiscount: Discount;
     let _testProduct: Product;
     let _testItem: Item;
     let _testStore: Store;
@@ -18,59 +19,66 @@ describe("Perform authorized operations, UC: 5.1", () => {
             .startSession()
             .getBridge();
 
-        _testItem = {
-            id: 123,
-            catalogNumber: 789,
-        };
+        _testProduct = new ProductBuilder()
+            .withName("test_name")
+            .withPrice(25)
+            .withCategory(CATEGORY.CLOTHING)
+            .withCatalogNumber(789)
+            .getProduct();
+
+        _testItem = new ItemBuilder()
+            .withId(123)
+            .withCatalogNumber(789)
+            .getItem();
+
         _testStore = {
             name: "some-mock-store",
         };
-
-        const date = new Date();
-        const dateTomorrow = new Date(date.getDate() + 1);
-        _testDiscount = {percents: 20, timePeriod: {startTime: date, endTime: dateTomorrow}};
+        _storeManagerCredentials = {userName: "manager-username", password: "manager-password"};
 
         _serviceBridge.createStore(_testStore);
-        _serviceBridge.addProductsToStore(_testStore,[_testProduct]);
-        _serviceBridge.addItemsToStore(_testStore, [_testItem]);
-
-         _serviceBridge.logout(); // logging out so that manager can register
+        _serviceBridge.logout(); // logging out so that manager can register
 
         _serviceBridge.register(_storeManagerCredentials); // store manager registers
 
         _driver.loginWithDefaults(); // Owner is logging in again
         _serviceBridge.assignManager(_testStore, _storeManagerCredentials);
-    });
 
-    test("Default permissions", () => {
-        _serviceBridge.logout() // Owner signs out
-        _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
-
-        const {data, error} = _serviceBridge.watchPermissions(_testStore, _storeManagerCredentials);
-        expect(data).toBeDefined();
-        expect(error).toBeUndefined();
-
-        expect(data.permissions.includes(PERMISSION.WATCH_USER_QUESTIONS)).toBeTruthy();
-        expect(data.permissions.includes(PERMISSION.REPLY_USER_QUESTIONS)).toBeTruthy();
-        expect(data.permissions.includes(PERMISSION.WATCH_PURCHASES_HISTORY)).toBeTruthy();
+        // const date = new Date();
+        // const dateTomorrow = new Date(date.getDate() + 1);
+        // _testDiscount = {percents: 20, timePeriod: {startTime: date, endTime: dateTomorrow}};
     });
 
     test("Act, no permissions", () => {
         _serviceBridge.logout() // Owner signs out
         _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
 
-        const {data, error} = _serviceBridge.setDiscountToStore(_testStore, _testDiscount);
+        const {data, error} = _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
     });
 
     test("Act, with permissions", () => {
-        _serviceBridge.grantPermissions(_storeManagerCredentials, _testStore, [PERMISSION.MODIFY_DISCOUNT]);
+        _serviceBridge.grantPermissions(_storeManagerCredentials, _testStore, [PERMISSION.MANAGE_INVENTORY]);
         _serviceBridge.logout() // Owner signs out
         _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
 
-        const {data, error} = _serviceBridge.setDiscountToStore(_testStore, _testDiscount);
+        const {data, error} = _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
     });
+
+    // test("Default permissions", () => {
+    //     _serviceBridge.logout() // Owner signs out
+    //     _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
+    //
+    //     const {data, error} = _serviceBridge.watchPermissions(_testStore, _storeManagerCredentials);
+    //     expect(data).toBeDefined();
+    //     expect(error).toBeUndefined();
+    //
+    //     expect(data.permissions.includes(PERMISSION.WATCH_USER_QUESTIONS)).toBeTruthy();
+    //     expect(data.permissions.includes(PERMISSION.REPLY_USER_QUESTIONS)).toBeTruthy();
+    //     expect(data.permissions.includes(PERMISSION.WATCH_PURCHASES_HISTORY)).toBeTruthy();
+    // });
+
 });
