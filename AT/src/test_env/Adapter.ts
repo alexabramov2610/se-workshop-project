@@ -156,12 +156,12 @@ export const Adapter: Partial<Env.Bridge> = {
   changeProductName(
     req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
   ): ServiceFacade.Res.BoolResponse {
-    return ServiceFacade.changeProductName(wrapWithToken(req));
+    return ServiceFacade.changeProductName(wrapWithToken(req.body));
   },
   changeProductPrice(
     req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
   ): ServiceFacade.Res.BoolResponse {
-    return ServiceFacade.changeProductPrice(wrapWithToken(req));
+    return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
 };
 

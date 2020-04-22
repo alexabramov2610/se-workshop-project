@@ -1,6 +1,7 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials } from "../../src/test_env/types";
 import { ProductBuilder } from "../mocks/builders/product-builder";
+import { ServiceFacade } from "service_layer";
 
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
@@ -130,15 +131,90 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(error).toBeDefined();
   });
 
-  xtest("Edit product - Happy Path: remove existing product", () => {
-    expect(true).toBe(false);
+  test("Edit product - change product name and price - Product exsits user logged in with permission", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
+      productToAdd,
+    ]).data;
+    expect(resProduct.result).toBe(true);
+    const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
+      { id: 123, catalogNumber: productToAdd.catalogNumber },
+    ]).data.result;
+    expect(resItem).toBe(true);
+
+    const resName = _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.data.result).toBe(true);
+    expect(resPrice.data.result).toBe(true);
   });
 
-  xtest("Edit product - Happy Path: remove existing product user logged out", () => {
-    expect(true).toBe(false);
+  test("Edit product - Product exsits user logged out with permission", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
+      productToAdd,
+    ]).data;
+    expect(resProduct.result).toBe(true);
+    const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
+      { id: 123, catalogNumber: productToAdd.catalogNumber },
+    ]).data.result;
+    expect(resItem).toBe(true);
+    _serviceBridge.logout();
+    const resName = _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.error.message).toBeDefined();
+    expect(resPrice.error.message).toBeDefined();
   });
 
-  xtest("Edit product - Happy Path: remove non-existing product user logged in", () => {
-    expect(true).toBe(false);
+  test("Edit product - change product name and price - Product not exsits user logged in with permission", () => {
+    const { name } = _serviceBridge.createStore(_storeInformation).data;
+    expect(name).toBe(_storeInformation.name);
+    const resName = _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.error.message).toBeDefined();
+    expect(resPrice.error.message).toBeDefined();
   });
 });
