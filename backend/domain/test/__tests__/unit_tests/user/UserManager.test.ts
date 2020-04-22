@@ -1,5 +1,6 @@
 import * as Responses from "../../../../src/api-int/internal_api";
-import {RemoveFromCartRequest, UserRole} from "../../../../src/api-int/internal_api";
+import {loggerW, UserRole} from "../../../../src/api-int/internal_api";
+const logger = loggerW(__filename)
 import {UserManager} from "../../../../src/user/UserManager";
 import {RegisteredUser, User} from "../../../../src/user/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";

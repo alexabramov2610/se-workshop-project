@@ -145,6 +145,7 @@ export {
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
     RemoveFromCartRequest,
-    ViewCartReq
+    ViewCartReq,
+    InitReq
 };
 

@@ -1,15 +1,7 @@
 import {UserRole} from "../api-int/Enums";
-import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
-import {
-    LoginRequest,
-    SaveToCartRequest,
-    RemoveFromCartRequest,
-    ViewCartReq,
-    LogoutRequest,
-    Product,
-    RegisterRequest,
-    BagItem
-} from "../api-ext/external_api"
+import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+const logger = loggerW(__filename)
+import {LoginRequest, LogoutRequest, Product, RegisterRequest, BagItem} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -203,7 +195,7 @@ class UserManager {
         user.saveProductToCart(storeName,product,amount);
     }
 
-    removeProductFromCart(req:RemoveFromCartRequest): BoolResponse {
+    removeProductFromCart(req:Req.RemoveFromCartRequest): BoolResponse {
         logger.info(` removing product: ${req.body.catalogNumber}  from ${req.token}  cart `)
         const user = this.getUserByToken(req.token);
         if (!user) {
@@ -224,7 +216,7 @@ class UserManager {
 
     }
 
-    viewCart(req:ViewCartReq):Res.ViewCartRes{
+    viewCart(req:Req.ViewCartReq):Res.ViewCartRes{
         logger.info(` viewing : ${req.token} cart `)
         const user=this.getUserByToken(req.token)
         if(!user){

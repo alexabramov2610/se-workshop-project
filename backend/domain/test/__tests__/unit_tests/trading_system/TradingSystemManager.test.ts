@@ -509,6 +509,68 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    function prepareRemoveStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn);
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: 'mock err'}
+        };
+        mocked(StoreManagement).mockImplementation((): any => {
+            return {
+                removeStoreManager: () => operationResMock
+            }
+        });
+    }
+
+    test("removeStoreManager success", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreManagerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreManagerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToRemove: 'user'}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.removeStoreManager(req)
+
+        expect(res.data.result).toBeTruthy();
+    });
+
+    test("removeStoreManager failure - not logged in", () => {
+        const isLoggedIn: boolean = false;
+        const isSuccess: boolean = true;
+
+        prepareRemoveStoreManagerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreManagerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToRemove: 'user'}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.removeStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("removeStoreManager failure", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareRemoveStoreManagerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.RemoveStoreManagerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToRemove: 'user'}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.removeStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
+
+
     function prepareChangeProductPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {

@@ -1,12 +1,19 @@
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response"
 import {errorMsg as Error} from "../api-int/Error"
-import {logger} from "../api-int/Logger";
+import {loggerW} from "../api-int/internal_api";
+const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
-import {ProductCatalogNumber, Product as ProductReq, ProductWithQuantity} from "../api-ext/CommonInterface";
+import {
+    ProductCatalogNumber,
+    Product as ProductReq,
+    ProductWithQuantity,
+    ProductCategory
+} from "../api-ext/CommonInterface";
 import {Receipt, ContactUsMessage} from "../trading_system/internal_api";
 import {ManagementPermission} from "../api-ext/Enums";
+
 
 interface ProductValidator {
     isValid: boolean,
@@ -39,6 +46,7 @@ export class Store {
                 return product;
             }
         }
+        logger.debug(`could not find product with catalog number: ${catalogNumber}`);
         return undefined;
     }
 
@@ -62,18 +70,17 @@ export class Store {
 
         const isNameValid: boolean = product.name && product.name !== "";
         const isIdValid: boolean = product.catalogNumber && product.catalogNumber > 0;
+        const isPriceValid: boolean = product.price && product.price > 0;
+        const isCategoryValid: boolean = Object.values(ProductCategory).includes(product.category);
 
-        if (isNameValid && isIdValid) {
+        if (isNameValid && isIdValid && isPriceValid && isCategoryValid) {
             logger.debug(`validated successfully product: ${JSON.stringify(product)}`);
             return {
                 isValid: true
             }
         } else {
-            logger.warn(`invalid product: ${JSON.stringify(product)}`)
-            const error: string =
-                !isIdValid && !isNameValid ? `product name and id are illegal. name: ${product.name}, id: ${product.catalogNumber}` :
-                    !isIdValid ? `product id is illegal. id: ${product.catalogNumber}` :
-                        !isNameValid ? `product name is illegal. name: ${product.name}` : "";
+            const error: string = `invalid product: ${JSON.stringify(product)}`;
+            logger.warn(error);
             return {
                 isValid: false, error
             }
@@ -85,6 +92,14 @@ export class Store {
         for (const storeOwner of this._storeOwners) {
             if (storeOwner.name === username)
                 return storeOwner;
+        }
+        return undefined;
+    }
+
+    private getStoreManagerByName(username: string): StoreManager {
+        for (const storeManager of this._storeManagers) {
+            if (storeManager.name === username)
+                return storeManager;
         }
         return undefined;
     }
@@ -225,9 +240,8 @@ export class Store {
 
         for (const catalogNumber of products) {
             const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
-            const productValidator: ProductValidator = this.validateProduct(product);
-            if (productValidator.isValid) {
-                    this._products.delete(product);
+            if (product) {
+                this._products.delete(product);
             } else {
                 productsNotRemoved.push(product);
             }
@@ -320,6 +334,16 @@ export class Store {
         return {data: {result: true}};
     }
 
+   
+    removeStoreManager(user: StoreManager): Res.BoolResponse {
+        const storeManagerToRemove: StoreManager = this.getStoreManagerByName(user.name);
+        if (!storeManagerToRemove)
+            return {data: {result: false}, error: {message: Error.E_NAL}}
+
+        this._storeManagers = this._storeManagers.filter(currManager => currManager.name !== storeManagerToRemove.name);
+        return {data: {result: true}};
+    }
+
     isProductInStock(catalogNumber:number,amount:number):boolean{
         const product=this.getProductByCatalogNumber(catalogNumber)
         if(product) {
@@ -328,6 +352,10 @@ export class Store {
         return false;
     }
 
+    getProductQuantity(catalogNumber: number) : number {
+        const product = this.getProductByCatalogNumber(catalogNumber);
+        return product ? this._products.get(product).length : 0;
+    }
 
     get storeName(): string {
         return this._storeName;

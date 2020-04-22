@@ -55,7 +55,7 @@ interface ViewUsersContactUsMessagesResponse extends Response {
 }
 
 interface ProductInfoResponse extends Response{
-  data:{result:boolean, info?:{name:string,catalogNumber:number,price:number,catagory:ProductCategory}}
+  data:{result:boolean, info?:{name:string,catalogNumber:number,price:number,category:ProductCategory, quantity:number}}
 
 }
 

@@ -13,6 +13,7 @@ import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory} from "../../../../src/api-ext/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
+import exp from "constants";
 
 
 describe("Store Management Unit Tests", () => {
@@ -338,6 +339,133 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBe(false);
         expect(store.removeStoreOwner).toBeCalledTimes(0);
         expect(alreadyOwner.isAssignerOfOwner(ownerToAssign)).toBe(true);
+    });
+
+    test("removeStoreOwner failure - not assigner", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("alreadyOwnerName");
+        const ownerToAssign1: StoreOwner = new StoreOwner("name1");
+        const ownerToAssign2: StoreOwner = new StoreOwner("name2");
+        alreadyOwner.assignStoreOwner(ownerToAssign1);
+        ownerToAssign1.assignStoreOwner(ownerToAssign2);
+        expect(alreadyOwner.isAssignerOfOwner(ownerToAssign1)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(ownerToAssign2);
+        jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreOwner(store.storeName, ownerToAssign2, alreadyOwner);
+
+        expect(res.data.result).toBe(false);
+        expect(store.removeStoreOwner).toBeCalledTimes(0);
+        expect(alreadyOwner.isAssignerOfOwner(ownerToAssign1)).toBe(true);
+        expect(ownerToAssign1.isAssignerOfOwner(ownerToAssign2)).toBe(true);
+    });
+
+
+    test("removeStoreManager success", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreManager(managerToAssign);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(managerToAssign);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBeTruthy();
+        expect(store.removeStoreManager).toBeCalledTimes(1);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(false);
+    });
+
+    test("removeStoreManager failure - store doesn't exist", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreManager(managerToAssign);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(undefined);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(managerToAssign);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBe(false);
+        expect(store.removeStoreManager).toBeCalledTimes(0);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+    });
+
+    test("removeStoreManager failure - invalid assigner", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreManager(managerToAssign);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(undefined);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(managerToAssign);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBe(false);
+        expect(store.removeStoreManager).toBeCalledTimes(0);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+    });
+
+    test("removeStoreManager failure - already manager", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreManager(managerToAssign);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(undefined);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBe(false);
+        expect(store.removeStoreManager).toBeCalledTimes(0);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+    });
+
+    test("removeStoreManager failure - not assigner", () => {
+        const store: Store = new Store("name");
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("alreadyOwnerName");
+        const ownerToAssign1: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreOwner(ownerToAssign1);
+        ownerToAssign1.assignStoreManager(managerToAssign);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(managerToAssign);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBe(false);
+        expect(store.removeStoreManager).toBeCalledTimes(0);
+        expect(alreadyOwner.isAssignerOfOwner(ownerToAssign1)).toBe(true);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(false);
+        expect(ownerToAssign1.isAssignerOfManager(managerToAssign)).toBe(true);
     });
 
 
@@ -982,7 +1110,7 @@ describe("Store Management Unit Tests", () => {
         expect(res).toBe(response);
     });
 
-    test('viewProductInfo seccess test', () => {
+    test('viewProductInfo success test', () => {
         const p = new Product('my product', 12345, 15.90, ProductCategory.General)
         const store = new Store('my store')
         store.addNewProducts([p]);
@@ -991,12 +1119,11 @@ describe("Store Management Unit Tests", () => {
             body: {storeName: 'my store', catalogNumber: 12345},
             token: "lala"
         })
-        expect(res.data.result).toBeTruthy()
-        expect(res.data).toEqual({
-            result: true,
-            info: {name: p.name, catalogNumber: p.catalogNumber, price: p.price, catagory: p.category}
-        })
-
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.info.catalogNumber).toBe(12345);
+        expect(res.data.info.price).toBe(15.90);
+        expect(res.data.info.category).toBe(ProductCategory.General);
+        expect(res.data.info.quantity).toBe(0);
     })
 
     test('viewProductInfo fail test', () => {

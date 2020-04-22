@@ -1,7 +1,8 @@
 import {DeliverySystem} from "./delivery_system/DeliverySystem"
 import {PaymentSystem} from "./payment_system/PaymentSystem"
 import {SecuritySystem} from "./security_system/SecuritySystem"
-import {errorMsg, ExternalSystems, BoolResponse, logger} from "../api-int/internal_api"
+import {errorMsg, ExternalSystems, BoolResponse, loggerW} from "../api-int/internal_api"
+const logger = loggerW(__filename)
 
 export class ExternalSystemsManager {
     private _paymentSystem: PaymentSystem;

@@ -14,11 +14,6 @@ export class Product {
         this._price = price;
     }
 
-    viewProductInfo():ProductInfoResponse{
-        return{  data:{result:true, info:{name:this._name,catalogNumber:this._catalogNumber,price:this._price,catagory:this._category}}
-        }
-    }
-
     set price(price: number) {
         this._price = price;
     }
