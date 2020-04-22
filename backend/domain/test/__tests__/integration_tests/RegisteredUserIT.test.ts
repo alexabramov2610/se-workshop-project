@@ -23,7 +23,7 @@ describe("Registered User Integration Tests", () => {
 
 
     it("View store information test", () => {
-        const ownerToken: string = utils.registeredUserLogin(tradingSystemManager, usernameOwner, passwordOwner)
+        const ownerToken: string = utils.initSessionRegisterLogin(tradingSystemManager, usernameOwner, passwordOwner)
         const storeName: string = "store name";
         utils.createStore(tradingSystemManager, storeName, ownerToken);
         utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
@@ -62,7 +62,7 @@ describe("Registered User Integration Tests", () => {
 
     it("view purchases history IT test", () => {
         const storeName: string = "store name";
-        const ownerToken: string = utils.registeredUserLogin(tradingSystemManager, usernameOwner, passwordOwner);
+        const ownerToken: string = utils.initSessionRegisterLogin(tradingSystemManager, usernameOwner, passwordOwner);
         utils.createStore(tradingSystemManager, storeName, token);
         let req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token}
         let res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req)

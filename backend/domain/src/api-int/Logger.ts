@@ -23,10 +23,10 @@ const myFormat = format.printf(({level, message, timestamp}) => {
 const silent = process.env.SILENT ? true : false;
 const debug = process.env.DEBUG ? true : false;
 const testMode = process.env.TEST_MODE ? true : false;
-export const logger = winston.createLogger({
+const myLogger = winston.createLogger({
     level: process.env.DEBUG ? 'debug' : 'info',
 
-    format: format.combine(format.json(), format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'}), myFormat),
+    format: format.combine(format.json(), format.timestamp({format: 'YYYY-MM-DD HH:mm:ss'})),
     transports: [
         // - Write all logs with level `error` and below to `error.log`
         // - Write all logs with level `debug` and below to `events.log`
@@ -45,3 +45,25 @@ export const logger = winston.createLogger({
         new winston.transports.Console({format: myFormat, level: debug ? 'debug' : 'info', silent})
     ]
 });
+export const loggerW =
+    (path:string) => {
+        const splitted: string[] = path.split('/');
+        const fileName: string = splitted[splitted.length - 1];
+        return {
+            error: (text) => {
+                myLogger.error(fileName + ': ' + text)
+            },
+            info: (text) => {
+                myLogger.info(fileName + ': ' + text)
+            },
+            debug: (text) => {
+                myLogger.debug(fileName + ': ' + text)
+            },
+            warn: (text) => {
+                myLogger.warn(fileName + ': ' + text)
+            }
+
+        }
+
+
+    }

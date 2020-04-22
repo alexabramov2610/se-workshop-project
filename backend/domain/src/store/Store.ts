@@ -1,7 +1,8 @@
 import {Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response"
 import {errorMsg as Error} from "../api-int/Error"
-import {logger} from "../api-int/Logger";
+import {loggerW} from "../api-int/internal_api";
+const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
@@ -12,6 +13,7 @@ import {
 } from "../api-ext/CommonInterface";
 import {Receipt, ContactUsMessage} from "../trading_system/internal_api";
 import {ManagementPermission} from "../api-ext/Enums";
+
 
 interface ProductValidator {
     isValid: boolean,
