@@ -44,6 +44,7 @@ export class Store {
                 return product;
             }
         }
+        logger.debug(`could not find product with catalog number: ${catalogNumber}`);
         return undefined;
     }
 
@@ -331,6 +332,10 @@ export class Store {
         return false;
     }
 
+    getProductQuantity(catalogNumber: number) : number {
+        const product = this.getProductByCatalogNumber(catalogNumber);
+        return product ? this._products.get(product).length : 0;
+    }
 
     get storeName(): string {
         return this._storeName;

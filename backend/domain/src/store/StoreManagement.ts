@@ -410,8 +410,10 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (product) {
-            return product.viewProductInfo()
-        } else {
+            const quantity: number = store.getProductQuantity(product.catalogNumber);
+            return { data: { result:true, info: { name: product.name, catalogNumber: product.catalogNumber, price: product.price, category: product.category, quantity: quantity }}}
+        }
+        else {
             return {data: {result: false}}
         }
     }
