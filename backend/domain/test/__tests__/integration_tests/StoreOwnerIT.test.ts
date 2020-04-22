@@ -429,7 +429,7 @@ describe("Store Owner Integration Tests", () => {
 
     });
 
-    
+
 
 });
 
