@@ -1,5 +1,5 @@
 import {Error} from "../api-int/internal_api";
-import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {Item, ProductCatalogNumber, Product, ProductWithQuantity, BagItem} from "./CommonInterface";
 import {ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
 
@@ -64,7 +64,7 @@ interface ViewRUserPurchasesHistoryRes extends Response{
 }
 
 interface ViewCartRes extends Response{
-    data:{result:boolean, cart: Product[]}
+    data:{result:boolean, cart: Map<string, BagItem[ ]>;}
 }
 
 export {

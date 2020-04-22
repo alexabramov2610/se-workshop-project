@@ -92,11 +92,11 @@ interface ProductInfoRequest extends Request {
 }
 
 interface SaveToCartRequest extends Request {
-    body: { storeName: string, catalogNumber: number }
+    body: { storeName: string, catalogNumber: number,amount:number }
 }
 
-interface RemoveProductRequest extends  Request{
-    body:{catalogNumber:number}
+interface RemoveFromCartRequest extends  Request{
+    body:{storeName:string,catalogNumber:number,amount:number}
 }
 
 interface ChangeProductPriceRequest extends Request {
@@ -144,7 +144,7 @@ export {
     ChangeProductPriceRequest,
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
-    RemoveProductRequest,
+    RemoveFromCartRequest,
     ViewCartReq
 };
 

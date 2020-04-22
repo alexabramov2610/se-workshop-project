@@ -1,6 +1,15 @@
 import {UserRole} from "../api-int/Enums";
 import {BoolResponse, errorMsg, logger, SetAdminRequest} from "../api-int/internal_api";
-import {LoginRequest,RemoveProductRequest,ViewCartReq, LogoutRequest, Product, RegisterRequest} from "../api-ext/external_api"
+import {
+    LoginRequest,
+    SaveToCartRequest,
+    RemoveFromCartRequest,
+    ViewCartReq,
+    LogoutRequest,
+    Product,
+    RegisterRequest,
+    BagItem
+} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -190,29 +199,29 @@ class UserManager {
         return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
-    addProductToCart(user: User, product: Product): void {
-        user.addProductToCart(product);
+    saveProductToCart(user:User,storeName:string,product:Product,amount:number): void {
+        user.saveProductToCart(storeName,product,amount);
     }
 
-    removeProductFromCart(req:RemoveProductRequest): BoolResponse {
+    removeProductFromCart(req:RemoveFromCartRequest): BoolResponse {
         logger.info(` removing product: ${req.body.catalogNumber}  from ${req.token}  cart `)
-        const user=this.getUserByToken(req.token);
-        if(!user){
-
+        const user = this.getUserByToken(req.token);
+        if (!user) {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const productToRemove=user.cart.find((p)=>p.catalogNumber===req.body.catalogNumber)
-        if (!productToRemove){
-            return {data:{result:false},error:{message:errorMsg['E_NOT_IN_CART']}}
+        const storeCart: BagItem[] = user.cart.get(req.body.storeName);
+        if (!storeCart) {
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
+        }
+        const oldBag = storeCart.find((b) => b.product.catalogNumber = req.body.catalogNumber);
+        if (!oldBag) {
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_PRODUCT}}
+        }
+        user.removeProductFromCart(req)
+        return {
+            data: {result: true}
         }
 
-        user.removeProductFromCart(productToRemove)
-        logger.info(`  product: ${req.body.catalogNumber} has removed  from ${req.token}  cart `)
-        return {data:{result:true}}
-    }
-
-    viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
-        return {data: {result: true, receipts: user.receipts}}
     }
 
     viewCart(req:ViewCartReq):Res.ViewCartRes{
@@ -222,12 +231,9 @@ class UserManager {
             return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
         const cart=user.cart
-        if(!cart){
-            return {data: {result: false,cart:undefined}, error: {message: errorMsg.E_NF}}
-        }
-        return {data:{result:true,cart:cart}}
-
+        return {data:{result:true,cart}}
     }
+
 }
 
 export {UserManager};

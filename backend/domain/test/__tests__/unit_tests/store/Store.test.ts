@@ -505,26 +505,19 @@ describe("Store Management Unit Tests", () => {
 
 
 
-    test("productInStock seccess test",()=>{
+    test.only("productInStock seccess test",()=>{
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
-        const items: Item[] = generateValidItems(5*2, 0, 5, 0);
+        const items: Item[] = generateValidItems(10, 0, 1, 0);
+
+        const res=store.isProductInStock(1,3);
+        expect(res).toBeFalsy();
         store.addItems(items);
 
-        const res=store.isProductInStock(1);
-        expect(res).toBeTruthy();
+        const resAfter=store.isProductInStock(1,3);
+        expect(resAfter).toBeTruthy();
 
     })
-
-    test("productInStock fail test",()=>{
-        const products: Product[] = generateValidProducts(5);
-        store.addNewProducts(products);
-
-        const res=store.isProductInStock(1);
-        expect(res).toBeFalsy();
-
-    })
-
 
 
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {

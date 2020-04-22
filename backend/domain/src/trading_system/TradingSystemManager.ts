@@ -245,7 +245,12 @@ export class TradingSystemManager {
     }
 
     saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
+
         logger.info(`saving product: ${req.body.catalogNumber} to ${req.token}  cart `)
+        const amount=req.body.amount;
+        if(amount<=0){
+            return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
+        }
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -255,16 +260,21 @@ export class TradingSystemManager {
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        const inStock: boolean = store.isProductInStock(req.body.catalogNumber);
+        const inStock: boolean = store.isProductInStock(req.body.catalogNumber,req.body.amount);
         if (!inStock)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK}};
 
-        logger.debug(` product: ${req.body.catalogNumber} added to ${req.token}  cart `)
-        this._userManager.addProductToCart(user, product);
+        logger.debug(` product: ${req.body.catalogNumber} added to ${req.token}  cart `);
+
+        const storeName=store.storeName;
+        this._userManager.saveProductToCart(user,storeName,product,amount);
         return {data: {result: true}}
     }
 
-    removeProductFromCart(req:Req.RemoveProductRequest): Res.BoolResponse {
+
+
+
+    removeProductFromCart(req:Req.RemoveFromCartRequest): Res.BoolResponse {
         return this._userManager.removeProductFromCart(req);
     }
 

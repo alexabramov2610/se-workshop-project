@@ -121,7 +121,7 @@ export const saveProductToCart = (req: Req.SaveToCartRequest): Res.BoolResponse 
     return runIfOpen(req, UserService.saveProductToCart);
 }
 
-export const removeProductFromCart = (req:Req.RemoveProductRequest): Res.BoolResponse=>{
+export const removeProductFromCart = (req:Req.RemoveFromCartRequest): Res.BoolResponse=>{
     return runIfOpen(req,UserService.removeProductFromCart);
 }
 
