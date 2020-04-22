@@ -53,10 +53,24 @@ describe("Registered User Integration Tests", () => {
 
     it("create store IT test", () => {
         const storeName: string = "store name";
-        const req: Req.StoreInfoRequest = {body: {storeName}, token};
+        const req: Req.OpenStoreRequest = {body: {storeName}, token};
         let res: Res.BoolResponse = tradingSystemManager.createStore(req)
         expect(res.data.result).toBe(true);
         res = tradingSystemManager.createStore(req)
+        expect(res.data.result).toBe(false);
+    });
+
+    it("view purchases history IT test", () => {
+        const storeName: string = "store name";
+        const ownerToken: string = utils.registeredUserLogin(tradingSystemManager, usernameOwner, passwordOwner);
+        utils.createStore(tradingSystemManager, storeName, token);
+        let req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token}
+        let res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req)
+        expect(res.data.result).toBe(true);
+        expect(res.data.receipts).toEqual([]);
+        // TODO view history after buying
+        req = {body: {userName: "moshe"}, token}
+        res = tradingSystemManager.viewRegisteredUserPurchasesHistory(req)
         expect(res.data.result).toBe(false);
     });
 });
