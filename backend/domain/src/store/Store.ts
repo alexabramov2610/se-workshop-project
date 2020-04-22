@@ -1,18 +1,18 @@
-import {Item, Product} from "../trading_system/internal_api";
+import {ContactUsMessage, Item, Product, Receipt} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response"
 import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
-const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
-    ProductCatalogNumber,
     Product as ProductReq,
-    ProductWithQuantity,
-    ProductCategory
+    ProductCatalogNumber,
+    ProductCategory, ProductInStore,
+    ProductWithQuantity, SearchFilters, SearchQuery
 } from "../api-ext/CommonInterface";
-import {Receipt, ContactUsMessage} from "../trading_system/internal_api";
-import {ManagementPermission} from "../api-ext/Enums";
+import {ManagementPermission, Rating} from "../api-ext/Enums";
+
+const logger = loggerW(__filename)
 
 
 interface ProductValidator {
@@ -22,6 +22,7 @@ interface ProductValidator {
 
 export class Store {
     private readonly _UUID: string;
+    private _rating: Rating;
     private _products: Map<Product, Item[]>;
     private readonly _storeName: string;
     private _storeOwners: StoreOwner[];
@@ -36,6 +37,7 @@ export class Store {
         this._storeOwners = [];
         this._storeManagers = [];
         this._receipts = [];
+        this._rating = Rating.MEDIUM;
     }
 
     getProductByCatalogNumber(catalogNumber: number): Product {
@@ -106,6 +108,18 @@ export class Store {
 
     private containsItem(product: Product, item: Item): boolean {
         return this._products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
+    }
+
+    private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
+        if (query.productName && query.productName !== product.name)
+            return false;
+        if (filters.priceRange && (product.price < filters.priceRange.min || filters.priceRange.max < product.price))
+            return false;
+        if (filters.productCategory && filters.productCategory !== product.category)
+            return false;
+        if (filters.productRating && filters.productRating !== product.rating)
+            return false;
+        return true;
     }
 
     addItems(items: Item[]): Res.ItemsAdditionResponse {
@@ -274,7 +288,7 @@ export class Store {
     }
 
     verifyIsStoreManager(userName: string): boolean {
-        logger.debug(`verify if user is manager: ${userName}`)
+        logger.debug(`verifying if user is manager: ${userName}`)
         for (const manager of this._storeManagers) {
             if (manager.name === userName) {
                 logger.debug(`user: ${userName} is a manager of store ${this.storeName}`)
@@ -286,18 +300,18 @@ export class Store {
     }
 
     viewStoreInfo(): Res.StoreInfoResponse {
-        const productNames = Array.from(this.products.keys()).map((p) => p.name);
-        const storeOwnersNames = this._storeOwners;
-        return {data: {result: true,
+        return {
+            data: {result: true,
                 info: {
                     storeName: this.storeName,
+                    storeRating: this.rating,
                     storeOwnersNames: this._storeOwners.map((owner) => owner.name),
-                    productNames
+                    storeManagersNames: this._storeManagers.map((manager) => manager.name),
+                    productsNames: Array.from(this.products.keys()).map((p) => p.name)
                 }
             }
         }
     }
-
 
     setFirstOwner(user: RegisteredUser): void {
         this._storeOwners.push(new StoreOwner(user.name));
@@ -356,6 +370,21 @@ export class Store {
         return product ? this._products.get(product).length : 0;
     }
 
+    search(filters: SearchFilters, query: SearchQuery) : ProductInStore[] {
+        let products: ProductInStore[] = [];
+
+        for (const product of this._products.keys()) {
+            if (this.matchingFilters(product, filters, query)) {
+                const matchingProduct: ProductReq = {name: product.name, price: product.price, category: product.category, catalogNumber: product.catalogNumber};
+                const matchingProdInStore: ProductInStore = { product: matchingProduct, storeName: this.storeName};
+                products.push(matchingProdInStore);
+            }
+        }
+
+        return products;
+    }
+
+
     get storeName(): string {
         return this._storeName;
     }
@@ -368,6 +397,10 @@ export class Store {
         return this._UUID;
     }
 
+    get rating(): Rating {
+        return this._rating;
+    }
+
     getStoreManager(userName: string): StoreManager {
         return this._storeManagers.find((manager: StoreManager) => manager.name === userName)
     }
@@ -377,9 +410,12 @@ export class Store {
     }
 
     verifyPermission(userName: string, permission: ManagementPermission): boolean {
-        if (this.verifyIsStoreOwner(userName)) return true;
+        if (this.verifyIsStoreOwner(userName))
+            return true;
         if (this.verifyIsStoreManager(userName)) {
-            return this.getStoreManager(userName).isAllowed(permission);
+            const isAllowed: boolean = this.getStoreManager(userName).isAllowed(permission);
+            logger.debug(`User ${userName} permission allowed: ${isAllowed}`);
+            return isAllowed;
         }
         return false;
     }

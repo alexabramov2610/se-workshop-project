@@ -136,7 +136,10 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
 export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes => {
     return runIfOpen(req, UserService.viewRegisteredUserPurchasesHistory);
 }
-export {Req,Res};
+
+export const search = (req: Req.SearchRequest): Res.SearchResponse => {
+    return runIfOpen(req, StoreService.search);
+}
 
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
@@ -145,3 +148,4 @@ const runIfOpen = (req: Req.Request, fn: any): any => {
     return fn.call(this, req, tradingSystem);
 }
 
+export {Req,Res};

@@ -7,7 +7,12 @@ import {ContactUsMessage, Item, Product, Receipt} from "../../../../src/trading_
 import {ExternalSystemsManager} from '../../../../src/external_systems/ExternalSystemsManager'
 import {UserManager} from '../../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
-import {Product as ProductReq, ProductCatalogNumber, ProductCategory} from "../../../../src/api-ext/external_api";
+import {
+    Product as ProductReq,
+    ProductCatalogNumber,
+    ProductCategory,
+    SearchFilters, SearchQuery
+} from "../../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
 import {User} from "../../../../src/user/users/User";
 
@@ -961,6 +966,27 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy()
 
     })
+
+
+    function prepareSearchMock(isSuccess: boolean) : Res.BoolResponse {
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: 'mock err'}};
+        mocked(StoreManagement).mockImplementation(() :any => {
+            return {
+                search: () => operationResMock
+            }
+        });
+        return operationResMock;
+    }
+
+    test("search", () => {
+        const isSuccess: boolean = true;
+        const req: Req.SearchRequest = {body: {filters: {}, searchQuery: {}}, token: 'mock-token'};
+        const res: Res.BoolResponse = prepareSearchMock(isSuccess);
+
+        tradingSystemManager = new TradingSystemManager();
+        expect(tradingSystemManager.search(req)).toMatchObject(res);
+    })
+
 
     function prepareMockToSaveProduct() {
         mocked(UserManager).mockImplementation((): any => {

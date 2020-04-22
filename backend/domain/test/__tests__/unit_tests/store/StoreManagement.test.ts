@@ -7,13 +7,15 @@ import {
     Item as ItemReq,
     Product as ProductReq,
     ProductCatalogNumber,
-    ProductWithQuantity
+    ProductInStore,
+    ProductWithQuantity,
+    SearchFilters,
+    SearchQuery
 } from "../../../../src/api-ext/CommonInterface";
 import {errorMsg} from "../../../../src/api-int/Error";
-import {ManagementPermission, ProductCategory} from "../../../../src/api-ext/Enums";
+import {ManagementPermission, ProductCategory, Rating} from "../../../../src/api-ext/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
-import exp from "constants";
 
 
 describe("Store Management Unit Tests", () => {
@@ -1143,6 +1145,80 @@ describe("Store Management Unit Tests", () => {
         const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
         expect(res.error.message).toEqual(errorMsg['E_NF']);
+    });
+
+
+    test("search - success with store name matching rating", () => {
+        const store: Store = new Store('my store');
+
+        const productsInStore: ProductInStore[] = [{product: {catalogNumber: 1, category: ProductCategory.General, name: "mock", price: 11}, storeName: store.storeName}];
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
+        jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
+
+        const filters: SearchFilters = {};
+        const query: SearchQuery = {
+            storeName: store.storeName
+        };
+
+        const res: Res.SearchResponse = storeManagement.search(filters, query);
+
+        expect(res.data.result).toBe(true);
+        expect(res.data.products).toMatchObject(productsInStore);
+        expect(store.search).toBeCalledTimes(1);
+    });
+
+    test("search - success with store name not matching rating", () => {
+        const store: Store = new Store('my store');
+
+        const productsInStore: ProductInStore[] = [];
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
+        jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
+
+        const filters: SearchFilters = {
+             storeRating: Rating.LOW
+        };
+        const query: SearchQuery = {
+            storeName: store.storeName
+        };
+
+        const res: Res.SearchResponse = storeManagement.search(filters, query);
+
+        expect(res.data.result).toBe(true);
+        expect(res.data.products).toMatchObject(productsInStore);
+        expect(store.search).toBeCalledTimes(0);
+    });
+
+    test("search - failed with store name", () => {
+        const store: Store = new Store('my store');
+
+        const productsInStore: ProductInStore[] = [];
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
+        jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
+
+        const filters: SearchFilters = {};
+        const query: SearchQuery = {
+            storeName: store.storeName
+        };
+
+        const res: Res.SearchResponse = storeManagement.search(filters, query);
+
+        expect(res.data.result).toBe(false);
+        expect(res.data.products).toMatchObject(productsInStore);
+        expect(store.search).toBeCalledTimes(0);
+    });
+
+    test("search - success without store name", () => {
+        expect(storeManagement.addStore("storename", new RegisteredUser('name','pw')).data.result).toBe(true);
+        const productsInStore: ProductInStore[] = [];
+
+        const filters: SearchFilters = {};
+        const query: SearchQuery = {
+        };
+
+        const res: Res.SearchResponse = storeManagement.search(filters, query);
+
+        expect(res.data.result).toBe(true);
+        expect(res.data.products).toMatchObject(productsInStore);
     });
 
 

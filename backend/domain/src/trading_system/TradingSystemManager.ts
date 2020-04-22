@@ -10,6 +10,7 @@ import {TradingSystemState} from "../api-ext/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
+import {TradingSystemManager as TS} from "../../dist/src/trading_system/TradingSystemManager";
 
 export class TradingSystemManager {
     private _userManager: UserManager;
@@ -25,6 +26,7 @@ export class TradingSystemManager {
     }
 
     startNewSession(): string {
+        logger.info(`starting new session...`);
         let newID: string = uuid();
         while (this._userManager.getUserByToken(newID)) {
             newID = uuid();
@@ -34,6 +36,7 @@ export class TradingSystemManager {
     }
 
     OpenTradeSystem(req: Req.Request): Res.BoolResponse {
+        logger.info(`opening trading system...`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (!user || !this._userManager.isAdmin(user)) return {data: {result: false}};
         this.state = TradingSystemState.OPEN;
@@ -41,6 +44,7 @@ export class TradingSystemManager {
     }
 
     GetTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
+        logger.info(`retrieving trading system state...`);
         return {data: {state: this.state}};
     }
 
@@ -91,7 +95,6 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
-
 
     addItems(req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse {
         logger.info(`trying to add items to store: ${req.body.storeName}`);
@@ -146,7 +149,7 @@ export class TradingSystemManager {
     }
 
     assignStoreOwner(req: Req.AssignStoreOwnerRequest): Res.BoolResponse {
-        logger.info(`requested to assign user as store owner of store: ${req.body.storeName}`)
+        logger.info(`requested to assign user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!usernameWhoAssigns) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
@@ -155,7 +158,7 @@ export class TradingSystemManager {
     }
 
     assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
-        logger.info(`requested to assign user as store manager of store: ${req.body.storeName}`)
+        logger.info(`requested to assign user: ${req.body.usernameToAssign} as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!usernameWhoAssigns) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
@@ -218,6 +221,7 @@ export class TradingSystemManager {
     }
 
     viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
+        logger.info(`trying to retrieve store: ${req.body.storeName} info`);
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
@@ -238,6 +242,7 @@ export class TradingSystemManager {
     }
 
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
+        logger.info(`trying to retrieve store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user) return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
@@ -273,6 +278,7 @@ export class TradingSystemManager {
     }
 
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
+        logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false,receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -286,5 +292,8 @@ export class TradingSystemManager {
         return res;
     }
 
-
+    search(req: Req.SearchRequest): Res.SearchResponse {
+        logger.info(`searching products`)
+        return this._storeManager.search(req.body.filters, req.body.searchQuery);
+    }
 }

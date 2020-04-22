@@ -1,4 +1,11 @@
-import {Item, ProductCatalogNumber, Product, ProductWithQuantity} from "./CommonInterface";
+import {
+    Item,
+    ProductCatalogNumber,
+    Product,
+    ProductWithQuantity,
+    SearchQuery,
+    SearchFilters
+} from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 
 
@@ -111,8 +118,13 @@ interface ViewRUserPurchasesHistoryReq extends Request {
     body: { userName?: string }
 }
 
+interface SearchRequest extends Request {
+    body: {filters: SearchFilters, searchQuery: SearchQuery}
+}
+
 
 export {
+    SearchRequest,
     RemoveStoreOwnerRequest,
     Request,
     SaveToCartRequest,

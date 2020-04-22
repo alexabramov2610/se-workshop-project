@@ -70,6 +70,10 @@ export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest, t
     return ts.addManagerPermissions(req);
 }
 
+export const search = (req: Req.SearchRequest, ts: TS): Res.SearchResponse => {
+    return ts.search(req);
+}
+
 export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest, ts: TS): Res.ViewUsersContactUsMessagesResponse => {
     return ts.viewUsersContactUsMessages(req);
 }

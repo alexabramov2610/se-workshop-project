@@ -24,7 +24,7 @@ export class StoreManager extends RegisteredUser {
         return this._permissions;
     }
 
-    isAllowed(permission: ManagementPermission) : boolean{
+    isAllowed(permission: ManagementPermission) : boolean {
         return this._permissions.find((p) => p === permission) >= 0
     }
 

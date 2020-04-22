@@ -51,18 +51,18 @@ describe("Guest Integration Tests", () => {
         let res: Res.StoreInfoResponse = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
-        expect(res.data.info.productNames).toEqual(["p"]);
+        expect(res.data.info.productsNames).toEqual(["p"]);
         utils.removeProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
         res = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
-        expect(res.data.info.productNames).toEqual([]);
+        expect(res.data.info.productsNames).toEqual([]);
         utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, true);
         utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, false);
         res = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
-        expect(res.data.info.productNames).toEqual(["p"]);
+        expect(res.data.info.productsNames).toEqual(["p"]);
     });
 
     // TODO

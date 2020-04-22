@@ -2,9 +2,13 @@ import * as Responses from "../../../../src/api-ext/Response";
 import * as Res from "../../../../src/api-ext/Response";
 import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {Item, Product, Store} from "../../../../src/trading_system/internal_api";
-import {ProductCatalogNumber, ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
-import {ProductCategory} from "../../../../src/api-ext/Enums";
-import {ManagementPermission} from "../../../../src/api-ext/Enums"
+import {
+    ProductCatalogNumber,
+    ProductInStore,
+    ProductWithQuantity,
+    SearchFilters, SearchQuery
+} from "../../../../src/api-ext/CommonInterface";
+import {ManagementPermission, ProductCategory, Rating} from "../../../../src/api-ext/Enums";
 
 describe("Store Management Unit Tests", () => {
     let store: Store;
@@ -40,8 +44,8 @@ describe("Store Management Unit Tests", () => {
 
         const res=store.viewStoreInfo();
         expect(res.data.info.storeName).toEqual(store.storeName);
-        expect(res.data.info.productNames).toContain(product1.name);
-        expect(res.data.info.productNames).toContain(product2.name);
+        expect(res.data.info.productsNames).toContain(product1.name);
+        expect(res.data.info.productsNames).toContain(product2.name);
         expect(res.data.info.storeOwnersNames).toContain(storeOwner.name)
 
     })
@@ -517,7 +521,6 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-
     test("productInStock seccess test",()=>{
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
@@ -538,6 +541,137 @@ describe("Store Management Unit Tests", () => {
 
     })
 
+
+    test("search - price range", () => {
+        let products: Product[] = [];
+        const numOfItems: number = 5;
+        for (let i = 1; i < numOfItems +1; i ++)
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+
+        // filter by price range
+        const filters: SearchFilters = {
+            priceRange: { min: 0, max: 60 }
+        };
+        const query: SearchQuery = { };
+        const productsInStore: ProductInStore[] = store.search(filters, query);
+
+        let expectedRes: ProductInStore[] = [];
+
+        for (let i = 0; i < 3; i ++)
+            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+
+        expect(productsInStore).toHaveLength(expectedRes.length);
+        expect(productsInStore).toMatchObject(expectedRes);
+    });
+
+    test("search - product name", () => {
+        let products: Product[] = [];
+        const numOfItems: number = 5;
+        for (let i = 1; i < numOfItems +1; i ++)
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+
+        // filter by name
+        const filters: SearchFilters = {};
+        const query: SearchQuery = {
+            productName: products[0].name
+        };
+        const productsInStore: ProductInStore[] = store.search(filters, query);
+
+        let expectedRes: ProductInStore[] = [{product: {catalogNumber: products[0].catalogNumber, category: products[0].category, name: products[0].name, price: products[0].price}, storeName: store.storeName}];
+
+        expect(productsInStore).toHaveLength(expectedRes.length);
+        expect(productsInStore).toMatchObject(expectedRes);
+    });
+
+    test("search - rating", () => {
+        let products: Product[] = [];
+        const numOfItems: number = 5;
+        for (let i = 1; i < numOfItems +1; i ++)
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+        // filter by rating
+        let filters: SearchFilters = {
+            productRating: Rating.MEDIUM
+        };
+        const query: SearchQuery = { };
+        let productsInStore: ProductInStore[] = store.search(filters, query);
+
+        let expectedRes: ProductInStore[] = [];
+
+        for (let i = 0; i < 5; i ++)
+            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+
+        expect(productsInStore).toHaveLength(5);
+        expect(productsInStore).toMatchObject(expectedRes);
+
+        filters = {
+            productRating: Rating.HIGH
+        };
+        productsInStore = store.search(filters, query);
+
+        expectedRes = [];
+
+        expect(productsInStore).toHaveLength(0);
+        expect(productsInStore).toMatchObject(expectedRes);
+
+    });
+
+    test("search - category", () => {
+        let products: Product[] = [];
+        const numOfItems: number = 5;
+        const category1: ProductCategory = ProductCategory.Electronics;
+        const category2: ProductCategory = ProductCategory.General;
+
+        for (let i = 1; i < numOfItems +1; i ++)
+            products.push(new Product("name" + i, i, 20*i, category1));
+
+        const res: Responses.ProductAdditionResponse = store.addNewProducts(products);
+
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.productsNotAdded.length).toBe(0);
+
+        // filter by rating
+        let filters: SearchFilters = {
+            productCategory: category1
+        };
+        const query: SearchQuery = { };
+        let productsInStore: ProductInStore[] = store.search(filters, query);
+
+        let expectedRes: ProductInStore[] = [];
+
+        for (let i = 0; i < 5; i ++)
+            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+
+        expect(productsInStore).toHaveLength(5);
+        expect(productsInStore).toMatchObject(expectedRes);
+
+        filters = {
+            productCategory: category2
+        };
+        productsInStore = store.search(filters, query);
+
+        expectedRes = [];
+
+        expect(productsInStore).toHaveLength(0);
+        expect(productsInStore).toMatchObject(expectedRes);
+    });
 
 
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {

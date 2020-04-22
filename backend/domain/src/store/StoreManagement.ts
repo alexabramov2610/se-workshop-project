@@ -8,8 +8,8 @@ import * as Req from "../api-ext/Request";
 import {
     Item as ItemReq,
     Product as ProductReq,
-    ProductCatalogNumber,
-    ProductWithQuantity
+    ProductCatalogNumber, ProductInStore,
+    ProductWithQuantity, SearchFilters, SearchQuery
 } from "../api-ext/CommonInterface";
 import {Receipt} from "../trading_system/data/Receipt";
 import {ManagementPermission} from "../api-ext/Enums";
@@ -40,7 +40,7 @@ export class StoreManagement {
         const newStore = new Store(storeName);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
-        logger.debug(`successfully added store: ${JSON.stringify(newStore)} to system`)
+        logger.info(`successfully added store: ${JSON.stringify(newStore)} to system`)
         return {data: {result: true}}
 
     }
@@ -134,7 +134,7 @@ export class StoreManagement {
 
     removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsRemovalResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (operationValid.error) {
+        if (!operationValid.data.result) {
             return {data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error};
         }
 
@@ -146,7 +146,7 @@ export class StoreManagement {
 
     removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]): Res.ProductRemovalResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (operationValid.error) {
+        if (!operationValid.data.result) {
             return {data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error};
         }
 
@@ -156,7 +156,7 @@ export class StoreManagement {
 
     addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (operationValid.error) {
+        if (!operationValid.data.result) {
             return {data: {result: false, productsNotAdded: productsReq}, error: operationValid.error};
         }
 
@@ -167,7 +167,7 @@ export class StoreManagement {
 
     removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (operationValid.error) {
+        if (!operationValid.data.result) {
             return {data: {result: false, productsNotRemoved: products}, error: operationValid.error};
         }
 
@@ -205,7 +205,7 @@ export class StoreManagement {
 
         const newUserToAssign: StoreOwner = new StoreOwner(userToAssign.name);
 
-        logger.debug(`successfully assigned user: ${userToAssign} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+        logger.debug(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
         const additionRes: Res.BoolResponse = store.addStoreOwner(newUserToAssign);
         if (additionRes.data.result)
             userWhoAssignsOwner.assignStoreOwner(newUserToAssign);
@@ -242,7 +242,7 @@ export class StoreManagement {
 
         const newUserToAssign: StoreManager = new StoreManager(userToAssign.name);
 
-        logger.debug(`successfully assigned user: ${userToAssign} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+        logger.debug(`successfully assigned user: ${userToAssign.name} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
         const additionRes: Res.BoolResponse = store.addStoreManager(newUserToAssign);
         if (additionRes.data.result)
             userWhoAssignsOwner.assignStoreManager(newUserToAssign);
@@ -432,7 +432,6 @@ export class StoreManagement {
             if (store.storeName === storeName)
                 return store;
         }
-
         return undefined;
     }
 
@@ -443,7 +442,6 @@ export class StoreManagement {
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
-
     }
 
     viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
@@ -488,6 +486,25 @@ export class StoreManagement {
         }
         const messages: ContactUsMessage[] = store.getContactUsMessages();
         return {data: {messages}}
+    }
+
+    search(filters: SearchFilters, query: SearchQuery) : Res.SearchResponse {
+        if (query.storeName) {
+            const store: Store = this.findStoreByName(query.storeName);
+            if (!store)
+                return { data: {result:false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
+            if (!filters.storeRating || filters.storeRating === store.rating)
+                return { data: {result:true, products: store.search(filters, query)}};
+            else
+                return {data: {result:true, products: []}};
+        }
+
+        let productsFound: ProductInStore[] = [];
+        for (const store of this._stores) {
+            if (!filters.storeRating || filters.storeRating === store.rating)
+                productsFound.concat(store.search(filters, query));
+        }
+        return { data: {result:true, products: productsFound}};
     }
 
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
