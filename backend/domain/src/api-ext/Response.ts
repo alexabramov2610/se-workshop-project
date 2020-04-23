@@ -1,5 +1,13 @@
 import {Error} from "../api-int/internal_api";
-import {Item, ProductCatalogNumber, Product,BagItem, ProductWithQuantity, StoreInfo, ProductInStore} from "./CommonInterface";
+import {
+    Item,
+    ProductCatalogNumber,
+    Product,
+    BagItem,
+    ProductWithQuantity,
+    StoreInfo,
+    ProductInStore
+} from "./CommonInterface";
 import {ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
 
@@ -46,24 +54,29 @@ interface ViewUsersContactUsMessagesResponse extends Response {
     data: { messages: ContactUsMessage[] }
 }
 
-interface ProductInfoResponse extends Response{
-  data:{result:boolean, info?:{name:string,catalogNumber:number,price:number,category:ProductCategory, quantity: number}}
+interface ProductInfoResponse extends Response {
+    data: { result: boolean, info?: { name: string, catalogNumber: number, price: number, category: ProductCategory, quantity: number } }
 }
 
-interface ViewRUserPurchasesHistoryRes extends Response{
-    data:{result:boolean, receipts: Receipt[]}
+interface ViewRUserPurchasesHistoryRes extends Response {
+    data: { result: boolean, receipts: Receipt[] }
 }
 
-interface ViewCartRes extends Response{
-    data:{result:boolean, cart: Map<string, BagItem[]>;}
+interface ViewCartRes extends Response {
+    data: { result: boolean, cart: Map<string, BagItem[]>; }
 }
 
 
 interface SearchResponse extends Response {
-    data: {result:boolean, products: ProductInStore[]}
+    data: { result: boolean, products: ProductInStore[] }
+}
+
+interface PurchaseResponse extends Response {
+    data: { result: boolean, reciept: Receipt }
 }
 
 export {
+    PurchaseResponse,
     SearchResponse,
     Response,
     BoolResponse,

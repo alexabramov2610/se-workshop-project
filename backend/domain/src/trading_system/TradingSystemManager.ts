@@ -10,7 +10,6 @@ import {User} from "../user/users/User";
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 const logger = loggerW(__filename)
-import {TradingSystemManager as TS} from "../../dist/src/trading_system/TradingSystemManager";
 
 export class TradingSystemManager {
     private _userManager: UserManager;

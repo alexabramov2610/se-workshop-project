@@ -4,8 +4,6 @@ import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
-import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
-import {errorMsg} from "domain_layer/dist/src/api-int/Error";
 
 let tradingSystem = getInstance();
 
@@ -141,6 +139,10 @@ export const search = (req: Req.SearchRequest): Res.SearchResponse => {
     return runIfOpen(req, StoreService.search);
 }
 
+export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse =>{
+    return runIfOpen(req, StoreService.search);
+
+}
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
     if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
@@ -148,4 +150,4 @@ const runIfOpen = (req: Req.Request, fn: any): any => {
     return fn.call(this, req, tradingSystem);
 }
 
-export {Req,Res};
+export {Req, Res};

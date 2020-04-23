@@ -7,6 +7,7 @@ import {
     SearchFilters
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
+import {CreditCard} from "../../../../AT";
 
 
 interface Request {
@@ -99,13 +100,12 @@ interface ProductInfoRequest extends Request {
 }
 
 interface SaveToCartRequest extends Request {
-    body: { storeName: string, catalogNumber: number,amount:number }
+    body: { storeName: string, catalogNumber: number, amount: number }
 }
 
-interface RemoveFromCartRequest extends  Request{
-    body:{storeName:string,catalogNumber:number,amount:number}
+interface RemoveFromCartRequest extends Request {
+    body: { storeName: string, catalogNumber: number, amount: number }
 }
-
 
 
 interface ChangeProductPriceRequest extends Request {
@@ -128,13 +128,20 @@ interface ViewCartReq extends Request {
     body: {}
 }
 
-
 interface SearchRequest extends Request {
-    body: {filters: SearchFilters, searchQuery: SearchQuery}
+    body: { filters: SearchFilters, searchQuery: SearchQuery }
 }
 
+interface PurchaseRequest extends Request {
+    body: {
+        cardDetails: CreditCard, address: string,
+        city: string,
+        country: string
+    }
+}
 
 export {
+    PurchaseRequest,
     SearchRequest,
     RemoveStoreOwnerRequest,
     Request,
