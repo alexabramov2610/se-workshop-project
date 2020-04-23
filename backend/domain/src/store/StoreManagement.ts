@@ -6,6 +6,7 @@ import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
+    BagItem,
     Item as ItemReq,
     Product as ProductReq,
     ProductCatalogNumber, ProductInStore,
@@ -499,7 +500,7 @@ export class StoreManagement {
                 return {data: {result:true, products: []}};
         }
 
-        let productsFound: ProductInStore[] = [];
+        const productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
             if (!filters.storeRating || filters.storeRating === store.rating)
                 productsFound.concat(store.search(filters, query));
@@ -530,4 +531,12 @@ export class StoreManagement {
     }
 
 
+    verifyStoreBag(storeName: string, bagItems: BagItem[]) :Res.BoolResponse{
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return { data: {result:false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const notInStock: BagItem[] = bagItems.filter((bagItem)=> (store.getProductQuantity(bagItem.product.catalogNumber) - bagItem.amount) < 0)
+        return notInStock.length === 0? {data: {result: true}} : {data: {result:false}, error: {message: errorMsg.E_STOCK, options: notInStock}}
+
+    }
 }

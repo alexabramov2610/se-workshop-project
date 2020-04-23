@@ -1,5 +1,4 @@
 import {ProductCategory, Rating} from "./Enums";
-import exp from "constants";
 
 export {ProductCategory}
 
@@ -34,7 +33,6 @@ export interface CreditCard {
     expYear: string,
     ccv: string,
 }
-
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number

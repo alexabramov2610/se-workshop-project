@@ -228,6 +228,11 @@ class UserManager {
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}
     }
+
+    getUserCart(user: User) {
+        return user.cart;
+
+    }
 }
 
 export {UserManager};

@@ -9,12 +9,14 @@ import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
+import {BagItem} from "../api-ext/CommonInterface";
+
 const logger = loggerW(__filename)
 
 export class TradingSystemManager {
     private _userManager: UserManager;
     private _storeManager: StoreManagement;
-    private _externalSystems: ExternalSystemsManager;
+    private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
 
     constructor() {
@@ -289,7 +291,7 @@ export class TradingSystemManager {
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        return this._userManager.removeProductFromCart(user,req.body.storeName,product,req.body.amount);
+        return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
     }
 
     viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
@@ -315,5 +317,21 @@ export class TradingSystemManager {
     search(req: Req.SearchRequest): Res.SearchResponse {
         logger.info(`searching products`)
         return this._storeManager.search(req.body.filters, req.body.searchQuery);
+    }
+
+    verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
+        logger.info(`Verify products in cart are on stock`)
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        for (const [storeName, bagItems] of cart.entries()) {
+            const result: Res.BoolResponse = this._storeManager.verifyStoreBag(storeName, bagItems)
+            if (!result.data.result) {
+                return result;
+            }
+        }
+        return {data: {result: true}}
+
     }
 }

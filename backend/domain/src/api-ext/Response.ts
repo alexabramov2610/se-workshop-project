@@ -4,7 +4,6 @@ import {
     ProductCatalogNumber,
     Product,
     BagItem,
-    ProductWithQuantity,
     StoreInfo,
     ProductInStore
 } from "./CommonInterface";
@@ -71,8 +70,8 @@ interface SearchResponse extends Response {
     data: { result: boolean, products: ProductInStore[] }
 }
 
-interface PurchaseResponse extends Response {
-    data: { result: boolean, reciept: Receipt }
+interface PurchaseResponse extends BoolResponse {
+    data: { result: boolean, reciept?: Receipt }
 }
 
 export {

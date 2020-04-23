@@ -4,7 +4,6 @@ import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/T
 
 export const createStore = (createStoreReq: Req.OpenStoreRequest, ts: TS): Res.BoolResponse => {
     return ts.createStore(createStoreReq);
-
 }
 
 export const addItems = (req: Req.ItemsAdditionRequest, ts: TS): Res.ItemsAdditionResponse => {
@@ -34,6 +33,7 @@ export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity, 
 export const addNewProducts = (req: Req.AddProductsRequest, ts: TS): Res.ProductAdditionResponse => {
     return ts.addNewProducts(req);
 }
+
 export const viewProductInfo = (req:Req.ProductInfoRequest, ts: TS):Res.BoolResponse => {
     return ts.viewProductInfo(req);
 }

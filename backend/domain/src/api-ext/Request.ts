@@ -7,7 +7,7 @@ import {
     SearchFilters
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
-import {CreditCard} from "../../../../AT";
+import {CreditCard} from "../api-ext/CommonInterface"
 
 
 interface Request {
@@ -132,6 +132,9 @@ interface SearchRequest extends Request {
     body: { filters: SearchFilters, searchQuery: SearchQuery }
 }
 
+interface VerifyCartRequest extends Request{
+    body: {}
+}
 interface PurchaseRequest extends Request {
     body: {
         cardDetails: CreditCard, address: string,
@@ -141,6 +144,7 @@ interface PurchaseRequest extends Request {
 }
 
 export {
+    VerifyCartRequest,
     PurchaseRequest,
     SearchRequest,
     RemoveStoreOwnerRequest,
