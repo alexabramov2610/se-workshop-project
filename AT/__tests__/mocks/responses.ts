@@ -1,6 +1,11 @@
 import {Response, CATEGORY, Cart, Product, PERMISSION} from "../../src/test_env/types";
-import {ProductCatalogNumber, ProductCategory} from "../../../backend/domain/src/api-ext/CommonInterface";
-import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+import {
+    BagItem,
+    Item,
+    ProductCatalogNumber,
+    ProductCategory
+} from "../../../backend/domain/src/api-ext/CommonInterface";
+import {Res, Req} from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface IResponse extends Response {
     data: any;
@@ -179,47 +184,38 @@ const SearchResponse: ISearchResponse = {
     },
 };
 
-export interface ICartResponse extends Response {
+const CartResponse: Res.ViewCartRes = {
     data: {
-        cart: Cart;
-    };
-}
-
-const CartResponse: ICartResponse = {
-    data: {
+        result: true,
         cart: {
             products: [
                 {
-                    product: {
-                        name: "-name1",
-                        category: CATEGORY.ELECTRONICS,
-                        price: 20,
-                        catalogNumber: 123,
-                    },
-                    amount: 10,
-                },
-                {
-                    product: {
-                        name: "-name2",
-                        category: CATEGORY.ELECTRONICS,
-                        price: 20,
-                        catalogNumber: 456,
-                    },
-                    amount: 1,
-                },
-                {
-                    product: {
-                        name: "-name3",
-                        category: CATEGORY.ELECTRONICS,
-                        price: 20,
-                        catalogNumber: 789,
-                    },
-                    amount: 2,
-                },
-            ],
-        },
-    },
+                    storeName: "store-name",
+                    bagItems: [{
+                        product: {name: "product", catalogNumber: 123, price: 20, category: ProductCategory.CLOTHING},
+                        amount: 2,
+                        finalPrice: 25
+                    }]
+                }
+            ]
+        }
+    }
 };
+
+
+// export interface Cart {
+//     products: CartProduct[]
+// }
+//
+// export interface CartProduct {
+//     storeName: string,
+//     bagItems: BagItem[]
+// }
+// export interface BagItem {
+//     product: Product,
+//     amount: number;
+//     finalPrice?: number
+// }
 
 const ProductsRemovalResponse: IProductsRemovalResponse = {
     data: {result: true, productsNotRemoved: []},
@@ -247,4 +243,4 @@ const DummyValues = {
     PermissionsResponse
 };
 
-export { DummyValues };
+export {DummyValues};

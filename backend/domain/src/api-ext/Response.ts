@@ -66,7 +66,6 @@ interface ViewCartRes extends Response {
     data: { result: boolean, cart: Cart }
 }
 
-
 interface SearchResponse extends Response {
     data: { result: boolean, products: ProductInStore[] }
 }

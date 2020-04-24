@@ -1,5 +1,4 @@
 import { Bridge } from "./Bridge";
-import { ServiceFacade } from "service_layer";
 import { Adapter } from "./Adapter";
 import {
   Item,
@@ -9,7 +8,6 @@ import {
   Credentials,
   RATE,
   SearchData,
-  Cart,
   CreditCard,
   Discount,
   PERMISSION,
@@ -20,6 +18,8 @@ import {
   IProductsRemovalResponse,
   IResponse,
 } from "../../__tests__/mocks/responses";
+import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+
 
 let real: Partial<Bridge> = Adapter;
 
@@ -180,15 +180,15 @@ const Proxy: Bridge = {
   },
 
   changeProductName(
-    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Res.BoolResponse {
     return real.changeProductName
       ? real.changeProductName(req)
       : { data: { result: true } };
   },
   changeProductPrice(
-    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Res.BoolResponse {
     return real.changeProductName
       ? real.changeProductPrice(req)
       : { data: { result: true } };
@@ -200,37 +200,37 @@ const Proxy: Bridge = {
       : DummyValues.PermissionsResponse;
   },
   removeStoreManager(
-    req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Res.BoolResponse {
     return real.removeStoreManager
       ? real.removeStoreManager(req)
       : { data: { result: false } };
   },
   removeManagerPermissions(
-    req: ServiceFacade.Req.ChangeManagerPermissionRequest
-  ): ServiceFacade.Res.BoolResponse {
+    req: Req.ChangeManagerPermissionRequest
+  ): Res.BoolResponse {
     return real.removeManagerPermissions
       ? real.removeManagerPermissions(req)
       : { data: { result: true } };
   },
   viewUserPurchasesHistory(
-    req: ServiceFacade.Req.ViewRUserPurchasesHistoryReq
-  ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
+    req: Req.ViewRUserPurchasesHistoryReq
+  ): Res.ViewRUserPurchasesHistoryRes {
     return real.viewUserPurchasesHistory
       ? real.viewUserPurchasesHistory(req)
       : { data: { result: false, receipts: [] } };
   },
   viewStorePurchasesHistory(
-    req: ServiceFacade.Req.ViewShopPurchasesHistoryRequest
-  ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse {
+    req: Req.ViewShopPurchasesHistoryRequest
+  ): Res.ViewShopPurchasesHistoryResponse {
     return real.viewUserPurchasesHistory
       ? real.viewStorePurchasesHistory
       (req)
       : { data: { result: false, receipts: [] } };
   },
   purchase(
-    req: ServiceFacade.Req.PurchaseRequest
-  ): ServiceFacade.Res.PurchaseResponse {
+    req: Req.PurchaseRequest
+  ): Res.PurchaseResponse {
     return real.purchase ? real.purchase(req) : { data: { result: false } };
   },
 };
