@@ -125,7 +125,7 @@ export class TradingSystemManager {
             data: {result: false, productsNotRemoved: req.body.products},
             error: {message: errorMsg.E_NOT_AUTHORIZED}
         };
-        return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products);
+        return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
     }
 
     addNewProducts(req: Req.AddProductsRequest): Res.ProductAdditionResponse {

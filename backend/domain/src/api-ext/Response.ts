@@ -23,7 +23,7 @@ interface ProductAdditionResponse extends Response {
 }
 
 interface ProductRemovalResponse extends Response {
-    data: { result: boolean, productsNotRemoved: ProductCatalogNumber[] }
+    data: { result: boolean, productsNotRemoved: ProductCatalogNumber[], itemsRemoved?: Item[] }
 }
 
 interface BoolResponse extends Response {

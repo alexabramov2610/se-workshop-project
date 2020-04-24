@@ -144,14 +144,14 @@ export class StoreManagement {
 
     }
 
-    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[]): Res.ProductRemovalResponse {
+    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (!operationValid.data.result) {
             return {data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error};
         }
 
         const store: Store = this.findStoreByName(storeName);
-        return store.removeProductsWithQuantity(productsReq);
+        return store.removeProductsWithQuantity(productsReq, isReturnItems);
     }
 
     addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {

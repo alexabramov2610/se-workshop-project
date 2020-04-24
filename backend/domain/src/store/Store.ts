@@ -188,16 +188,25 @@ export class Store {
         }
     }
 
-    removeProductsWithQuantity(products: ProductWithQuantity[]): Res.ProductRemovalResponse {
+    removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
         const notRemovedProducts: ProductCatalogNumber[] = [];
-
+        let itemsToReturn: Item[] = [];
         for (const product of products) {
             const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
                 const items: Item[] = this._products.get(productInStore);
 
-                items.length = product.quantity >= items.length ? 0 : items.length - product.quantity;
+                const numOfItemsToRemove: number = product.quantity >= items.length ? items.length : product.quantity;
+
+                if (isReturnItems) {
+                    for (let i = 0; i < numOfItemsToRemove; i++) {
+                        itemsToReturn.push(items[i]);
+                    }
+                }
+                items.length = items.length - numOfItemsToRemove;
+
+                this._products.set(productInStore, items);
             } else {
                 const prodCatalogNumber: ProductCatalogNumber = {catalogNumber: product.catalogNumber};
                 notRemovedProducts.push(prodCatalogNumber);
@@ -212,9 +221,8 @@ export class Store {
             }
         } else {
             logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store id: ${this._UUID}`)
-            return {
-                data: {result: true, productsNotRemoved: notRemovedProducts}
-            }
+            return isReturnItems ? { data: {result: true, productsNotRemoved: notRemovedProducts, itemsRemoved: itemsToReturn }} :
+                { data: {result: true, productsNotRemoved: notRemovedProducts }}
         }
 
     }
