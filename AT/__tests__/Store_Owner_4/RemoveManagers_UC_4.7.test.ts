@@ -61,7 +61,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       },
     });
     expect(data.result).toBe(true);
-    expect(error.message).toBeUndefined();
+    expect(error).toBeUndefined();
   });
 
 });
