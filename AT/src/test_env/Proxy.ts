@@ -213,6 +213,7 @@ const Proxy: Bridge = {
       ? real.removeManagerPermissions(req)
       : { data: { result: true } };
   },
+
 };
 
 export { Proxy };

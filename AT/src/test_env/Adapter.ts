@@ -3,7 +3,7 @@ import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
-import { changeProductName } from "service_layer/dist/src/service_facade/ServiceFacade";
+import { changeProductName, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -187,4 +187,10 @@ export const Adapter: Partial<Env.Bridge> = {
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   },
+  viewStorePurchasesHistory(req : ServiceFacade.Req.ViewShopPurchasesHistoryRequest ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse {
+    return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
+  },
+  viewUserPurchasesHistory(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
+    return ServiceFacade.viewRegisteredUserPurchasesHistory(wrapWithToken(req.body));
+  }
 };

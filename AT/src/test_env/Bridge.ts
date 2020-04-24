@@ -63,4 +63,6 @@ export interface Bridge {
   watchPermissions(store: Store, credentials: Credentials): DummyTypes.IPermissionsResponse;
   removeStoreManager(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse;
   removeManagerPermissions(req: ServiceFacade.Req.ChangeManagerPermissionRequest): ServiceFacade.Res.BoolResponse;
+  viewStorePurchasesHistory?(req : ServiceFacade.Req.ViewShopPurchasesHistoryRequest ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse;
+  viewUserPurchasesHistory?(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes;
 }
