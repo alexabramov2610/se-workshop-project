@@ -182,12 +182,14 @@ export class TradingSystemManager {
     }
 
     removeStoreManager(req: Req.RemoveStoreManagerRequest): Res.BoolResponse {
-        logger.info(`user: ${JSON.stringify(req.token)} requested to remove user:
-                ${JSON.stringify(req.body.usernameToRemove)} as a manager in store: ${JSON.stringify(req.body.storeName)} `)
+        logger.info(`user requested to remove user:
+                ${req.body.usernameToRemove} as a manager in store: ${req.body.storeName} `)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoRemoves) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        if (!usernameWhoRemoves)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
-        if (!usernameToRemove) return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        if (!usernameToRemove)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.removeStoreManager(req.body.storeName, usernameToRemove, usernameWhoRemoves);
     }
 
