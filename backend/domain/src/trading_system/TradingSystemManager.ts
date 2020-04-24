@@ -355,7 +355,7 @@ export class TradingSystemManager {
         if (rUser) {
             rUser.addReceipt(receipt)
         }
-        return {data: {result: true, receipt: new Receipt(purchases)}}
+        return {data: {result: true, receipt: {purchases,date: new Date()}}}
     }
 
 

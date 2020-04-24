@@ -203,7 +203,7 @@ export class UserManager {
     }
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
-        return {data: {result: true, receipts: user.receipts}}
+        return {data: {result: true, receipts: user.receipts.map(r=>{return {date: r.date,purchases:r.purchases}})}}
     }
 
     getUserCart(user: User) {
