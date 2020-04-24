@@ -3,7 +3,7 @@ import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
-import { changeProductName, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -116,13 +116,6 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  // viewProduct(store: Store, product: Product) {
-  //   const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
-  //   return error
-  //       ? {data: undefined, error: error}
-  //       : {data: data.info, error: undefined};
-  // },
-
   assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
     const req = {
       storeName: store.name,
@@ -177,20 +170,31 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
+
   removeStoreManager(
     req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
   },
+
   removeManagerPermissions(
     req: ServiceFacade.Req.ChangeManagerPermissionRequest
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   },
+
   viewStorePurchasesHistory(req : ServiceFacade.Req.ViewShopPurchasesHistoryRequest ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse {
     return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
   },
+
   viewUserPurchasesHistory(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
     return ServiceFacade.viewRegisteredUserPurchasesHistory(wrapWithToken(req.body));
-  }
+  },
+
+  viewProduct(store: Store, product: Product): Res.ProductInfoResponse{
+    const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
+    return error
+        ? {data: undefined, error: error}
+        : {data: data, error: undefined};
+  },
 };

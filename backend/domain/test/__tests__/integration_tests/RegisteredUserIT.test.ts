@@ -26,19 +26,19 @@ describe("Registered User Integration Tests", () => {
         const ownerToken: string = utils.initSessionRegisterLogin(tradingSystemManager, usernameOwner, passwordOwner)
         const storeName: string = "store name";
         utils.createStore(tradingSystemManager, storeName, ownerToken);
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, true);
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.HOME)], ownerToken, true);
         const req: Req.StoreInfoRequest = {body: {storeName}, token};
         let res: Res.StoreInfoResponse = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
         expect(res.data.info.productsNames).toEqual(["p"]);
-        utils.removeProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken)
+        utils.removeProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.HOME)], ownerToken)
         res = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);
         expect(res.data.info.productsNames).toEqual([]);
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, true);
-        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.Home)], ownerToken, false);
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.HOME)], ownerToken, true);
+        utils.addNewProducts(tradingSystemManager, storeName, [new Product("p", 1, 2, ProductCategory.HOME)], ownerToken, false);
         res = tradingSystemManager.viewStoreInfo(req);
         expect(res.data.result).toBe(true);
         expect(res.data.info.storeName).toEqual(storeName);

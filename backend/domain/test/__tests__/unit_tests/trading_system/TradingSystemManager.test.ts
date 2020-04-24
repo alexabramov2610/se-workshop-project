@@ -214,7 +214,7 @@ describe("Store Management Unit Tests", () => {
                 catalogNumber: prod.catalogNumber,
                 name: prod.name,
                 price: prod.price,
-                category: ProductCategory.Electronics
+                category: ProductCategory.ELECTRONICS
             };
             productsReq.push(prodReq);
         }
@@ -245,7 +245,7 @@ describe("Store Management Unit Tests", () => {
                 catalogNumber: prod.catalogNumber,
                 name: prod.name,
                 price: prod.price,
-                category: ProductCategory.Electronics
+                category: ProductCategory.ELECTRONICS
             };
             productsReq.push(prodReq);
         }
@@ -959,7 +959,7 @@ describe("Store Management Unit Tests", () => {
     test("saveProductToCart success test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
-        const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
+        const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
         jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(true);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
@@ -977,7 +977,7 @@ describe("Store Management Unit Tests", () => {
     test("saveProductToCart not in stock-Fail test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
-        const p: Product = new Product('prod', 12, 5, ProductCategory.Home)
+        const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
         jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(false);
         jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
 
@@ -1015,7 +1015,7 @@ describe("Store Management Unit Tests", () => {
         };
         const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
         cart.set("storeName", [{
-            product: {catalogNumber: 5, name: "bamba", category: ProductCategory.Home, price: 20},
+            product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
             amount: 2
         }])
         mocked(StoreManagement).mockImplementation((): any => {
@@ -1142,7 +1142,7 @@ describe("Store Management Unit Tests", () => {
     function generateProducts(numOfItems: number): ProductReq[] {
         const products: ProductReq[] = [];
         for (let i = 0; i < numOfItems; i++)
-            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.Electronics});
+            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.ELECTRONICS});
 
         return products;
     }

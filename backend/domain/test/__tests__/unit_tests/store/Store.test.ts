@@ -23,7 +23,7 @@ describe("Store Management Unit Tests", () => {
 
     test("view store info success", () => {
         const dor = new StoreOwner("dor")
-        const chair = new Product("chair", 6, 200, ProductCategory.Home)
+        const chair = new Product("chair", 6, 200, ProductCategory.HOME)
         store.addStoreOwner(dor)
         store.addNewProducts([chair])
 
@@ -33,8 +33,8 @@ describe("Store Management Unit Tests", () => {
     })
 
     test("view store info success", () => {
-        const product1 = new Product('product1', 1, 1, ProductCategory.Home)
-        const product2 = new Product('product2', 2, 2, ProductCategory.Home)
+        const product1 = new Product('product1', 1, 1, ProductCategory.HOME)
+        const product2 = new Product('product2', 2, 2, ProductCategory.HOME)
         const products: Product[] = [product1, product2];
 
         store.addNewProducts(products);
@@ -535,7 +535,7 @@ describe("Store Management Unit Tests", () => {
         let products: Product[] = [];
         const numOfItems: number = 5;
         for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -563,7 +563,7 @@ describe("Store Management Unit Tests", () => {
         let products: Product[] = [];
         const numOfItems: number = 5;
         for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -588,7 +588,7 @@ describe("Store Management Unit Tests", () => {
         let products: Product[] = [];
         const numOfItems: number = 5;
         for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.Electronics));
+            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -625,8 +625,8 @@ describe("Store Management Unit Tests", () => {
     test("search - category", () => {
         let products: Product[] = [];
         const numOfItems: number = 5;
-        const category1: ProductCategory = ProductCategory.Electronics;
-        const category2: ProductCategory = ProductCategory.General;
+        const category1: ProductCategory = ProductCategory.ELECTRONICS;
+        const category2: ProductCategory = ProductCategory.GENERAL;
 
         for (let i = 1; i < numOfItems +1; i ++)
             products.push(new Product("name" + i, i, 20*i, category1));
@@ -666,7 +666,7 @@ describe("Store Management Unit Tests", () => {
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
         const products: ProductCatalogNumber[] = [];
         for (let i = 1; i < numberOfItems + 1; i++)
-            products.push(new Product("name", i, 5, ProductCategory.Electronics));
+            products.push(new Product("name", i, 5, ProductCategory.ELECTRONICS));
 
         return products;
 
@@ -687,7 +687,7 @@ describe("Store Management Unit Tests", () => {
     function generateValidProducts(numOfItems: number): Product[] {
         const products: Product[] = [];
         for (let i = 1; i < numOfItems + 1; i++)
-            products.push(new Product("name", i, 5, ProductCategory.Electronics));
+            products.push(new Product("name", i, 5, ProductCategory.ELECTRONICS));
 
         return products;
     }
@@ -695,7 +695,7 @@ describe("Store Management Unit Tests", () => {
     function generateInvalidProducts(numOfItems: number): Product[] {
         const products: Product[] = [];
         for (let i = 1; i < numOfItems + 1; i++)
-            products.push(new Product("", i, 5, ProductCategory.Electronics));
+            products.push(new Product("", i, 5, ProductCategory.ELECTRONICS));
 
         return products;
     }

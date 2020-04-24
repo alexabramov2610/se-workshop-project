@@ -15,10 +15,11 @@ export enum ManagementPermission {
 }
 
 export enum ProductCategory {
-    General = 1,
-    Electronics = 2,
-    Hobbies = 3,
-    Home = 4
+    GENERAL,
+    ELECTRONICS,
+    HOBBIES,
+    HOME,
+    CLOTHING,
 }
 
 export enum Rating {
