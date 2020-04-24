@@ -15,8 +15,8 @@ describe("Guest - View Information, UC: 2.4", () => {
     beforeEach(() => {
         _serviceBridge = _driver
             .resetState()
-            .initWithDefaults()
             .startSession()
+            .initWithDefaults()
             .registerWithDefaults()
             .loginWithDefaults()
             .getBridge();

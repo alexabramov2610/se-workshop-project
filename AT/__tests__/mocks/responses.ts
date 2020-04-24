@@ -1,5 +1,6 @@
 import {Response, CATEGORY, Cart, Product, PERMISSION} from "../../src/test_env/types";
-import {ProductCatalogNumber} from "../../../backend/domain/src/api-ext/CommonInterface";
+import {ProductCatalogNumber, ProductCategory} from "../../../backend/domain/src/api-ext/CommonInterface";
+import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface IResponse extends Response {
     data: any;
@@ -41,16 +42,18 @@ const ProductResponse: IProductResponse = {
 };
 
 export interface IViewProductResponse extends Response {
-    data: { info: Product };
+    data: { result: boolean, info?: { name: string, catalogNumber: number, price: number, category: ProductCategory, quantity: number } }
 }
 
-const ViewProductResponse: IViewProductResponse = {
+const ViewProductResponse: Res.ProductInfoResponse = {
     data: {
+        result: true,
         info: {
             name: "Item",
             price: 33.5,
             catalogNumber: 123,
-            category: CATEGORY.CLOTHING,
+            category: ProductCategory.CLOTHING,
+            quantity: 2
         },
     },
 };

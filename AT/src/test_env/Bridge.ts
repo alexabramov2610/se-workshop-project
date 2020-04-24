@@ -12,6 +12,7 @@ import {
 } from "./types";
 import * as DummyTypes from "../../__tests__/mocks/responses";
 import { ServiceFacade } from "service_layer";
+import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
@@ -27,7 +28,7 @@ export interface Bridge {
     Products: Product[]
   ): DummyTypes.IProductsRemovalResponse;
   viewStore(store: Store): DummyTypes.IViewStoreResponse;
-  viewProduct(store: Store, product: Product): DummyTypes.IViewProductResponse;
+  viewProduct(store: Store, product: Product): Res.ProductInfoResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
   login(credentials: Credentials): DummyTypes.IResponse;

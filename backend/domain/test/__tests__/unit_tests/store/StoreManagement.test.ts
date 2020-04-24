@@ -1020,7 +1020,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = true;
         const isSuccessFlow: boolean = true;
         mockVerifyStoreOperation(isSuccessVerify);
-        const prodReq: ProductReq[] = [{name: 'mock-prod', category: ProductCategory.Electronics, catalogNumber: 1, price: 1}];
+        const prodReq: ProductReq[] = [{name: 'mock-prod', category: ProductCategory.ELECTRONICS, catalogNumber: 1, price: 1}];
         const mockRes: Res.ProductAdditionResponse = {data: {result: isSuccessFlow, productsNotAdded: prodReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
@@ -1113,7 +1113,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test('viewProductInfo success test', () => {
-        const p = new Product('my product', 12345, 15.90, ProductCategory.General)
+        const p = new Product('my product', 12345, 15.90, ProductCategory.GENERAL)
         const store = new Store('my store')
         store.addNewProducts([p]);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(store);
@@ -1124,12 +1124,12 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeTruthy();
         expect(res.data.info.catalogNumber).toBe(12345);
         expect(res.data.info.price).toBe(15.90);
-        expect(res.data.info.category).toBe(ProductCategory.General);
+        expect(res.data.info.category).toBe(ProductCategory.GENERAL);
         expect(res.data.info.quantity).toBe(0);
     })
 
     test('viewProductInfo fail test', () => {
-        const p = new Product('my product', 12345, 15.90, ProductCategory.General)
+        const p = new Product('my product', 12345, 15.90, ProductCategory.GENERAL)
         const store = new Store('my store')
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(store);
         const res = storeManagement.viewProductInfo({
@@ -1151,7 +1151,7 @@ describe("Store Management Unit Tests", () => {
     test("search - success with store name matching rating", () => {
         const store: Store = new Store('my store');
 
-        const productsInStore: ProductInStore[] = [{product: {catalogNumber: 1, category: ProductCategory.General, name: "mock", price: 11}, storeName: store.storeName}];
+        const productsInStore: ProductInStore[] = [{product: {catalogNumber: 1, category: ProductCategory.GENERAL, name: "mock", price: 11}, storeName: store.storeName}];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
 

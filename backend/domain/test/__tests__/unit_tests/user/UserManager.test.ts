@@ -361,7 +361,7 @@ describe("RegisteredUser Management Unit Tests", () => {
     test("removeProductFromCart Success", () => {
         const user: User = new RegisteredUser('dor', '12345');
         jest.spyOn(userManager, "getUserByToken").mockReturnValue(user);
-        const product: Product = new Product('table', 5, 120, ProductCategory.Home);
+        const product: Product = new Product('table', 5, 120, ProductCategory.HOME);
         userManager.saveProductToCart(user, 'store', product, 5);
         expect(user.cart.get('store')).toEqual([{product, amount: 5}])
 
@@ -383,7 +383,7 @@ describe("RegisteredUser Management Unit Tests", () => {
 
     test("removeProductFromCart fail no such store", () => {
         const user: User = new RegisteredUser('dor', '12345');
-        const product: Product = new Product('table', 5, 120, ProductCategory.Home);
+        const product: Product = new Product('table', 5, 120, ProductCategory.HOME);
         jest.spyOn(userManager, "getUserByToken").mockReturnValue(user);
         const req: Req.RemoveFromCartRequest = {body: {storeName: 'store', catalogNumber: 5, amount: 1}, token: "whatever"}
         const res: Res.BoolResponse = userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
@@ -394,7 +394,7 @@ describe("RegisteredUser Management Unit Tests", () => {
     test('viewCart Success', () => {
         const user: User = new RegisteredUser('dor', '12345');
         jest.spyOn(userManager, "getUserByToken").mockReturnValue(user);
-        const product = new Product('table', 15, 120, ProductCategory.Home);
+        const product = new Product('table', 15, 120, ProductCategory.HOME);
 
         const res: Res.ViewCartRes = userManager.viewCart({body: {}, token: 'whatever'});
         expect(res.data.cart).toEqual(transferToCartRes(user.cart))
@@ -409,7 +409,7 @@ describe("RegisteredUser Management Unit Tests", () => {
     test('viewCart failure', () => {
         const user: User = new RegisteredUser('dor', '12345');
         jest.spyOn(userManager, "getUserByToken").mockReturnValue(undefined);
-        const product = new Product('table', 15, 120, ProductCategory.Home);
+        const product = new Product('table', 15, 120, ProductCategory.HOME);
 
         const res: Res.ViewCartRes = userManager.viewCart({body: {}, token: 'whatever'});
         expect(res.data.cart).toBeUndefined();
