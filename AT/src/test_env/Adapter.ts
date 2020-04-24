@@ -192,5 +192,9 @@ export const Adapter: Partial<Env.Bridge> = {
   },
   viewUserPurchasesHistory(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
     return ServiceFacade.viewRegisteredUserPurchasesHistory(wrapWithToken(req.body));
-  }
+  },
+  purchase(req : ServiceFacade.Req.PurchaseRequest ): ServiceFacade.Res.PurchaseResponse {
+    return ServiceFacade.purchase(wrapWithToken(req.body));
+  },
+  
 };
