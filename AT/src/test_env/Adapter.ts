@@ -148,14 +148,14 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   changeProductName(
-    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Res.BoolResponse {
     return ServiceFacade.changeProductName(wrapWithToken(req.body));
   },
 
   changeProductPrice(
-    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Res.BoolResponse {
     return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
 
@@ -172,22 +172,22 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   removeStoreManager(
-    req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>
-  ): ServiceFacade.Res.BoolResponse {
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Res.BoolResponse {
     return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
   },
 
   removeManagerPermissions(
-    req: ServiceFacade.Req.ChangeManagerPermissionRequest
-  ): ServiceFacade.Res.BoolResponse {
+    req: Req.ChangeManagerPermissionRequest
+  ): Res.BoolResponse {
     return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   },
 
-  viewStorePurchasesHistory(req : ServiceFacade.Req.ViewShopPurchasesHistoryRequest ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse {
+  viewStorePurchasesHistory(req : Req.ViewShopPurchasesHistoryRequest ): Res.ViewShopPurchasesHistoryResponse {
     return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
   },
 
-  viewUserPurchasesHistory(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
+  viewUserPurchasesHistory(req : Req.ViewRUserPurchasesHistoryReq ): Res.ViewRUserPurchasesHistoryRes {
     return ServiceFacade.viewRegisteredUserPurchasesHistory(wrapWithToken(req.body));
   },
 
@@ -198,8 +198,14 @@ export const Adapter: Partial<Env.Bridge> = {
         : {data: data, error: undefined};
   },
   
-  purchase(req : ServiceFacade.Req.PurchaseRequest ): ServiceFacade.Res.PurchaseResponse {
+  purchase(req : Req.PurchaseRequest ): Res.PurchaseResponse {
     return ServiceFacade.purchase(wrapWithToken(req.body));
   },
-  
+
+  watchCart(): Res.ViewCartRes {
+    const {data, error} = ServiceFacade.viewCart(wrapWithToken({}));
+    return error
+        ? {data: undefined, error: error}
+        : {data: data, error: undefined};
+  }
 };
