@@ -197,4 +197,9 @@ export const Adapter: Partial<Env.Bridge> = {
         ? {data: undefined, error: error}
         : {data: data, error: undefined};
   },
+  
+  purchase(req : ServiceFacade.Req.PurchaseRequest ): ServiceFacade.Res.PurchaseResponse {
+    return ServiceFacade.purchase(wrapWithToken(req.body));
+  },
+  
 };

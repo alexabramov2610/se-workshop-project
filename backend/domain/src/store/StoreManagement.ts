@@ -477,7 +477,7 @@ export class StoreManagement {
                 }
             }
         } else {
-            return {data: {result: false}}
+            return {data: {result: false} , error:{message: errorMsg.E_PROD_DOES_NOT_EXIST}}
         }
     }
 
