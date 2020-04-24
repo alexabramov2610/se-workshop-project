@@ -11,7 +11,6 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       .resetState()
       .startSession()
       .initWithDefaults()
-      .startSession()
       .registerWithDefaults()
       .loginWithDefaults();
     _newManagerCreds = {
