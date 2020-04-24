@@ -68,7 +68,7 @@ export interface SearchQuery {
     // tags: Tag[]
 }
 
-export interface IReciept {
+export interface IReceipt {
   date: Date;
   purchases: Purchase[];
 }
