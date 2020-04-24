@@ -34,7 +34,7 @@ export const addNewProducts = (req: Req.AddProductsRequest, ts: TS): Res.Product
     return ts.addNewProducts(req);
 }
 
-export const viewProductInfo = (req:Req.ProductInfoRequest, ts: TS):Res.BoolResponse => {
+export const viewProductInfo = (req:Req.ProductInfoRequest, ts: TS):Res.ProductInfoResponse => {
     return ts.viewProductInfo(req);
 }
 

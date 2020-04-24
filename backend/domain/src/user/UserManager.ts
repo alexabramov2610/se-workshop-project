@@ -1,5 +1,13 @@
 import {UserRole} from "../api-int/Enums";
-import {LoginRequest, LogoutRequest, Product, RegisterRequest, BagItem} from "../api-ext/external_api"
+import {
+    LoginRequest,
+    LogoutRequest,
+    Product,
+    RegisterRequest,
+    BagItem,
+    Cart,
+    CartProduct
+} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
@@ -7,6 +15,7 @@ import * as Req from "../api-ext/Request";
 import * as Res from "../api-ext/Response";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+
 const logger = loggerW(__filename)
 
 export class UserManager {
@@ -179,10 +188,19 @@ export class UserManager {
         if (!user) {
             return {data: {result: false, cart: undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const cart = user.cart
-        return {data: {result: true, cart}}
+
+        const cartRes: Cart = this.transferToCartRes(user.cart)
+        return {data: {result: true, cart: cartRes}}
     }
 
+    private transferToCartRes(cart: Map<string, BagItem[]>): Cart {
+        const cartProducts: CartProduct[] = [];
+        for (const [storeName, bagItems] of cart) {
+            cartProducts.push({storeName, bagItems})
+        }
+        const cartRes: Cart = {products: cartProducts}
+        return cartRes
+    }
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {data: {result: true, receipts: user.receipts}}

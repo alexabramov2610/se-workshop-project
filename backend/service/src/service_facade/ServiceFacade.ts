@@ -60,7 +60,7 @@ UC-2.4
 export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse => {
     return runIfOpen(req, StoreService.viewStoreInfo);
 }
-export const viewProductInfo = (req: Req.ProductInfoRequest): Res.BoolResponse => {
+export const viewProductInfo = (req: Req.ProductInfoRequest): Res.ProductInfoResponse => {
     return runIfOpen(req, StoreService.viewProductInfo);
 }
 /*
@@ -83,7 +83,6 @@ export const removeProductFromCart = (req:Req.RemoveFromCartRequest):Res.BoolRes
 }
 export const viewCart = (req:Req.ViewCartReq,ts: TS):Res.ViewCartRes =>{
     return runIfOpen(req, UserService.viewCart);
-
 }
 /*
 UC-2.8

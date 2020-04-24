@@ -16,6 +16,15 @@ export interface Product extends ProductCatalogNumber {
     category: ProductCategory
 }
 
+export interface Cart {
+    products: CartProduct[]
+}
+
+export interface CartProduct {
+    storeName: string,
+    bagItems: BagItem[]
+}
+
 export interface Purchase {
     storeName: string,
     userName: string,

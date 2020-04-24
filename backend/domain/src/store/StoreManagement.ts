@@ -560,6 +560,12 @@ export class StoreManagement {
 
     calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
         const store: Store = this.findStoreByName(storeName);
-        return bagItems.map((bagItem) :BagItem => { return {product:bagItem.product,amount:bagItem.amount,finalPrice: store.getProductFinalPrice(bagItem.product)}})
+        return bagItems.map((bagItem): BagItem => {
+            return {
+                product: bagItem.product,
+                amount: bagItem.amount,
+                finalPrice: store.getProductFinalPrice(bagItem.product)
+            }
+        })
     }
 }

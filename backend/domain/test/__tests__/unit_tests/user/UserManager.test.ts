@@ -3,7 +3,7 @@ import * as Req from "../../../../src/api-ext/Request";
 import {UserManager} from "../../../../src/user/UserManager";
 import {RegisteredUser, User, StoreManager} from "../../../../src/user/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
-import {ProductCategory} from "../../../../src/api-ext/CommonInterface";
+import {BagItem, Cart, CartProduct, ProductCategory} from "../../../../src/api-ext/CommonInterface";
 import {Product} from "../../../../src/trading_system/data/Product";
 import {loggerW, UserRole, RemoveFromCartRequest} from "../../../../src/api-int/internal_api";
 import {mocked} from "ts-jest/utils";
@@ -397,12 +397,12 @@ describe("RegisteredUser Management Unit Tests", () => {
         const product = new Product('table', 15, 120, ProductCategory.Home);
 
         const res: Res.ViewCartRes = userManager.viewCart({body: {}, token: 'whatever'});
-        expect(res.data.cart).toEqual(user.cart);
+        expect(res.data.cart).toEqual(transferToCartRes(user.cart))
         expect(res.data.result).toBeTruthy();
 
         user.saveProductToCart('store', product, 3);
         const res2: Res.ViewCartRes = userManager.viewCart({body: {}, token: 'whatever'});
-        expect(res2.data.cart).toEqual(user.cart);
+        expect(res2.data.cart).toEqual(transferToCartRes(user.cart));
         expect(res2.data.result).toBeTruthy();
     })
 
@@ -434,5 +434,14 @@ describe("RegisteredUser Management Unit Tests", () => {
                 encryptPassword: () => encPassword
             }
         });
+    }
+
+  function transferToCartRes(cart: Map<string, BagItem[]>): Cart {
+        const cartProducts: CartProduct[] = [];
+        for (const [storeName, bagItems] of cart) {
+            cartProducts.push({storeName, bagItems})
+        }
+        const cartRes: Cart = {products: cartProducts}
+        return cartRes
     }
 });

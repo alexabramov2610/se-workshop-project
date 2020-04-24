@@ -5,7 +5,7 @@ import {
     Product,
     BagItem,
     StoreInfo,
-    ProductInStore
+    ProductInStore, Cart
 } from "./CommonInterface";
 import {ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
@@ -62,7 +62,7 @@ interface ViewRUserPurchasesHistoryRes extends Response {
 }
 
 interface ViewCartRes extends Response {
-    data: { result: boolean, cart: Map<string, BagItem[]>; }
+    data: { result: boolean, cart: Cart }
 }
 
 
