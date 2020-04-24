@@ -23,12 +23,11 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
 
-  test("Give Manager Permissions - store owner logged in, new manager", () => {
+  test("Remove managers - remove store manager options- store owner not logged in", () => {
     const newManager: Credentials = {
       userName: "new-manager",
       password: "newpwd123",
     };
-
     _serviceBridge.register(newManager);
     _serviceBridge.login(_driver.getLoginDefaults());
 
@@ -37,6 +36,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       newManager
     );
     expect(data.result).toBe(true);
+    _serviceBridge.logout();
+    
   });
 
   test("Give Manager Permissions - valid store, store owner not logged in", () => {
@@ -79,7 +80,9 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       userName: "new-manager",
       password: "newpwd123",
     };
+
     _serviceBridge.login(_driver.getLoginDefaults());
+
     const { data,error } = _serviceBridge.assignManager(
       _storeInformation,
       newManager

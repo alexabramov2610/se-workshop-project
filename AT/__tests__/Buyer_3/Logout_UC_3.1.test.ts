@@ -7,8 +7,8 @@ describe("Guest Buyer, UC: 3.1", () => {
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults();
     _serviceBridge = _driver.getBridge();
   });
