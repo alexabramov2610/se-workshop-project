@@ -4,7 +4,6 @@ import { Store, Credentials, User } from "../../src/test_env/types";
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: Credentials;
   let _driver: Driver;
   let _newOwner: User;
   let _newOwnerCreds: Credentials;
