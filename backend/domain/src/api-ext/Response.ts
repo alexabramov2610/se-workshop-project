@@ -59,7 +59,7 @@ interface ProductInfoResponse extends Response {
 }
 
 interface ViewRUserPurchasesHistoryRes extends Response {
-    data: { result: boolean, receipts: Receipt[] }
+    data: { result: boolean, receipts: IReceipt[] }
 }
 
 interface ViewCartRes extends Response {
@@ -72,7 +72,7 @@ interface SearchResponse extends Response {
 }
 
 interface PurchaseResponse extends BoolResponse {
-    data: { result: boolean, receipt?: Receipt }
+    data: { result: boolean, receipt?: IReceipt }
 }
 
 export {
