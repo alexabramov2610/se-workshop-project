@@ -1,7 +1,4 @@
 import {UserRole} from "../api-int/Enums";
-import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
-
-const logger = loggerW(__filename)
 import {LoginRequest, LogoutRequest, Product, RegisterRequest, BagItem} from "../api-ext/external_api"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
@@ -9,8 +6,10 @@ import {Guest} from "./users/Guest";
 import * as Req from "../api-ext/Request";
 import * as Res from "../api-ext/Response";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
+import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+const logger = loggerW(__filename)
 
-class UserManager {
+export class UserManager {
     private registeredUsers: RegisteredUser[];
     private loggedInUsers: Map<string, RegisteredUser>;
     private guests: Map<string, Guest>;
@@ -193,6 +192,5 @@ class UserManager {
         return user.cart;
 
     }
-}
 
-export {UserManager};
+}

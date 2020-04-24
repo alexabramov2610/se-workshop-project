@@ -27,8 +27,8 @@ export class RegisteredUser extends User {
         return this._role;
     }
 
-    set role(newROle: UserRole) {
-        this._role = newROle;
+    set role(newRole: UserRole) {
+        this._role = newRole;
     }
 
     get password(): string {
