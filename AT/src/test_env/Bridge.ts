@@ -36,7 +36,7 @@ export interface Bridge {
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
   search(input: SearchData): DummyTypes.ISearchResponse;
   rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
-  addToCart(store: Store, product: Product): DummyTypes.IResponse;
+  addToCart(store: Store, product: Product, quantity: number): DummyTypes.IResponse;
   watchCart(): DummyTypes.ICartResponse;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;

@@ -83,7 +83,8 @@ export interface IViewStoreResponse extends Response {
     data: {
         storeName: string;
         storeOwnersNames: string[];
-        productNames: string[];
+        storeManagersNames: string[];
+        productsNames: string[];
     };
 }
 
@@ -91,7 +92,8 @@ const ViewStoreResponse: IViewStoreResponse = {
     data: {
         storeName: "store",
         storeOwnersNames: ["avishai", "ron"],
-        productNames: ["Bamba", "Laptop"],
+        storeManagersNames: ["avishaiM", "ronM"],
+        productsNames: ["Bamba", "Laptop"],
     },
 };
 

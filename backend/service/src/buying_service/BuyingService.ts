@@ -10,6 +10,8 @@ export const purchase = (req: Req.PurchaseRequest, ts: TS): Res.PurchaseResponse
     //calculate price after discount
     ts.calculateFinalPrices({body: {}, token: req.token})
     const isPaid :Res.BoolResponse = ts.pay({body: req.body.payment , token: req.token});
+    if(!isPaid.data.result)
+        return isPaid
     return ts.purchase(req);
 }
 

@@ -12,8 +12,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults()
       .loginWithDefaults();
     _serviceBridge = _driver.getBridge();

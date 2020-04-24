@@ -4,7 +4,7 @@ import { Credentials } from "./types";
 class Driver {
   private initDefCredentials: Credentials = {
     userName: "admin",
-    password: "admin",
+    password: "admin123",
   };
   private loginDefCredentials: Credentials = {
     userName: "ron",

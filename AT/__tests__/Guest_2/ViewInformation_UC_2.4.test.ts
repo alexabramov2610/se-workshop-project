@@ -57,10 +57,10 @@ describe("Guest - View Information, UC: 2.4", () => {
         _serviceBridge.logout();
 
         const {data, error} = _serviceBridge.viewStore(_testStore);
-        const {storeName, storeOwnersNames, productNames} = data;
+        const {storeName, storeOwnersNames, productsNames} = data;
         expect(error).toBeUndefined();
         expect(storeName).toEqual(_testStore.name);
-        expect(productNames[0]).toEqual(_testProduct.name);
+        expect(productsNames[0]).toEqual(_testProduct.name);
     });
 
     test("View invalid store", () => {
