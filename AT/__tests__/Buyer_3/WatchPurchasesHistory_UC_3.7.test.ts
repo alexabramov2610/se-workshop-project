@@ -22,7 +22,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
   });
 
   test("Happy Path: logged in user with history", () => {
-    _serviceBridge.addToCart(_store, _prodct);
+    _serviceBridge.addToCart(_store, _prodct, 1);
     const { data } = _serviceBridge.checkout(_testCreditCard);
     expect(data).toBeDefined();
     const latestBuy = _serviceBridge
