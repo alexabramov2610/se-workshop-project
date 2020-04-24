@@ -544,17 +544,22 @@ export class StoreManagement {
 
     }
 
-    purchaseFromStore(storeName: string, bagItems: BagItem[], userName:string): Purchase[] {
+    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string): Purchase[] {
         const store: Store = this.findStoreByName(storeName);
         const purchases: Purchase[] = [];
 
         for (const bagItem of bagItems) {
             const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
             for (const item of items) {
-                purchases.push({storeName, userName,item, price: bagItem.finalPrice})
+                purchases.push({storeName, userName, item, price: bagItem.finalPrice})
             }
         }
         store.addReceipt(purchases)
         return purchases
+    }
+
+    calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
+        const store: Store = this.findStoreByName(storeName);
+        return bagItems.map((bagItem) :BagItem => { return {product:bagItem.product,amount:bagItem.amount,finalPrice: store.getProductFinalPrice(bagItem.product)}})
     }
 }

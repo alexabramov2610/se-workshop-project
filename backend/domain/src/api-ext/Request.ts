@@ -9,7 +9,6 @@ import {
 import {ManagementPermission} from "./Enums";
 import {CreditCard} from "../api-ext/CommonInterface"
 
-
 interface Request {
     body: any;
     token: string;
@@ -136,6 +135,7 @@ interface VerifyCartRequest extends Request {
     body: {}
 }
 
+
 interface PurchaseRequest extends Request {
     body: {
         payment: {
@@ -156,10 +156,14 @@ interface PayRequest extends Request {
         country: string,
         price: number
     }
-    
+}
+
+interface CalcFinalPriceReq extends Request {
+    body: {}
 }
 
 export {
+    CalcFinalPriceReq,
     PayRequest,
     VerifyCartRequest,
     PurchaseRequest,

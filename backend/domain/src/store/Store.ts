@@ -173,7 +173,7 @@ export class Store {
     removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
         const notRemovedProducts: ProductCatalogNumber[] = [];
-        let itemsToReturn: Item[] = [];
+        const itemsToReturn: Item[] = [];
         for (const product of products) {
             const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
@@ -464,5 +464,11 @@ export class Store {
 
     addReceipt(purchases: Purchase[]) {
         this._receipts.push(new Receipt(purchases))
+    }
+
+
+    // TODO calculate from discount object
+    getProductFinalPrice(product: ProductReq) {
+        return product.price;
     }
 }

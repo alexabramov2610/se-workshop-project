@@ -296,6 +296,18 @@ export class TradingSystemManager {
         return this._storeManager.search(req.body.filters, req.body.searchQuery);
     }
 
+    calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        for (const [storeName, bagItems] of cart.entries()) {
+            const bagItemsWithPrices: BagItem[] = this._storeManager.calculateFinalPrices(storeName, bagItems)
+            cart.set(storeName, bagItemsWithPrices)
+        }
+        return {data: {result: true}}
+    }
+
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
         logger.info(`Verify that products in cart are on stock`)
         const user = this._userManager.getUserByToken(req.token);
