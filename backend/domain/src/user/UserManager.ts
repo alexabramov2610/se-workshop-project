@@ -9,7 +9,6 @@ import {Guest} from "./users/Guest";
 import * as Req from "../api-ext/Request";
 import * as Res from "../api-ext/Response";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import has = Reflect.has;
 
 class UserManager {
     private registeredUsers: RegisteredUser[];
@@ -47,16 +46,16 @@ class UserManager {
         const password = req.body.password;
         const user = this.getUserByName(userName)
         if (!user) {
-            logger.warn(`fail to login ${userName}, user not found `);
+            logger.warn(`failed to login ${userName}, user not found `);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
         } else if (!this.verifyPassword(userName, password, user.password)) {
-            logger.warn(`fail to login ${userName}, bad password `);
+            logger.warn(`failed to login ${userName}, bad password `);
             return {data: {result: false}, error: {message: errorMsg.E_BP}} // bad pass
         } else if (this.isLoggedIn(userName)) { // already logged in
-            logger.warn(`fail to login ${userName}, user is already logged in `);
+            logger.warn(`failed to login ${userName}, user is already logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
         } else if (req.body.asAdmin && !this.isAdmin(user)) {
-            logger.warn(`fail to login ${userName} as Admin- this user doesn't have admin privileges `);
+            logger.warn(`failed to login ${userName} as Admin- this user doesn't have admin privileges `);
             return {data: {result: false}, error: {message: errorMsg.E_NA}}
         } else {
             logger.info(`${userName} has logged in  `);
@@ -83,7 +82,7 @@ class UserManager {
     }
 
     isValidPassword(password: string) {
-        return password.length >= 4;
+        return password.length >= 6;
     }
 
     getLoggedInUsers(): RegisteredUser[] {
@@ -100,23 +99,12 @@ class UserManager {
 
     getUserByToken(token: string): User {
         const user: User = this.loggedInUsers.get(token);
-        return user ? user : this.guests.get(token);
+        return user ? user :
+            this.guests.get(token);
     }
 
     getLoggedInUserByToken(token: string): RegisteredUser {
         return this.loggedInUsers.get(token);
-    }
-
-    verifyRegisteredUser(username: string, loggedInCheck: boolean): BoolResponse {
-        const user: RegisteredUser = this.getUserByName(username);
-        if (loggedInCheck) {
-            return user && this.isLoggedIn(user.name) ? {data: {result: true}} :
-                !user ? {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}} :
-                    {data: {result: false}, error: {message: errorMsg.E_NOT_LOGGED_IN}};
-        } else {
-            return !user ? {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}} :
-                {data: {result: true}};
-        }
     }
 
     isAdmin(u: RegisteredUser): boolean {
@@ -142,41 +130,13 @@ class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
         const user: RegisteredUser = this.getUserByName(req.body.newAdminUserName)
-        if (!user) return {data: {result: false}, error: {message: errorMsg.E_NF}}
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const isAdmin: boolean = this.isAdmin(user);
-        if (isAdmin) return {data: {result: false}, error: {message: errorMsg.E_AL}}
+        if (isAdmin)
+            return {data: {result: false}, error: {message: errorMsg.E_AL}}
         this.admins = this.admins.concat([user]);
         return {data: {result: true}};
-    }
-
-    setUserRole(username: string, role: UserRole): RegisteredUser {
-        const userToChange: RegisteredUser = this.getUserByName(username);
-        let error: string;
-        if (userToChange) {
-            const newUser: RegisteredUser = this.duplicateUserByRole(userToChange, role);
-            if (newUser) {
-                return newUser;
-            } else {
-                error = `failed setting user role, invalid user role: ${role}`;
-            }
-        } else {
-            error = `failed setting user role, user does not exist: ${username}`;
-        }
-        logger.warn(error);
-        return undefined;
-    }
-
-
-    private duplicateUserByRole(userToChange: RegisteredUser, role: UserRole): RegisteredUser {
-        switch (role) {
-            case UserRole.OWNER: {
-                return new StoreOwner(userToChange.name);
-            }
-            case UserRole.MANAGER: {
-                return new StoreManager(userToChange.name);
-            }
-        }
-        return undefined;
     }
 
     addGuestToken(token: string): void {
@@ -188,7 +148,7 @@ class UserManager {
     }
 
     private getAdminByToken(token: string): Admin {
-        const user: RegisteredUser = this.loggedInUsers.get(token);
+        const user: RegisteredUser = this.getLoggedInUserByToken(token);
         return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
