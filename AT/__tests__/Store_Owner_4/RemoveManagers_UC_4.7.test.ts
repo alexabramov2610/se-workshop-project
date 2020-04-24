@@ -28,7 +28,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge.logout();
   });
 
-  xtest("Remove managers - remove store manager options- store owner not logged in", () => {
+  test("Remove managers - remove store manager options- store owner not logged in", () => {
     const { data, error } = _serviceBridge.removeStoreManager({
       body: {
         storeName: _storeInformation.name,
@@ -40,7 +40,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
 
-  xtest("Remove managers - id is not a manager id", () => {
+  test("Remove managers - id is not a manager id", () => {
     _driver.loginWithDefaults();
     const { data, error } = _serviceBridge.removeStoreManager({
       body: {
