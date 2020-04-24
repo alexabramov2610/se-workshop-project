@@ -52,8 +52,11 @@ export class TradingSystemManager {
 
     register(req: Req.RegisterRequest): Res.BoolResponse {
         logger.info(`registering new user: ${req.body.username} `);
-        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        if (user) {
+        const user: User = this._userManager.getUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        if (rUser) {
             logger.debug(`logged in user cant register `);
             return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}};
         }
