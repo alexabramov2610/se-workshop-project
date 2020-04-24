@@ -213,7 +213,26 @@ const Proxy: Bridge = {
       ? real.removeManagerPermissions(req)
       : { data: { result: true } };
   },
-
+  viewUserPurchasesHistory(
+    req: ServiceFacade.Req.ViewRUserPurchasesHistoryReq
+  ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes {
+    return real.viewUserPurchasesHistory
+      ? real.viewUserPurchasesHistory(req)
+      : { data: { result: false, receipts: [] } };
+  },
+  viewStorePurchasesHistory(
+    req: ServiceFacade.Req.ViewShopPurchasesHistoryRequest
+  ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse {
+    return real.viewUserPurchasesHistory
+      ? real.viewStorePurchasesHistory
+      (req)
+      : { data: { result: false, receipts: [] } };
+  },
+  purchase(
+    req: ServiceFacade.Req.PurchaseRequest
+  ): ServiceFacade.Res.PurchaseResponse {
+    return real.purchase ? real.purchase(req) : { data: { result: false } };
+  },
 };
 
 export { Proxy };
