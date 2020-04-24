@@ -132,18 +132,35 @@ interface SearchRequest extends Request {
     body: { filters: SearchFilters, searchQuery: SearchQuery }
 }
 
-interface VerifyCartRequest extends Request{
+interface VerifyCartRequest extends Request {
     body: {}
 }
+
 interface PurchaseRequest extends Request {
     body: {
-        cardDetails: CreditCard, address: string,
-        city: string,
-        country: string
+        payment: {
+            cardDetails: CreditCard,
+            address: string,
+            city: string,
+            country: string,
+            price: number
+        }
     }
 }
 
+interface PayRequest extends Request {
+    body: {
+        cardDetails: CreditCard,
+        address: string,
+        city: string,
+        country: string,
+        price: number
+    }
+    
+}
+
 export {
+    PayRequest,
     VerifyCartRequest,
     PurchaseRequest,
     SearchRequest,

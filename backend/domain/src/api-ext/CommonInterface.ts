@@ -17,6 +17,8 @@ export interface Product extends ProductCatalogNumber {
 }
 
 export interface Purchase {
+    storeName: string,
+    userName: string,
     item: Item,
     price: number;
 }
@@ -24,14 +26,15 @@ export interface Purchase {
 export interface BagItem {
     product: Product,
     amount: number;
+    finalPrice?: number
 }
 
 export interface CreditCard {
     holderName: string,
-    number: string,
-    expMonth: string,
-    expYear: string,
-    ccv: string,
+    number: number,
+    expMonth: number,
+    expYear: number,
+    ccv: number,
 }
 
 export interface ProductWithQuantity extends ProductCatalogNumber {

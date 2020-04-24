@@ -71,7 +71,7 @@ interface SearchResponse extends Response {
 }
 
 interface PurchaseResponse extends BoolResponse {
-    data: { result: boolean, reciept?: Receipt }
+    data: { result: boolean, receipt?: Receipt }
 }
 
 export {

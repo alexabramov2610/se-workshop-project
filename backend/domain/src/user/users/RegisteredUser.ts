@@ -15,6 +15,10 @@ export class RegisteredUser extends User {
         this._receipts = [];
     }
 
+    addReceipt(receipt: Receipt) {
+        this._receipts.push(receipt);
+    }
+
     get name(): string {
         return this._name;
     }

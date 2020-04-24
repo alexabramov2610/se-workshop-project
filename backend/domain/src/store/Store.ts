@@ -9,7 +9,7 @@ import {
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
-    ProductWithQuantity,
+    ProductWithQuantity, Purchase,
     SearchFilters,
     SearchQuery
 } from "../api-ext/CommonInterface";
@@ -427,6 +427,16 @@ export class Store {
         return true;
     }
 
+    getItemsFromStock(product: ProductReq, amount: number): Item[] {
+        const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
+        const items: Item[] = this._products.get(productInStore);
+        const itemsToReturn: Item[] = items.slice(0, amount);
+        const itemsRemaining: Item[] = items.slice(amount, items.length);
+        this._products.set(productInStore, itemsRemaining)
+        return itemsToReturn;
+
+    }
+
     get storeName(): string {
         return this._storeName;
     }
@@ -441,5 +451,10 @@ export class Store {
 
     get rating(): Rating {
         return this._rating;
+    }
+
+
+    addReceipt(purchases: Purchase[]) {
+        this._receipts.push(new Receipt(purchases))
     }
 }

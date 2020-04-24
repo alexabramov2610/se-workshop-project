@@ -918,6 +918,8 @@ describe("Store Management Unit Tests", () => {
             data: {
                 result: succ,
                 receipts: succ ? [new Receipt([{
+                    storeName: store.storeName,
+                    userName: user.name,
                     item,
                     price: 30
                 }])] : []
@@ -936,6 +938,7 @@ describe("Store Management Unit Tests", () => {
             }
         });
     }
+
     function prepareMockToSaveProduct() {
         mocked(UserManager).mockImplementation((): any => {
             return {
@@ -952,6 +955,7 @@ describe("Store Management Unit Tests", () => {
 
 
     }
+
     test("saveProductToCart success test", () => {
         prepareMockToSaveProduct()
         tradingSystemManager = new TradingSystemManager();
@@ -1016,7 +1020,7 @@ describe("Store Management Unit Tests", () => {
         }])
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                verifyStoreBag: () => isSuccess ? {data: {result: true}} : {data: {result: false}},
+                verifyStoreBag: () => isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message:"error", options: 1}},
             }
         });
         mocked(UserManager).mockImplementation((): any => {
@@ -1057,7 +1061,6 @@ describe("Store Management Unit Tests", () => {
     })
 
 
-
     function prepareSearchMock(isSuccess: boolean): Res.BoolResponse {
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
@@ -1081,8 +1084,6 @@ describe("Store Management Unit Tests", () => {
     })
 
 
-
-
     function prepareMocksForStoreManagement(succ: boolean) {
         const createStoreRes: Res.BoolResponse = {data: {result: succ}};
         const item: Item = new Item(5, 10);
@@ -1090,6 +1091,8 @@ describe("Store Management Unit Tests", () => {
             data: {
                 result: succ,
                 receipts: succ ? [new Receipt([{
+                    storeName: store.storeName,
+                    userName: user.name,
                     item,
                     price: 30
                 }])] : []
