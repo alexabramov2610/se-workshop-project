@@ -331,7 +331,7 @@ describe("Store Management Unit Tests", () => {
             removeProducts.push(prodToRemove);
         }
 
-        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts);
+        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, false);
         expect(removeProdRes.data.result).toBeTruthy();
         expect(removeProdRes.data.productsNotRemoved.length).toBe(0);
 
@@ -365,7 +365,7 @@ describe("Store Management Unit Tests", () => {
             removeProducts.push(prodToRemove);
         }
 
-        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts);
+        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, false);
         expect(removeProdRes.data.result).toBeTruthy();
         expect(removeProdRes.data.productsNotRemoved.length).toBe(0);
 
@@ -399,7 +399,7 @@ describe("Store Management Unit Tests", () => {
             removeProducts.push(prodToRemove);
         }
 
-        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts);
+        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, false);
         expect(removeProdRes.data.result).toBeTruthy();
         expect(removeProdRes.data.productsNotRemoved.length).toBe(numberOfItems);
 
@@ -436,7 +436,7 @@ describe("Store Management Unit Tests", () => {
             removeProducts.push(prodToRemove);
         }
 
-        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts);
+        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, false);
         expect(removeProdRes.data.result).toBeFalsy();
         expect(removeProdRes.data.productsNotRemoved.length).toBe(removeProducts.length);
 

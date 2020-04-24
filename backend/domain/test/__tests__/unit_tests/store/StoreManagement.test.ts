@@ -994,7 +994,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(mockRes);
 
-        const actualRes: Res.ProductRemovalResponse = storeManagement.removeProductsWithQuantity(user, store.storeName, itemsReq);
+        const actualRes: Res.ProductRemovalResponse = storeManagement.removeProductsWithQuantity(user, store.storeName, itemsReq, false);
         expect(actualRes).toBe(mockRes);
         expect(store.removeProductsWithQuantity).toBeCalledTimes(1);
     });
@@ -1010,7 +1010,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(mockRes);
 
-        const actualRes: Res.ProductRemovalResponse = storeManagement.removeProductsWithQuantity(user, store.storeName, itemsReq);
+        const actualRes: Res.ProductRemovalResponse = storeManagement.removeProductsWithQuantity(user, store.storeName, itemsReq, false);
         expect(actualRes.data.result).toBeFalsy();
         expect(store.removeProductsWithQuantity).toBeCalledTimes(0);
     });
