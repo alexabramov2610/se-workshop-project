@@ -178,7 +178,7 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
   removeManagerPermissions(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse {
-    return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
+    return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
     
   },
 
