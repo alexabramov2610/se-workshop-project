@@ -167,15 +167,22 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   addToCart(store: Store, product: Product, quantity: number) {
-    const req = { storeName: store.name, catalogNumber: product.catalogNumber, amount: quantity };
-    const {data, error} = ServiceFacade.saveProductToCart(wrapWithToken(req));
+    const req = {
+      storeName: store.name,
+      catalogNumber: product.catalogNumber,
+      amount: quantity,
+    };
+    const { data, error } = ServiceFacade.saveProductToCart(wrapWithToken(req));
     return error
-        ? { data: undefined, error: error.message }
-        : { data: data, error: undefined };
-  }
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
+  removeManagerPermissions(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
+    
+  },
 
-// watchPermissions(store: Store, credentials: Credentials) {
-//
-// }
-
+  // watchPermissions(store: Store, credentials: Credentials) {
+  //
+  // }
 };
