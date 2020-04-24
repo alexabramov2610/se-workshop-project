@@ -1042,7 +1042,6 @@ describe("Store Management Unit Tests", () => {
             return {
                 verifyUser: () => verifyResMock,
                 getUserByToken: () => user,
-                setUserRole: () => true,
                 assignStoreManagerBasicPermissions: () => true,
                 getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
                 getUserByName: () => user

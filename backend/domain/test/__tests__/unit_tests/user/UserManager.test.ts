@@ -6,12 +6,22 @@ import {ExternalSystemsManager} from "../../../../src/external_systems/internal_
 import {ProductCategory} from "../../../../src/api-ext/CommonInterface";
 import {Product} from "../../../../src/trading_system/data/Product";
 import {loggerW, UserRole, RemoveFromCartRequest} from "../../../../src/api-int/internal_api";
+import {mocked} from "ts-jest/utils";
+import {SecuritySystem} from "../../../../src/external_systems/security_system/SecuritySystem";
+import {StoreManagement} from "../../../../src/store/StoreManagement";
+import {Guest} from "../../../../src/user/users/Guest";
+import {SetAdminRequest} from "../../../../src/api-ext/Request";
+import {BoolResponse} from "../../../../src/api-ext/Response";
 const logger = loggerW(__filename)
+jest.mock('../../../../src/external_systems/security_system/SecuritySystem');
 
 describe("RegisteredUser Management Unit Tests", () => {
+    const encPassword: string = "enchardpwformocking";
+    const token: string = "mock-token-for-testing";
     let userManager: UserManager;
 
     beforeEach(() => {
+        mockSecuritySystem();
         userManager = new UserManager(new ExternalSystemsManager());
     });
 
@@ -70,12 +80,36 @@ describe("RegisteredUser Management Unit Tests", () => {
     });
 
     test("Login already logged in fail Test", () => {
-        jest.spyOn(userManager, "getUserByName").mockReturnValue(new RegisteredUser('ron', '123456'));
-        jest.spyOn(userManager, "verifyPassword").mockReturnValue(false);
+        const username: string = "mockname";
+        const password: string = "mock-pw";
+        const user: RegisteredUser = new RegisteredUser(username, password);
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true);
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(true);
         const res: Res.BoolResponse = userManager.login({
             body: {username: 'ron', password: '123456'},
             token: "token"
         });
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("Login Failure - user doens't exist", () => {
+        const username: string = "mockname";
+        const password: string = "mock-pw";
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(undefined);
+        const res: Res.BoolResponse = userManager.login({body: {username: username, password: password}, token: "token"});
+        expect(res.data.result).toBeFalsy();
+    });
+
+    test("Login Failure - as admin req", () => {
+        const username: string = "mockname";
+        const password: string = "mock-pw";
+        const user: RegisteredUser = new RegisteredUser(username, password);
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true);
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(false);
+        jest.spyOn(userManager, "isAdmin").mockReturnValue(false);
+        const res: Res.BoolResponse = userManager.login({body: {username: username, password: password, asAdmin: true}, token: "token"});
         expect(res.data.result).toBeFalsy();
     });
 
@@ -94,44 +128,234 @@ describe("RegisteredUser Management Unit Tests", () => {
     });
 
 
-    test("setUserRole - Manager, logged in - Success", () => {
-        const isLoggedIn: boolean = true;
-        const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-        const roleToAssign: UserRole = UserRole.MANAGER;
-        jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(buyer);
-        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
-
-        const dupUser: RegisteredUser = userManager.setUserRole(buyer.name, roleToAssign)
-        expect(dupUser).toBeDefined();
-        expect(dupUser.name).toBe(buyer.name);
+    test("verifyPassword", () => {
+        const password: string = "pw123toenc";
+        const encPassword: string = password + "enchard" + password;
+        expect(userManager.verifyPassword("usernamemock", password, encPassword)).toBeTruthy();
     });
 
-    test("setUserRole - Manager - Failure - User doesn't exist", () => {
-        const isLoggedIn: boolean = true;
-        const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-        const roleToAssign: UserRole = UserRole.MANAGER;
+    test("isValidPassword success", () => {
+        const password: string = "pw123toenc";
+        expect(userManager.isValidPassword(password)).toBe(true);
+    });
+
+    test("isValidPassword failure", () => {
+        let password: string = "";
+        expect(userManager.isValidPassword(password)).toBe(false);
+
+        password = "asda";
+        expect(userManager.isValidPassword(password)).toBe(false);
+    });
+
+
+    test("getRegisteredUsers success", () => {
+        const user: RegisteredUser = new RegisteredUser('mockmock', '123456');
+        const encUser: RegisteredUser = new RegisteredUser('mockmock', encPassword);
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(undefined);
+        jest.spyOn(userManager, "isValidPassword").mockReturnValue(true)
+        const res: Res.BoolResponse = userManager.register({ body: {username: user.name, password: user.password}, token: "token" });
+        expect(res.data.result).toBeTruthy();
+
+        const registeredUsers: RegisteredUser[] = userManager.getRegisteredUsers();
+        expect(registeredUsers).toBeDefined();
+        expect(registeredUsers).toHaveLength(1);
+        expect(registeredUsers).toContainEqual(encUser);
+    });
+
+
+    test("getLoggedInUsers success", () => {
+        const user: RegisteredUser = new RegisteredUser('mockmock', '123456');
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(false)
+
+        const res: Res.BoolResponse = userManager.login({ body: { username: user.name, password: user.password }, token: "token" });
+        expect(res.data.result).toBeTruthy();
+
+        const loggedInUsers: RegisteredUser[] = userManager.getLoggedInUsers();
+        expect(loggedInUsers).toBeDefined();
+        expect(loggedInUsers).toHaveLength(1);
+        expect(loggedInUsers).toContain(user);
+    });
+
+
+    test("getUserByName success", () => {
+        const user: RegisteredUser = new RegisteredUser('mockmock', '123456');
+        const encUser: RegisteredUser = new RegisteredUser('mockmock', encPassword);
+
         jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(undefined);
-        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
+        jest.spyOn(userManager, "isValidPassword").mockReturnValue(true)
+        const res: Res.BoolResponse = userManager.register({ body: {username: user.name, password: user.password}, token: "token" });
+        expect(res.data.result).toBeTruthy();
 
-        const userChangedInRegistered: RegisteredUser = userManager.getRegisteredUsers().pop();
-        const userChangedInLoggedIn: RegisteredUser = userManager.getLoggedInUsers().pop();
-
-        expect(userChangedInRegistered).toBeUndefined();
-        expect(userChangedInLoggedIn).toBeUndefined();
+        const registeredUser: RegisteredUser = userManager.getUserByName(user.name);
+        expect(registeredUser).toBeDefined();
+        expect(registeredUser).toEqual(encUser);
     });
 
-    test("setUserRole - Manager - Failure - Invalid role", () => {
-        const isLoggedIn: boolean = true;
-        const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-        jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(buyer);
-        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
 
-        const userChangedInRegistered: RegisteredUser = userManager.getRegisteredUsers().pop();
-        const userChangedInLoggedIn: RegisteredUser = userManager.getLoggedInUsers().pop();
+    test("getUserByToken success - registered user", () => {
+        const user: RegisteredUser = new RegisteredUser('mockmock', '123456');
+        const token: string = "mock-token-for-testing";
 
-        expect(userChangedInRegistered).toBeUndefined();
-        expect(userChangedInLoggedIn).toBeUndefined();
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(false)
+
+        const res: Res.BoolResponse = userManager.login({ body: { username: user.name, password: user.password }, token: token});
+        expect(res.data.result).toBeTruthy();
+
+        const userByToken: User = userManager.getUserByToken(token);
+        expect(userByToken).toBeDefined();
+        expect(userByToken).toEqual(user);
     });
+
+    test("getUserByToken success - guest", () => {
+        const token: string = "mock-token-for-testing";
+        userManager.addGuestToken(token);
+
+        const userByToken: User = userManager.getUserByToken(token);
+        expect(userByToken).toBeDefined();
+        expect(userByToken instanceof Guest).toBe(true);
+    });
+
+
+    test("getLoggedInUserByToken success", () => {
+        const user: RegisteredUser = new RegisteredUser('mockmock', '123456');
+        const token: string = "mock-token-for-testing";
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValue(false)
+
+        const res: Res.BoolResponse = userManager.login({ body: { username: user.name, password: user.password }, token: token});
+        expect(res.data.result).toBeTruthy();
+
+        const registeredUser: RegisteredUser = userManager.getLoggedInUserByToken(token);
+        expect(registeredUser).toBeDefined();
+        expect(registeredUser).toEqual(user);
+    });
+
+
+    test("isAdmin - failure", () => {
+        const adminUserName: string = "admin-super-mock";
+        const adminUser: RegisteredUser = new RegisteredUser(adminUserName);
+
+        expect(userManager.isAdmin(adminUser)).toBe(false);
+    });
+
+    test("isAdmin - success", () => {
+        const adminUserName: string = "admin-super-mock";
+        const adminUser: RegisteredUser = setFirstAdmin(adminUserName);
+
+        expect(userManager.isAdmin(adminUser)).toBe(true);
+    });
+
+
+    function setFirstAdmin(adminUserName: string) : RegisteredUser {
+        const adminUser: RegisteredUser = new RegisteredUser(adminUserName);
+        const req: SetAdminRequest = { body: { newAdminUserName: adminUserName }, token };
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(adminUser);
+        jest.spyOn(userManager, "isAdmin").mockReturnValueOnce(false);
+
+        const res: BoolResponse = userManager.setAdmin(req);
+        expect(res.data.result).toBe(true);
+        return adminUser;
+    }
+
+    test("setAdmin Success - first admin", () => {
+        const adminUserName: string = "admin-super-mock";
+        setFirstAdmin(adminUserName);
+    });
+
+    test("setAdmin Success - not first admin and authorized", () => {
+        const adminUserName: string = "admin-super-mock";
+        const adminUser: RegisteredUser = setFirstAdmin(adminUserName);
+        const newAdminUser: RegisteredUser = new RegisteredUser(adminUserName+ "2", "mock-pw");
+
+        const req: SetAdminRequest = { body: { newAdminUserName: adminUserName + "not-first" }, token: token};
+        jest.spyOn(userManager, "getLoggedInUserByToken").mockReturnValueOnce(adminUser);
+        jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(newAdminUser);
+        jest.spyOn(userManager, "isAdmin").mockReturnValueOnce(false);
+
+        const res: BoolResponse = userManager.setAdmin(req);
+        expect(res.data.result).toBe(true);
+    });
+
+
+    test("setAdmin failure - not first admin and not authorized user", () => {
+        const adminUserName: string = "admin-super-mock";
+        setFirstAdmin(adminUserName);
+
+        const req: SetAdminRequest = { body: { newAdminUserName: adminUserName + "not-first" }, token: token + "not-first" };
+
+        const res: BoolResponse = userManager.setAdmin(req);
+        expect(res.data.result).toBe(false);
+    });
+
+    test("setAdmin failure - invalid user", () => {
+        const adminUserName: string = "admin-super-mock";
+        const req: SetAdminRequest = { body: { newAdminUserName: adminUserName }, token };
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(undefined);
+
+        const res: BoolResponse = userManager.setAdmin(req);
+        expect(res.data.result).toBe(false);
+    });
+
+    test("setAdmin failure - already admin", () => {
+        const adminUserName: string = "admin-super-mock";
+        const adminUser: RegisteredUser = new RegisteredUser(adminUserName);
+        const req: SetAdminRequest = { body: { newAdminUserName: adminUserName }, token };
+
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(adminUser);
+        jest.spyOn(userManager, "isAdmin").mockReturnValue(true);
+
+        const res: BoolResponse = userManager.setAdmin(req);
+        expect(res.data.result).toBe(false);
+    })
+
+
+    test("isLoggedIn Success", () => {
+        const user: RegisteredUser = new RegisteredUser("username-mock", '123456')
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValueOnce(false)
+
+        const res: Res.BoolResponse = userManager.login({ body: {username: user.name, password: user.password}, token: "token" });
+        expect(res.data.result).toBeTruthy();
+        expect(userManager.isLoggedIn(user.name)).toBe(true);
+    });
+
+    test("isLoggedIn Failure", () => {
+        const user: RegisteredUser = new RegisteredUser("username-mock", '123456')
+        jest.spyOn(userManager, "getUserByName").mockReturnValue(user);
+        jest.spyOn(userManager, "verifyPassword").mockReturnValue(true)
+        jest.spyOn(userManager, "isLoggedIn").mockReturnValueOnce(false)
+
+        const res: Res.BoolResponse = userManager.login({ body: {username: user.name, password: user.password}, token: "token" });
+        expect(res.data.result).toBeTruthy();
+        expect(userManager.isLoggedIn(user.name + "-new-one")).toBe(false);
+    });
+
+
+    test("removeGuest success & failure", () => {
+        const token1: string = "token1";
+        expect(userManager.getUserByToken(token1)).toBeUndefined();
+
+        userManager.addGuestToken(token1);
+        let user: User = userManager.getUserByToken(token1);
+        expect(user).toBeDefined();
+        expect(user instanceof Guest).toBe(true);
+
+        userManager.removeGuest(token1);
+        user = userManager.getUserByToken(token1);
+        expect(user).toBeUndefined();
+    });
+
 
     test("removeProductFromCart Success", () => {
         const user: User = new RegisteredUser('dor', '12345');
@@ -165,7 +389,8 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
-    test('view cart Success test', () => {
+
+    test('viewCart Success', () => {
         const user: User = new RegisteredUser('dor', '12345');
         jest.spyOn(userManager, "getUserByToken").mockReturnValue(user);
         const product = new Product('table', 15, 120, ProductCategory.Home);
@@ -180,54 +405,33 @@ describe("RegisteredUser Management Unit Tests", () => {
         expect(res2.data.result).toBeTruthy();
     })
 
+    test('viewCart failure', () => {
+        const user: User = new RegisteredUser('dor', '12345');
+        jest.spyOn(userManager, "getUserByToken").mockReturnValue(undefined);
+        const product = new Product('table', 15, 120, ProductCategory.Home);
 
-    // TODO: fix setUserRole tests
-
-    // test("setUserRole - Owner, logged in - Success", () => {
-    //     const isLoggedIn: boolean = true;
-    //     const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-    //     const roleToAssign: UserRole = UserRole.OWNER;
-    //     jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(buyer);
-    //     jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
-    //
-    //     const userChangedInRegistered: RegisteredUser = userManager.getRegisteredUsers().pop();
-    //     const userChangedInLoggedIn: RegisteredUser = userManager.getLoggedInUsers().pop();
-    //
-    //     expect(userChangedInRegistered).toBeDefined();
-    //     expect(userChangedInRegistered.name).toBe(buyer.name);
-    //     expect(userChangedInRegistered.password).toBe(buyer.password);
-    //
-    //     expect(userChangedInLoggedIn).toBeDefined();
-    //     expect(userChangedInLoggedIn.name).toBe(buyer.name);
-    //     expect(userChangedInLoggedIn.password).toBe(buyer.password);
-    // });
-    //
-    // test("setUserRole - Owner - Failure - User doesn't exist", () => {
-    //     const isLoggedIn: boolean = true;
-    //     const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-    //     const roleToAssign: UserRole = UserRole.OWNER;
-    //     jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(undefined);
-    //     jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
-    //
-    //     const userChangedInRegistered: RegisteredUser = userManager.getRegisteredUsers().pop();
-    //     const userChangedInLoggedIn: RegisteredUser = userManager.getLoggedInUsers().pop();
-    //
-    //     expect(userChangedInRegistered).toBeUndefined();
-    //     expect(userChangedInLoggedIn).toBeUndefined();
-    // });
-    //
-    // test("setUserRole - Owner - Failure - Invalid role", () => {
-    //     const isLoggedIn: boolean = true;
-    //     const buyer: RegisteredUser = new RegisteredUser('test', '111111');
-    //     jest.spyOn(userManager, "getUserByName").mockReturnValueOnce(buyer);
-    //     jest.spyOn(userManager, "isLoggedIn").mockReturnValue(isLoggedIn);
-    //
-    //     const userChangedInRegistered: RegisteredUser = userManager.getRegisteredUsers().pop();
-    //     const userChangedInLoggedIn: RegisteredUser = userManager.getLoggedInUsers().pop();
-    //
-    //     expect(userChangedInRegistered).toBeUndefined();
-    //     expect(userChangedInLoggedIn).toBeUndefined();
-    // });
+        const res: Res.ViewCartRes = userManager.viewCart({body: {}, token: 'whatever'});
+        expect(res.data.cart).toBeUndefined();
+        expect(res.data.result).toBe(false);
+    })
 
 
+    test("viewRegisteredUserPurchasesHistory success", () => {
+        const user: RegisteredUser = new RegisteredUser("user-mock", "user-mock-pw");
+        const res: Res.ViewRUserPurchasesHistoryRes = { data: { result: true, receipts: user.receipts } };
+        expect(userManager.viewRegisteredUserPurchasesHistory(user)).toEqual(res);
+
+    });
+
+
+
+    function mockSecuritySystem() {
+        mocked(SecuritySystem).mockClear();
+        mocked(SecuritySystem).mockImplementation((): any => {
+            return {
+                comparePassword: () => true,
+                encryptPassword: () => encPassword
+            }
+        });
+    }
 });
