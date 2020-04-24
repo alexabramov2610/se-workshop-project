@@ -11,8 +11,8 @@ describe("Watch Purchases History, UC: 3.7", () => {
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults()
       .loginWithDefaults();
     _store = { name: "stor-e-tell" };
