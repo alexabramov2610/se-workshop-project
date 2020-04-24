@@ -81,7 +81,7 @@ UC-2.7
 export const removeProductFromCart = (req:Req.RemoveFromCartRequest):Res.BoolResponse =>{
     return runIfOpen(req, UserService.removeProductFromCart);
 }
-export const viewCart = (req:Req.ViewCartReq,ts: TS):Res.ViewCartRes =>{
+export const viewCart = (req:Req.ViewCartReq):Res.ViewCartRes =>{
     return runIfOpen(req, UserService.viewCart);
 }
 /*
@@ -157,7 +157,7 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 /*
 UC-4.7
  */
-export const removeStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
+export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeStoreManager);
 }
 /*
