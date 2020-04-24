@@ -32,7 +32,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     const { data, error } = _serviceBridge.removeStoreManager({
       body: {
         storeName: _storeInformation.name,
-        usernameToAssign: _newManagerCreds.userName,
+        usernameToRemove: _newManagerCreds.userName,
       },
     });
     expect(data.result).toBe(false);
@@ -45,19 +45,19 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     const { data, error } = _serviceBridge.removeStoreManager({
       body: {
         storeName: _storeInformation.name,
-        usernameToAssign: 'no-such-user',
+        usernameToRemove: 'no-such-user',
       },
     });
     expect(data.result).toBe(false);
     expect(error.message).toBeDefined();
   });
 
-  test("Remove managers - id is not a manager id", () => {
+  test("Remove managers -logged in, valid Store manager ID", () => {
     _driver.loginWithDefaults();
     const { data, error } = _serviceBridge.removeStoreManager({
       body: {
         storeName: _storeInformation.name,
-        usernameToAssign: _newManagerCreds.userName,
+        usernameToRemove: _newManagerCreds.userName,
       },
     });
     expect(data.result).toBe(true);

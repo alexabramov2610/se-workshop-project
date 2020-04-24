@@ -200,7 +200,7 @@ const Proxy: Bridge = {
       : DummyValues.PermissionsResponse;
   },
   removeStoreManager(
-    req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>
+    req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>
   ): ServiceFacade.Res.BoolResponse {
     return real.removeStoreManager
       ? real.removeStoreManager(req)

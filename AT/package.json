@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/AT/index.js",
-    "test": "SILENT=1 jest",
+    "test": "DEBUG=1 jest",
     "test:watch": "npm t -- --watch",
     "clear": "cd ../backend/domain && rm -rf node_modules dist && npm i && cd ../service && rm -rf node_modules dist && npm i && npm run start:comp && cd ../../at && rm -rf node_modules dist && npm i && npm run start"
   },

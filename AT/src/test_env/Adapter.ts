@@ -178,7 +178,7 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
   removeStoreManager(
-    req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>
+    req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
   },
