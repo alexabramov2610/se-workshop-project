@@ -106,9 +106,9 @@ const Proxy: Bridge = {
     return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
   },
 
-  addToCart(store: Store, product: Product) {
+  addToCart(store: Store, product: Product, quantity: number) {
     return real.addToCart
-      ? real.addToCart(store, product)
+      ? real.addToCart(store, product, quantity)
       : DummyValues.Response;
   },
 

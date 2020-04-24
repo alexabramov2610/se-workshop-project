@@ -166,6 +166,14 @@ export const Adapter: Partial<Env.Bridge> = {
     return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
 
+  addToCart(store: Store, product: Product, quantity: number) {
+    const req = { storeName: store.name, catalogNumber: product.catalogNumber, amount: quantity };
+    const {data, error} = ServiceFacade.saveProductToCart(wrapWithToken(req));
+    return error
+        ? { data: undefined, error: error.message }
+        : { data: data, error: undefined };
+  }
+
 // watchPermissions(store: Store, credentials: Credentials) {
 //
 // }
