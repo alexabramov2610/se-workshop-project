@@ -61,5 +61,6 @@ export interface Bridge {
     req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
   ): ServiceFacade.Res.BoolResponse;
   watchPermissions(store: Store, credentials: Credentials): DummyTypes.IPermissionsResponse;
-  removeManagerPermissions(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse;
+  removeStoreManager(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse;
+  removeManagerPermissions(req: ServiceFacade.Req.ChangeManagerPermissionRequest): ServiceFacade.Res.BoolResponse;
 }

@@ -177,12 +177,14 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
-  removeManagerPermissions(req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>): ServiceFacade.Res.BoolResponse {
-    return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
-    
+  removeStoreManager(
+    req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
   },
-
-  // watchPermissions(store: Store, credentials: Credentials) {
-  //
-  // }
+  removeManagerPermissions(
+    req: ServiceFacade.Req.ChangeManagerPermissionRequest
+  ): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
+  },
 };
