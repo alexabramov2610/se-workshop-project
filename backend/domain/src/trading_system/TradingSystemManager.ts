@@ -332,6 +332,5 @@ export class TradingSystemManager {
             }
         }
         return {data: {result: true}}
-
     }
 }

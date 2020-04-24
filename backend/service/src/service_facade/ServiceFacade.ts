@@ -4,6 +4,7 @@ import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
+import * as BuyingService from '../buying_service/BuyingService'
 import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/TradingSystemManager";
 
 let tradingSystem = getInstance();
@@ -89,10 +90,8 @@ export const viewCart = (req:Req.ViewCartReq,ts: TS):Res.ViewCartRes =>{
 UC-2.8
  */
 export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse =>{
-    return runIfOpen(req, StoreService.search);
-
+    return runIfOpen(req, BuyingService.purchase);
 }
-
 /*
 UC-3.1
  */
