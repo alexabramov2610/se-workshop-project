@@ -5,6 +5,7 @@ import {
     Product,
     BagItem,
     StoreInfo,
+    IReceipt,
     ProductInStore, Cart
 } from "./CommonInterface";
 import {ProductCategory, TradingSystemState} from "./Enums";
@@ -46,7 +47,7 @@ interface TradingSystemStateResponse extends Response {
 }
 
 interface ViewShopPurchasesHistoryResponse extends Response {
-    data: { result: boolean, receipts: Receipt[] }
+    data: { result: boolean, receipts: IReceipt[] }
 }
 
 interface ViewUsersContactUsMessagesResponse extends Response {

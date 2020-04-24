@@ -68,6 +68,11 @@ export interface SearchQuery {
     // tags: Tag[]
 }
 
+export interface IReceipt {
+  date: Date;
+  purchases: Purchase[];
+}
+
 export interface StoreInfo {
     storeName: string,
     storeRating: Rating,

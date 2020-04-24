@@ -7,6 +7,7 @@ import {
     BagItem,
     Item as ItemReq,
     Product as ProductReq,
+    IReceipt,
     ProductCatalogNumber, ProductInStore,
     ProductWithQuantity, Purchase, SearchFilters, SearchQuery
 } from "../api-ext/CommonInterface";
@@ -452,8 +453,8 @@ export class StoreManagement {
             data: {result: false, receipts: []},
             error: {message: errorMsg.E_PERMISSION}
         }
-        const receipts: Receipt[] = store.getPurchasesHistory();
-        return {data: {result: true, receipts}}
+        const ireceipts: IReceipt[] = store.getPurchasesHistory().map(r => {return {purchases: r.purchases, date: r.date}})
+        return {data: {result: true, receipts:ireceipts}}
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
