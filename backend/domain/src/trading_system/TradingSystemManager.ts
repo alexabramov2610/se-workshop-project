@@ -320,7 +320,7 @@ export class TradingSystemManager {
     }
 
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
-        logger.info(`Verify products in cart are on stock`)
+        logger.info(`Verify that products in cart are on stock`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -328,9 +328,11 @@ export class TradingSystemManager {
         for (const [storeName, bagItems] of cart.entries()) {
             const result: Res.BoolResponse = this._storeManager.verifyStoreBag(storeName, bagItems)
             if (!result.data.result) {
+                logger.debug(`product ${JSON.stringify(result.error.options)} not in stock`)
                 return result;
             }
         }
+        logger.debug(`All products on cart are available`)
         return {data: {result: true}}
     }
 }
