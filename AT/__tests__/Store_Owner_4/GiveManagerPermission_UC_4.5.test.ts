@@ -4,15 +4,13 @@ import { Store, Credentials, User } from "../../src/test_env/types";
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: Credentials;
   let _driver: Driver;
-  let _newOwner: User;
-  let _newOwnerCreds: Credentials;
+  
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults()
       .loginWithDefaults();
 
@@ -79,9 +77,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       userName: "new-manager",
       password: "newpwd123",
     };
-
     _serviceBridge.login(_driver.getLoginDefaults());
-
     const { data,error } = _serviceBridge.assignManager(
       _storeInformation,
       newManager

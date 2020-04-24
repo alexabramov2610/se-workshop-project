@@ -196,9 +196,24 @@ const Proxy: Bridge = {
 
   watchPermissions(store: Store, credentials: Credentials) {
     return real.watchPermissions(store, credentials)
-        ? real.watchPermissions(store, credentials)
-        : DummyValues.PermissionsResponse;
-  }
+      ? real.watchPermissions(store, credentials)
+      : DummyValues.PermissionsResponse;
+  },
+  removeStoreManager(
+    req: Partial<ServiceFacade.Req.AssignStoreManagerRequest>
+  ): ServiceFacade.Res.BoolResponse {
+    return real.removeStoreManager
+      ? real.removeStoreManager(req)
+      : { data: { result: false } };
+  },
+  removeManagerPermissions(
+    req: ServiceFacade.Req.ChangeManagerPermissionRequest
+  ): ServiceFacade.Res.BoolResponse {
+    return real.removeManagerPermissions
+      ? real.removeManagerPermissions(req)
+      : { data: { result: true } };
+  },
+
 };
 
 export { Proxy };

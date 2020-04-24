@@ -1,4 +1,4 @@
-import { Bridge, Driver, Store, Credentials } from "../..";
+import { Bridge, Driver, Store } from "../..";
 
 describe("Create Store Buyer, UC: 3.2", () => {
   let _serviceBridge: Bridge;
@@ -7,8 +7,8 @@ describe("Create Store Buyer, UC: 3.2", () => {
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults()
       .loginWithDefaults();
     _serviceBridge = _driver.getBridge();

@@ -1,12 +1,11 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials } from "../../src/test_env/types";
 import { ProductBuilder } from "../mocks/builders/product-builder";
-import { ServiceFacade } from "service_layer";
+
 
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
-  let _credentials: Credentials;
   let _driver: Driver;
 
   beforeEach(() => {
