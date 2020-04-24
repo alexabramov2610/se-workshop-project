@@ -15,7 +15,7 @@ export class Item {
     }
 
     get catalogNumber(): number {
-        return this._catalogNumber;;
+        return this._catalogNumber;
     }
 
 

@@ -1,23 +1,24 @@
 import {Store} from './internal_api'
-import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
-const logger = loggerW(__filename)
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
+    BagItem,
     Item as ItemReq,
     Product as ProductReq,
     ProductCatalogNumber, ProductInStore,
-    ProductWithQuantity, SearchFilters, SearchQuery
+    ProductWithQuantity, Purchase, SearchFilters, SearchQuery
 } from "../api-ext/CommonInterface";
 import {Receipt} from "../trading_system/data/Receipt";
 import {ManagementPermission} from "../api-ext/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
+import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+
+const logger = loggerW(__filename)
 
 export class StoreManagement {
-
-    private _stores: Store[];
+    private readonly _stores: Store[];
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _externalSystems: ExternalSystemsManager;
@@ -462,7 +463,9 @@ export class StoreManagement {
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (product) {
             const quantity: number = store.getProductQuantity(product.catalogNumber);
-            return {data: {result: true,
+            return {
+                data: {
+                    result: true,
                     info: {
                         name: product.name,
                         catalogNumber: product.catalogNumber,
@@ -488,23 +491,23 @@ export class StoreManagement {
         return {data: {messages}}
     }
 
-    search(filters: SearchFilters, query: SearchQuery) : Res.SearchResponse {
+    search(filters: SearchFilters, query: SearchQuery): Res.SearchResponse {
         if (query.storeName) {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
-                return { data: {result:false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
+                return {data: {result: false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
             if (!filters.storeRating || filters.storeRating === store.rating)
-                return { data: {result:true, products: store.search(filters, query)}};
+                return {data: {result: true, products: store.search(filters, query)}};
             else
-                return {data: {result:true, products: []}};
+                return {data: {result: true, products: []}};
         }
 
-        let productsFound: ProductInStore[] = [];
+        const productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
             if (!filters.storeRating || filters.storeRating === store.rating)
                 productsFound.concat(store.search(filters, query));
         }
-        return { data: {result:true, products: productsFound}};
+        return {data: {result: true, products: productsFound}};
     }
 
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
@@ -529,5 +532,34 @@ export class StoreManagement {
         return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
+    verifyStoreBag(storeName: string, bagItems: BagItem[]): Res.BoolResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const notInStock: BagItem[] = bagItems.filter((bagItem) => (store.getProductQuantity(bagItem.product.catalogNumber) - bagItem.amount) < 0)
+        return notInStock.length === 0 ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.E_STOCK, options: notInStock}
+        }
 
+    }
+
+    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string): Purchase[] {
+        const store: Store = this.findStoreByName(storeName);
+        const purchases: Purchase[] = [];
+
+        for (const bagItem of bagItems) {
+            const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
+            for (const item of items) {
+                purchases.push({storeName, userName, item, price: bagItem.finalPrice})
+            }
+        }
+        store.addReceipt(purchases)
+        return purchases
+    }
+
+    calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
+        const store: Store = this.findStoreByName(storeName);
+        return bagItems.map((bagItem) :BagItem => { return {product:bagItem.product,amount:bagItem.amount,finalPrice: store.getProductFinalPrice(bagItem.product)}})
+    }
 }

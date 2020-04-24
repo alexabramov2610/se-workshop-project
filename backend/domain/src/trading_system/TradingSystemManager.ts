@@ -9,13 +9,15 @@ import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
+import {BagItem, Purchase} from "../api-ext/CommonInterface";
+import {Receipt} from "./internal_api";
+
 const logger = loggerW(__filename)
-import {TradingSystemManager as TS} from "../../dist/src/trading_system/TradingSystemManager";
 
 export class TradingSystemManager {
     private _userManager: UserManager;
     private _storeManager: StoreManagement;
-    private _externalSystems: ExternalSystemsManager;
+    private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
 
     constructor() {
@@ -212,14 +214,6 @@ export class TradingSystemManager {
         return res;
     }
 
-    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
-        logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
-        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
-        return res;
-    }
-
     viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
         logger.info(`trying to retrieve store: ${req.body.storeName} info`);
         return this._storeManager.viewStoreInfo(req.body.storeName);
@@ -290,14 +284,77 @@ export class TradingSystemManager {
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        return this._userManager.removeProductFromCart(user,req.body.storeName,product,req.body.amount);
+        return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
     }
 
     viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
         return this._userManager.viewCart(req);
     }
 
-    // buyer / admin request
+    search(req: Req.SearchRequest): Res.SearchResponse {
+        logger.info(`searching products`)
+        return this._storeManager.search(req.body.filters, req.body.searchQuery);
+    }
+
+    calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        for (const [storeName, bagItems] of cart.entries()) {
+            const bagItemsWithPrices: BagItem[] = this._storeManager.calculateFinalPrices(storeName, bagItems)
+            cart.set(storeName, bagItemsWithPrices)
+        }
+        return {data: {result: true}}
+    }
+
+    verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
+        logger.info(`Verify that products in cart are on stock`)
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        for (const [storeName, bagItems] of cart.entries()) {
+            const result: Res.BoolResponse = this._storeManager.verifyStoreBag(storeName, bagItems)
+            if (!result.data.result) {
+                logger.debug(`product ${JSON.stringify(result.error.options)} not in stock`)
+                return result;
+            }
+        }
+        logger.debug(`All products on cart are available`)
+        return {data: {result: true}}
+    }
+
+    pay(req: Req.PayRequest): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.cardDetails);
+        if (!isPaid)
+            return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
+        return {data: {result: true}}
+    }
+
+    // pre condition: already calculated final prices and put them in bagItem.finalPrice
+    purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        let purchases: Purchase[] = []
+        for (const [storeName, bagItems] of cart.entries()) {
+            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest"))
+        }
+        const receipt: Receipt = new Receipt(purchases);
+        if (rUser) {
+            rUser.addReceipt(receipt)
+        }
+        return {data: {result: true, receipt: new Receipt(purchases)}}
+    }
+
+
+    // methods that are available for admin also
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
@@ -313,8 +370,11 @@ export class TradingSystemManager {
         return res;
     }
 
-    search(req: Req.SearchRequest): Res.SearchResponse {
-        logger.info(`searching products`)
-        return this._storeManager.search(req.body.filters, req.body.searchQuery);
+    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
+        logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+        return res;
     }
 }

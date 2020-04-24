@@ -1,6 +1,8 @@
 import {ProductCategory, Rating} from "./Enums";
+
 export {ProductCategory}
-export interface Item extends ProductCatalogNumber{
+
+export interface Item extends ProductCatalogNumber {
     id: number
 }
 
@@ -15,6 +17,8 @@ export interface Product extends ProductCatalogNumber {
 }
 
 export interface Purchase {
+    storeName: string,
+    userName: string,
     item: Item,
     price: number;
 }
@@ -22,8 +26,16 @@ export interface Purchase {
 export interface BagItem {
     product: Product,
     amount: number;
+    finalPrice?: number
 }
 
+export interface CreditCard {
+    holderName: string,
+    number: number,
+    expMonth: number,
+    expYear: number,
+    ccv: number,
+}
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number

@@ -28,3 +28,15 @@ export enum Rating {
     HIGH = 4,
     VERY_HIGH = 5
 }
+
+export enum DiscountsTypes {
+    SHOWN_DISCOUNT,
+    COND_DISCOUNT,
+    HIDDEN_DISCOUNT
+}
+
+export enum BuyingTypes {
+    IMMEDIATE_PURCHASE,
+    Auction,
+    Lottery
+}

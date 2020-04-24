@@ -15,6 +15,10 @@ export class RegisteredUser extends User {
         this._receipts = [];
     }
 
+    addReceipt(receipt: Receipt) {
+        this._receipts.push(receipt);
+    }
+
     get name(): string {
         return this._name;
     }
@@ -23,8 +27,8 @@ export class RegisteredUser extends User {
         return this._role;
     }
 
-    set role(newROle: UserRole) {
-        this._role = newROle;
+    set role(newRole: UserRole) {
+        this._role = newRole;
     }
 
     get password(): string {
