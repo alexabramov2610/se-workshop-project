@@ -424,13 +424,13 @@ export class Store {
     }
 
     private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
-        if (query.productName && query.productName !== product.name)
+        if (typeof query.productName !== "undefined" && query.productName !== product.name)
             return false;
-        if (filters.priceRange && (product.price < filters.priceRange.min || filters.priceRange.max < product.price))
+        if (typeof filters.priceRange !== "undefined" && (product.price < filters.priceRange.min || filters.priceRange.max < product.price))
             return false;
-        if (filters.productCategory && filters.productCategory !== product.category)
+        if (typeof filters.productCategory !== "undefined" && filters.productCategory !== product.category)
             return false;
-        if (filters.productRating && filters.productRating !== product.rating)
+        if (typeof filters.productRating !== "undefined" && filters.productRating !== product.rating)
             return false;
         return true;
     }
