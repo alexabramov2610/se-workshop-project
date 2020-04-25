@@ -35,8 +35,10 @@ rm -r node_modules logs package-lock.json coverage
 ##### Pulling from master #####
 
 #####  domain
-echo -e "${BLUE}puliing from master...${NC}"
-echo -e "${BLUE}FIX YOUR CONFLICTS BEFORE MAKING PR...${NC}"
+echo -e "${GREEN}puliing from master...${NC}"
+echo -e "${GREEN}FIX YOUR CONFLICTS BEFORE MAKING PR...${NC}"
+echo -e "${GREEN}you can type :x and press enter to make the silent merge after the pull...${NC}"
+echo -e "${GREEN}SOMETIME YOU WILL HAVE CONFLICTS PLEASE FIX THEM AND RERUN THIS SCRIPT!${NC}"
 git pull origin master
 
 ##### INSTALL #####
