@@ -231,6 +231,9 @@ const Proxy: Bridge = {
   ): Res.PurchaseResponse {
     return real.purchase ? real.purchase(req) : { data: { result: false } };
   },
+  saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
+    return real.saveProductToCart && real.saveProductToCart(req);
+  },
 };
 
 export { Proxy };

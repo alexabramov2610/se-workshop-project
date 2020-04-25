@@ -209,9 +209,9 @@ export const Adapter: Partial<Env.Bridge> = {
         ? {data: undefined, error: error}
         : {data: data, error: undefined};
   },
-
-  // data: { result: boolean, products: ProductInStore[] }
-
+  saveProductToCart(req: ServiceFacade.Req.SaveToCartRequest): ServiceFacade.Res.BoolResponse {
+    return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
+  },
   search(searchData: Req.SearchRequest): ISearchResponse {
     const {data, error} = ServiceFacade.search(wrapWithToken(searchData.body));
     return error
