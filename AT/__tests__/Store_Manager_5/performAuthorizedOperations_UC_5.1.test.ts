@@ -67,18 +67,4 @@ describe("Perform authorized operations, UC: 5.1", () => {
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
     });
-
-    // test("Default permissions", () => {
-    //     _serviceBridge.logout() // Owner signs out
-    //     _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
-    //
-    //     const {data, error} = _serviceBridge.watchPermissions(_testStore, _storeManagerCredentials);
-    //     expect(data).toBeDefined();
-    //     expect(error).toBeUndefined();
-    //
-    //     expect(data.permissions.includes(PERMISSION.WATCH_USER_QUESTIONS)).toBeTruthy();
-    //     expect(data.permissions.includes(PERMISSION.REPLY_USER_QUESTIONS)).toBeTruthy();
-    //     expect(data.permissions.includes(PERMISSION.WATCH_PURCHASES_HISTORY)).toBeTruthy();
-    // });
-
 });
