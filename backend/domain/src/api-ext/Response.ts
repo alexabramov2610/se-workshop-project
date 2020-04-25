@@ -67,7 +67,7 @@ interface ProductInfoResponse extends Response {
 }
 
 interface AddDiscountResponse extends BoolResponse {
-    data: { result: boolean, discountID:  string }
+    data: { result: boolean, discountID?:  string }
 }
 interface ViewRUserPurchasesHistoryRes extends Response {
     data: { result: boolean, receipts: IReceipt[] }
@@ -89,6 +89,7 @@ interface ViewManagerPermissionResponse extends BoolResponse {
     data: {result: boolean,  permissions?: ManagementPermission[]}
 }
 export {
+    AddDiscountResponse,
     PaymentResponse,
     CartFinalPriceRes,
     ViewManagerPermissionResponse,
