@@ -270,11 +270,8 @@ export class Store {
     }
 
     isProductAmountInStock(catalogNumber: number, amount: number): boolean {
-        const product = this.getProductByCatalogNumber(catalogNumber)
-        if (product) {
-            return this.products.get(product).length >= amount;
-        }
-        return false;
+        const product = this.getProductByCatalogNumber(catalogNumber);
+        return product && this.products.get(product).length >= amount;
     }
 
     search(filters: SearchFilters, query: SearchQuery): ProductInStore[] {
