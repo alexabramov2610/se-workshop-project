@@ -1140,6 +1140,19 @@ describe("Store Management Unit Tests", () => {
 
     })
 
+    test('viewProductInfo fail - store not found', () => {
+        const p = new Product('my product', 12345, 15.90, ProductCategory.GENERAL)
+        const store = new Store('my store')
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(undefined);
+        const res = storeManagement.viewProductInfo({
+            body: {storeName: 'my store', catalogNumber: 12345},
+            token: "lala"
+        })
+        expect(res.data.result).toBeFalsy()
+
+    })
+
+
     test('viewStoreInfo cant find store Fail ', () => {
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
         const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');

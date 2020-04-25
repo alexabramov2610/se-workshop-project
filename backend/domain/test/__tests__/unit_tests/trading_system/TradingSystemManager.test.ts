@@ -43,6 +43,27 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    test("startNewSession success", () => {
+        tradingSystemManager = new TradingSystemManager();
+        const token: string = tradingSystemManager.startNewSession();
+        expect(token).toBeDefined();
+        expect(token.length > 10).toBe(true);
+    });
+
+    test("startNewSession success - token taken", () => {
+        tradingSystemManager = new TradingSystemManager();
+        mocked(UserManager).mockImplementationOnce((): any => {
+            return {
+                getUserByToken: () => user
+            }
+        });
+
+        const token: string = tradingSystemManager.startNewSession();
+        expect(token).toBeDefined();
+        expect(token.length > 10).toBe(true);
+    });
+
+
     function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
