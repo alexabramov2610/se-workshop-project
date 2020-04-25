@@ -387,4 +387,14 @@ export class TradingSystemManager {
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
     }
+
+    verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (this._storeManager.verifyStoreExists(req.body.storeName)) {
+            return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+        }
+        return {data: {result: true}};
+    }
 }
