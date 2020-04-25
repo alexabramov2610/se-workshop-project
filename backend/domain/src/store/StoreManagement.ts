@@ -503,10 +503,10 @@ export class StoreManagement {
                 return {data: {result: true, products: []}};
         }
 
-        const productsFound: ProductInStore[] = [];
+        let productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
-            if (!filters.storeRating || filters.storeRating === store.rating)
-                productsFound.concat(store.search(filters, query));
+            if (typeof filters.storeRating === "undefined" || filters.storeRating === store.rating)
+                productsFound = productsFound.concat(store.search(filters, query));
         }
         return {data: {result: true, products: productsFound}};
     }
