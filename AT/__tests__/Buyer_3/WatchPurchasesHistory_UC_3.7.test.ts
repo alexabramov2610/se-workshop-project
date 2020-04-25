@@ -4,7 +4,6 @@ import { Credentials } from "../../src/test_env/types";
 
 describe("Watch Purchases History, UC: 3.7", () => {
   let _serviceBridge: Bridge;
-  let _testCreditCard: CreditCard;
   let _driver: Driver;
   let _item: Item;
   let _prodct: Product;
