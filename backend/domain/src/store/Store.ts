@@ -204,8 +204,14 @@ export class Store {
             }
         } else {
             logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store id: ${this._UUID}`)
-            return isReturnItems ? { data: {result: true, productsNotRemoved: notRemovedProducts, itemsRemoved: itemsToReturn }} :
-                { data: {result: true, productsNotRemoved: notRemovedProducts }}
+            return isReturnItems ? {
+                    data: {
+                        result: true,
+                        productsNotRemoved: notRemovedProducts,
+                        itemsRemoved: itemsToReturn
+                    }
+                } :
+                {data: {result: true, productsNotRemoved: notRemovedProducts}}
         }
 
     }
@@ -460,13 +466,14 @@ export class Store {
     }
 
 
-    addReceipt(purchases: Purchase[], payment:IPayment) {
-        this._receipts.push(new Receipt(purchases,payment))
+    addReceipt(purchases: Purchase[], payment: IPayment) {
+        this._receipts.push(new Receipt(purchases, payment))
     }
 
 
     // TODO calculate from discount object
-    getProductFinalPrice(product: ProductReq) {
+    getProductFinalPrice(catalogNumber: number) {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber)
         return product.price;
     }
 }

@@ -83,3 +83,11 @@ export const search = (req: Req.SearchRequest, ts: TS): Res.SearchResponse => {
 export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest, ts: TS): Res.ViewUsersContactUsMessagesResponse => {
     return ts.viewUsersContactUsMessages(req);
 }
+
+
+export const addProductDiscount = (req: Req.AddDiscountRequest, ts: TS): Res.BoolResponse => {
+    return ts.addProductDiscount(req)
+}
+export const removeProductDiscount = (req: Req.RemoveDiscountRequest, ts: TS): Res.BoolResponse => {
+    return ts.removeProductDiscount(req)
+}
