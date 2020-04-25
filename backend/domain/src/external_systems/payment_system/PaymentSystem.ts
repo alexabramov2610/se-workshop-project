@@ -54,6 +54,8 @@ export class PaymentSystem {
             }
         } else {
             isPaid = this.validateCreditCard(creditCard)
+            if(!isPaid)
+                logger.error("payment failed")
         }
         return isPaid
     }
@@ -64,7 +66,7 @@ export class PaymentSystem {
         } else {
             const today: Date = new Date();
 
-            return creditCard.holderName && creditCard.number && creditCard.ccv && creditCard.expYear > today.getFullYear() && creditCard.expMonth > today.getMonth()
+            return creditCard.holderName && creditCard.number && creditCard.ccv && creditCard.expYear > today.getFullYear() && creditCard.expMonth > today.getMonth()+1
         }
     }
 }

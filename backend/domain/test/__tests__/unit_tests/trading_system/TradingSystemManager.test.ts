@@ -9,28 +9,37 @@ import {UserManager} from '../../../../src/user/UserManager';
 import {mocked} from "ts-jest/utils";
 import {
     BagItem,
-    Product as ProductReq,
+    IProduct as ProductReq,
     ProductCatalogNumber,
-    ProductCategory
+    ProductCategory, Purchase
 } from "../../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
 import {User} from "../../../../src/user/users/User";
+import {PaymentSystem} from "../../../../src/external_systems/payment_system/PaymentSystem";
 
 jest.mock('../../../../src/user/UserManager');
 jest.mock('../../../../src/store/StoreManagement');
 jest.mock('../../../../src/external_systems/ExternalSystemsManager');
-
+jest.mock('../../../../src/external_systems/payment_system/PaymentSystem')
 describe("Store Management Unit Tests", () => {
     let tradingSystemManager: TradingSystemManager;
     let store: Store;
     let user: StoreOwner;
     const mockToken: string = "mock-token";
+    const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
+    cart.set("storeName", [{
+        product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
+        amount: 2
+    }])
 
     beforeEach(() => {
         store = new Store("store");
         user = new StoreOwner("name");
         mocked(UserManager).mockClear();
         mocked(StoreManagement).mockClear();
+        mocked(PaymentSystem).mockClear();
+        mocked(ExternalSystemsManager).mockReset();
+
     });
 
 
@@ -1013,14 +1022,13 @@ describe("Store Management Unit Tests", () => {
             data: {result: false},
             error: {message: 'mock err'}
         };
-        const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
-        cart.set("storeName", [{
-            product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
-            amount: 2
-        }])
+
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                verifyStoreBag: () => isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message:"error", options: 1}},
+                verifyStoreBag: () => isSuccess ? {data: {result: true}} : {
+                    data: {result: false},
+                    error: {message: "error", options: 1}
+                },
             }
         });
         mocked(UserManager).mockImplementation((): any => {
@@ -1057,6 +1065,88 @@ describe("Store Management Unit Tests", () => {
         const res = tradingSystemManager.verifyCart(req);
 
         expect(res.data.result).toBeFalsy();
+
+    })
+
+
+/*
+    function prepareMockToPay(isSuccess: boolean): void {
+        mocked(PaymentSystem).mockImplementation((): any => {
+            return {
+                constructor:() => new PaymentSystem(),
+                pay: () => isSuccess,
+            }
+        });
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getUserByToken: () => user,
+            }
+        });
+        mocked(ExternalSystemsManager).mockReset()
+
+    }
+    test("pay success test", () => {
+        prepareMockToPay(true)
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.PayRequest = {
+            body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+            token: mockToken
+        }
+        const res = tradingSystemManager.pay(req)
+
+        expect(res.data.result).toBeTruthy();
+
+    })
+
+    test("pay failure test", () => {
+        prepareMockToPay(false)
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.PayRequest = {
+            body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+            token: mockToken
+        }
+        const res = tradingSystemManager.pay(req)
+
+        expect(res.data.result).toBeFalsy();
+
+    })
+*/
+
+    function preparePurchaseMock(isSuccess: boolean): Res.PurchaseResponse {
+        const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: 'mock err'}
+        };
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getUserByToken: () => user,
+                getLoggedInUserByToken : () => user,
+                getUserCart: () => cart
+            }
+        });
+        const purchase: Purchase = {item: {catalogNumber:5,id:2},price:20, storeName:store.storeName,userName:user.name}
+        mocked(StoreManagement).mockImplementation((): any => {
+            return {
+                purchaseFromStore: () => [purchase]
+            }
+        });
+        const res: Res.PurchaseResponse = isSuccess ? {data: {result: true,receipt: {date: new Date(),purchases:[purchase]}}} : {
+            data: {result: false},
+            error: {message: 'mock err'}
+        };
+        return res;
+    }
+
+    test("purchase success", () => {
+        const req: Req.PurchaseRequest = {
+            body: { payment:{ cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 }},
+            token: mockToken
+        }
+        const mockRes:Res.PurchaseResponse = preparePurchaseMock(true);
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.PurchaseResponse = tradingSystemManager.purchase(req);
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt.purchases).toEqual(mockRes.data.receipt.purchases)
 
     })
 

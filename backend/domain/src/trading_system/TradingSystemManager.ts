@@ -272,14 +272,17 @@ export class TradingSystemManager {
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         const inStock: boolean = store.isProductAmountInStock(req.body.catalogNumber, req.body.amount);
-        if (!inStock)
+        if (!inStock) {
+            logger.debug(` product: ${req.body.catalogNumber} not in stock`)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK}};
+        }
         logger.debug(` product: ${req.body.catalogNumber} added to cart`)
         this._userManager.saveProductToCart(user, req.body.storeName, product, amount);
         return {data: {result: true}}
     }
 
     removeProductFromCart(req: Req.RemoveFromCartRequest): Res.BoolResponse {
+        logger.info(`request to remove product: ${req.body.catalogNumber} from cart`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -302,6 +305,7 @@ export class TradingSystemManager {
     }
 
     calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.BoolResponse {
+        logger.info(`calculate final prices of user cart`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -331,6 +335,7 @@ export class TradingSystemManager {
     }
 
     pay(req: Req.PayRequest): Res.BoolResponse {
+        logger.info(`request to pay via external system`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -355,7 +360,7 @@ export class TradingSystemManager {
         if (rUser) {
             rUser.addReceipt(receipt)
         }
-        return {data: {result: true, receipt: {purchases,date: new Date()}}}
+        return {data: {result: true, receipt: {purchases, date: new Date()}}}
     }
 
 
@@ -381,5 +386,15 @@ export class TradingSystemManager {
         if (!user) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
+    }
+
+    verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (this._storeManager.verifyStoreExists(req.body.storeName)) {
+            return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+        }
+        return {data: {result: true}};
     }
 }

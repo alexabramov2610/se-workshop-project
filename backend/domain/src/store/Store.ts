@@ -5,7 +5,7 @@ import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
-    Product as ProductReq,
+    IProduct as ProductReq,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
