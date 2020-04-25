@@ -2,9 +2,9 @@ import * as Types from "../..";
 import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import {Product, Store, Item, User, Credentials, PERMISSION} from "../..";
+import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
-import {ISearchResponse} from "../../__tests__/mocks/responses";
+import { ISearchResponse } from "../../__tests__/mocks/responses";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -184,41 +184,58 @@ export const Adapter: Partial<Env.Bridge> = {
     return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   },
 
-  viewStorePurchasesHistory(req : Req.ViewShopPurchasesHistoryRequest ): Res.ViewShopPurchasesHistoryResponse {
+  viewStorePurchasesHistory(
+    req: Req.ViewShopPurchasesHistoryRequest
+  ): Res.ViewShopPurchasesHistoryResponse {
     return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
   },
 
-  viewUserPurchasesHistory(req : Req.ViewRUserPurchasesHistoryReq ): Res.ViewRUserPurchasesHistoryRes {
-    return ServiceFacade.viewRegisteredUserPurchasesHistory(wrapWithToken(req.body));
+  viewUserPurchasesHistory(
+    req: Req.ViewRUserPurchasesHistoryReq
+  ): Res.ViewRUserPurchasesHistoryRes {
+    return ServiceFacade.viewRegisteredUserPurchasesHistory(
+      wrapWithToken(req.body)
+    );
   },
 
-  viewProduct(store: Store, product: Product): Res.ProductInfoResponse{
-    const {data, error} = ServiceFacade.viewProductInfo(wrapWithToken({storeName: store.name, catalogNumber: product.catalogNumber}));
+  viewProduct(store: Store, product: Product): Res.ProductInfoResponse {
+    const { data, error } = ServiceFacade.viewProductInfo(
+      wrapWithToken({
+        storeName: store.name,
+        catalogNumber: product.catalogNumber,
+      })
+    );
     return error
-        ? {data: undefined, error: error}
-        : {data: data, error: undefined};
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
   },
-  
-  purchase(req : Req.PurchaseRequest ): Res.PurchaseResponse {
+
+  purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
     return ServiceFacade.purchase(wrapWithToken(req.body));
   },
 
   watchCart(): Res.ViewCartRes {
-    const {data, error} = ServiceFacade.viewCart(wrapWithToken({}));
+    const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
     return error
-        ? {data: undefined, error: error}
-        : {data: data, error: undefined};
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
   },
-  saveProductToCart(req: ServiceFacade.Req.SaveToCartRequest): ServiceFacade.Res.BoolResponse {
+  saveProductToCart(
+    req: ServiceFacade.Req.SaveToCartRequest
+  ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   },
   search(searchData: Req.SearchRequest): ISearchResponse {
-    const {data, error} = ServiceFacade.search(wrapWithToken(searchData.body));
+    const { data, error } = ServiceFacade.search(
+      wrapWithToken(searchData.body)
+    );
     return error
-        ? {data: undefined, error: error.message}
-        : {data: data, error: undefined};
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
   },
- viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
-  return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));  
-}
+  viewManagerPermissions(
+    req: Req.ViewManagerPermissionRequest
+  ): Res.ViewManagerPermissionResponse {
+    return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
+  },
 };

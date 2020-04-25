@@ -1,5 +1,5 @@
 import { Bridge, Driver } from "../../";
-import { Store, Credentials, User } from "../../src/test_env/types";
+import { Store, Credentials, User, PERMISSION } from "../../src/test_env/types";
 
 describe("Edit or Set Permissions, UC: 4.6", () => {
   let _serviceBridge: Bridge;
@@ -10,11 +10,12 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
-      .initWithDefaults()
       .startSession()
+      .initWithDefaults()
       .registerWithDefaults()
       .loginWithDefaults();
     _storeInformation = { name: "this-is-the-coolest-store" };
+    _newManagerCredentials = { userName: "new-manager", password: "boss1234" };
     _serviceBridge = _driver.getBridge();
     _serviceBridge.createStore(_storeInformation);
     _serviceBridge.logout();
@@ -24,38 +25,69 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
     _serviceBridge.assignManager(_storeInformation, _newManagerCredentials);
   });
 
-  test("store owner not logged in", () => {
-    //TODO - REMOVE PERMISSIONS
-    expect(false).toBe(true);
+  test("store owner logged in valid manager", () => {
+    const res = _serviceBridge.grantPermissions(
+      _newManagerCredentials,
+      _storeInformation,
+      [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
+    );
+
+    const { data, error } = _serviceBridge.viewManagerPermissions({
+      body: {
+        managerToView: _newManagerCredentials.userName,
+        storeName: _storeInformation.name,
+      },
+    });
+    const filtered = data.permissions.filter(
+      (perm) =>
+        perm.valueOf() === PERMISSION.CLOSE_STORE ||
+        perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
+    );
+
+    expect(filtered.length).toBe(2);
   });
 
-  test("Edit or Set Permissions - store owner not logged in", () => {
-    const newUser: Credentials = {
-      userName: "new-user",
-      password: "newpwd123",
-    };
-    _serviceBridge.register(newUser);
-    //TODO: TRY TO EDIT/SET PERMISSIONS
-    expect(false).toBe(true);
-  });
+  test("store owner logged in valid manager grant permissions and grant again", () => {
+    const res = _serviceBridge.grantPermissions(
+      _newManagerCredentials,
+      _storeInformation,
+      [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
+    );
+    _serviceBridge.grantPermissions(_newManagerCredentials, _storeInformation, [
+      PERMISSION.MODIFY_BUYING_METHODS,
+      PERMISSION.CLOSE_STORE,
+    ]);
+    const { data, error } = _serviceBridge.viewManagerPermissions({
+      body: {
+        managerToView: _newManagerCredentials.userName,
+        storeName: _storeInformation.name,
+      },
+    });
+    const filtered = data.permissions.filter(
+      (perm) =>
+        perm.valueOf() === PERMISSION.CLOSE_STORE ||
+        perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
+    );
 
-  test("Edit or Set Permissions - store owner not logged in", () => {
-    const newUser: Credentials = {
-      userName: "new-user",
-      password: "newpwd123",
-    };
-    _serviceBridge.register(newUser);
-    //TODO: TRY TO EDIT/SET PERMISSIONS
-    expect(false).toBe(true);
+    expect(filtered.length).toBe(2);
   });
-
-  test("Edit or Set Permissions - store owner not logged in", () => {
-    const newUser: Credentials = {
-      userName: "new-user",
-      password: "newpwd123",
-    };
-    _serviceBridge.register(newUser);
-    //TODO: TRY TO EDIT/SET PERMISSIONS
-    expect(false).toBe(true);
+  test("store owner logged out valid manager details", () => {
+    _serviceBridge.logout();
+    const res = _serviceBridge.grantPermissions(
+      _newManagerCredentials,
+      _storeInformation,
+      [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
+    );
+    expect(res.data).toBeUndefined();
+    expect(res.error).toBeDefined();
+  });
+  test("store owner logged in invalid manager details", () => {
+    const res = _serviceBridge.grantPermissions(
+      { userName: "nosuchuser", password: "password123" },
+      _storeInformation,
+      [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
+    );
+    expect(res.data).toBeUndefined();
+    expect(res.error).toBeDefined();
   });
 });
