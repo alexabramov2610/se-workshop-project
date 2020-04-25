@@ -1,6 +1,6 @@
-import {BoolResponse, errorMsg} from "../../api-int/internal_api";
+import {BoolResponse, errorMsg, loggerW} from "../../api-int/internal_api";
 import {CreditCard} from "../../api-ext/CommonInterface";
-
+const logger = loggerW(__filename)
 
 export class PaymentSystem {
     private _paymentSys: any;
@@ -38,6 +38,8 @@ export class PaymentSystem {
             isPaid = this._paymentSys.pay(price, creditCard);
         } else {
             isPaid = this.validateCreditCard(creditCard)
+            if(!isPaid)
+                logger.error("payment failed")
         }
         return isPaid
     }
