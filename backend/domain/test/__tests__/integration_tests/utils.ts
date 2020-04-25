@@ -55,6 +55,17 @@ export default {
         const loginReq: Req.LoginRequest = {body: {username: user.name, password: user.password}, token: token};
         const loginRes: Res.BoolResponse = tradingSystemManager.login(loginReq);
         expect(loginRes.data.result).toBeTruthy();
+    },
+
+    makeStoreWithProduct(tradingSystemManager: TradingSystemManager, itemsNumber: number){
+        const ownerToken: string = this.initSessionRegisterLogin(tradingSystemManager, "ownername", "ownerpassword")
+        const storeName: string = "store name";
+        this.createStore(tradingSystemManager, storeName, ownerToken);
+        const catalogNumber:number = 1;
+        const products: Product[] = [new Product("bamba",1,20,ProductCategory.GENERAL)]
+        this.addNewProducts(tradingSystemManager,storeName,products,ownerToken,true)
+        tradingSystemManager.addItems({token:ownerToken,body:{storeName,items: [{catalogNumber:1,id:2}]}})
+        return {ownerToken,storeName,products}
     }
 
 

@@ -1,8 +1,8 @@
 import {Error} from "../api-int/internal_api";
 import {
-    Item,
+    IItem,
     ProductCatalogNumber,
-    Product,
+    IProduct,
     BagItem,
     StoreInfo,
     IReceipt,
@@ -19,19 +19,19 @@ interface Response {
 
 
 interface ItemsAdditionResponse extends Response {
-    data: { result: boolean, itemsNotAdded: Item[] }
+    data: { result: boolean, itemsNotAdded: IItem[] }
 }
 
 interface ItemsRemovalResponse extends Response {
-    data: { result: boolean, itemsNotRemoved: Item[] }
+    data: { result: boolean, itemsNotRemoved: IItem[] }
 }
 
 interface ProductAdditionResponse extends Response {
-    data: { result: boolean, productsNotAdded: Product[] }
+    data: { result: boolean, productsNotAdded: IProduct[] }
 }
 
 interface ProductRemovalResponse extends Response {
-    data: { result: boolean, productsNotRemoved: ProductCatalogNumber[], itemsRemoved?: Item[] }
+    data: { result: boolean, productsNotRemoved: ProductCatalogNumber[], itemsRemoved?: IItem[] }
 }
 
 interface BoolResponse extends Response {

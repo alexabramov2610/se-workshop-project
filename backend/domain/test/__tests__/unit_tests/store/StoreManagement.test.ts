@@ -4,8 +4,8 @@ import * as Res from "../../../../src/api-ext/Response";
 import {BoolResponse, StoreInfoResponse} from "../../../../src/api-ext/Response";
 import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
-    Item as ItemReq,
-    Product as ProductReq,
+    IItem as ItemReq,
+    IProduct as ProductReq,
     ProductCatalogNumber,
     ProductInStore,
     ProductWithQuantity,

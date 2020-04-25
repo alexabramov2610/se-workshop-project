@@ -4,9 +4,9 @@ import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
-    BagItem,
-    Item as ItemReq,
-    Product as ProductReq,
+    BagItem, IItem,
+    IItem as ItemReq,
+    IProduct as ProductReq,
     IReceipt,
     ProductCatalogNumber, ProductInStore,
     ProductWithQuantity, Purchase, SearchFilters, SearchQuery
@@ -42,7 +42,7 @@ export class StoreManagement {
         const newStore = new Store(storeName);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
-        logger.info(`successfully added store: ${JSON.stringify(newStore)} to system`)
+        logger.info(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
         return {data: {result: true}}
 
     }
@@ -52,7 +52,7 @@ export class StoreManagement {
             if (store.storeName === storeName)
                 return true;
         }
-        logger.warn(`store ${storeName} doesn't exist`);
+        logger.debug(`store "${storeName}" doesn't exist`);
         return false;
     }
 
@@ -552,7 +552,8 @@ export class StoreManagement {
         for (const bagItem of bagItems) {
             const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
             for (const item of items) {
-                purchases.push({storeName, userName, item, price: bagItem.finalPrice})
+                const outputItem: IItem = {catalogNumber:item.catalogNumber, id:item.id}
+                purchases.push({storeName, userName,item: outputItem, price: bagItem.finalPrice})
             }
         }
         store.addReceipt(purchases)

@@ -4,6 +4,8 @@ import * as Res from "../../../src/api-ext/Response";
 import utils from "./utils"
 import {Product} from "../../../src/trading_system/data/Product";
 import {ProductCategory} from "../../../src/api-ext/Enums";
+import {Cart, IReceipt} from "../../../src/api-ext/CommonInterface";
+
 
 describe("Guest Integration Tests", () => {
     const username: string = "username";
@@ -65,8 +67,10 @@ describe("Guest Integration Tests", () => {
         expect(res.data.info.productsNames).toEqual(["p"]);
     });
 
+
     // TODO
     it("View product information IT test", () => {
+
         expect(true)
     });
 
@@ -75,19 +79,108 @@ describe("Guest Integration Tests", () => {
         expect(true)
     });
 
-    // TODO
     it("Save items in cart IT test", () => {
-        expect(true)
+        const {ownerToken, storeName, products} = utils.makeStoreWithProduct(tradingSystemManager, 1);
+        const userToken: string = utils.initSessionRegisterLogin(tradingSystemManager, "tal", "taltal")
+        const req: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: userToken
+        }
+        const res: Res.BoolResponse = tradingSystemManager.saveProductToCart(req)
+        expect(res.data.result).toBeTruthy();
     });
 
-    // TODO
+    it("Remove items from cart IT test", () => {
+        const {ownerToken, storeName, products} = utils.makeStoreWithProduct(tradingSystemManager, 1);
+        const userToken: string = utils.initSessionRegisterLogin(tradingSystemManager, "tal", "taltal")
+        const saveReq: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: userToken
+        }
+        const saveRes: Res.BoolResponse = tradingSystemManager.saveProductToCart(saveReq)
+
+        const removeReq: Req.RemoveFromCartRequest = {
+            body: {
+                amount: 1,
+                storeName,
+                catalogNumber: products[0].catalogNumber
+            }, token: userToken
+        }
+        const watchRes: Res.ViewCartRes = tradingSystemManager.viewCart(removeReq)
+        expect(watchRes.data.result).toBeTruthy();
+    });
+
     it("Watch cart IT test", () => {
-        expect(true)
+        const {ownerToken, storeName, products} = utils.makeStoreWithProduct(tradingSystemManager, 1);
+        const userToken: string = utils.initSessionRegisterLogin(tradingSystemManager, "tal", "taltal")
+        const saveReq: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: userToken
+        }
+        const saveRes: Res.BoolResponse = tradingSystemManager.saveProductToCart(saveReq)
+
+        const watchReq: Req.ViewCartReq = {body: {}, token: userToken}
+        const watchRes: Res.ViewCartRes = tradingSystemManager.viewCart(watchReq)
+        const cart: Cart = {products: [{storeName, bagItems: [{product: products[0], amount: 1}]}]}
+        expect(watchRes.data.result).toBeTruthy();
+        expect(watchRes.data.cart).toEqual(cart)
+
     });
 
-    // TODO
+    test("pay test", () => {
+        const req: Req.PayRequest = {
+            body: {
+                cardDetails: {holderName: "tal", number: 152, expYear: 2021, expMonth: 5, ccv: 40},
+                address: "batyam",
+                city: "batya",
+                country: "israel",
+                price: 30
+            },
+            token
+        }
+        const res = tradingSystemManager.pay(req)
+        expect(res.data.result).toBeTruthy();
+
+    })
     it("Buy items IT test", () => {
-        expect(true)
+        const {ownerToken, storeName, products} = utils.makeStoreWithProduct(tradingSystemManager, 1);
+        const userToken: string = utils.initSessionRegisterLogin(tradingSystemManager, "tal", "taltal")
+        const saveReq: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: userToken
+        }
+        tradingSystemManager.saveProductToCart(saveReq)
+        let saveRes: Res.BoolResponse;
+        const purchaseReq: Req.PurchaseRequest = {
+            body: {
+                payment: {
+                    cardDetails: {
+                        holderName: "tal",
+                        number: 152,
+                        expYear: 2021,
+                        expMonth: 5,
+                        ccv: 40
+                    }, address: "batyam", city: "batya", country: "israel", price: 30
+                }
+            }, token: userToken
+        }
+        tradingSystemManager.calculateFinalPrices({token: userToken, body: {}})
+        const purchaseRes: Res.PurchaseResponse = tradingSystemManager.purchase(purchaseReq)
+        const expectedReciept: IReceipt = {
+            date: new Date(),
+            purchases: [{
+                userName: "tal",
+                storeName,
+                price: 20,
+                item: {catalogNumber: products[0].catalogNumber, id: 2}
+            }]
+        }
+        expect(purchaseRes.data.result).toBeTruthy()
+
+        expect(purchaseRes.data.receipt).toEqual(expectedReciept)
+        saveRes = tradingSystemManager.saveProductToCart(saveReq)
+        expect(saveRes.data.result).toBeFalsy()
+
     });
 
 
