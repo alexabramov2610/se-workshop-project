@@ -312,17 +312,19 @@ export class TradingSystemManager {
         return this._storeManager.search(req.body.filters, req.body.searchQuery);
     }
 
-    calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.BoolResponse {
+    calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.CartFinalPriceRes {
         logger.info(`calculate final prices of user cart`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        let finalPrice: number = 0;
         for (const [storeName, bagItems] of cart.entries()) {
             const bagItemsWithPrices: BagItem[] = this._storeManager.calculateFinalPrices(storeName, bagItems)
+            finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
             cart.set(storeName, bagItemsWithPrices)
         }
-        return {data: {result: true}}
+        return {data: {result: true , price: finalPrice}}
     }
 
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {

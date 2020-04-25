@@ -38,6 +38,10 @@ interface BoolResponse extends Response {
     data: { result: boolean }
 }
 
+interface CartFinalPriceRes extends BoolResponse {
+    data: { result: boolean , price?: number }
+}
+
 interface StoreInfoResponse extends Response {
     data: { result: boolean, info?: StoreInfo }
 }
@@ -77,6 +81,7 @@ interface ViewManagerPermissionResponse extends BoolResponse {
     data: {result: boolean,  permissions?: ManagementPermission[]}
 }
 export {
+    CartFinalPriceRes,
     ViewManagerPermissionResponse,
     PurchaseResponse,
     SearchResponse,
