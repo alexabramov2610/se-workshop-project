@@ -1,9 +1,8 @@
-import {Response, CATEGORY, Cart, Product, PERMISSION} from "../../src/test_env/types";
+import {Response, Cart, Product, PERMISSION} from "../../src/test_env/types";
 import {
     BagItem,
-    Item,
     ProductCatalogNumber,
-    ProductCategory
+    ProductCategory, ProductInStore
 } from "../../../backend/domain/src/api-ext/CommonInterface";
 import {Res, Req} from "service_layer/dist/src/service_facade/ServiceFacade";
 
@@ -41,7 +40,7 @@ const ProductResponse: IProductResponse = {
             name: "Item",
             price: 33.5,
             catalogNumber: 123,
-            category: CATEGORY.CLOTHING,
+            category: ProductCategory.CLOTHING,
         },
     },
 };
@@ -153,32 +152,22 @@ const PurchaseHistoryResponse: IPurchaseHistoryResponse = {
     data: {purchases: [{productName: "some-name"}]},
 };
 
+
 export interface ISearchResponse extends Response {
-    data: {
-        products: Product[];
-    };
+    data: { products: ProductInStore[] }
 }
 
 const SearchResponse: ISearchResponse = {
     data: {
         products: [
             {
-                name: "-name1",
-                category: CATEGORY.ELECTRONICS,
-                catalogNumber: 123,
-                price: 20,
-            },
-            {
-                name: "-name2",
-                category: CATEGORY.ELECTRONICS,
-                catalogNumber: 456,
-                price: 20,
-            },
-            {
-                name: "-name3",
-                category: CATEGORY.ELECTRONICS,
-                catalogNumber: 789,
-                price: 20,
+                storeName: "store-name1",
+                product: {
+                    name: "p-name1",
+                    category: ProductCategory.ELECTRONICS,
+                    catalogNumber: 123,
+                    price: 20,
+                }
             },
         ],
     },

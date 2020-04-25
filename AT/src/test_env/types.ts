@@ -1,3 +1,5 @@
+import {ProductCategory} from "../../../backend/domain/src/api-ext/CommonInterface";
+
 interface User {
   username: string;
 }
@@ -13,7 +15,7 @@ interface Item extends ProductCatalogNumber {
 interface Product extends ProductCatalogNumber {
   name: string;
   price: number;
-  category: CATEGORY;
+  category: ProductCategory;
 }
 
 interface CreditCard {
@@ -54,42 +56,7 @@ interface Inventory {
 
 interface Response {
   data: any;
-  error?: string;
-}
-
-interface SearchData {
-  input: string;
-  filters?: Filters;
-}
-
-interface PriceRange {
-  low: number;
-  high: number;
-}
-
-interface Filters {
-  category?: CATEGORY;
-  priceRange?: PriceRange;
-  storeRate?: RATE;
-  itemRate?: RATE;
-}
-
-enum CATEGORY {
-  ELECTRONICS,
-  HOME_AND_OFFICE,
-  CLOTHING,
-  Electronics,
-  Hobbies,
-  Home,
-}
-
-enum RATE {
-  ZERO_STARS,
-  ONE_STAR,
-  TWO_STARS,
-  THREE_STARS,
-  FOUR_STARS,
-  FIVE_STARS,
+  error?: any;
 }
 
 enum PERMISSION {
@@ -111,11 +78,6 @@ export {
   Product,
   Response,
   Credentials,
-  SearchData,
-  Filters,
-  CATEGORY,
-  RATE,
-  PriceRange,
   Cart,
   CreditCard,
   Discount,

@@ -2,8 +2,9 @@ import * as Types from "../..";
 import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
+import {Product, Store, Item, User, Credentials, PERMISSION} from "../..";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+import {ISearchResponse} from "../../__tests__/mocks/responses";
 
 let token;
 const wrapWithToken = (req: any) => {
@@ -206,6 +207,15 @@ export const Adapter: Partial<Env.Bridge> = {
     const {data, error} = ServiceFacade.viewCart(wrapWithToken({}));
     return error
         ? {data: undefined, error: error}
+        : {data: data, error: undefined};
+  },
+
+  // data: { result: boolean, products: ProductInStore[] }
+
+  search(searchData: Req.SearchRequest): ISearchResponse {
+    const {data, error} = ServiceFacade.search(wrapWithToken(searchData.body));
+    return error
+        ? {data: undefined, error: error.message}
         : {data: data, error: undefined};
   }
 };

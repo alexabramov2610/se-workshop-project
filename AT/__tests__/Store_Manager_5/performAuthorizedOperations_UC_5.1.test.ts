@@ -1,6 +1,7 @@
-import {Bridge, Driver, Store, Credentials, Item, CATEGORY, PERMISSION, Discount, Product} from "../../";
+import {Bridge, Driver, Store, Credentials, Item, PERMISSION, Discount, Product} from "../../";
 import {ProductBuilder} from "../mocks/builders/product-builder";
 import {ItemBuilder} from "../mocks/builders/item-builder";
+import {ProductCategory} from "../../../backend/domain/dist/src/api-ext/CommonInterface";
 
 describe("Perform authorized operations, UC: 5.1", () => {
     let _driver = new Driver;
@@ -13,8 +14,8 @@ describe("Perform authorized operations, UC: 5.1", () => {
     beforeEach(() => {
         _serviceBridge = _driver
             .resetState()
-            .initWithDefaults()
             .startSession()
+            .initWithDefaults()
             .registerWithDefaults()
             .loginWithDefaults()
             .getBridge();
@@ -22,7 +23,7 @@ describe("Perform authorized operations, UC: 5.1", () => {
         _testProduct = new ProductBuilder()
             .withName("test_name")
             .withPrice(25)
-            .withCategory(CATEGORY.CLOTHING)
+            .withCategory(ProductCategory.CLOTHING)
             .withCatalogNumber(789)
             .getProduct();
         _testItem = new ItemBuilder()

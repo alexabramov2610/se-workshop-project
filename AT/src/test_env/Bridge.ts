@@ -3,8 +3,6 @@ import {
   Store,
   User,
   Credentials,
-  SearchData,
-  RATE,
   CreditCard,
   Discount,
   PERMISSION,
@@ -35,8 +33,8 @@ export interface Bridge {
   register(credentials: Credentials): DummyTypes.IResponse;
   logout(): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
-  search(input: SearchData): DummyTypes.ISearchResponse;
-  rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
+  search(input: Req.SearchRequest): DummyTypes.ISearchResponse;
+  // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
   addToCart(store: Store, product: Product, quantity: number): DummyTypes.IResponse;
   watchCart(): Res.ViewCartRes;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
