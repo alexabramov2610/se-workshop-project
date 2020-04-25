@@ -1,4 +1,4 @@
-import {Bridge, Driver, Item, CATEGORY, Store, Credentials, Product} from "../../";
+import {Bridge, Driver, Item, Store, Credentials, Product} from "../../";
 import {ItemBuilder} from "../mocks/builders/item-builder";
 import {ProductBuilder} from "../mocks/builders/product-builder";
 
@@ -61,6 +61,7 @@ describe("Guest - View Information, UC: 2.4", () => {
         expect(error).toBeUndefined();
         expect(storeName).toEqual(_testStore.name);
         expect(productsNames[0]).toEqual(_testProduct.name);
+        expect(storeOwnersNames[0]).toEqual(_driver.getLoginDefaults().userName);
     });
 
     test("View invalid store", () => {

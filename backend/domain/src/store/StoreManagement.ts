@@ -4,8 +4,8 @@ import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
-    BagItem, IItem,
-    IItem as ItemReq,
+    BagItem,
+    IItem,
     IProduct as ProductReq,
     IReceipt,
     ProductCatalogNumber, ProductInStore,
@@ -122,7 +122,7 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
-    addItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsAdditionResponse {
+    addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsAdditionResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
 
         if (!operationValid.data.result) {
@@ -134,7 +134,7 @@ export class StoreManagement {
         return store.addItems(items);
     }
 
-    removeItems(user: RegisteredUser, storeName: string, itemsReq: ItemReq[]): Res.ItemsRemovalResponse {
+    removeItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsRemovalResponse {
         const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
         if (!operationValid.data.result) {
             return {data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error};
@@ -503,10 +503,10 @@ export class StoreManagement {
                 return {data: {result: true, products: []}};
         }
 
-        const productsFound: ProductInStore[] = [];
+        let productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
-            if (!filters.storeRating || filters.storeRating === store.rating)
-                productsFound.concat(store.search(filters, query));
+            if (typeof filters.storeRating === "undefined" || filters.storeRating === store.rating)
+                productsFound = productsFound.concat(store.search(filters, query));
         }
         return {data: {result: true, products: productsFound}};
     }
@@ -520,7 +520,7 @@ export class StoreManagement {
         return products;
     }
 
-    private getItemsFromRequest(itemsReq: ItemReq[]): Item[] {
+    private getItemsFromRequest(itemsReq: IItem[]): Item[] {
         const items: Item[] = [];
         for (const itemReq of itemsReq) {
             const item: Item = new Item(itemReq.id, itemReq.catalogNumber);

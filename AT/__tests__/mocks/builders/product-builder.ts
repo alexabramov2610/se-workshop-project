@@ -1,4 +1,5 @@
-import { Product, CATEGORY } from "../../..";
+import { Product } from "../../..";
+import {ProductCategory} from "../../../../backend/domain/dist/src/api-ext/CommonInterface";
 
 export class ProductBuilder {
   private _p: Product;
@@ -7,7 +8,7 @@ export class ProductBuilder {
     this._p = {
       catalogNumber: 123,
       name: "default-product-name",
-      category: CATEGORY.CLOTHING,
+      category: ProductCategory.CLOTHING,
       price: 666,
     };
   }
@@ -22,7 +23,7 @@ export class ProductBuilder {
     return this;
   }
 
-  withCategory(cat: CATEGORY): ProductBuilder {
+  withCategory(cat: ProductCategory): ProductBuilder {
     this._p.category = cat;
     return this;
   }

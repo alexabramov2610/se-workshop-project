@@ -6,8 +6,6 @@ import {
   Store,
   User,
   Credentials,
-  RATE,
-  SearchData,
   CreditCard,
   Discount,
   PERMISSION,
@@ -98,13 +96,13 @@ const Proxy: Bridge = {
       : DummyValues.PurchaseHistoryResponse;
   },
 
-  search(searchData: SearchData): Response {
+  search(searchData: Req.SearchRequest): Response {
     return real.search ? real.search(searchData) : DummyValues.SearchResponse;
   },
 
-  rate(toRate: Store | Product, rate: RATE): Response {
-    return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
-  },
+  // rate(toRate: Store | Product, rate: RATE): Response {
+  //   return real.rate ? real.rate(toRate, rate) : DummyValues.SearchResponse;
+  // },
 
   addToCart(store: Store, product: Product, quantity: number) {
     return real.addToCart
