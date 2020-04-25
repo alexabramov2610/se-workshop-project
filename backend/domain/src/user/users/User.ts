@@ -1,4 +1,4 @@
-import {Product, BagItem} from "../../api-ext/CommonInterface";
+import {IProduct, BagItem} from "../../api-ext/CommonInterface";
 import {BoolResponse} from "../../api-ext/Response";
 import {errorMsg} from "../../api-int/Error";
 import {RemoveFromCartRequest} from "../../api-ext/Request";
@@ -16,7 +16,7 @@ export abstract class User {
     }
 
 
-    removeProductFromCart(storeName: string, product: Product, amount: number): void {
+    removeProductFromCart(storeName: string, product: IProduct, amount: number): void {
         const storeCart: BagItem[] = this.cart.get(storeName);
         const oldBagItem: BagItem = storeCart.find((b) => b.product.catalogNumber === product.catalogNumber);
         const newBagItem = {product: oldBagItem.product, amount: oldBagItem.amount - amount}
@@ -30,7 +30,7 @@ export abstract class User {
     }
 
 
-    saveProductToCart(storeName: string, product: Product, amount: number): void {
+    saveProductToCart(storeName: string, product: IProduct, amount: number): void {
         logger.debug(`saving ${amount} of product ${product.name} to cart`)
         const storeBag: BagItem[] = this.cart.get(storeName);
         if (!storeBag) {

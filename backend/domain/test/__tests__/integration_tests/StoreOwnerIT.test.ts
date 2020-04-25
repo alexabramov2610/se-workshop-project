@@ -4,9 +4,9 @@ import {StoreOwner} from "../../../src/user/users/StoreOwner";
 import * as Res from "../../../src/api-ext/Response";
 import * as Req from "../../../src/api-ext/Request";
 import {
-    Item as ItemReq,
+    IItem as ItemReq,
     ManagementPermission,
-    Product as ProductReq,
+    IProduct as ProductReq,
     ProductCategory,
     ProductWithQuantity
 } from "../../../src/api-ext/external_api";

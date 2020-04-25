@@ -1,7 +1,7 @@
 import {
-    Item,
+    IItem,
     ProductCatalogNumber,
-    Product,
+    IProduct,
     ProductWithQuantity,
     SearchQuery,
     SearchFilters
@@ -27,11 +27,11 @@ interface InitReq extends Request {
 }
 
 interface ItemsAdditionRequest extends Request {
-    body: { storeName: string, items: Item[] }
+    body: { storeName: string, items: IItem[] }
 }
 
 interface ItemsRemovalRequest extends Request {
-    body: { storeName: string, items: Item[] }
+    body: { storeName: string, items: IItem[] }
 }
 
 interface RemoveProductsWithQuantity extends Request {
@@ -39,7 +39,7 @@ interface RemoveProductsWithQuantity extends Request {
 }
 
 interface AddProductsRequest extends Request {
-    body: { storeName: string, products: Product[] }
+    body: { storeName: string, products: IProduct[] }
 }
 
 interface ProductRemovalRequest extends Request {

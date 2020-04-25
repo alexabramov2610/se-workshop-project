@@ -2,7 +2,7 @@ import {UserRole} from "../api-int/Enums";
 import {
     LoginRequest,
     LogoutRequest,
-    Product,
+    IProduct,
     RegisterRequest,
     BagItem,
     Cart,
@@ -160,11 +160,11 @@ export class UserManager {
         return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
-    saveProductToCart(user: User, storeName: string, product: Product, amount: number): void {
+    saveProductToCart(user: User, storeName: string, product: IProduct, amount: number): void {
         user.saveProductToCart(storeName, product, amount);
     }
 
-    removeProductFromCart(user: User, storeName: string, product: Product, amountToRemove: number): BoolResponse {
+    removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): BoolResponse {
         const storeBag: BagItem[] = user.cart.get(storeName);
         if (!storeBag) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}
