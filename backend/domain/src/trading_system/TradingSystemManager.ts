@@ -37,15 +37,16 @@ export class TradingSystemManager {
         return newID;
     }
 
-    OpenTradeSystem(req: Req.Request): Res.BoolResponse {
+    openTradeSystem(req: Req.Request): Res.BoolResponse {
         logger.info(`opening trading system...`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        if (!user || !this._userManager.isAdmin(user)) return {data: {result: false}};
+        if (!user || !this._userManager.isAdmin(user))
+            return {data: {result: false}};
         this.state = TradingSystemState.OPEN;
         return {data: {result: true}};
     }
 
-    GetTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
+    getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
         logger.info(`retrieving trading system state...`);
         return {data: {state: this.state}};
     }
@@ -66,7 +67,7 @@ export class TradingSystemManager {
 
     login(req: Req.LoginRequest): Res.BoolResponse {
         logger.info(`logging in user: ${req.body.username} `);
-        const res = this._userManager.login(req);
+        const res: Res.BoolResponse = this._userManager.login(req);
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
         }
@@ -76,7 +77,7 @@ export class TradingSystemManager {
     logout(req: Req.LogoutRequest): Res.BoolResponse {
         logger.info(`logging out user... `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        const res = this._userManager.logout(req);
+        const res: Res.BoolResponse = this._userManager.logout(req);
         if (res.data.result) {
             this._userManager.addGuestToken(req.token);
             if (user)
@@ -156,18 +157,22 @@ export class TradingSystemManager {
     assignStoreOwner(req: Req.AssignStoreOwnerRequest): Res.BoolResponse {
         logger.info(`requested to assign user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoAssigns) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        if (!usernameWhoAssigns)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
-        if (!usernameToAssign) return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        if (!usernameToAssign)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
     }
 
     assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
         logger.info(`requested to assign user: ${req.body.usernameToAssign} as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoAssigns) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        if (!usernameWhoAssigns)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
-        if (!usernameToAssign) return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        if (!usernameToAssign)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
     }
 
@@ -175,9 +180,11 @@ export class TradingSystemManager {
         logger.info(`user: ${JSON.stringify(req.token)} requested to remove user:
                 ${JSON.stringify(req.body.usernameToRemove)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoRemoves) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        if (!usernameWhoRemoves)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
-        if (!usernameToRemove) return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        if (!usernameToRemove)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
     }
 
@@ -214,7 +221,8 @@ export class TradingSystemManager {
     createStore(req: Req.OpenStoreRequest): Res.BoolResponse {
         logger.info(`open store request: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, user);
         return res;
     }
@@ -243,7 +251,8 @@ export class TradingSystemManager {
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
         logger.info(`trying to retrieve store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (!user)
+            return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
         return res;
     }
@@ -259,9 +268,8 @@ export class TradingSystemManager {
     saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
         logger.info(`request to saving product: ${req.body.catalogNumber} to cart`)
         const amount: number = req.body.amount;
-        if (amount <= 0) {
+        if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
-        }
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -383,7 +391,8 @@ export class TradingSystemManager {
     viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
         logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        if (!user)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
     }

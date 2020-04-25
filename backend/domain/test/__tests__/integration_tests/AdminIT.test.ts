@@ -45,12 +45,12 @@ describe("Admin Integration Tests", () => {
         if (connectDeliveryRes.error) return connectDeliveryRes;
         const connectPaymentRes: Res.BoolResponse = tradingSystemManager.connectPaymentSys(connectExtReq);
         if (connectPaymentRes.error) return connectPaymentRes;
-        tradingSystemManager.OpenTradeSystem({body: {}, token: req.token})
+        tradingSystemManager.openTradeSystem({body: {}, token: req.token})
         const logout: Res.BoolResponse = tradingSystemManager.logout({body: {}, token: req.token});
         if (!logout.data.result) return logout;
         expect(logout.data.result).toBeTruthy()
         const isOpenReq: Req.Request = {body: {}, token: req.token};
-        const isOpen = tradingSystemManager.GetTradeSystemState(isOpenReq);
+        const isOpen = tradingSystemManager.getTradeSystemState(isOpenReq);
         expect(isOpen.data.state).toEqual(TradingSystemState.OPEN)
 
 });

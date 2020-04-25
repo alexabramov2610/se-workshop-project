@@ -2,6 +2,7 @@ import * as Res from "../../../../src/api-ext/Response";
 import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {Item, Product, Store} from "../../../../src/trading_system/internal_api";
 import {
+    IProduct as ProductReq,
     ProductCatalogNumber,
     ProductInStore,
     ProductWithQuantity,
@@ -331,9 +332,13 @@ describe("Store Management Unit Tests", () => {
             removeProducts.push(prodToRemove);
         }
 
-        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, false);
+        const numOfItemsToRemove: number = removeProducts.reduce((acc, curr) => curr.quantity + acc, 0);
+        const removeProdRes: Res.ProductRemovalResponse = store.removeProductsWithQuantity(removeProducts, true);
+
         expect(removeProdRes.data.result).toBeTruthy();
         expect(removeProdRes.data.productsNotRemoved.length).toBe(0);
+        expect(removeProdRes.data.itemsRemoved).toBeDefined();
+        expect(removeProdRes.data.itemsRemoved).toHaveLength(numOfItemsToRemove);
 
         let numOfItemsOfProduct = numberOfItems - 1;
         const productsInStore: Map<Product, Item[]> = store.products;
@@ -519,7 +524,7 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-    test("productInStock success test", () => {
+    test("productInStock success", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
         const items: Item[] = generateValidItems(10, 0, 1, 0);
@@ -529,7 +534,34 @@ describe("Store Management Unit Tests", () => {
         store.addItems(items);
         const resAfter = store.isProductAmountInStock(1, 3);
         expect(resAfter).toBeTruthy();
+    });
+
+
+    test("getProductQuantity success", () => {
+        const products: Product[] = generateValidProducts(5);
+        store.addNewProducts(products);
+        const items: Item[] = generateValidItems(10, 0, 1, 0);
+        let res = store.getProductQuantity(1);
+        expect(res).toBe(0);
+        store.addItems(items);
+        res = store.getProductQuantity(1);
+        expect(res).toBe(10);
+    });
+
+
+    test("getItemsFromStock success", () => {
+        const products: Product[] = generateValidProducts(5);
+        store.addNewProducts(products);
+        const items: Item[] = generateValidItems(10, 0, 1, 0);
+        let product: ProductReq = { catalogNumber:1, category: ProductCategory.ELECTRONICS, name: "name", price: 5 }
+        let res : Item[] = store.getItemsFromStock(product, 3);
+        expect(res).toHaveLength(0);
+        store.addItems(items);
+        res = store.getItemsFromStock(product, 3);
+        expect(res).toHaveLength(3);
     })
+
+
 
     test("search - price range", () => {
         let products: Product[] = [];
