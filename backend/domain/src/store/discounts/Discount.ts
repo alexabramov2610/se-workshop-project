@@ -1,3 +1,5 @@
+import {ProductCatalogNumber} from "../../api-ext/CommonInterface";
+
 export abstract class Discount {
     protected _startDate: Date;
     private _percentage: number;

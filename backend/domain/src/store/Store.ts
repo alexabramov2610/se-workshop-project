@@ -5,6 +5,7 @@ import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
+    IPayment,
     IProduct as ProductReq,
     ProductCatalogNumber,
     ProductCategory,
@@ -459,8 +460,8 @@ export class Store {
     }
 
 
-    addReceipt(purchases: Purchase[]) {
-        this._receipts.push(new Receipt(purchases))
+    addReceipt(purchases: Purchase[], payment:IPayment) {
+        this._receipts.push(new Receipt(purchases,payment))
     }
 
 

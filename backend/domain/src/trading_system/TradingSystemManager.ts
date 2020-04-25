@@ -344,7 +344,7 @@ export class TradingSystemManager {
         return {data: {result: true}}
     }
 
-    pay(req: Req.PayRequest): Res.BoolResponse {
+    pay(req: Req.PayRequest): Res.PaymentResponse {
         logger.info(`request to pay via external system`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
@@ -352,11 +352,11 @@ export class TradingSystemManager {
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
-        return {data: {result: true}}
+        return {data: {result: true , payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number}}}
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
-    purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
+    purchase(req: Req.UpdateStockRequest): Res.PurchaseResponse {
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -364,13 +364,13 @@ export class TradingSystemManager {
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let purchases: Purchase[] = []
         for (const [storeName, bagItems] of cart.entries()) {
-            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest"))
+            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest",req.body.payment))
         }
-        const receipt: Receipt = new Receipt(purchases);
+        const receipt: Receipt = new Receipt(purchases, req.body.payment);
         if (rUser) {
             rUser.addReceipt(receipt)
         }
-        return {data: {result: true, receipt: {purchases, date: new Date()}}}
+        return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
 

@@ -4,7 +4,7 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters
+    SearchFilters, IPayment
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 import {CreditCard} from "../api-ext/CommonInterface"
@@ -154,6 +154,12 @@ interface PurchaseRequest extends Request {
     }
 }
 
+interface UpdateStockRequest extends Request {
+    body: {
+        payment: IPayment
+    }
+}
+
 interface PayRequest extends Request {
     body: {
         payment: {
@@ -175,6 +181,7 @@ interface VerifyStoreName extends Request{
 }
 
 export {
+    UpdateStockRequest,
     VerifyCredentialsReq,
     VerifyStoreName,
     CalcFinalPriceReq,

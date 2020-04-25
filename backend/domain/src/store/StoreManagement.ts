@@ -5,7 +5,7 @@ import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
     BagItem,
-    IItem,
+    IItem, IPayment,
     IProduct as ProductReq,
     IReceipt,
     ProductCatalogNumber, ProductInStore,
@@ -547,7 +547,7 @@ export class StoreManagement {
 
     }
 
-    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string): Purchase[] {
+    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment:IPayment): Purchase[] {
         const store: Store = this.findStoreByName(storeName);
         const purchases: Purchase[] = [];
 
@@ -558,7 +558,7 @@ export class StoreManagement {
                 purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice})
             }
         }
-        store.addReceipt(purchases)
+        store.addReceipt(purchases,payment)
         return purchases
     }
 

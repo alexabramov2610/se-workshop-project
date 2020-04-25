@@ -1,12 +1,14 @@
-import {Purchase} from "../../api-ext/CommonInterface";
+import {IPayment, Purchase} from "../../api-ext/CommonInterface";
 
 export class Receipt {
 
     private _purchases: Purchase[];
     private readonly _date: Date;
+    private _payment: IPayment
 
-    constructor(purchases: Purchase[]) {
+    constructor(purchases: Purchase[], payment: IPayment) {
         this._purchases = purchases
+        this._payment = payment;
         this._date = new Date();
     }
 

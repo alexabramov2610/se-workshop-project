@@ -6,7 +6,7 @@ import {
     BagItem,
     StoreInfo,
     IReceipt,
-    ProductInStore, Cart
+    ProductInStore, Cart, IPayment
 } from "./CommonInterface";
 import {ManagementPermission, ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
@@ -36,6 +36,10 @@ interface ProductRemovalResponse extends Response {
 
 interface BoolResponse extends Response {
     data: { result: boolean }
+}
+
+interface PaymentResponse extends BoolResponse {
+    data: { result: boolean, payment?: IPayment }
 }
 
 interface CartFinalPriceRes extends BoolResponse {
@@ -77,10 +81,12 @@ interface SearchResponse extends Response {
 interface PurchaseResponse extends BoolResponse {
     data: { result: boolean, receipt?: IReceipt }
 }
+
 interface ViewManagerPermissionResponse extends BoolResponse {
     data: {result: boolean,  permissions?: ManagementPermission[]}
 }
 export {
+    PaymentResponse,
     CartFinalPriceRes,
     ViewManagerPermissionResponse,
     PurchaseResponse,

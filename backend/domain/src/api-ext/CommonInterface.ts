@@ -40,14 +40,21 @@ export interface BagItem {
 
 export interface CreditCard {
     holderName: string,
-    number: number,
-    expMonth: number,
-    expYear: number,
-    ccv: number,
+    number: string,
+    expMonth: string,
+    expYear: string,
+    ccv: string,
 }
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number
+}
+
+// duration - in days
+export interface IDiscount {
+    startDate: Date,
+    percentage: number,
+    duration: number
 }
 
 export interface PriceRange {
@@ -69,9 +76,16 @@ export interface SearchQuery {
 }
 
 export interface IReceipt {
-  date: Date;
-  purchases: Purchase[];
+    date: Date,
+    purchases: Purchase[],
+    payment?: IPayment
 }
+
+export interface IPayment {
+    lastCC4: string,
+    totalCharged: number,
+}
+
 
 export interface StoreInfo {
     storeName: string,

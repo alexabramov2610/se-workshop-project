@@ -1224,7 +1224,7 @@ describe("Store Management Unit Tests", () => {
                     userName: user.name,
                     item,
                     price: 30
-                }])] : []
+                }],{lastCC4: "5555",totalCharged:30})] : []
             }
         };
         mocked(UserManager).mockImplementation((): any => {
@@ -1432,9 +1432,9 @@ describe("Store Management Unit Tests", () => {
     }
 
     test("purchase success", () => {
-        const req: Req.PurchaseRequest = {
-            body: { payment:{ cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel"}},
-            token: mockToken
+
+        const req :Req.UpdateStockRequest = {
+            body:{payment:{totalCharged: 30, lastCC4:"5555"}},token:mockToken
         }
         const mockRes:Res.PurchaseResponse = preparePurchaseMock(true);
         tradingSystemManager = new TradingSystemManager();
@@ -1528,7 +1528,7 @@ describe("Store Management Unit Tests", () => {
                     userName: user.name,
                     item,
                     price: 30
-                }])] : []
+                }],{lastCC4: "5555",totalCharged:30})] : []
             }
         };
         const viewUsersContactUsMessagesResponse: Res.ViewUsersContactUsMessagesResponse = {

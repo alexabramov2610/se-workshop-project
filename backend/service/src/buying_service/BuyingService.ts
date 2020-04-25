@@ -17,10 +17,12 @@ export const purchase = (
     const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
     if (!calcRes)
         return calcRes
-    const isPaid: Res.BoolResponse = ts.pay({
+    const isPaid: Res.PaymentResponse = ts.pay({
         body: {price: calcRes.data.price, payment: req.body.payment},
         token: req.token,
     });
     if (!isPaid.data.result) return isPaid;
-    return ts.purchase(req);
+    const updateStockRequest : Req.UpdateStockRequest = {token:req.token,body:{payment: isPaid.data.payment}}
+    const purchaseRes: Res.PurchaseResponse = ts.purchase(updateStockRequest)
+    return purchaseRes;
 };

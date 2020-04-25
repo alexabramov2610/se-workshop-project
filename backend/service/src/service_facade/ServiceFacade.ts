@@ -133,6 +133,7 @@ export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAddition
 export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
     return runIfOpen(req, StoreService.removeProducts);
 }
+
 /*
 UC-4.3
  */

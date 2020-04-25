@@ -5,6 +5,7 @@ import utils from "./utils"
 import {Product} from "../../../src/trading_system/data/Product";
 import {ProductCategory} from "../../../src/api-ext/Enums";
 import {Cart, IReceipt} from "../../../src/api-ext/CommonInterface";
+import {UpdateStockRequest} from "../../../src/api-ext/Request";
 
 
 describe("Guest Integration Tests", () => {
@@ -131,7 +132,7 @@ describe("Guest Integration Tests", () => {
         const req: Req.PayRequest = {
             body: {
                 payment: {
-                    cardDetails: {holderName: "tal", number: 152, expYear: 2021, expMonth: 5, ccv: 40},
+                    cardDetails: {holderName: "tal", number: "152", expYear: "2021", expMonth: "5", ccv: "40"},
                     address: "batyam",
                     city: "batya",
                     country: "israel"
@@ -153,19 +154,22 @@ describe("Guest Integration Tests", () => {
         }
         tradingSystemManager.saveProductToCart(saveReq)
         let saveRes: Res.BoolResponse;
+        /*
         const purchaseReq: Req.PurchaseRequest = {
             body: {
                 payment: {
                     cardDetails: {
                         holderName: "tal",
-                        number: 152,
-                        expYear: 2021,
-                        expMonth: 5,
-                        ccv: 40
+                        number: "152",
+                        expYear: "2021",
+                        expMonth: "5",
+                        ccv: "40"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: userToken
         }
+        */
+        const purchaseReq: UpdateStockRequest = {body:{payment:{totalCharged: 30, lastCC4:"5555"}},token: userToken}
         tradingSystemManager.calculateFinalPrices({token: userToken, body: {}})
         const purchaseRes: Res.PurchaseResponse = tradingSystemManager.purchase(purchaseReq)
         const expectedReciept: IReceipt = {
@@ -175,7 +179,7 @@ describe("Guest Integration Tests", () => {
                 storeName,
                 price: 20,
                 item: {catalogNumber: products[0].catalogNumber, id: 2}
-            }]
+            }],payment:{totalCharged: 30, lastCC4:"5555"}
         }
         expect(purchaseRes.data.result).toBeTruthy()
 
