@@ -1,11 +1,6 @@
-import {Response, Cart, Product, PERMISSION} from "../../src/test_env/types";
-import {
-    BagItem,
-    IItem,
-    ProductCatalogNumber,
-    ProductCategory, ProductInStore
-} from "../../../backend/domain/src/api-ext/CommonInterface";
-import {Res, Req} from "service_layer/dist/src/service_facade/ServiceFacade";
+import {Response, Product, PERMISSION} from "../../src/test_env/types";
+import {ProductCatalogNumber, ProductCategory, ProductInStore} from "../../../backend/domain/src/api-ext/CommonInterface";
+import {Res} from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface IResponse extends Response {
     data: any;

@@ -104,21 +104,3 @@ describe("Guest watch cart, UC: 2.7", () => {
     });
 });
 
-
-
-// data: {
-//     result: true,
-//         cart: {
-//         products: [
-//             {
-//                 storeName: "store-name",
-//                 bagItems: [{
-//                     product: {name: "product", catalogNumber: 123, price: 20, category: ProductCategory.CLOTHING},
-//                     amount: 2,
-//                     finalPrice: 25
-//                 }]
-//             }
-//         ]
-//     }
-// }
-
