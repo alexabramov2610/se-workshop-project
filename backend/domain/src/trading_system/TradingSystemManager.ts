@@ -324,7 +324,7 @@ export class TradingSystemManager {
             finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
             cart.set(storeName, bagItemsWithPrices)
         }
-        return {data: {result: true , price: finalPrice}}
+        return {data: {result: true, price: finalPrice}}
     }
 
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
@@ -352,7 +352,12 @@ export class TradingSystemManager {
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
-        return {data: {result: true , payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number}}}
+        return {
+            data: {
+                result: true,
+                payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number}
+            }
+        }
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
@@ -364,7 +369,7 @@ export class TradingSystemManager {
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let purchases: Purchase[] = []
         for (const [storeName, bagItems] of cart.entries()) {
-            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest",req.body.payment))
+            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment))
         }
         const receipt: Receipt = new Receipt(purchases, req.body.payment);
         if (rUser) {
@@ -425,12 +430,12 @@ export class TradingSystemManager {
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
-    addProductDiscount(req:Req.AddDiscountRequest) : Res.BoolResponse{
+    addProductDiscount(req: Req.AddDiscountRequest): Res.BoolResponse {
 
-        return {data: {result:true}}
+        return {data: {result: true}}
     }
 
-    removeProductDiscount(req:Req.RemoveDiscountRequest) : Res.BoolResponse{
-        return {data: {result:true}}
+    removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
+        return {data: {result: true}}
     }
 }

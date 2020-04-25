@@ -89,6 +89,7 @@ interface ViewManagerPermissionResponse extends BoolResponse {
     data: {result: boolean,  permissions?: ManagementPermission[]}
 }
 export {
+    AddDiscountResponse,
     PaymentResponse,
     CartFinalPriceRes,
     ViewManagerPermissionResponse,
