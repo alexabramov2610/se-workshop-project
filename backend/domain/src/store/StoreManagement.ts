@@ -559,6 +559,7 @@ export class StoreManagement {
                 purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice})
             }
         }
+
         store.addReceipt(purchases, payment)
         return purchases
     }

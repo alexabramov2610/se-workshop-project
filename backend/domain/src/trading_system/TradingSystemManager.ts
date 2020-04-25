@@ -352,7 +352,7 @@ export class TradingSystemManager {
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
-        return {data: {result: true , payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number}}}
+        return {data: {result: true , payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number.slice(req.body.payment.cardDetails.number.length-4,req.body.payment.cardDetails.number.length)}}}
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
