@@ -453,8 +453,10 @@ export class StoreManagement {
             data: {result: false, receipts: []},
             error: {message: errorMsg.E_PERMISSION}
         }
-        const ireceipts: IReceipt[] = store.getPurchasesHistory().map(r => {return {purchases: r.purchases, date: r.date}})
-        return {data: {result: true, receipts:ireceipts}}
+        const ireceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
+            return {purchases: r.purchases, date: r.date}
+        })
+        return {data: {result: true, receipts: ireceipts}}
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
@@ -477,7 +479,7 @@ export class StoreManagement {
                 }
             }
         } else {
-            return {data: {result: false} , error:{message: errorMsg.E_PROD_DOES_NOT_EXIST}}
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}}
         }
     }
 
@@ -552,8 +554,8 @@ export class StoreManagement {
         for (const bagItem of bagItems) {
             const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
             for (const item of items) {
-                const outputItem: IItem = {catalogNumber:item.catalogNumber, id:item.id}
-                purchases.push({storeName, userName,item: outputItem, price: bagItem.finalPrice})
+                const outputItem: IItem = {catalogNumber: item.catalogNumber, id: item.id}
+                purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice})
             }
         }
         store.addReceipt(purchases)
@@ -569,5 +571,19 @@ export class StoreManagement {
                 finalPrice: store.getProductFinalPrice(bagItem.product)
             }
         })
+    }
+
+    viewManagerPermissions(owner: RegisteredUser, manager: RegisteredUser, req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+        const store: Store = this.findStoreByName(req.body.storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const storeOwner:StoreOwner = store.getStoreOwner(owner.name)
+        if(!storeOwner && manager.name !== owner.name)
+            return  {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
+        const managerToView: StoreManager = store.getStoreManager(manager.name);
+        if (!managerToView)
+            return {data: {result: false}, error: {message: errorMsg.E_MANGER_NOT_EXISTS}};
+        const permissions = managerToView.getPermissions();
+        return {data: {result: true, permissions}}
     }
 }

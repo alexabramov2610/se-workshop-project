@@ -1139,7 +1139,7 @@ describe("Store Management Unit Tests", () => {
 
     test("purchase success", () => {
         const req: Req.PurchaseRequest = {
-            body: { payment:{ cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 }},
+            body: { payment:{ cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel"}},
             token: mockToken
         }
         const mockRes:Res.PurchaseResponse = preparePurchaseMock(true);

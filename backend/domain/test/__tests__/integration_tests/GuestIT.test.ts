@@ -130,10 +130,12 @@ describe("Guest Integration Tests", () => {
     test("pay test", () => {
         const req: Req.PayRequest = {
             body: {
-                cardDetails: {holderName: "tal", number: 152, expYear: 2021, expMonth: 5, ccv: 40},
-                address: "batyam",
-                city: "batya",
-                country: "israel",
+                payment: {
+                    cardDetails: {holderName: "tal", number: 152, expYear: 2021, expMonth: 5, ccv: 40},
+                    address: "batyam",
+                    city: "batya",
+                    country: "israel"
+                },
                 price: 30
             },
             token
@@ -160,7 +162,7 @@ describe("Guest Integration Tests", () => {
                         expYear: 2021,
                         expMonth: 5,
                         ccv: 40
-                    }, address: "batyam", city: "batya", country: "israel", price: 30
+                    }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: userToken
         }

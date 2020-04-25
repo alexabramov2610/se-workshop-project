@@ -86,6 +86,9 @@ interface ViewShopPurchasesHistoryRequest extends Request {
 interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
 }
+interface ViewManagerPermissionRequest extends Request {
+    body: { managerToView: string, storeName: string}
+}
 
 interface ViewBuyerPurchasesHistoryRequest extends Request {
     body: {}
@@ -147,17 +150,18 @@ interface PurchaseRequest extends Request {
             address: string,
             city: string,
             country: string,
-            price: number
         }
     }
 }
 
 interface PayRequest extends Request {
     body: {
-        cardDetails: CreditCard,
-        address: string,
-        city: string,
-        country: string,
+        payment: {
+            cardDetails: CreditCard,
+            address: string,
+            city: string,
+            country: string,
+        }
         price: number
     }
 }
@@ -203,5 +207,6 @@ export {
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
     InitReq,
-    ViewCartReq
+    ViewCartReq,
+    ViewManagerPermissionRequest
 };
