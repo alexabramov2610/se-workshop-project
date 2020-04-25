@@ -11,7 +11,10 @@ import {
     BagItem,
     IProduct as ProductReq,
     ProductCatalogNumber,
-    ProductCategory, Purchase
+    ProductCategory,
+    Purchase,
+    Rating,
+    TradingSystemState
 } from "../../../../src/api-ext/external_api";
 import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
 import {User} from "../../../../src/user/users/User";
@@ -50,22 +53,175 @@ describe("Store Management Unit Tests", () => {
         expect(token.length > 10).toBe(true);
     });
 
-    test("startNewSession success - token taken", () => {
-        tradingSystemManager = new TradingSystemManager();
-        mocked(UserManager).mockImplementationOnce((): any => {
+
+    function prepareOpenTradeSystemMock(isLoggedIn: boolean, isAdmin: boolean) {
+        mocked(UserManager).mockImplementation((): any => {
             return {
-                getUserByToken: () => user
+                getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
+                isAdmin: () => isAdmin
             }
         });
+    }
 
-        const token: string = tradingSystemManager.startNewSession();
-        expect(token).toBeDefined();
-        expect(token.length > 10).toBe(true);
+    test("OpenTradeSystem - Success", () => {
+        const isLoggedIn: boolean = true;
+        const isAdmin: boolean = true;
+        prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.Request = {  body: {}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
+
+        expect(res.data.result).toBe(true);
+        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.OPEN);
+    });
+
+    test("OpenTradeSystem - Fail, no session", () => {
+        const isLoggedIn: boolean = false;
+        const isAdmin: boolean = true;
+        prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.Request = {  body: {}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
+
+        expect(res.data.result).toBe(false);
+        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.CLOSED);
+    });
+
+    test("OpenTradeSystem - Fail, not admin", () => {
+        const isLoggedIn: boolean = true;
+        const isAdmin: boolean = false;
+        prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.Request = {  body: {}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
+
+        expect(res.data.result).toBe(false);
+        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.CLOSED);
+    });
+
+
+    function prepareRegisterMock(isLoggedIn: boolean, isHasSession: boolean) {
+        const mockRes: Res.BoolResponse = { data : {result: !isLoggedIn && isHasSession}};
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getUserByToken: () => isHasSession ? user : undefined,
+                getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
+                register: () => mockRes
+            }
+        });
+    }
+
+    test("register - Success", () => {
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        const isLoggedIn: boolean = false;
+        const isHasSession: boolean = true;
+        prepareRegisterMock(isLoggedIn, isHasSession);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.register(req);
+
+        expect(res.data.result).toBe(true);
+    });
+
+    test("register - failure - logged in", () => {
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        const isLoggedIn: boolean = true;
+        const isHasSession: boolean = true;
+        prepareRegisterMock(isLoggedIn, isHasSession);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.register(req);
+
+        expect(res.data.result).toBe(false);
+    });
+
+    test("register - failure - no session", () => {
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        const isLoggedIn: boolean = false;
+        const isHasSession: boolean = false;
+        prepareRegisterMock(isLoggedIn, isHasSession);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.register(req);
+
+        expect(res.data.result).toBe(false);
+    });
+
+
+    function prepareLoginMock(isSuccess: boolean) {
+        const mockRes: Res.BoolResponse = { data : {result: isSuccess } };
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                login: () => mockRes,
+                removeGuest: () => true
+            }
+        });
+    }
+
+    test("login - success", () => {
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        const isSuccess: boolean = true;
+        prepareLoginMock(isSuccess);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.LoginRequest = {  body: { username: user.name, password: user.password}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.login(req);
+        expect(res.data.result).toBe(isSuccess);
+    });
+
+    test("login - failure", () => {
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        const isSuccess: boolean = false;
+        prepareLoginMock(isSuccess);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.LoginRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.login(req);
+        expect(res.data.result).toBe(isSuccess);
+    });
+
+
+    function prepareLogoutMock(isSuccess: boolean) {
+        const mockRes: Res.BoolResponse = { data : { result: isSuccess } };
+        const user: RegisteredUser = new RegisteredUser("name", "pw");
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getLoggedInUserByToken: () => isSuccess ? user : undefined,
+                logout: () => mockRes,
+                addGuestToken: () => true
+            }
+        });
+    }
+
+    test("logout - success", () => {
+        const isSuccess: boolean = true;
+        prepareLogoutMock(isSuccess);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.LogoutRequest = {  body: {}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.logout(req);
+        expect(res.data.result).toBe(isSuccess);
+    });
+
+    test("logout - failure", () => {
+        const isSuccess: boolean = false;
+        prepareLogoutMock(isSuccess);
+
+        tradingSystemManager = new TradingSystemManager();
+        const req: Req.LogoutRequest = {  body: {}, token: mockToken };
+        const res: Res.BoolResponse = tradingSystemManager.logout(req);
+        expect(res.data.result).toBe(isSuccess);
     });
 
 
     function prepareAddItemMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -108,7 +264,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRemoveItemsMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -153,7 +309,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRemoveProductsWithQuantityMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -217,7 +373,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareAddNewProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -292,7 +448,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRemoveProductsMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -355,7 +511,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareAssignStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, isSuccess);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -416,9 +572,35 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
+    test("assignStoreOwner failure - not valid user", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareAssignStoreOwnerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (const prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToAssign: 'user'}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.assignStoreOwner(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
+
 
     function prepareAssignStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, isSuccess);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -479,9 +661,35 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
+    test("assignStoreManager failure - not valid user", () => {
+        const numOfItems: number = 5;
+        const products: ProductReq[] = generateProducts(numOfItems);
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = false;
+
+        prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
+        jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
+
+        tradingSystemManager = new TradingSystemManager();
+        const productsReq: ProductCatalogNumber[] = [];
+        for (const prod of products) {
+            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
+            productsReq.push(prodReq);
+        }
+
+        const req: Req.AssignStoreOwnerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToAssign: 'user'}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+        expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
+    });
+
 
     function prepareRemoveStoreOwnerMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, isSuccess);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -525,7 +733,7 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
-    test("removeStoreOwner failure", () => {
+    test("removeStoreOwner failure - not valid user", () => {
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = false;
 
@@ -543,7 +751,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRemoveStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, isSuccess);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -605,7 +813,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareChangeProductPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -650,7 +858,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     function prepareChangeProductNameMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -695,7 +903,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     function prepareAddManagerPermissionsPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -741,7 +949,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRemoveManagerPermissionsPriceMock(isLoggedIn: boolean, isSuccess: boolean) {
-        prepareMocksForInventoryManagement(isLoggedIn);
+        prepareMocksForInventoryManagement(isLoggedIn, true);
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -867,26 +1075,49 @@ describe("Store Management Unit Tests", () => {
     });
 
 
-    test("Create store success", () => {
-        prepareMocksForStoreManagement(true);
+    test("createStore success", () => {
+        prepareMocksForStoreManagement(true, true);
         const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeTruthy();
-
     });
 
-    test("Create store failure", () => {
-        prepareMocksForStoreManagement(false);
+    test("createStore failure", () => {
+        prepareMocksForStoreManagement(false, true);
         const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeFalsy();
     });
 
+    test("createStore failure - invalid user", () => {
+        prepareMocksForStoreManagement(false, false);
+        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
+        expect(res.data.result).toBeFalsy();
+    });
+
+
+    test("viewStoreInfo success", () => {
+        const mockReq: Req.StoreInfoRequest = { body: { storeName: "store-name"}, token: mockToken };
+        const mockRes: Res.StoreInfoResponse = { data: { result: true, info: { productsNames: ["aa"], storeManagersNames: ["aa"],
+                    storeName: "store-name", storeOwnersNames: ["aa"], storeRating: Rating.LOW}}};
+        mocked(StoreManagement).mockImplementation((): any => {
+            return {
+                viewStoreInfo: () => mockRes
+            }
+        });
+
+        tradingSystemManager = new TradingSystemManager();
+        expect(tradingSystemManager.viewStoreInfo(mockReq)).toMatchObject(mockRes);
+
+    });
+
+
     test("viewStorePurchasesHistory success", () => {
-        prepereMocksForLoggedinUser(true);
-        prepareMocksForStoreManagement(true);
+        prepareMocksForStoreManagement(true, true);
         const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewShopPurchasesHistoryResponse = tradingSystemManager.viewStorePurchasesHistory(req);
@@ -895,17 +1126,16 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("viewStorePurchasesHistory failure", () => {
-        prepareMocksForStoreManagement(false);
-        prepereMocksForLoggedinUser(false);
+        prepareMocksForStoreManagement(false, true);
         const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewShopPurchasesHistoryResponse = tradingSystemManager.viewStorePurchasesHistory(req);
         expect(res.data.receipts).toHaveLength(0)
     });
 
+
     test("viewRegisteredUserPurchasesHistory success", () => {
-        prepereMocksForLoggedinUser(true);
-        prepareMocksForStoreManagement(true);
+        prepareMocksForStoreManagement(true, true);
         const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
@@ -914,34 +1144,76 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("viewRegisteredUserPurchasesHistory failure", () => {
-        prepareMocksForStoreManagement(false);
-        prepereMocksForLoggedinUser(false);
+        prepareMocksForStoreManagement(false, true);
         const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
         expect(res.data.receipts).toHaveLength(0)
     });
 
+    test("viewRegisteredUserPurchasesHistory failure - invalid logged in user", () => {
+        prepareMocksForStoreManagement(false, false);
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(0)
+    });
+
+    test("viewRegisteredUserPurchasesHistory failure - invalid user to view", () => {
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getLoggedInUserByToken: () =>  new RegisteredUser("name1", "pw1"),
+                getUserByName: () => undefined,
+            }
+        });
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: { userName: "username-to-watch" }, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(0)
+        expect(res.data.result).toBe(false)
+    });
+
+    test("viewRegisteredUserPurchasesHistory failure - not admin", () => {
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getLoggedInUserByToken: () => new RegisteredUser("name1", "pw1"),
+                getUserByName: () =>  new RegisteredUser("name2", "pw1")
+            }
+        });
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: { userName: "username-to-watch" }, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
+        expect(res.data.receipts).toHaveLength(0)
+        expect(res.data.result).toBe(false)
+    });
+
+
     test("viewUsersContactUsMessages success", () => {
-        prepereMocksForLoggedinUser(true);
-        prepareMocksForStoreManagement(true);
+        prepareMocksForStoreManagement(true, true);
         const req: Req.ViewUsersContactUsMessagesRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewUsersContactUsMessagesResponse = tradingSystemManager.viewUsersContactUsMessages(req);
         expect(res.data.messages).toHaveLength(1);
-
     });
 
     test("viewUsersContactUsMessages failure", () => {
-        prepareMocksForStoreManagement(false);
-        prepereMocksForLoggedinUser(false);
-        const req: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: "mock shop"}, token: "1"};
+        prepareMocksForStoreManagement(false, true);
+        const req: Req.ViewUsersContactUsMessagesRequest = {body: {storeName: "mock shop"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
-        const res: Res.ViewShopPurchasesHistoryResponse = tradingSystemManager.viewStorePurchasesHistory(req);
-        expect(res.data.receipts).toHaveLength(0)
+        const res: Res.ViewUsersContactUsMessagesResponse = tradingSystemManager.viewUsersContactUsMessages(req);
+        expect(res.data.messages).toHaveLength(0);
     });
 
-    function prepereMocksForLoggedinUser(succ: boolean) {
+    test("viewUsersContactUsMessages failure - invalid user", () => {
+        prepareMocksForStoreManagement(true, false);
+        const req: Req.ViewUsersContactUsMessagesRequest = {body: {storeName: "mock shop"}, token: "1"};
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.ViewUsersContactUsMessagesResponse = tradingSystemManager.viewUsersContactUsMessages(req);
+        expect(res.data.messages).toHaveLength(0);
+    });
+
+
+    function prepereMocksForLoggedinUser(succ: boolean, isLoggedIn: boolean) {
         const getUserByToken: RegisteredUser = new RegisteredUser("tal", "tal123");
         const item: Item = new Item(5, 10);
         const viewRUserPurchasesHistoryRes: Res.ViewRUserPurchasesHistoryRes = {
@@ -957,7 +1229,7 @@ describe("Store Management Unit Tests", () => {
         };
         mocked(UserManager).mockImplementation((): any => {
             return {
-                getLoggedInUserByToken: () => getUserByToken,
+                getLoggedInUserByToken: () => isLoggedIn ? getUserByToken : undefined,
                 isLoggedIn: () => succ,
                 addProductToCart: (u: User, product: Product) => {
                     return 5 + 5
@@ -1037,6 +1309,7 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy()
 
     })
+
 
     function prepareMockToVerifyCart(isSuccess: boolean): void {
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
@@ -1195,7 +1468,56 @@ describe("Store Management Unit Tests", () => {
     })
 
 
-    function prepareMocksForStoreManagement(succ: boolean) {
+    function prepareVerifyNewStoreMock(isStoreExists: boolean, isUserValid: boolean) {
+        mocked(StoreManagement).mockImplementation((): any => {
+            return {
+                verifyStoreExists: () =>  isStoreExists ? new Store("new-store-mock") : undefined,
+            }
+        });
+
+        mocked(UserManager).mockImplementation((): any => {
+            return {
+                getUserByToken: () => isUserValid ? new RegisteredUser("username-mock", "username-pw") : undefined
+            }
+        });
+
+    }
+
+    test("verifyNewStore success", () => {
+        const isStoreExists: boolean = false;
+        const isUserValid: boolean = true;
+        prepareVerifyNewStoreMock(isStoreExists, isUserValid);
+        tradingSystemManager = new TradingSystemManager();
+
+        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
+        expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
+    });
+
+    test("verifyNewStore failure - store exists", () => {
+        const isStoreExists: boolean = true;
+        const isUserValid: boolean = true;
+        prepareVerifyNewStoreMock(isStoreExists, isUserValid);
+        tradingSystemManager = new TradingSystemManager();
+
+        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
+        expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
+    });
+
+    test("verifyNewStore failure - invalid user", () => {
+        const isStoreExists: boolean = false;
+        const isUserValid: boolean = false;
+        prepareVerifyNewStoreMock(isStoreExists, isUserValid);
+        tradingSystemManager = new TradingSystemManager();
+
+        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
+        expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
+    });
+
+
+    function prepareMocksForStoreManagement(succ: boolean, isLoggedIn: boolean) {
         const createStoreRes: Res.BoolResponse = {data: {result: succ}};
         const item: Item = new Item(5, 10);
         const viewShopPurchasesHistoryResponse: Res.ViewShopPurchasesHistoryResponse = {
@@ -1215,7 +1537,7 @@ describe("Store Management Unit Tests", () => {
             }
         };
 
-        prepereMocksForLoggedinUser(succ);
+        prepereMocksForLoggedinUser(succ, isLoggedIn);
         mocked(StoreManagement).mockImplementation((): any => {
             return {
                 addStore: () => createStoreRes,
@@ -1225,7 +1547,7 @@ describe("Store Management Unit Tests", () => {
         });
     }
 
-    function prepareMocksForInventoryManagement(isLoggedIn: boolean) {
+    function prepareMocksForInventoryManagement(isLoggedIn: boolean, isGetUserByName) {
         const verifyResMock: Res.BoolResponse = isLoggedIn ? {data: {result: true}} : {
             data: {result: false},
             error: {message: 'mock err'}
@@ -1237,7 +1559,7 @@ describe("Store Management Unit Tests", () => {
                 getUserByToken: () => user,
                 assignStoreManagerBasicPermissions: () => true,
                 getLoggedInUserByToken: () => isLoggedIn ? user : undefined,
-                getUserByName: () => user
+                getUserByName: () => isGetUserByName ? user : undefined
             }
         });
     }
