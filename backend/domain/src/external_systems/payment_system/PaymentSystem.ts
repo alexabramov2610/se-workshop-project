@@ -65,8 +65,8 @@ export class PaymentSystem {
             return this._paymentSys.validateCreditCard();
         } else {
             const today: Date = new Date();
-
-            return creditCard.holderName && creditCard.number && creditCard.ccv && creditCard.expYear > today.getFullYear() && creditCard.expMonth > today.getMonth()+1
+            const expOk: boolean = (creditCard.expYear > today.getFullYear()  || (creditCard.expYear === today.getFullYear() && creditCard.expMonth >= today.getMonth()+1))
+            return creditCard.holderName && creditCard.number && creditCard.ccv && expOk;
         }
     }
 }
