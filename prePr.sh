@@ -29,7 +29,7 @@ rm -r node_modules logs package-lock.json dist coverage
 #####  AT
 echo -e "${RED}cleaning AT folder...${NC}"
 cd $AT
-rm -r node_modules logs package-lock.json coverage
+rm -r node_modules dist logs package-lock.json coverage
 
 
 ##### Pulling from master #####
