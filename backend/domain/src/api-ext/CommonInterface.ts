@@ -55,6 +55,8 @@ export interface IDiscount {
     startDate: Date,
     percentage: number,
     duration: number
+    condition? : string
+    coupon? : string
 }
 
 export interface PriceRange {

@@ -474,7 +474,8 @@ export class StoreManagement {
                         catalogNumber: product.catalogNumber,
                         price: product.price,
                         category: product.category,
-                        quantity
+                        quantity,
+                        finalPrice: store.getProductFinalPrice(req.body.catalogNumber)
                     }
                 }
             }
@@ -547,7 +548,7 @@ export class StoreManagement {
 
     }
 
-    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment:IPayment): Purchase[] {
+    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment: IPayment): Purchase[] {
         const store: Store = this.findStoreByName(storeName);
         const purchases: Purchase[] = [];
 
@@ -558,9 +559,10 @@ export class StoreManagement {
                 purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice})
             }
         }
-        store.addReceipt(purchases,payment)
+        store.addReceipt(purchases, payment)
         return purchases
     }
+
 
     calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
         const store: Store = this.findStoreByName(storeName);
@@ -568,7 +570,7 @@ export class StoreManagement {
             return {
                 product: bagItem.product,
                 amount: bagItem.amount,
-                finalPrice: store.getProductFinalPrice(bagItem.product)
+                finalPrice: store.getProductFinalPrice(bagItem.product.catalogNumber)
             }
         })
     }
@@ -577,9 +579,9 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const storeOwner:StoreOwner = store.getStoreOwner(owner.name)
-        if(!storeOwner && manager.name !== owner.name)
-            return  {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
+        const storeOwner: StoreOwner = store.getStoreOwner(owner.name)
+        if (!storeOwner && manager.name !== owner.name)
+            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
         const managerToView: StoreManager = store.getStoreManager(manager.name);
         if (!managerToView)
             return {data: {result: false}, error: {message: errorMsg.E_MANGER_NOT_EXISTS}};

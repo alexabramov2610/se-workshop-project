@@ -4,7 +4,7 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment
+    SearchFilters, IPayment, IDiscount
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 import {CreditCard} from "../api-ext/CommonInterface"
@@ -98,6 +98,14 @@ interface StoreInfoRequest extends Request {
     body: { storeName: string }
 }
 
+interface AddDiscountRequest extends Request {
+    body: { storeName: string, catalogNumber: number, discount:IDiscount }
+}
+
+interface RemoveDiscountRequest extends Request {
+    body: { storeName: string, catalogNumber: number, discountID: string }
+}
+
 interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
 }
@@ -113,7 +121,6 @@ interface SaveToCartRequest extends Request {
 interface RemoveFromCartRequest extends Request {
     body: { storeName: string, catalogNumber: number, amount: number }
 }
-
 
 interface ChangeProductPriceRequest extends Request {
     body: { storeName: string, catalogNumber: number, newPrice: number }
@@ -181,6 +188,8 @@ interface VerifyStoreName extends Request{
 }
 
 export {
+    RemoveDiscountRequest,
+    AddDiscountRequest,
     UpdateStockRequest,
     VerifyCredentialsReq,
     VerifyStoreName,

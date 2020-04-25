@@ -424,4 +424,13 @@ export class TradingSystemManager {
 
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
+
+    addProductDiscount(req:Req.AddDiscountRequest) : Res.BoolResponse{
+
+        return {data: {result:true}}
+    }
+
+    removeProductDiscount(req:Req.RemoveDiscountRequest) : Res.BoolResponse{
+        return {data: {result:true}}
+    }
 }

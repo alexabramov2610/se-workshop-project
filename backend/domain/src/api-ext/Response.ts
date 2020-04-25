@@ -63,9 +63,12 @@ interface ViewUsersContactUsMessagesResponse extends Response {
 }
 
 interface ProductInfoResponse extends Response {
-    data: { result: boolean, info?: { name: string, catalogNumber: number, price: number, category: ProductCategory, quantity: number } }
+    data: { result: boolean, info?: { name: string, catalogNumber: number, price: number, category: ProductCategory, quantity: number, finalPrice: number } }
 }
 
+interface AddDiscountResponse extends BoolResponse {
+    data: { result: boolean, discountID:  string }
+}
 interface ViewRUserPurchasesHistoryRes extends Response {
     data: { result: boolean, receipts: IReceipt[] }
 }
