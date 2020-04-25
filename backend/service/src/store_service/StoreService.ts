@@ -84,7 +84,6 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
     return ts.viewUsersContactUsMessages(req);
 }
 
-
 export const addProductDiscount = (req: Req.AddDiscountRequest, ts: TS): Res.BoolResponse => {
     return ts.addProductDiscount(req)
 }

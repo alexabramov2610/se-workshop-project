@@ -426,6 +426,7 @@ export class TradingSystemManager {
     }
 
     addProductDiscount(req:Req.AddDiscountRequest) : Res.BoolResponse{
+
         return {data: {result:true}}
     }
 
