@@ -1,4 +1,4 @@
-import {Bridge, Driver, Store, Credentials, Item, CATEGORY, PERMISSION} from "../../";
+import {Bridge, Driver, Store, Credentials, Item, PERMISSION} from "../../";
 
 describe("System Boot - UC 1", () => {
     let _serviceBridge: Bridge;

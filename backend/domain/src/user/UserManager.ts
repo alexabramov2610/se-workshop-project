@@ -56,9 +56,6 @@ export class UserManager {
         if (!user) {
             logger.warn(`failed to login ${userName}, user not found `);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
-        } else if (!this.verifyPassword(userName, password, user.password)) {
-            logger.warn(`failed to login ${userName}, bad password `);
-            return {data: {result: false}, error: {message: errorMsg.E_BP}} // bad pass
         } else if (this.isLoggedIn(userName)) { // already logged in
             logger.warn(`failed to login ${userName}, user is already logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
@@ -203,7 +200,13 @@ export class UserManager {
     }
 
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
-        return {data: {result: true, receipts: user.receipts.map(r=>{return {date: r.date,purchases:r.purchases}})}}
+        return {
+            data: {
+                result: true, receipts: user.receipts.map(r => {
+                    return {date: r.date, purchases: r.purchases}
+                })
+            }
+        }
     }
 
     getUserCart(user: User) {
@@ -211,4 +214,11 @@ export class UserManager {
 
     }
 
+    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        const rUser: RegisteredUser = this.getUserByName(req.body.username)
+        if (!rUser)
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
+        const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
+        return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
+    }
 }

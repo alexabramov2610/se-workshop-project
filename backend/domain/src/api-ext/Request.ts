@@ -66,9 +66,14 @@ interface RegisterRequest extends Request {
     body: { username: string, password: string }
 }
 
+interface VerifyCredentialsReq extends Request {
+    body: { username: string, password: string}
+}
+
 interface LoginRequest extends Request {
     body: { username: string, password: string, asAdmin?: boolean }
 }
+
 
 interface LogoutRequest extends Request {
     body: {}
@@ -80,6 +85,9 @@ interface ViewShopPurchasesHistoryRequest extends Request {
 
 interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
+}
+interface ViewManagerPermissionRequest extends Request {
+    body: { managerToView: string, storeName: string}
 }
 
 interface ViewBuyerPurchasesHistoryRequest extends Request {
@@ -142,17 +150,18 @@ interface PurchaseRequest extends Request {
             address: string,
             city: string,
             country: string,
-            price: number
         }
     }
 }
 
 interface PayRequest extends Request {
     body: {
-        cardDetails: CreditCard,
-        address: string,
-        city: string,
-        country: string,
+        payment: {
+            cardDetails: CreditCard,
+            address: string,
+            city: string,
+            country: string,
+        }
         price: number
     }
 }
@@ -166,6 +175,7 @@ interface VerifyStoreName extends Request{
 }
 
 export {
+    VerifyCredentialsReq,
     VerifyStoreName,
     CalcFinalPriceReq,
     PayRequest,
@@ -197,5 +207,6 @@ export {
     ChangeProductNameRequest,
     ViewRUserPurchasesHistoryReq,
     InitReq,
-    ViewCartReq
+    ViewCartReq,
+    ViewManagerPermissionRequest
 };

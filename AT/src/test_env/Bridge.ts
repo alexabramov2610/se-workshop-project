@@ -3,8 +3,6 @@ import {
   Store,
   User,
   Credentials,
-  SearchData,
-  RATE,
   CreditCard,
   Discount,
   PERMISSION,
@@ -35,9 +33,13 @@ export interface Bridge {
   register(credentials: Credentials): DummyTypes.IResponse;
   logout(): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
-  search(input: SearchData): DummyTypes.ISearchResponse;
-  rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
-  addToCart(store: Store, product: Product, quantity: number): DummyTypes.IResponse;
+  search(input: Req.SearchRequest): DummyTypes.ISearchResponse;
+  // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
+  addToCart(
+    store: Store,
+    product: Product,
+    quantity: number
+  ): DummyTypes.IResponse;
   watchCart(): Res.ViewCartRes;
   checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
@@ -56,15 +58,32 @@ export interface Bridge {
   reset(): void;
   assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
   changeProductName(
-    req: Partial<ServiceFacade.Req.ChangeProductNameRequest>
-  ): ServiceFacade.Res.BoolResponse;
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Res.BoolResponse;
   changeProductPrice(
-    req: Partial<ServiceFacade.Req.ChangeProductPriceRequest>
-  ): ServiceFacade.Res.BoolResponse;
-  watchPermissions(store: Store, credentials: Credentials): DummyTypes.IPermissionsResponse;
-  removeStoreManager(req: Partial<ServiceFacade.Req.RemoveStoreManagerRequest>): ServiceFacade.Res.BoolResponse;
-  removeManagerPermissions(req: ServiceFacade.Req.ChangeManagerPermissionRequest): ServiceFacade.Res.BoolResponse;
-  viewStorePurchasesHistory(req : ServiceFacade.Req.ViewShopPurchasesHistoryRequest ): ServiceFacade.Res.ViewShopPurchasesHistoryResponse;
-  viewUserPurchasesHistory(req : ServiceFacade.Req.ViewRUserPurchasesHistoryReq ): ServiceFacade.Res.ViewRUserPurchasesHistoryRes;
-  purchase(req : ServiceFacade.Req.PurchaseRequest ): ServiceFacade.Res.PurchaseResponse;
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Res.BoolResponse;
+  watchPermissions(
+    store: Store,
+    credentials: Credentials
+  ): DummyTypes.IPermissionsResponse;
+  removeStoreManager(
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Res.BoolResponse;
+  removeManagerPermissions(
+    req: Partial<Req.ChangeManagerPermissionRequest>
+  ): Res.BoolResponse;
+  viewStorePurchasesHistory(
+    req: Partial<Req.ViewShopPurchasesHistoryRequest>
+  ): Res.ViewShopPurchasesHistoryResponse;
+  viewUserPurchasesHistory(
+    req: Partial<Req.ViewRUserPurchasesHistoryReq>
+  ): Res.ViewRUserPurchasesHistoryRes;
+  purchase(
+    req: Partial<Req.PurchaseRequest>
+  ): Res.PurchaseResponse;
+  saveProductToCart(
+    req: Partial<Req.SaveToCartRequest>
+  ): Res.BoolResponse;
+
 }

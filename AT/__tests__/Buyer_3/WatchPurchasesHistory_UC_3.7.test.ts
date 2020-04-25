@@ -1,5 +1,6 @@
 import { Bridge, Driver, Item, CreditCard, Product, Store } from "../..";
 import { ProductBuilder } from "../mocks/builders/product-builder";
+import { Credentials } from "../../src/test_env/types";
 
 describe("Watch Purchases History, UC: 3.7", () => {
   let _serviceBridge: Bridge;
@@ -8,6 +9,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
   let _item: Item;
   let _prodct: Product;
   let _store: Store;
+  let _shopoholic: Credentials;
   beforeEach(() => {
     _driver = new Driver()
       .resetState()
@@ -18,27 +20,18 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _store = { name: "stor-e-tell" };
     _serviceBridge = _driver.getBridge();
     _prodct = new ProductBuilder().getProduct();
+    _shopoholic = { userName: "shopoholic", password: "ibuyALL123" };
     _item = { id: 123, catalogNumber: _prodct.catalogNumber };
+    _serviceBridge.createStore(_store);
+    _serviceBridge.addProductsToStore(_store, [_prodct]);
+    _serviceBridge.addItemsToStore(_store, [_item]);
+    _serviceBridge.logout();
+    _serviceBridge.register(_shopoholic);
   });
 
   test("Happy Path: logged in user with history", () => {
-    _serviceBridge.addToCart(_store, _prodct, 1);
-    const { data } = _serviceBridge.checkout(_testCreditCard);
-    expect(data).toBeDefined();
-    const latestBuy = _serviceBridge
-      .getPurchaseHistory()
-      .data.purchases.filter((p) => p.productName === _prodct.name)[0];
-    expect(latestBuy.productName).toBe(_prodct.name);
-  });
-
-  test("Happy Path: logged in user no history", () => {
-    const { purchases: purchases } = _serviceBridge.getPurchaseHistory().data;
-    expect(purchases.length).toBe(0);
-  });
-
-  test("Sad Path: not-logged in user", () => {
-    _serviceBridge.logout();
-    const error = _serviceBridge.getPurchaseHistory().error;
-    expect(error).toBeDefined();
+    _serviceBridge.login(_shopoholic);
+    _driver.given.store(_store).products([_prodct]).makeABuy();
+    expect(true).toBe(false);
   });
 });

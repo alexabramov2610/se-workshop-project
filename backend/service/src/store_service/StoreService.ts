@@ -72,6 +72,9 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS): Res.BoolResponse => {
     return ts.addManagerPermissions(req);
 }
+export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest, ts: TS): Res.ViewManagerPermissionResponse => {
+    return ts.viewManagerPermissions(req);
+}
 
 export const search = (req: Req.SearchRequest, ts: TS): Res.SearchResponse => {
     return ts.search(req);

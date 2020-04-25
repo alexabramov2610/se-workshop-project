@@ -347,7 +347,7 @@ export class TradingSystemManager {
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.cardDetails);
+        const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
         return {data: {result: true}}
@@ -405,5 +405,21 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
         }
         return {data: {result: true}};
+    }
+
+    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        return this._userManager.verifyCredentials(req);
+    }
+
+    viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const manager: RegisteredUser = this._userManager.getUserByName(req.body.managerToView);
+
+        return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 }

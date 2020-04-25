@@ -68,7 +68,7 @@ describe("RegisteredUser Management Unit Tests", () => {
         });
         expect(res.data.result).toBeTruthy();
     });
-
+/*
     test("Login bad password fail Test", () => {
         jest.spyOn(userManager, "getUserByName").mockReturnValue(new RegisteredUser('ron', '123456'));
         jest.spyOn(userManager, "verifyPassword").mockReturnValue(false);
@@ -78,7 +78,7 @@ describe("RegisteredUser Management Unit Tests", () => {
         });
         expect(res.data.result).toBeFalsy();
     });
-
+*/
     test("Login already logged in fail Test", () => {
         const username: string = "mockname";
         const password: string = "mock-pw";

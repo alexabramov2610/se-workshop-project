@@ -6,7 +6,7 @@ describe("Guest Registration, UC: 2.2", () => {
     let _driver = new Driver();
 
     beforeEach(() => {
-        _serviceBridge = _driver.resetState().initWithDefaults().startSession().getBridge();
+        _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
         _credentials = {userName: "test-username", password: "test-password"};
     });
 

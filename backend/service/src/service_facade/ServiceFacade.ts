@@ -154,6 +154,10 @@ export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): 
 export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeManagerPermissions);
 }
+export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+    return runIfOpen(req, StoreService.viewManagerPermissions);
+}
+
 /*
 UC-4.7
  */
