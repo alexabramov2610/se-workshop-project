@@ -135,7 +135,6 @@ interface VerifyCartRequest extends Request {
     body: {}
 }
 
-
 interface PurchaseRequest extends Request {
     body: {
         payment: {
@@ -162,7 +161,12 @@ interface CalcFinalPriceReq extends Request {
     body: {}
 }
 
+interface VerifyStoreName extends Request{
+    body:{storeName: string}
+}
+
 export {
+    VerifyStoreName,
     CalcFinalPriceReq,
     PayRequest,
     VerifyCartRequest,

@@ -2,8 +2,11 @@ import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
 import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/TradingSystemManager";
 
-export const createStore = (createStoreReq: Req.OpenStoreRequest, ts: TS): Res.BoolResponse => {
-    return ts.createStore(createStoreReq);
+export const createStore = (req: Req.OpenStoreRequest, ts: TS): Res.BoolResponse => {
+    const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: req.body.storeName}, token: req.token}
+    const verifyStoreRes: Res.BoolResponse = ts.verifyNewStore(verifyStoreReq);
+    if (!verifyStoreRes.data.result) return verifyStoreRes
+    return ts.createStore(req);
 }
 
 export const addItems = (req: Req.ItemsAdditionRequest, ts: TS): Res.ItemsAdditionResponse => {
@@ -14,12 +17,12 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest, ts: TS): Res.StoreInfoR
     return ts.viewStoreInfo(req);
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest,ts: TS): Res.BoolResponse => {
-   return ts.changeProductName(req);
+export const changeProductName = (req: Req.ChangeProductNameRequest, ts: TS): Res.BoolResponse => {
+    return ts.changeProductName(req);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest,ts: TS): Res.BoolResponse => {
-   return ts.changeProductPrice(req);
+export const changeProductPrice = (req: Req.ChangeProductPriceRequest, ts: TS): Res.BoolResponse => {
+    return ts.changeProductPrice(req);
 }
 
 export const removeItems = (req: Req.ItemsRemovalRequest, ts: TS): Res.ItemsRemovalResponse => {
@@ -34,7 +37,7 @@ export const addNewProducts = (req: Req.AddProductsRequest, ts: TS): Res.Product
     return ts.addNewProducts(req);
 }
 
-export const viewProductInfo = (req:Req.ProductInfoRequest, ts: TS):Res.ProductInfoResponse => {
+export const viewProductInfo = (req: Req.ProductInfoRequest, ts: TS): Res.ProductInfoResponse => {
     return ts.viewProductInfo(req);
 }
 
@@ -62,11 +65,11 @@ export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryReque
     return ts.viewStorePurchasesHistory(req);
 }
 
-export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS) : Res.BoolResponse => {
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS): Res.BoolResponse => {
     return ts.removeManagerPermissions(req);
 }
 
-export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS) : Res.BoolResponse => {
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest, ts: TS): Res.BoolResponse => {
     return ts.addManagerPermissions(req);
 }
 
