@@ -5,6 +5,7 @@ import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
+    IDiscount,
     IPayment,
     IProduct as ProductReq,
     ProductCatalogNumber,
@@ -15,6 +16,8 @@ import {
     SearchQuery
 } from "../api-ext/CommonInterface";
 import {BuyingTypes, DiscountsTypes, ManagementPermission, Rating} from "../api-ext/Enums";
+import {Discount} from "./discounts/Discount";
+import {ShownDiscount} from "./discounts/ShownDiscount";
 
 const logger = loggerW(__filename)
 
@@ -476,4 +479,17 @@ export class Store {
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
         return product.price;
     }
+
+    addDiscount(catalogNumber: number, discount: IDiscount): string {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber);
+        let newDiscount: Discount;
+        if (!discount.condition && !discount.coupon) {
+            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration)
+        }
+        product.addDiscount(newDiscount);
+        return newDiscount.id;
+
+    }
+
+
 }

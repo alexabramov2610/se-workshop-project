@@ -374,30 +374,6 @@ export class TradingSystemManager {
     }
 
 
-    // methods that are available for admin also
-    viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
-        logger.info(`retrieving purchases history`)
-        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
-        if (!userToView)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isAdminReq: boolean = req.body.userName && user.role === UserRole.ADMIN;
-        if (userToView.name !== user.name && !isAdminReq)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
-        return res;
-    }
-
-    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
-        logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
-        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
-        return res;
-    }
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
         const user = this._userManager.getUserByToken(req.token);
@@ -426,11 +402,40 @@ export class TradingSystemManager {
     }
 
     addProductDiscount(req:Req.AddDiscountRequest) : Res.AddDiscountResponse{
-
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this._storeManager.addProductDiscount(user, req.body.storeName,req.body.catalogNumber,req.body.discount)
         return {data: {result:true}}
     }
 
     removeProductDiscount(req:Req.RemoveDiscountRequest) : Res.BoolResponse{
         return {data: {result:true}}
     }
+
+    // methods that are available for admin also
+    viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
+        logger.info(`retrieving purchases history`)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
+        if (!userToView)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const isAdminReq: boolean = req.body.userName && user.role === UserRole.ADMIN;
+        if (userToView.name !== user.name && !isAdminReq)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
+        return res;
+    }
+
+    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
+        logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+        return res;
+    }
+
 }

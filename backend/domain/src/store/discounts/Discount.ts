@@ -1,14 +1,15 @@
-import {ProductCatalogNumber} from "../../api-ext/CommonInterface";
-
+import {v4 as uuid} from 'uuid';
 export abstract class Discount {
-    protected _startDate: Date;
+    private _id: string;
+    private _startDate: Date;
     private _percentage: number;
     private _duration: number;
 
-    protected constructor(percentage: number, duration: number) {
+    protected constructor(startDate:Date,percentage: number, duration: number) {
+        this._id = uuid();
         this._percentage = percentage;
         this._duration = duration;
-        this._startDate = new Date();
+        this._startDate = startDate;
     }
 
 
@@ -26,5 +27,13 @@ export abstract class Discount {
 
     set duration(value: number) {
         this._duration = value;
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    get startDate(): Date {
+        return this._startDate;
     }
 }

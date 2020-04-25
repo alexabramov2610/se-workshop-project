@@ -4,7 +4,7 @@ import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import * as Res from "../api-ext/Response";
 import * as Req from "../api-ext/Request";
 import {
-    BagItem,
+    BagItem, IDiscount,
     IItem, IPayment,
     IProduct as ProductReq,
     IReceipt,
@@ -588,4 +588,18 @@ export class StoreManagement {
         const permissions = managerToView.getPermissions();
         return {data: {result: true, permissions}}
     }
+
+    addProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discount: IDiscount): Res.AddDiscountResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        if (!store.verifyPermission(user.name, ManagementPermission.MODIFY_DISCOUNT)) return {
+            data: {result: false},
+            error: {message: errorMsg.E_PERMISSION}
+        }
+        const discountID: string = store.addDiscount(catalogNumber, discount);
+        return {data: {result: true, discountID}}
+
+    }
+
 }
