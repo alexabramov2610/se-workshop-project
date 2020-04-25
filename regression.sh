@@ -76,9 +76,11 @@ npm run comp
 #####  domain
 echo -e "${RED}testing domain...${NC}"
 cd $domain
+npm start jest --clearCache
 npm run test:silent
 
 #####  AT
 echo -e "${RED}testing AT...${NC}"
 cd $AT
+npm start jest --clearCache
 npm run test:silent
