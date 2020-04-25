@@ -18,7 +18,6 @@ import {
 } from "../../__tests__/mocks/responses";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
-
 let real: Partial<Bridge> = Adapter;
 
 const Proxy: Bridge = {
@@ -222,17 +221,19 @@ const Proxy: Bridge = {
     req: Req.ViewShopPurchasesHistoryRequest
   ): Res.ViewShopPurchasesHistoryResponse {
     return real.viewUserPurchasesHistory
-      ? real.viewStorePurchasesHistory
-      (req)
+      ? real.viewStorePurchasesHistory(req)
       : { data: { result: false, receipts: [] } };
   },
-  purchase(
-    req: Req.PurchaseRequest
-  ): Res.PurchaseResponse {
+  purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
     return real.purchase ? real.purchase(req) : { data: { result: false } };
   },
   saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
     return real.saveProductToCart && real.saveProductToCart(req);
+  },
+  viewManagerPermissions(
+    req: Req.ViewManagerPermissionRequest
+  ): Res.ViewManagerPermissionResponse {
+    return real.viewManagerPermissions && real.viewManagerPermissions(req);
   },
 };
 

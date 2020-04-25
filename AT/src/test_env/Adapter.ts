@@ -217,5 +217,8 @@ export const Adapter: Partial<Env.Bridge> = {
     return error
         ? {data: undefined, error: error.message}
         : {data: data, error: undefined};
-  }
+  },
+ viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+  return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));  
+}
 };

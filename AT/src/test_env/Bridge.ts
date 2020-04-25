@@ -79,11 +79,10 @@ export interface Bridge {
   viewUserPurchasesHistory(
     req: Partial<Req.ViewRUserPurchasesHistoryReq>
   ): Res.ViewRUserPurchasesHistoryRes;
-  purchase(
-    req: Partial<Req.PurchaseRequest>
-  ): Res.PurchaseResponse;
-  saveProductToCart(
-    req: Partial<Req.SaveToCartRequest>
-  ): Res.BoolResponse;
-
+  purchase(req: Partial<Req.PurchaseRequest>): Res.PurchaseResponse;
+  saveProductToCart(req: Partial<Req.SaveToCartRequest>): Res.BoolResponse;
+  viewManagerPermissions(
+    req: Partial<Req.ViewManagerPermissionRequest>
+  ): Res.ViewManagerPermissionResponse;
+  
 }
