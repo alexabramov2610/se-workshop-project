@@ -1,4 +1,4 @@
-import {Error} from "../api-int/internal_api";
+import {Error, Request} from "../api-int/internal_api";
 import {
     IItem,
     ProductCatalogNumber,
@@ -8,7 +8,7 @@ import {
     IReceipt,
     ProductInStore, Cart
 } from "./CommonInterface";
-import {ProductCategory, TradingSystemState} from "./Enums";
+import {ManagementPermission, ProductCategory, TradingSystemState} from "./Enums";
 import {ContactUsMessage, Receipt} from "../trading_system/internal_api";
 
 
@@ -73,8 +73,11 @@ interface SearchResponse extends Response {
 interface PurchaseResponse extends BoolResponse {
     data: { result: boolean, receipt?: IReceipt }
 }
-
+interface ViewManagerPermissionResponse extends BoolResponse {
+    data: {result: boolean,  permissions?: ManagementPermission[]}
+}
 export {
+    ViewManagerPermissionResponse,
     PurchaseResponse,
     SearchResponse,
     Response,
