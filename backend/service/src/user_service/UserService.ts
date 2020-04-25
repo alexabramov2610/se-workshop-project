@@ -9,7 +9,15 @@ export const registerUser = (req: Req.RegisterRequest, ts: TS): Res.BoolResponse
 }
 
 export const loginUser = (req: Req.LoginRequest, ts: TS): Res.BoolResponse => {
-    // TODO 1.verify credentials  2.login
+    const verifyCredentialsReq: Req.VerifyCredentialsReq = {
+        body: {
+            username: req.body.username,
+            password: req.body.password
+        }, token: req.token
+    }
+    const isValid: Res.BoolResponse = ts.verifyCredentials(verifyCredentialsReq);
+    if (!isValid.data.result)
+        return isValid
     return ts.login(req);
 }
 
@@ -17,19 +25,19 @@ export const logoutUser = (req: Req.LogoutRequest, ts: TS): Res.BoolResponse => 
     return ts.logout(req);
 }
 
-export const saveProductToCart = (req:Req.SaveToCartRequest,ts: TS):Res.BoolResponse =>{
+export const saveProductToCart = (req: Req.SaveToCartRequest, ts: TS): Res.BoolResponse => {
     // TODO 1.check products are on stock  2.save to cart
     return ts.saveProductToCart(req);
 }
 
-export const removeProductFromCart = (req:Req.RemoveFromCartRequest,ts: TS):Res.BoolResponse =>{
+export const removeProductFromCart = (req: Req.RemoveFromCartRequest, ts: TS): Res.BoolResponse => {
     return ts.removeProductFromCart(req);
 }
 
-export const viewCart = (req:Req.ViewCartReq,ts: TS):Res.ViewCartRes =>{
+export const viewCart = (req: Req.ViewCartReq, ts: TS): Res.ViewCartRes => {
     return ts.viewCart(req);
 }
 
-export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq,ts: TS): Res.ViewRUserPurchasesHistoryRes => {
+export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq, ts: TS): Res.ViewRUserPurchasesHistoryRes => {
     return ts.viewRegisteredUserPurchasesHistory(req);
 }

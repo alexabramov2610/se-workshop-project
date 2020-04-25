@@ -397,4 +397,11 @@ export class TradingSystemManager {
         }
         return {data: {result: true}};
     }
+
+    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        return this._userManager.verifyCredentials(req);
+    }
 }

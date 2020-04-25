@@ -1,7 +1,7 @@
 import {Response, CATEGORY, Cart, Product, PERMISSION} from "../../src/test_env/types";
 import {
     BagItem,
-    Item,
+    IItem,
     ProductCatalogNumber,
     ProductCategory
 } from "../../../backend/domain/src/api-ext/CommonInterface";

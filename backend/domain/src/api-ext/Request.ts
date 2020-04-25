@@ -66,9 +66,14 @@ interface RegisterRequest extends Request {
     body: { username: string, password: string }
 }
 
+interface VerifyCredentialsReq extends Request {
+    body: { username: string, password: string}
+}
+
 interface LoginRequest extends Request {
     body: { username: string, password: string, asAdmin?: boolean }
 }
+
 
 interface LogoutRequest extends Request {
     body: {}
@@ -166,6 +171,7 @@ interface VerifyStoreName extends Request{
 }
 
 export {
+    VerifyCredentialsReq,
     VerifyStoreName,
     CalcFinalPriceReq,
     PayRequest,
