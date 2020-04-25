@@ -5,21 +5,7 @@ import { ServiceFacade } from "service_layer";
 class Driver {
   private mutant: { p: Product[]; s: Store; u: User };
   private refMe: any;
-  private _pi: {
-    payment: {
-      cardDetails: {
-        holderName: "Mr Cat";
-        number: 123456;
-        expMonth: 12;
-        expYear: 12;
-        ccv: 123;
-      };
-      address: "St. Cats 123";
-      city: "Cat City";
-      country: "CatZone";
-      price: 90;
-    };
-  };
+  private _pi;
   private initDefCredentials: Credentials = {
     userName: "admin",
     password: "admin123",
@@ -27,6 +13,21 @@ class Driver {
   constructor() {
     this.bridge = Proxy;
     this.refMe = this.given;
+    this._pi = {
+      payment: {
+        cardDetails: {
+          holderName: "Mr Cat",
+          number: 123456,
+          expMonth: 12,
+          expYear: 2028,
+          ccv: 123,
+        },
+        address: "St. Cats 123",
+        city: "Cat City",
+        country: "CatZone",
+        price: 90,
+      },
+    };
   }
 
   private loginDefCredentials: Credentials = {
@@ -112,6 +113,7 @@ class Driver {
         },
       })
     );
+
     const res = this.bridge.purchase({ body: this._pi });
     return res;
   }

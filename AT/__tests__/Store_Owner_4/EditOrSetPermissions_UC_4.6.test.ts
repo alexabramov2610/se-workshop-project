@@ -24,7 +24,7 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
     _serviceBridge.assignManager(_storeInformation, _newManagerCredentials);
   });
 
-  test("Edit or Set Permissions - store owner not logged in", () => {
+  test("store owner not logged in", () => {
     //TODO - REMOVE PERMISSIONS
     expect(false).toBe(true);
   });
