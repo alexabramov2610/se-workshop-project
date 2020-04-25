@@ -37,7 +37,7 @@ export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
     if (connectDeliveryRes.error) return connectDeliveryRes;
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
-    tradingSystem.OpenTradeSystem({body: {}, token: req.token})
+    tradingSystem.openTradeSystem({body: {}, token: req.token})
     const logout: Res.BoolResponse = tradingSystem.logout({body: {}, token: req.token});
     if (!logout.data.result) return logout;
     return {data: {result: true}}
@@ -188,7 +188,7 @@ export const startNewSession = (): string => {
 }
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.GetTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
+    if (tradingSystem.getTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req, tradingSystem);
 }

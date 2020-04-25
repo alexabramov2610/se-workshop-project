@@ -33,5 +33,15 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _serviceBridge.login(_shopoholic);
     _driver.given.store(_store).products([_prodct]).makeABuy();
     expect(true).toBe(false);
+  })
+  test("Happy Path: logged in user with history", () => {
+    _serviceBridge.login(_shopoholic);
+    _driver.given.store(_store).products([_prodct]).makeABuy();
+    expect(true).toBe(false);
+  });
+  test("Happy Path: logged in user with history", () => {
+    _serviceBridge.login(_shopoholic);
+    _driver.given.store(_store).products([_prodct]).makeABuy();
+    expect(true).toBe(false);
   });
 });
