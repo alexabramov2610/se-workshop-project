@@ -77,4 +77,12 @@ describe("External System Unit Tests", () => {
 
         expect(response.data.result).toBeFalsy();
     })
+
+    test("Initialization", () => {
+        this.externalSystemManager = new ExternalSystemsManager();
+        expect(this.externalSystemManager.paymentSystem).toBeDefined();
+        expect(this.externalSystemManager.deliverySystem).toBeDefined();
+        expect(this.externalSystemManager.securitySystem).toBeDefined();
+
+    });
 })
