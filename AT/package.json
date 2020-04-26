@@ -25,5 +25,10 @@
     "typescript": "^3.8.3"
   },
   "keywords": [],
-  "description": ""
+  "description": "",
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/mocks"
+    ]
+  }
 }

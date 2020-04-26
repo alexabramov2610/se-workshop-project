@@ -6,8 +6,8 @@ import {
     Product
 } from "../../";
 
-import {ProductBuilder} from "../mocks/builders/product-builder";
-import {ItemBuilder} from "../mocks/builders/item-builder";
+import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
+import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 
 
 describe("Guest saves items in the cart, UC: 2.6", () => {

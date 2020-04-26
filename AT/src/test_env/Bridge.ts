@@ -7,7 +7,7 @@ import {
   PERMISSION,
   Product,
 } from "./types";
-import * as DummyTypes from "../../__tests__/mocks/responses";
+import * as DummyTypes from "./mocks/responses";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface Bridge {

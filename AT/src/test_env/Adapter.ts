@@ -1,10 +1,10 @@
 import * as Types from "../..";
 import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
-import * as DummyTypes from "../../__tests__/mocks/responses";
+import * as DummyTypes from "./mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
-import { ISearchResponse } from "../../__tests__/mocks/responses";
+import { ISearchResponse } from "./mocks/responses";
 
 let token;
 const wrapWithToken = (req: any) => {

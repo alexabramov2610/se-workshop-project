@@ -1,6 +1,6 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials } from "../../src/test_env/types";
-import { ProductBuilder } from "../mocks/builders/product-builder";
+import { ProductBuilder } from "../../src/test_env/mocks/builders/product-builder";
 
 
 describe("Add Remove Edit Products, UC: 3.2", () => {

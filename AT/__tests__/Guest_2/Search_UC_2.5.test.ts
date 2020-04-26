@@ -5,7 +5,7 @@ import {
     Store,
     Product
 } from "../../";
-import {ProductBuilder} from "../mocks/builders/product-builder";
+import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {
     PriceRange,
     ProductCategory,

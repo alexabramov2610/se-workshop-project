@@ -14,7 +14,7 @@ import {
     DummyValues,
     IProductsRemovalResponse,
     IResponse,
-} from "../../__tests__/mocks/responses";
+} from "./mocks/responses";
 import {Res, Req} from "service_layer/dist/src/service_facade/ServiceFacade";
 
 let real: Partial<Bridge> = Adapter;

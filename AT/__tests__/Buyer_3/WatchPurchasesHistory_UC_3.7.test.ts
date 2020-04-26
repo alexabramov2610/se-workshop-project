@@ -1,5 +1,5 @@
 import { Bridge, Driver, Item, CreditCard, Product, Store } from "../..";
-import { ProductBuilder } from "../mocks/builders/product-builder";
+import { ProductBuilder } from "../../src/test_env/mocks/builders/product-builder";
 import { Credentials } from "../../src/test_env/types";
 
 describe("Watch Purchases History, UC: 3.7", () => {
