@@ -81,5 +81,5 @@ export interface Bridge {
   viewManagerPermissions(
     req: Partial<Req.ViewManagerPermissionRequest>
   ): Res.ViewManagerPermissionResponse;
-  addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse;
+  addProductDiscount(req: Req.AddDiscountRequest);
 }

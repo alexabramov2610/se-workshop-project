@@ -83,9 +83,9 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(totalCharged).toEqual(_testProduct1.price);
     });
 
-    test("Non empty cart, items not in stock, no discount",() => {
-        const {data, error} = _driver.given.store(_testStore1).products([_testProduct4]).makeABuy();
-        expect(data).toBeUndefined();
+    test("Non empty cart, empty cart, no discount",() => {
+        const req = {token: "123", body: {payment: _driver.getPaymentInfo().payment}};
+        const {error} = _serviceBridge.purchase(req);
         expect(error).toBeDefined();
     });
 
@@ -109,7 +109,6 @@ describe("Guest buy items, UC: 2.8", () => {
         const purchases: Purchase[] = receipt.purchases;
         expect(purchases.length).toEqual(1);
         expect(purchases[0].storeName).toEqual(_testStore1.name);
-        expect(purchases[0].price).toEqual(_testProduct1.price);
         expect(purchases[0].item.id).toEqual(_testItem1.id);
         expect(purchases[0].item.catalogNumber).toEqual(_testProduct1.catalogNumber);
 
