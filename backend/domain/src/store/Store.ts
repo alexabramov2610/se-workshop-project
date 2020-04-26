@@ -473,10 +473,10 @@ export class Store {
         this._receipts.push(new Receipt(purchases, payment))
     }
 
-
-    // TODO calculate from discount object
     getProductFinalPrice(catalogNumber: number) {
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
+        if (!product)
+            return {isValid: false, error: Error.E_INVALID_PROD}
         const discounts: Discount[] = product.discounts;
         let finalPrice = product.price;
         for (const d of discounts) {
