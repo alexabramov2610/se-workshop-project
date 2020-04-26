@@ -77,16 +77,16 @@ export const saveProductToCart = (req: Req.SaveToCartRequest): Res.BoolResponse 
 /*
 UC-2.7
  */
-export const removeProductFromCart = (req:Req.RemoveFromCartRequest):Res.BoolResponse =>{
+export const removeProductFromCart = (req: Req.RemoveFromCartRequest): Res.BoolResponse => {
     return runIfOpen(req, UserService.removeProductFromCart);
 }
-export const viewCart = (req:Req.ViewCartReq):Res.ViewCartRes =>{
+export const viewCart = (req: Req.ViewCartReq): Res.ViewCartRes => {
     return runIfOpen(req, UserService.viewCart);
 }
 /*
 UC-2.8
  */
-export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse =>{
+export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
     return runIfOpen(req, BuyingService.purchase);
 }
 /*
@@ -132,10 +132,10 @@ export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAddition
 export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
     return runIfOpen(req, StoreService.removeProducts);
 }
-export const addProductDiscount= (req:Req.AddDiscountRequest): Res.BoolResponse =>{
+export const addProductDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.addProductDiscount);
 }
-export const removeProductDiscount= (req: Req.RemoveDiscountRequest): Res.BoolResponse=>{
+export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.removeProductDiscount);
 }
 
@@ -188,6 +188,12 @@ UC-7
 export const pay = (req: Req.PayRequest): Res.PaymentResponse => {
     return runIfOpen(req, BuyingService.pay);
 }
+/*
+UC-8
+ */
+export const deliver = (req: Req.DeliveryRequest): Res.DeliveryResponse => {
+    return runIfOpen(req, BuyingService.deliver);
+};
 
 /*
 Utils
