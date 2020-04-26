@@ -113,7 +113,7 @@ export const removeProductDiscount = (req: Req.RemoveDiscountRequest
     return ts.removeProductDiscount(req)
 }
 
-export const setPurchasePolicy = (req: Req.SetPaymentPolicyRequest
+export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest
 ): Res.BoolResponse => {
     return ts.setPurchasePolicy(req);
 }

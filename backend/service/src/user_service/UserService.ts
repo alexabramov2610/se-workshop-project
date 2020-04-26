@@ -1,5 +1,4 @@
-import * as Req from "se-workshop-20-interfaces";
-import * as Res from "se-workshop-20-interfaces";
+import {Req, Res, Enums,CommonInterface} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const registerUser = (req: Req.RegisterRequest): Res.BoolResponse => {
