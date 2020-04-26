@@ -221,4 +221,19 @@ export class UserManager {
         const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
         return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
     }
+
+    isValidUserName(username: string): boolean {
+        return this.getUserByName(username) === undefined;
+    }
+
+    verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        const validName: boolean = this.isValidUserName(req.body.username)
+        if (!validName)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_EXISTS}}
+        const validPass: boolean = this.isValidPassword(req.body.password)
+        if (!validPass)
+            return {data: {result: false}, error: {message: errorMsg.E_BP}}
+        return {data: {result: true}}
+    }
+
 }

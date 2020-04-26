@@ -1,4 +1,4 @@
-import {Error, Request} from "../api-int/internal_api";
+import {Error} from "../api-int/internal_api";
 import {
     IItem,
     ProductCatalogNumber,
@@ -88,7 +88,13 @@ interface PurchaseResponse extends BoolResponse {
 interface ViewManagerPermissionResponse extends BoolResponse {
     data: {result: boolean,  permissions?: ManagementPermission[]}
 }
+
+
+interface DeliveryResponse extends BoolResponse {
+    data: {result: boolean,  deliveryID?: string}
+}
 export {
+    DeliveryResponse,
     AddDiscountResponse,
     PaymentResponse,
     CartFinalPriceRes,

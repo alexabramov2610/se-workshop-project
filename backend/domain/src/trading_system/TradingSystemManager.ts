@@ -451,4 +451,22 @@ export class TradingSystemManager {
         return res;
     }
 
+
+    deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
+        logger.info(`request to deliver via external system`)
+        const user = this._userManager.getUserByToken(req.token);
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const isDeliver: boolean = this._externalSystems.deliverySystem.deliver(req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address);
+
+        return {
+            data: {result: true, deliveryID: "1"}
+        }
+    }
+
+    verifyNewCredentials(req:Req.VerifyCredentialsReq):Res.BoolResponse {
+        return this._userManager.verifyNewCredentials(req);
+    }
+
+
 }
