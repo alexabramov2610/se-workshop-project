@@ -1,4 +1,4 @@
-import {ProductCategory} from "../../../backend/domain/src/api-ext/CommonInterface";
+import {ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 interface User {
   username: string;

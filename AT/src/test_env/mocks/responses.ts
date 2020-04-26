@@ -1,5 +1,5 @@
 import {Response, Product, PERMISSION} from "../types";
-import {ProductCatalogNumber, ProductCategory, ProductInStore} from "../../../../backend/domain/src/api-ext/CommonInterface";
+import {ProductCatalogNumber, ProductCategory, ProductInStore} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import { Res } from "se-workshop-20-interfaces"
 
 export interface IResponse extends Response {

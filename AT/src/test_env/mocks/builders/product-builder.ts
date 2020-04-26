@@ -1,5 +1,5 @@
 import { Product } from "../../../../index";
-import {ProductCategory} from "../../../../../backend/domain/dist/src/api-ext/CommonInterface";
+import {ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export class ProductBuilder {
   private _p: Product;

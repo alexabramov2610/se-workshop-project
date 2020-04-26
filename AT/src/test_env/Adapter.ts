@@ -222,8 +222,8 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   saveProductToCart(
-    req: ServiceFacade.Req.SaveToCartRequest
-  ): ServiceFacade.Res.BoolResponse {
+    req: Req.SaveToCartRequest
+  ): Res.BoolResponse {
     return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   },
 

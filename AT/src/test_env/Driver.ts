@@ -107,7 +107,7 @@ class Driver {
     },
   };
 
-  makeABuy(amount: number = 1): ServiceFacade.Res.PurchaseResponse {
+  makeABuy(amount: number = 1): Res.PurchaseResponse {
     this.mutant.p.map((p) =>
       this.bridge.saveProductToCart({
         body: {

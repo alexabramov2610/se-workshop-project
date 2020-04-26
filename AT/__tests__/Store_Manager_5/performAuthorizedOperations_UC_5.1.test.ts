@@ -1,7 +1,7 @@
 import {Bridge, Driver, Store, Credentials, Item, PERMISSION, Discount, Product} from "../../";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import {ProductCategory} from "../../../backend/domain/dist/src/api-ext/CommonInterface";
+import {ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 describe("Perform authorized operations, UC: 5.1", () => {
     let _driver = new Driver;

@@ -11,9 +11,9 @@ import {
     ProductCategory,
     SearchFilters,
     SearchQuery
-} from "../../../backend/domain/dist/src/api-ext/CommonInterface";
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import { Req } from "se-workshop-20-interfaces"
-import {Rating} from "../../../backend/domain/dist/src/api-ext/Enums";
+import {Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 
 describe("Guest Search, UC: 2.5", () => {
