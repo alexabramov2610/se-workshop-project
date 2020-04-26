@@ -473,12 +473,10 @@ export class Store {
         this._receipts.push(new Receipt(purchases, payment))
     }
 
-    getProductFinalPrice(catalogNumber: number) {
+    getProductFinalPrice(catalogNumber: number):number {
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
-        if (!product)
-            return {isValid: false, error: Error.E_INVALID_PROD}
         const discounts: Discount[] = product.discounts;
-        let finalPrice = product.price;
+        let finalPrice:number = product.price;
         for (const d of discounts) {
             finalPrice = d.calc(finalPrice);
         }
