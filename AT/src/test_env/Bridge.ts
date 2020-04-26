@@ -3,13 +3,11 @@ import {
   Store,
   User,
   Credentials,
-  CreditCard,
   Discount,
   PERMISSION,
   Product,
 } from "./types";
 import * as DummyTypes from "../../__tests__/mocks/responses";
-import { ServiceFacade } from "service_layer";
 import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
 
 export interface Bridge {
@@ -41,7 +39,6 @@ export interface Bridge {
     quantity: number
   ): DummyTypes.IResponse;
   watchCart(): Res.ViewCartRes;
-  checkout(creditCard: CreditCard): DummyTypes.ICheckoutResponse;
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   setDiscountToItem(
     store: Store,
@@ -84,5 +81,5 @@ export interface Bridge {
   viewManagerPermissions(
     req: Partial<Req.ViewManagerPermissionRequest>
   ): Res.ViewManagerPermissionResponse;
-  
+  addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse;
 }

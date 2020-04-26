@@ -1,4 +1,4 @@
-import {Bridge, Driver, Item, Store, Credentials, Product} from "../../";
+import {Bridge, Driver, Item, Store, Product} from "../../";
 import {ItemBuilder} from "../mocks/builders/item-builder";
 import {ProductBuilder} from "../mocks/builders/product-builder";
 
@@ -27,7 +27,7 @@ describe("Guest - View Information, UC: 2.4", () => {
 
     });
 
-    test("View valid item", () => {
+    test("View valid product", () => {
         _serviceBridge.createStore(_testStore);
         _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
         _serviceBridge.addItemsToStore(_testStore, [_testItem]);

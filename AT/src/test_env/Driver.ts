@@ -17,7 +17,7 @@ class Driver {
       payment: {
         cardDetails: {
           holderName: "Mr Cat",
-          number: 123456,
+          number: "4242424242424242",
           expMonth: 12,
           expYear: 2028,
           ccv: 123,
@@ -51,6 +51,10 @@ class Driver {
 
   getInitDefaults(): Credentials {
     return this.initDefCredentials;
+  }
+
+  getPaymentInfo() {
+    return this._pi;
   }
 
   initWithDefaults(): Driver {
@@ -103,6 +107,7 @@ class Driver {
       return this;
     },
   };
+
   makeABuy(amount: number = 1): ServiceFacade.Res.PurchaseResponse {
     this.mutant.p.map((p) =>
       this.bridge.saveProductToCart({
