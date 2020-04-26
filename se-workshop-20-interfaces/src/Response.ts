@@ -106,7 +106,12 @@ interface PurchaseResponse extends BoolResponse {
 interface ViewManagerPermissionResponse extends BoolResponse {
   data: { result: boolean; permissions?: ManagementPermission[] };
 }
+
+interface DeliveryResponse extends BoolResponse {
+  data: {result: boolean,  deliveryID?: string}
+}
 export {
+  DeliveryResponse,
   AddDiscountResponse,
   PaymentResponse,
   CartFinalPriceRes,

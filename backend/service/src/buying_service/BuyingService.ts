@@ -1,8 +1,8 @@
 import * as Req from "domain_layer/dist/src/api-ext/Request";
 import * as Res from "domain_layer/dist/src/api-ext/Response";
-import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/TradingSystemManager";
+import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
-export const purchase = (req: Req.PurchaseRequest, ts: TS): Res.PurchaseResponse => {
+export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
     const isCartOnStock: Res.BoolResponse = ts.verifyCart({
         body: {},
         token: req.token,
@@ -24,11 +24,11 @@ export const purchase = (req: Req.PurchaseRequest, ts: TS): Res.PurchaseResponse
     return purchaseRes;
 };
 
-export const pay = (req: Req.PayRequest, ts: TS): Res.PaymentResponse => {
+export const pay = (req: Req.PayRequest): Res.PaymentResponse => {
     return ts.pay(req)
 
 };
 
-export const deliver = (req: Req.DeliveryRequest, ts: TS): Res.DeliveryResponse => {
+export const deliver = (req: Req.DeliveryRequest): Res.DeliveryResponse => {
     return ts.deliver(req)
 };
