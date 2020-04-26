@@ -18,14 +18,13 @@ class Driver {
         cardDetails: {
           holderName: "Mr Cat",
           number: "4242424242424242",
-          expMonth: 12,
-          expYear: 2028,
-          ccv: 123,
+          expMonth: "12",
+          expYear: "2028",
+          ccv: "123",
         },
         address: "St. Cats 123",
         city: "Cat City",
         country: "CatZone",
-        price: 90,
       },
     };
   }
@@ -119,8 +118,7 @@ class Driver {
       })
     );
 
-    const res = this.bridge.purchase({ body: this._pi });
-    return res;
+    return this.bridge.purchase({ body: this._pi });
   }
 
   resetState() {

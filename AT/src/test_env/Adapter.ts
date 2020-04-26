@@ -242,7 +242,10 @@ export const Adapter: Partial<Env.Bridge> = {
     return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
   },
 
-  // addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
-  //
-  // }
+  addProductDiscount(req: Req.AddDiscountRequest) {
+    const {data, error} =  ServiceFacade.addProductDiscount(wrapWithToken(req.body));
+    return error
+        ? {data: undefined, error: error}
+        : {data: data, error: undefined};
+  }
 };
