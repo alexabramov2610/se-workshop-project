@@ -44,22 +44,22 @@ rm -r node_modules logs package-lock.json coverage
 #####  api
 echo -e "${BLUE}installing api...${NC}"
 cd $api
-npm i
+sudo npm i
 
 #####  domain
 echo -e "${BLUE}installing domain...${NC}"
 cd $domain
-npm i
+sudo npm i
 
 #####  service
 echo -e "${BLUE}installing service...${NC}"
 cd $service
-npm i
+sudo npm i
 
 #####  AT
 echo -e "${BLUE}installing AT...${NC}"
 cd $AT
-npm i
+sudo npm i
 
 
 
