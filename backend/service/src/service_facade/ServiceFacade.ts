@@ -190,6 +190,17 @@ export const pay = (req: Req.PayRequest): Res.PaymentResponse => {
 }
 
 /*
+correctness-constraints
+ */
+export const setPurchasePolicy = (req: Req.SetPaymentPolicyRequest): Res.BoolResponse => {
+    return runIfOpen(req, StoreService.setPurchasePolicy);
+}
+
+export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
+    return runIfOpen(req, StoreService.setDiscountsPolicy);
+}
+
+/*
 Utils
  */
 export const reset = (): void => {

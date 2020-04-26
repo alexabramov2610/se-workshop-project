@@ -187,7 +187,17 @@ interface VerifyStoreName extends Request{
     body:{storeName: string}
 }
 
+interface SetDiscountsPolicyRequest extends Request {
+    body: { policy: string }
+}
+
+interface SetPurchasePolicyRequest extends Request {
+    body: { policy: string }
+}
+
 export {
+    SetPurchasePolicyRequest,
+    SetDiscountsPolicyRequest,
     RemoveDiscountRequest,
     AddDiscountRequest,
     UpdateStockRequest,
