@@ -53,7 +53,8 @@ const ViewProductResponse: Res.ProductInfoResponse = {
             price: 33.5,
             catalogNumber: 123,
             category: ProductCategory.CLOTHING,
-            quantity: 2
+            quantity: 2,
+            finalPrice: 2
         },
     },
 };

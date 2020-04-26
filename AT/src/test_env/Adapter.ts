@@ -220,11 +220,13 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+
   saveProductToCart(
     req: ServiceFacade.Req.SaveToCartRequest
   ): ServiceFacade.Res.BoolResponse {
     return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   },
+
   search(searchData: Req.SearchRequest): ISearchResponse {
     const { data, error } = ServiceFacade.search(
       wrapWithToken(searchData.body)
@@ -233,9 +235,14 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
+
   viewManagerPermissions(
     req: Req.ViewManagerPermissionRequest
   ): Res.ViewManagerPermissionResponse {
     return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
   },
+
+  // addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+  //
+  // }
 };

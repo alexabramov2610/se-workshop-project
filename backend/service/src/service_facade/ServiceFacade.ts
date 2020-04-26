@@ -5,7 +5,6 @@ import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
 import * as BuyingService from '../buying_service/BuyingService'
-import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/TradingSystemManager";
 
 let tradingSystem = getInstance();
 

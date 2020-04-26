@@ -43,10 +43,6 @@ describe("Perform authorized operations, UC: 5.1", () => {
 
         _driver.loginWithDefaults(); // Owner is logging in again
         _serviceBridge.assignManager(_testStore, _storeManagerCredentials);
-
-        // const date = new Date();
-        // const dateTomorrow = new Date(date.getDate() + 1);
-        // _testDiscount = {percents: 20, timePeriod: {startTime: date, endTime: dateTomorrow}};
     });
 
     test("Act, no permissions", () => {
