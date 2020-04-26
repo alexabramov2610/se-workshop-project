@@ -361,6 +361,7 @@ export class TradingSystemManager {
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
     purchase(req: Req.UpdateStockRequest): Res.PurchaseResponse {
+        logger.info(`request to update the stock of stores (purchase)`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -379,6 +380,7 @@ export class TradingSystemManager {
 
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
+        logger.info(`request to verify new store details`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -389,6 +391,7 @@ export class TradingSystemManager {
     }
 
     verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        logger.info(`request to verify credentials`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -396,6 +399,7 @@ export class TradingSystemManager {
     }
 
     viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+        logger.info(`request to view manager permissions`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -405,6 +409,7 @@ export class TradingSystemManager {
     }
 
     addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount at store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -413,6 +418,7 @@ export class TradingSystemManager {
     }
 
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
+        logger.info(`request to remove discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
