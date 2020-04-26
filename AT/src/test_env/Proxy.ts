@@ -15,7 +15,7 @@ import {
     IProductsRemovalResponse,
     IResponse,
 } from "./mocks/responses";
-import {Res, Req} from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Req, Res } from "se-workshop-20-interfaces"
 
 let real: Partial<Bridge> = Adapter;
 
