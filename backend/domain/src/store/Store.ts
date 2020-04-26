@@ -477,7 +477,12 @@ export class Store {
     // TODO calculate from discount object
     getProductFinalPrice(catalogNumber: number) {
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
-        return product.price;
+        const discounts: Discount[] = product.discounts;
+        let finalPrice = product.price;
+        for (const d of discounts) {
+            finalPrice = d.calc(finalPrice);
+        }
+        return finalPrice
     }
 
     addDiscount(catalogNumber: number, discount: IDiscount): string {
@@ -491,5 +496,9 @@ export class Store {
 
     }
 
+    removeDiscount(catalogNumber: number, discountID: string): boolean {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber);
+        return product.removeDiscount(discountID);
+    }
 
 }

@@ -603,4 +603,21 @@ export class StoreManagement {
 
     }
 
+    removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string) :Res.BoolResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        if (!store.verifyPermission(user.name, ManagementPermission.MODIFY_DISCOUNT)) return {
+            data: {result: false},
+            error: {message: errorMsg.E_PERMISSION}
+        }
+        const isRemoved: boolean = store.removeDiscount(catalogNumber, discountID);
+        if(!isRemoved)
+            return {
+                data: {result: false},
+                error: {message: errorMsg.E_MODIFY_DISCOUNT}
+            }
+        return {data: {result: true}}
+
+    }
 }

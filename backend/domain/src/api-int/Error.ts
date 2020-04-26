@@ -41,8 +41,9 @@ const errorMsg:ErrorMessages = {
     E_BAG_NOT_EXISTS:"This store bag is not exist",
     E_BAG_BAD_AMOUNT:"This bag don't have the requested amount",
     E_PAY_FAILURE: "Payment failure.",
-    E_MANGER_NOT_EXISTS:"This user not manager in this store."
-
+    E_MANGER_NOT_EXISTS:"This user not manager in this store.",
+    E_EMPTY_CART:"The cart is empty",
+    E_MODIFY_DISCOUNT:"Modify discount failed"
 
 
 

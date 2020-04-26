@@ -25,9 +25,11 @@ export class Product {
     get price(): number {
         return this._price;
     }
+
     get name(): string {
         return this._name;
     }
+
     set name(value: string) {
         this._name = value;
     }
@@ -35,6 +37,7 @@ export class Product {
     set rating(value: Rating) {
         this._rating = value;
     }
+
     get rating(): Rating {
         return this._rating;
     }
@@ -48,9 +51,21 @@ export class Product {
         return this._catalogNumber;
     }
 
-    addDiscount(discount: Discount) : void{
+
+    get discounts(): Discount[] {
+        return this._discounts;
+    }
+
+    addDiscount(discount: Discount): void {
         this._discounts.push(discount);
     }
 
+
+    removeDiscount(discountID: string): boolean {
+        const discountToRemove : Discount = this._discounts.find((d)=> d.id === discountID);
+        if(!discountToRemove) return false;
+        this._discounts = this._discounts.filter((d) => d.id !== discountID);
+        return true;
+    }
 
 }
