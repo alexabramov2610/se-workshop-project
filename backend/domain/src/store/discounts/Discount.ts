@@ -36,4 +36,7 @@ export abstract class Discount {
     get startDate(): Date {
         return this._startDate;
     }
+
+    abstract calc(price: number) :number;
+
 }

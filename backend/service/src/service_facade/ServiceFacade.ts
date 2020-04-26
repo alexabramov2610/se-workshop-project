@@ -182,6 +182,12 @@ UC-4.10
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
     return runIfOpen(req, StoreService.viewStorePurchasesHistory);
 }
+/*
+UC-7
+ */
+export const pay = (req: Req.PayRequest): Res.PaymentResponse => {
+    return runIfOpen(req, BuyingService.pay);
+}
 
 /*
 Utils

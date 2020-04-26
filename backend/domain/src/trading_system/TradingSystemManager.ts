@@ -324,7 +324,7 @@ export class TradingSystemManager {
             finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
             cart.set(storeName, bagItemsWithPrices)
         }
-        return {data: {result: true , price: finalPrice}}
+        return {data: {result: true, price: finalPrice}}
     }
 
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
@@ -333,6 +333,8 @@ export class TradingSystemManager {
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        if (cart.size === 0)
+            return {data: {result: false}, error: {message: errorMsg.E_EMPTY_CART}}
         for (const [storeName, bagItems] of cart.entries()) {
             const result: Res.BoolResponse = this._storeManager.verifyStoreBag(storeName, bagItems)
             if (!result.data.result) {
@@ -352,11 +354,14 @@ export class TradingSystemManager {
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
-        return {data: {result: true , payment: {totalCharged: req.body.price, lastCC4: req.body.payment.cardDetails.number.slice(req.body.payment.cardDetails.number.length-4,req.body.payment.cardDetails.number.length)}}}
+        const lastCC4 = req.body.payment.cardDetails.number.slice(req.body.payment.cardDetails.number.length - 4, req.body.payment.cardDetails.number.length)
+        logger.debug(`paid with credit card ${lastCC4}`)
+        return {data: {result: true, payment: {totalCharged: req.body.price, lastCC4}}}
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
     purchase(req: Req.UpdateStockRequest): Res.PurchaseResponse {
+        logger.info(`request to update the stock of stores (purchase)`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -364,7 +369,7 @@ export class TradingSystemManager {
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let purchases: Purchase[] = []
         for (const [storeName, bagItems] of cart.entries()) {
-            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest",req.body.payment))
+            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment))
         }
         const receipt: Receipt = new Receipt(purchases, req.body.payment);
         if (rUser) {
@@ -374,8 +379,8 @@ export class TradingSystemManager {
     }
 
 
-
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
+        logger.info(`request to verify new store details`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -386,6 +391,7 @@ export class TradingSystemManager {
     }
 
     verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+        logger.info(`request to verify credentials`)
         const user = this._userManager.getUserByToken(req.token);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -393,6 +399,7 @@ export class TradingSystemManager {
     }
 
     viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+        logger.info(`request to view manager permissions`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -401,16 +408,22 @@ export class TradingSystemManager {
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
-    addProductDiscount(req:Req.AddDiscountRequest) : Res.AddDiscountResponse{
+    addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount at store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        return this._storeManager.addProductDiscount(user, req.body.storeName,req.body.catalogNumber,req.body.discount)
-        return {data: {result:true}}
+        return this._storeManager.addProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
+        return {data: {result: true}}
     }
 
-    removeProductDiscount(req:Req.RemoveDiscountRequest) : Res.BoolResponse{
-        return {data: {result:true}}
+    removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
+        logger.info(`request to remove discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        return this._storeManager.removeProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discountID)
+        return {data: {result: true}}
     }
 
     // methods that are available for admin also
