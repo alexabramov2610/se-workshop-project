@@ -1,5 +1,4 @@
-import * as Req from "domain_layer/dist/src/api-ext/Request";
-import * as Res from "domain_layer/dist/src/api-ext/Response";
+import { Res, Req } from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const createStore = (req: Req.OpenStoreRequest
