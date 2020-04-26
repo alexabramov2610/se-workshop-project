@@ -1,8 +1,8 @@
 import {DeliverySystem} from "./delivery_system/DeliverySystem"
 import {PaymentSystem} from "./payment_system/PaymentSystem"
 import {SecuritySystem} from "./security_system/SecuritySystem"
-import { BoolResponse} from "../api-ext/Response";
 import {errorMsg, ExternalSystems, loggerW} from "../api-int/internal_api"
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 const logger = loggerW(__filename)
 
 export class ExternalSystemsManager {

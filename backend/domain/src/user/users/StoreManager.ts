@@ -1,5 +1,5 @@
 import {RegisteredUser} from "../internal_api"
-import {ManagementPermission} from "../../api-ext/Enums";
+import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class StoreManager extends RegisteredUser {
 

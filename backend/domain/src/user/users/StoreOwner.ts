@@ -27,7 +27,7 @@ export class StoreOwner extends StoreManager {
     }
 
     isAssignerOfManager(storeManager: StoreManager) : boolean {
-        for (let manager of this._assignedStoreManagers) {
+        for (const manager of this._assignedStoreManagers) {
             if (manager.name === storeManager.name)
                 return true;
         }
@@ -35,7 +35,7 @@ export class StoreOwner extends StoreManager {
     }
 
     isAssignerOfOwner(storeOwner: StoreOwner) : boolean {
-        for (let manager of this._assignedStoreOwners) {
+        for (const manager of this._assignedStoreOwners) {
             if (manager.name === storeOwner.name)
                 return true;
         }

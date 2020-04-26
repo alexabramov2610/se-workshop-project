@@ -1,6 +1,6 @@
 import {Store, StoreManagement} from "../../../../src/store/internal_api";
-import * as Res from "../../../../src/api-ext/Response";
-import * as Req from "../../../../src/api-ext/Request";
+import {Req, Res} from 'se-workshop-20-interfaces'
+
 import {RegisteredUser, StoreOwner} from "../../../../src/user/internal_api";
 import {TradingSystemManager} from "../../../../src/trading_system/TradingSystemManager";
 import {ContactUsMessage, Item, Product, Receipt} from "../../../../src/trading_system/internal_api";
@@ -13,13 +13,14 @@ import {
     ProductCatalogNumber,
     ProductCategory,
     Purchase,
+    ProductWithQuantity
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
     Rating,
     TradingSystemState
-} from "../../../../src/api-ext/external_api";
-import {ProductWithQuantity} from "../../../../src/api-ext/CommonInterface";
+} from "se-workshop-20-interfaces/dist/src/Enums";
 import {User} from "../../../../src/user/users/User";
 import {PaymentSystem} from "../../../../src/external_systems/payment_system/PaymentSystem";
-
 jest.mock('../../../../src/user/UserManager');
 jest.mock('../../../../src/store/StoreManagement');
 jest.mock('../../../../src/external_systems/ExternalSystemsManager');
@@ -69,7 +70,7 @@ describe("Store Management Unit Tests", () => {
         prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.Request = {  body: {}, token: mockToken };
+        const req: Req.Request = {body: {}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(true);
@@ -82,7 +83,7 @@ describe("Store Management Unit Tests", () => {
         prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.Request = {  body: {}, token: mockToken };
+        const req: Req.Request = {body: {}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(false);
@@ -95,7 +96,7 @@ describe("Store Management Unit Tests", () => {
         prepareOpenTradeSystemMock(isLoggedIn, isAdmin);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.Request = {  body: {}, token: mockToken };
+        const req: Req.Request = {body: {}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(false);
@@ -104,7 +105,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareRegisterMock(isLoggedIn: boolean, isHasSession: boolean) {
-        const mockRes: Res.BoolResponse = { data : {result: !isLoggedIn && isHasSession}};
+        const mockRes: Res.BoolResponse = {data: {result: !isLoggedIn && isHasSession}};
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getUserByToken: () => isHasSession ? user : undefined,
@@ -121,7 +122,7 @@ describe("Store Management Unit Tests", () => {
         prepareRegisterMock(isLoggedIn, isHasSession);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const req: Req.RegisterRequest = {body: {username: user.name, password: user.password}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.register(req);
 
         expect(res.data.result).toBe(true);
@@ -134,7 +135,7 @@ describe("Store Management Unit Tests", () => {
         prepareRegisterMock(isLoggedIn, isHasSession);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const req: Req.RegisterRequest = {body: {username: user.name, password: user.password}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.register(req);
 
         expect(res.data.result).toBe(false);
@@ -147,7 +148,7 @@ describe("Store Management Unit Tests", () => {
         prepareRegisterMock(isLoggedIn, isHasSession);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.RegisterRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const req: Req.RegisterRequest = {body: {username: user.name, password: user.password}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.register(req);
 
         expect(res.data.result).toBe(false);
@@ -155,7 +156,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function prepareLoginMock(isSuccess: boolean) {
-        const mockRes: Res.BoolResponse = { data : {result: isSuccess } };
+        const mockRes: Res.BoolResponse = {data: {result: isSuccess}};
         mocked(UserManager).mockImplementation((): any => {
             return {
                 login: () => mockRes,
@@ -170,7 +171,7 @@ describe("Store Management Unit Tests", () => {
         prepareLoginMock(isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.LoginRequest = {  body: { username: user.name, password: user.password}, token: mockToken };
+        const req: Req.LoginRequest = {body: {username: user.name, password: user.password}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.login(req);
         expect(res.data.result).toBe(isSuccess);
     });
@@ -181,14 +182,14 @@ describe("Store Management Unit Tests", () => {
         prepareLoginMock(isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.LoginRequest = {  body: {username: user.name, password: user.password}, token: mockToken };
+        const req: Req.LoginRequest = {body: {username: user.name, password: user.password}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.login(req);
         expect(res.data.result).toBe(isSuccess);
     });
 
 
     function prepareLogoutMock(isSuccess: boolean) {
-        const mockRes: Res.BoolResponse = { data : { result: isSuccess } };
+        const mockRes: Res.BoolResponse = {data: {result: isSuccess}};
         const user: RegisteredUser = new RegisteredUser("name", "pw");
         mocked(UserManager).mockImplementation((): any => {
             return {
@@ -204,7 +205,7 @@ describe("Store Management Unit Tests", () => {
         prepareLogoutMock(isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.LogoutRequest = {  body: {}, token: mockToken };
+        const req: Req.LogoutRequest = {body: {}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.logout(req);
         expect(res.data.result).toBe(isSuccess);
     });
@@ -214,7 +215,7 @@ describe("Store Management Unit Tests", () => {
         prepareLogoutMock(isSuccess);
 
         tradingSystemManager = new TradingSystemManager();
-        const req: Req.LogoutRequest = {  body: {}, token: mockToken };
+        const req: Req.LogoutRequest = {body: {}, token: mockToken};
         const res: Res.BoolResponse = tradingSystemManager.logout(req);
         expect(res.data.result).toBe(isSuccess);
     });
@@ -1101,9 +1102,15 @@ describe("Store Management Unit Tests", () => {
 
 
     test("viewStoreInfo success", () => {
-        const mockReq: Req.StoreInfoRequest = { body: { storeName: "store-name"}, token: mockToken };
-        const mockRes: Res.StoreInfoResponse = { data: { result: true, info: { productsNames: ["aa"], storeManagersNames: ["aa"],
-                    storeName: "store-name", storeOwnersNames: ["aa"], storeRating: Rating.LOW}}};
+        const mockReq: Req.StoreInfoRequest = {body: {storeName: "store-name"}, token: mockToken};
+        const mockRes: Res.StoreInfoResponse = {
+            data: {
+                result: true, info: {
+                    productsNames: ["aa"], storeManagersNames: ["aa"],
+                    storeName: "store-name", storeOwnersNames: ["aa"], storeRating: Rating.LOW
+                }
+            }
+        };
         mocked(StoreManagement).mockImplementation((): any => {
             return {
                 viewStoreInfo: () => mockRes
@@ -1162,11 +1169,11 @@ describe("Store Management Unit Tests", () => {
     test("viewRegisteredUserPurchasesHistory failure - invalid user to view", () => {
         mocked(UserManager).mockImplementation((): any => {
             return {
-                getLoggedInUserByToken: () =>  new RegisteredUser("name1", "pw1"),
+                getLoggedInUserByToken: () => new RegisteredUser("name1", "pw1"),
                 getUserByName: () => undefined,
             }
         });
-        const req: Req.ViewRUserPurchasesHistoryReq = {body: { userName: "username-to-watch" }, token: "1"};
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {userName: "username-to-watch"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
         expect(res.data.receipts).toHaveLength(0)
@@ -1177,10 +1184,10 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getLoggedInUserByToken: () => new RegisteredUser("name1", "pw1"),
-                getUserByName: () =>  new RegisteredUser("name2", "pw1")
+                getUserByName: () => new RegisteredUser("name2", "pw1")
             }
         });
-        const req: Req.ViewRUserPurchasesHistoryReq = {body: { userName: "username-to-watch" }, token: "1"};
+        const req: Req.ViewRUserPurchasesHistoryReq = {body: {userName: "username-to-watch"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.ViewRUserPurchasesHistoryRes = tradingSystemManager.viewRegisteredUserPurchasesHistory(req);
         expect(res.data.receipts).toHaveLength(0)
@@ -1224,7 +1231,7 @@ describe("Store Management Unit Tests", () => {
                     userName: user.name,
                     item,
                     price: 30
-                }],{lastCC4: "5555",totalCharged:30})] : []
+                }], {lastCC4: "5555", totalCharged: 30})] : []
             }
         };
         mocked(UserManager).mockImplementation((): any => {
@@ -1363,48 +1370,48 @@ describe("Store Management Unit Tests", () => {
     })
 
 
-/*
-    function prepareMockToPay(isSuccess: boolean): void {
-        mocked(PaymentSystem).mockImplementation((): any => {
-            return {
-                constructor:() => new PaymentSystem(),
-                pay: () => isSuccess,
-            }
-        });
-        mocked(UserManager).mockImplementation((): any => {
-            return {
-                getUserByToken: () => user,
-            }
-        });
-        mocked(ExternalSystemsManager).mockReset()
+    /*
+        function prepareMockToPay(isSuccess: boolean): void {
+            mocked(PaymentSystem).mockImplementation((): any => {
+                return {
+                    constructor:() => new PaymentSystem(),
+                    pay: () => isSuccess,
+                }
+            });
+            mocked(UserManager).mockImplementation((): any => {
+                return {
+                    getUserByToken: () => user,
+                }
+            });
+            mocked(ExternalSystemsManager).mockReset()
 
-    }
-    test("pay success test", () => {
-        prepareMockToPay(true)
-        tradingSystemManager = new TradingSystemManager();
-        const req: Req.PayRequest = {
-            body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
-            token: mockToken
         }
-        const res = tradingSystemManager.pay(req)
+        test("pay success test", () => {
+            prepareMockToPay(true)
+            tradingSystemManager = new TradingSystemManager();
+            const req: Req.PayRequest = {
+                body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+                token: mockToken
+            }
+            const res = tradingSystemManager.pay(req)
 
-        expect(res.data.result).toBeTruthy();
+            expect(res.data.result).toBeTruthy();
 
-    })
+        })
 
-    test("pay failure test", () => {
-        prepareMockToPay(false)
-        tradingSystemManager = new TradingSystemManager();
-        const req: Req.PayRequest = {
-            body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
-            token: mockToken
-        }
-        const res = tradingSystemManager.pay(req)
+        test("pay failure test", () => {
+            prepareMockToPay(false)
+            tradingSystemManager = new TradingSystemManager();
+            const req: Req.PayRequest = {
+                body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,ccv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+                token: mockToken
+            }
+            const res = tradingSystemManager.pay(req)
 
-        expect(res.data.result).toBeFalsy();
+            expect(res.data.result).toBeFalsy();
 
-    })
-*/
+        })
+    */
 
     function preparePurchaseMock(isSuccess: boolean): Res.PurchaseResponse {
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
@@ -1414,17 +1421,27 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getUserByToken: () => user,
-                getLoggedInUserByToken : () => user,
+                getLoggedInUserByToken: () => user,
                 getUserCart: () => cart
             }
         });
-        const purchase: Purchase = {item: {catalogNumber:5,id:2},price:20, storeName:store.storeName,userName:user.name}
+        const purchase: Purchase = {
+            item: {catalogNumber: 5, id: 2},
+            price: 20,
+            storeName: store.storeName,
+            userName: user.name
+        }
         mocked(StoreManagement).mockImplementation((): any => {
             return {
                 purchaseFromStore: () => [purchase]
             }
         });
-        const res: Res.PurchaseResponse = isSuccess ? {data: {result: true,receipt: {date: new Date(),purchases:[purchase]}}} : {
+        const res: Res.PurchaseResponse = isSuccess ? {
+            data: {
+                result: true,
+                receipt: {date: new Date(), purchases: [purchase]}
+            }
+        } : {
             data: {result: false},
             error: {message: 'mock err'}
         };
@@ -1433,10 +1450,10 @@ describe("Store Management Unit Tests", () => {
 
     test("purchase success", () => {
 
-        const req :Req.UpdateStockRequest = {
-            body:{payment:{totalCharged: 30, lastCC4:"5555"}},token:mockToken
+        const req: Req.UpdateStockRequest = {
+            body: {payment: {totalCharged: 30, lastCC4: "5555"}}, token: mockToken
         }
-        const mockRes:Res.PurchaseResponse = preparePurchaseMock(true);
+        const mockRes: Res.PurchaseResponse = preparePurchaseMock(true);
         tradingSystemManager = new TradingSystemManager();
         const res: Res.PurchaseResponse = tradingSystemManager.purchase(req);
         expect(res.data.result).toBeTruthy()
@@ -1471,7 +1488,7 @@ describe("Store Management Unit Tests", () => {
     function prepareVerifyNewStoreMock(isStoreExists: boolean, isUserValid: boolean) {
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                verifyStoreExists: () =>  isStoreExists ? new Store("new-store-mock") : undefined,
+                verifyStoreExists: () => isStoreExists ? new Store("new-store-mock") : undefined,
             }
         });
 
@@ -1489,7 +1506,7 @@ describe("Store Management Unit Tests", () => {
         prepareVerifyNewStoreMock(isStoreExists, isUserValid);
         tradingSystemManager = new TradingSystemManager();
 
-        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: "name1"}, token: "token-mock"};
         const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
         expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
     });
@@ -1500,7 +1517,7 @@ describe("Store Management Unit Tests", () => {
         prepareVerifyNewStoreMock(isStoreExists, isUserValid);
         tradingSystemManager = new TradingSystemManager();
 
-        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: "name1"}, token: "token-mock"};
         const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
         expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
     });
@@ -1511,7 +1528,7 @@ describe("Store Management Unit Tests", () => {
         prepareVerifyNewStoreMock(isStoreExists, isUserValid);
         tradingSystemManager = new TradingSystemManager();
 
-        const verifyStoreReq: Req.VerifyStoreName = { body: { storeName: "name1"}, token: "token-mock" };
+        const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: "name1"}, token: "token-mock"};
         const verifyStoreRes: Res.BoolResponse = tradingSystemManager.verifyNewStore(verifyStoreReq);
         expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
     });
@@ -1528,7 +1545,7 @@ describe("Store Management Unit Tests", () => {
                     userName: user.name,
                     item,
                     price: 30
-                }],{lastCC4: "5555",totalCharged:30})] : []
+                }], {lastCC4: "5555", totalCharged: 30})] : []
             }
         };
         const viewUsersContactUsMessagesResponse: Res.ViewUsersContactUsMessagesResponse = {

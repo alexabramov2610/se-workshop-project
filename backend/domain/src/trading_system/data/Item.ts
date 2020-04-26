@@ -1,5 +1,3 @@
-import {Product} from "./Product";
-
 export class Item {
 
     private readonly _id: number;

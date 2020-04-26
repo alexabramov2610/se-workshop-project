@@ -1,12 +1,9 @@
 import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
-import * as Req from "../../../src/api-ext/Request";
-import * as Res from "../../../src/api-ext/Response";
+import {Req, Res} from 'se-workshop-20-interfaces'
 import utils from "./utils"
 import {Product} from "../../../src/trading_system/data/Product";
-import {ProductCategory} from "../../../src/api-ext/Enums";
-import {Cart, IReceipt} from "../../../src/api-ext/CommonInterface";
-import {UpdateStockRequest} from "../../../src/api-ext/Request";
-
+import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums"
+import {Cart, IReceipt} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 describe("Guest Integration Tests", () => {
     const username: string = "username";
@@ -169,7 +166,10 @@ describe("Guest Integration Tests", () => {
             }, token: userToken
         }
         */
-        const purchaseReq: UpdateStockRequest = {body:{payment:{totalCharged: 30, lastCC4:"5555"}},token: userToken}
+        const purchaseReq: Req.UpdateStockRequest = {
+            body: {payment: {totalCharged: 30, lastCC4: "5555"}},
+            token: userToken
+        }
         tradingSystemManager.calculateFinalPrices({token: userToken, body: {}})
         const purchaseRes: Res.PurchaseResponse = tradingSystemManager.purchase(purchaseReq)
         const expectedReciept: IReceipt = {
@@ -179,7 +179,7 @@ describe("Guest Integration Tests", () => {
                 storeName,
                 price: 20,
                 item: {catalogNumber: products[0].catalogNumber, id: 2}
-            }],payment:{totalCharged: 30, lastCC4:"5555"}
+            }], payment: {totalCharged: 30, lastCC4: "5555"}
         }
         expect(purchaseRes.data.result).toBeTruthy()
 

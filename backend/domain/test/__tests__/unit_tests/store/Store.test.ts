@@ -1,4 +1,3 @@
-import * as Res from "../../../../src/api-ext/Response";
 import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {Item, Product, Store} from "../../../../src/trading_system/internal_api";
 import {
@@ -7,8 +6,9 @@ import {
     ProductInStore,
     ProductWithQuantity,
     SearchFilters, SearchQuery
-} from "../../../../src/api-ext/CommonInterface";
-import {ManagementPermission, ProductCategory, Rating} from "../../../../src/api-ext/Enums";
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Req, Res} from 'se-workshop-20-interfaces'
+import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 describe("Store Management Unit Tests", () => {
     let store: Store;
@@ -553,8 +553,8 @@ describe("Store Management Unit Tests", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
         const items: Item[] = generateValidItems(10, 0, 1, 0);
-        let product: ProductReq = { catalogNumber:1, category: ProductCategory.ELECTRONICS, name: "name", price: 5 }
-        let res : Item[] = store.getItemsFromStock(product, 3);
+        const product: ProductReq = {catalogNumber: 1, category: ProductCategory.ELECTRONICS, name: "name", price: 5}
+        let res: Item[] = store.getItemsFromStock(product, 3);
         expect(res).toHaveLength(0);
         store.addItems(items);
         res = store.getItemsFromStock(product, 3);
@@ -562,12 +562,11 @@ describe("Store Management Unit Tests", () => {
     })
 
 
-
     test("search - price range", () => {
-        let products: Product[] = [];
+        const products: Product[] = [];
         const numOfItems: number = 5;
-        for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
+        for (let i = 1; i < numOfItems + 1; i++)
+            products.push(new Product("name" + i, i, 20 * i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -577,25 +576,32 @@ describe("Store Management Unit Tests", () => {
 
         // filter by price range
         const filters: SearchFilters = {
-            priceRange: { min: 0, max: 60 }
+            priceRange: {min: 0, max: 60}
         };
-        const query: SearchQuery = { };
+        const query: SearchQuery = {};
         const productsInStore: ProductInStore[] = store.search(filters, query);
 
-        let expectedRes: ProductInStore[] = [];
+        const expectedRes: ProductInStore[] = [];
 
-        for (let i = 0; i < 3; i ++)
-            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+        for (let i = 0; i < 3; i++)
+            expectedRes.push({
+                product: {
+                    catalogNumber: i + 1,
+                    category: products[i].category,
+                    name: products[i].name,
+                    price: products[i].price
+                }, storeName: store.storeName
+            });
 
         expect(productsInStore).toHaveLength(expectedRes.length);
         expect(productsInStore).toMatchObject(expectedRes);
     });
 
     test("search - product name", () => {
-        let products: Product[] = [];
+        const products: Product[] = [];
         const numOfItems: number = 5;
-        for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
+        for (let i = 1; i < numOfItems + 1; i++)
+            products.push(new Product("name" + i, i, 20 * i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -610,17 +616,24 @@ describe("Store Management Unit Tests", () => {
         };
         const productsInStore: ProductInStore[] = store.search(filters, query);
 
-        let expectedRes: ProductInStore[] = [{product: {catalogNumber: products[0].catalogNumber, category: products[0].category, name: products[0].name, price: products[0].price}, storeName: store.storeName}];
+        const expectedRes: ProductInStore[] = [{
+            product: {
+                catalogNumber: products[0].catalogNumber,
+                category: products[0].category,
+                name: products[0].name,
+                price: products[0].price
+            }, storeName: store.storeName
+        }];
 
         expect(productsInStore).toHaveLength(expectedRes.length);
         expect(productsInStore).toMatchObject(expectedRes);
     });
 
     test("search - rating", () => {
-        let products: Product[] = [];
+        const products: Product[] = [];
         const numOfItems: number = 5;
-        for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, ProductCategory.ELECTRONICS));
+        for (let i = 1; i < numOfItems + 1; i++)
+            products.push(new Product("name" + i, i, 20 * i, ProductCategory.ELECTRONICS));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -631,13 +644,20 @@ describe("Store Management Unit Tests", () => {
         let filters: SearchFilters = {
             productRating: Rating.MEDIUM
         };
-        const query: SearchQuery = { };
+        const query: SearchQuery = {};
         let productsInStore: ProductInStore[] = store.search(filters, query);
 
         let expectedRes: ProductInStore[] = [];
 
-        for (let i = 0; i < 5; i ++)
-            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+        for (let i = 0; i < 5; i++)
+            expectedRes.push({
+                product: {
+                    catalogNumber: i + 1,
+                    category: products[i].category,
+                    name: products[i].name,
+                    price: products[i].price
+                }, storeName: store.storeName
+            });
 
         expect(productsInStore).toHaveLength(5);
         expect(productsInStore).toMatchObject(expectedRes);
@@ -655,13 +675,13 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("search - category", () => {
-        let products: Product[] = [];
+        const products: Product[] = [];
         const numOfItems: number = 5;
         const category1: ProductCategory = ProductCategory.ELECTRONICS;
         const category2: ProductCategory = ProductCategory.GENERAL;
 
-        for (let i = 1; i < numOfItems +1; i ++)
-            products.push(new Product("name" + i, i, 20*i, category1));
+        for (let i = 1; i < numOfItems + 1; i++)
+            products.push(new Product("name" + i, i, 20 * i, category1));
 
         const res: Res.ProductAdditionResponse = store.addNewProducts(products);
 
@@ -672,13 +692,20 @@ describe("Store Management Unit Tests", () => {
         let filters: SearchFilters = {
             productCategory: category1
         };
-        const query: SearchQuery = { };
+        const query: SearchQuery = {};
         let productsInStore: ProductInStore[] = store.search(filters, query);
 
         let expectedRes: ProductInStore[] = [];
 
-        for (let i = 0; i < 5; i ++)
-            expectedRes.push({product: {catalogNumber: i+1, category: products[i].category, name: products[i].name, price: products[i].price}, storeName: store.storeName});
+        for (let i = 0; i < 5; i++)
+            expectedRes.push({
+                product: {
+                    catalogNumber: i + 1,
+                    category: products[i].category,
+                    name: products[i].name,
+                    price: products[i].price
+                }, storeName: store.storeName
+            });
 
         expect(productsInStore).toHaveLength(5);
         expect(productsInStore).toMatchObject(expectedRes);

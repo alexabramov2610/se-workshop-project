@@ -1,8 +1,7 @@
 import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
-import * as Req from "../../../src/api-ext/Request";
-import * as Res from "../../../src/api-ext/Response";
+import {Req, Res} from 'se-workshop-20-interfaces'
 import utils from "./utils"
-import {TradingSystemState} from "../../../src/api-ext/Enums";
+import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 
 describe("Admin Integration Tests", () => {
 

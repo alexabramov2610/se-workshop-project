@@ -1,5 +1,5 @@
 import {ContactUsMessage, Item, Product, Receipt} from "../trading_system/internal_api";
-import * as Res from "../api-ext/Response"
+import {Res} from 'se-workshop-20-interfaces'
 import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
@@ -14,8 +14,8 @@ import {
     ProductWithQuantity, Purchase,
     SearchFilters,
     SearchQuery
-} from "../api-ext/CommonInterface";
-import {BuyingTypes, DiscountsTypes, ManagementPermission, Rating} from "../api-ext/Enums";
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {BuyingTypes, DiscountsTypes, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Discount} from "./discounts/Discount";
 import {ShownDiscount} from "./discounts/ShownDiscount";
 
@@ -473,10 +473,10 @@ export class Store {
         this._receipts.push(new Receipt(purchases, payment))
     }
 
-    getProductFinalPrice(catalogNumber: number):number {
+    getProductFinalPrice(catalogNumber: number): number {
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
         const discounts: Discount[] = product.discounts;
-        let finalPrice:number = product.price;
+        let finalPrice: number = product.price;
         for (const d of discounts) {
             finalPrice = d.calc(finalPrice);
         }

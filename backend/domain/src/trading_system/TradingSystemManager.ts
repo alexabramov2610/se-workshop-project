@@ -1,15 +1,14 @@
 import {RegisteredUser, UserManager} from "../user/internal_api";
 import {StoreManagement} from '../store/internal_api';
-import * as Res from "../api-ext/Response"
-import * as Req from "../api-ext/Request"
+import {Req,Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {TradingSystemState} from "../api-ext/Enums";
+import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
-import {BagItem, Purchase} from "../api-ext/CommonInterface";
+import {BagItem, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
 const logger = loggerW(__filename)
 
