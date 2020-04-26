@@ -4,8 +4,8 @@ import {
     Store,
     Product, Item
 } from "../../";
-import {ProductBuilder} from "../mocks/builders/product-builder";
-import {ItemBuilder} from "../mocks/builders/item-builder";
+import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
+import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 import {IDiscount, Purchase} from "../../../backend/domain/dist/src/api-ext/CommonInterface";
 
 

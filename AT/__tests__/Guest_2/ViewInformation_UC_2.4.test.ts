@@ -1,6 +1,6 @@
 import {Bridge, Driver, Item, Store, Product} from "../../";
-import {ItemBuilder} from "../mocks/builders/item-builder";
-import {ProductBuilder} from "../mocks/builders/product-builder";
+import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
+import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 
 // const ITEM_NOT_FOUND = "Item not found";
 // const STORE_NOT_FOUND = "Store not found";

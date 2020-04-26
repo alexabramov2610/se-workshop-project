@@ -1,4 +1,4 @@
-import {Item} from "../../..";
+import {Item} from "../../../../index";
 
 export class ItemBuilder {
     private _item: Item;
