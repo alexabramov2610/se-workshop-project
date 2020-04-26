@@ -1,4 +1,4 @@
-import {IPayment, Purchase} from "../../api-ext/CommonInterface";
+import {IPayment, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export class Receipt {
 

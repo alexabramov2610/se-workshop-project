@@ -1,4 +1,4 @@
-import { BoolResponse} from "../../api-ext/Response";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 import { errorMsg, loggerW} from "../../api-int/internal_api";
 const logger = loggerW(__filename)
 

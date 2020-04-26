@@ -1,7 +1,4 @@
-import {IProduct, BagItem} from "../../api-ext/CommonInterface";
-import {BoolResponse} from "../../api-ext/Response";
-import {errorMsg} from "../../api-int/Error";
-import {RemoveFromCartRequest} from "../../api-ext/Request";
+import {IProduct, BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {loggerW} from "../../api-int/Logger";
 
 const logger = loggerW(__filename)

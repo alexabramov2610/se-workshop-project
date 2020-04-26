@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt'
-import {BoolResponse} from "../../api-ext/Response";
-import {errorMsg} from "../../api-int/Error";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 
 export class SecuritySystem {
     private _securitySys: any;

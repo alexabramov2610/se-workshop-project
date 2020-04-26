@@ -1,20 +1,16 @@
 import {UserRole} from "../api-int/Enums";
 import {
-    LoginRequest,
-    LogoutRequest,
     IProduct,
-    RegisterRequest,
     BagItem,
     Cart,
     CartProduct
-} from "../api-ext/external_api"
+} from "se-workshop-20-interfaces/src/CommonInterface"
 import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
-import * as Req from "../api-ext/Request";
-import * as Res from "../api-ext/Response";
+import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {BoolResponse, errorMsg, loggerW, SetAdminRequest} from "../api-int/internal_api";
+import {errorMsg, loggerW} from "../api-int/internal_api";
 
 const logger = loggerW(__filename)
 
@@ -33,7 +29,7 @@ export class UserManager {
         this.admins = [];
     }
 
-    register(req: RegisterRequest): BoolResponse {
+    register(req: Req.RegisterRequest): Res.BoolResponse {
         const userName = req.body.username;
         const password = req.body.password;
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
@@ -49,7 +45,7 @@ export class UserManager {
         }
     }
 
-    login(req: LoginRequest): BoolResponse {
+    login(req: Req.LoginRequest): Res.BoolResponse {
         const userName = req.body.username;
         const password = req.body.password;
         const user = this.getUserByName(userName)
@@ -70,7 +66,7 @@ export class UserManager {
         }
     }
 
-    logout(req: LogoutRequest): BoolResponse {
+    logout(req: Req.LogoutRequest): Res.BoolResponse {
         const user: RegisteredUser = this.getLoggedInUserByToken(req.token);
         if (!user) { // user not logged in
             logger.warn(`logging out fail, user is not logged in  `);
@@ -128,7 +124,7 @@ export class UserManager {
         return false;
     }
 
-    setAdmin(req: SetAdminRequest): BoolResponse {
+    setAdmin(req: Req.SetAdminRequest): Res.BoolResponse {
         const admin: Admin = this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
@@ -161,7 +157,7 @@ export class UserManager {
         user.saveProductToCart(storeName, product, amount);
     }
 
-    removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): BoolResponse {
+    removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): Res.BoolResponse {
         const storeBag: BagItem[] = user.cart.get(storeName);
         if (!storeBag) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}

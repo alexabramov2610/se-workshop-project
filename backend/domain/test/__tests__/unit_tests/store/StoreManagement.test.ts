@@ -1,7 +1,4 @@
 import {Store, StoreManagement} from "../../../../src/store/internal_api";
-import * as Responses from "../../../../src/api-ext/Response";
-import * as Res from "../../../../src/api-ext/Response";
-import {BoolResponse, StoreInfoResponse} from "../../../../src/api-ext/Response";
 import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
     IItem as ItemReq,
@@ -11,11 +8,12 @@ import {
     ProductWithQuantity,
     SearchFilters,
     SearchQuery
-} from "../../../../src/api-ext/CommonInterface";
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {errorMsg} from "../../../../src/api-int/Error";
-import {ManagementPermission, ProductCategory, Rating} from "../../../../src/api-ext/Enums";
+import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
+import {Req, Res} from 'se-workshop-20-interfaces'
 
 
 describe("Store Management Unit Tests", () => {
@@ -38,14 +36,14 @@ describe("Store Management Unit Tests", () => {
 
     test("addStore success", () => {
         const user: RegisteredUser = new RegisteredUser("tal", "tal12345");
-        const res: Responses.BoolResponse = storeManagement.addStore("new store name", user);
+        const res: Res.BoolResponse = storeManagement.addStore("new store name", user);
         expect(res.data.result).toBeTruthy();
 
     });
 
     test("addStore failure", () => {
         const user: RegisteredUser = new RegisteredUser("tal", "tal12345");
-        const res: Responses.BoolResponse = storeManagement.addStore("", user);
+        const res: Res.BoolResponse = storeManagement.addStore("", user);
         expect(res.data.result).toBeFalsy();
     });
 
@@ -1020,7 +1018,12 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = true;
         const isSuccessFlow: boolean = true;
         mockVerifyStoreOperation(isSuccessVerify);
-        const prodReq: ProductReq[] = [{name: 'mock-prod', category: ProductCategory.ELECTRONICS, catalogNumber: 1, price: 1}];
+        const prodReq: ProductReq[] = [{
+            name: 'mock-prod',
+            category: ProductCategory.ELECTRONICS,
+            catalogNumber: 1,
+            price: 1
+        }];
         const mockRes: Res.ProductAdditionResponse = {data: {result: isSuccessFlow, productsNotAdded: prodReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
         const store: Store = new Store("store-mock");
@@ -1096,7 +1099,7 @@ describe("Store Management Unit Tests", () => {
 
     test('viewStoreInfo cant find store Fail ', () => {
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
-        const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
+        const res: Res.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
         expect(res.error.message).toEqual(errorMsg.E_NF);
     });
@@ -1104,11 +1107,11 @@ describe("Store Management Unit Tests", () => {
     test('viewStoreInfo Success ', () => {
         const storeName: string = 'mock-store';
         const store: Store = new Store(storeName);
-        const response: StoreInfoResponse = {data: {result: true}};
+        const response: Res.StoreInfoResponse = {data: {result: true}};
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'viewStoreInfo').mockReturnValueOnce(response);
 
-        const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo(storeName);
+        const res: Res.StoreInfoResponse = storeManagement.viewStoreInfo(storeName);
         expect(res).toBe(response);
     });
 
@@ -1155,16 +1158,23 @@ describe("Store Management Unit Tests", () => {
 
     test('viewStoreInfo cant find store Fail ', () => {
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
-        const res: Responses.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
+        const res: Res.StoreInfoResponse = storeManagement.viewStoreInfo('whatever');
         expect(res.data.result).toBeFalsy();
-        expect(res.error.message).toEqual(errorMsg['E_NF']);
+        expect(res.error.message).toEqual(errorMsg.E_NF);
     });
 
 
     test("search - success with store name matching rating", () => {
         const store: Store = new Store('my store');
 
-        const productsInStore: ProductInStore[] = [{product: {catalogNumber: 1, category: ProductCategory.GENERAL, name: "mock", price: 11}, storeName: store.storeName}];
+        const productsInStore: ProductInStore[] = [{
+            product: {
+                catalogNumber: 1,
+                category: ProductCategory.GENERAL,
+                name: "mock",
+                price: 11
+            }, storeName: store.storeName
+        }];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
 
@@ -1188,7 +1198,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
 
         const filters: SearchFilters = {
-             storeRating: Rating.LOW
+            storeRating: Rating.LOW
         };
         const query: SearchQuery = {
             storeName: store.storeName
@@ -1221,12 +1231,11 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("search - success without store name", () => {
-        expect(storeManagement.addStore("storename", new RegisteredUser('name','pw')).data.result).toBe(true);
+        expect(storeManagement.addStore("storename", new RegisteredUser('name', 'pw')).data.result).toBe(true);
         const productsInStore: ProductInStore[] = [];
 
         const filters: SearchFilters = {};
-        const query: SearchQuery = {
-        };
+        const query: SearchQuery = {};
 
         const res: Res.SearchResponse = storeManagement.search(filters, query);
 
@@ -1236,7 +1245,7 @@ describe("Store Management Unit Tests", () => {
 
 
     function mockVerifyStoreOperation(isSuccess: boolean) {
-        const mockValidationRes: BoolResponse = isSuccess ? {data: {result: isSuccess}} : {
+        const mockValidationRes: Res.BoolResponse = isSuccess ? {data: {result: isSuccess}} : {
             data: {result: isSuccess},
             error: {message: "mock"}
         }

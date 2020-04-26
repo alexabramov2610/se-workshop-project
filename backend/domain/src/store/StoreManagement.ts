@@ -1,18 +1,16 @@
 import {Store} from './internal_api'
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
-import * as Res from "../api-ext/Response";
-import * as Req from "../api-ext/Request";
+import {Req, Res} from 'se-workshop-20-interfaces'
 import {
     BagItem, IDiscount,
     IItem, IPayment,
     IProduct as ProductReq,
     IReceipt,
     ProductCatalogNumber, ProductInStore,
-    ProductWithQuantity, Purchase, SearchFilters, SearchQuery
-} from "../api-ext/CommonInterface";
-import {Receipt} from "../trading_system/data/Receipt";
-import {ManagementPermission} from "../api-ext/Enums";
+    ProductWithQuantity, Purchase, SearchFilters, SearchQuery, IContactUsMessage
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
 
@@ -484,6 +482,7 @@ export class StoreManagement {
         }
     }
 
+
     viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store) return {data: {messages: []}, error: {message: errorMsg.E_NF}}
@@ -491,11 +490,19 @@ export class StoreManagement {
             data: {messages: []},
             error: {message: errorMsg.E_PERMISSION}
         }
-        const messages: ContactUsMessage[] = store.getContactUsMessages();
-        return {data: {messages}}
+        const newMessages: ContactUsMessage[] = store.getContactUsMessages();
+        const newMessageI: IContactUsMessage[] = newMessages.map((contactUs) => {
+            return {
+                question: contactUs.question, date: contactUs.date, response: contactUs.response,
+                responderName: contactUs.responderName, responseDate: contactUs.responseDate
+            }
+        })
+        return {data: {messages: newMessageI}}
     }
 
-    search(filters: SearchFilters, query: SearchQuery): Res.SearchResponse {
+
+    search(filters: SearchFilters, query: SearchQuery):
+        Res.SearchResponse {
         if (query.storeName) {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
@@ -532,11 +539,23 @@ export class StoreManagement {
         return items;
     }
 
-    private verifyPermissions(permissions: ManagementPermission[]): boolean {
+    private
+
+    verifyPermissions(permissions
+                          :
+                          ManagementPermission[]
+    ):
+        boolean {
         return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
     }
 
-    verifyStoreBag(storeName: string, bagItems: BagItem[]): Res.BoolResponse {
+    verifyStoreBag(storeName
+                       :
+                       string, bagItems
+                       :
+                       BagItem[]
+    ):
+        Res.BoolResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -548,7 +567,17 @@ export class StoreManagement {
 
     }
 
-    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment: IPayment): Purchase[] {
+    purchaseFromStore(storeName
+                          :
+                          string, bagItems
+                          :
+                          BagItem[], userName
+                          :
+                          string, payment
+                          :
+                          IPayment
+    ):
+        Purchase[] {
         const store: Store = this.findStoreByName(storeName);
         const purchases: Purchase[] = [];
 
@@ -565,7 +594,13 @@ export class StoreManagement {
     }
 
 
-    calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
+    calculateFinalPrices(storeName
+                             :
+                             string, bagItems
+                             :
+                             BagItem[]
+    ):
+        BagItem[] {
         const store: Store = this.findStoreByName(storeName);
         return bagItems.map((bagItem): BagItem => {
             return {
@@ -576,7 +611,15 @@ export class StoreManagement {
         })
     }
 
-    viewManagerPermissions(owner: RegisteredUser, manager: RegisteredUser, req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+    viewManagerPermissions(owner
+                               :
+                               RegisteredUser, manager
+                               :
+                               RegisteredUser, req
+                               :
+                               Req.ViewManagerPermissionRequest
+    ):
+        Res.ViewManagerPermissionResponse {
         const store: Store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -590,7 +633,17 @@ export class StoreManagement {
         return {data: {result: true, permissions}}
     }
 
-    addProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discount: IDiscount): Res.AddDiscountResponse {
+    addProductDiscount(user
+                           :
+                           RegisteredUser, storeName
+                           :
+                           string, catalogNumber
+                           :
+                           number, discount
+                           :
+                           IDiscount
+    ):
+        Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -603,7 +656,16 @@ export class StoreManagement {
 
     }
 
-    removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string) :Res.BoolResponse {
+    removeProductDiscount(user:
+                              RegisteredUser, storeName
+                              :
+                              string, catalogNumber
+                              :
+                              number, discountID
+                              :
+                              string
+    ):
+        Res.BoolResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -612,7 +674,7 @@ export class StoreManagement {
             error: {message: errorMsg.E_PERMISSION}
         }
         const isRemoved: boolean = store.removeDiscount(catalogNumber, discountID);
-        if(!isRemoved)
+        if (!isRemoved)
             return {
                 data: {result: false},
                 error: {message: errorMsg.E_MODIFY_DISCOUNT}

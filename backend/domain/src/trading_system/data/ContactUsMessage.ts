@@ -19,16 +19,18 @@ export class ContactUsMessage {
         return this._date;
     }
 
-    get responserName(): string {
+    get responderName(): string {
         return this._responderName;
     }
-    set responserName(value: string) {
+
+    set responderName(value: string) {
         this._responderName = value;
     }
 
     get responseDate(): string {
         return this._responseDate;
     }
+
     set responseDate(value: string) {
         this._responseDate = value;
     }

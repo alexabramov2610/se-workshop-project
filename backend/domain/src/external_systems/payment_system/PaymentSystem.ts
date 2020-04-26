@@ -1,7 +1,7 @@
-import {CreditCard} from "../../api-ext/CommonInterface";
-import { BoolResponse, errorMsg, loggerW} from "../../api-int/internal_api";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
+import {CreditCard} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import { errorMsg, loggerW} from "../../api-int/internal_api";
 const logger = loggerW(__filename)
-
 
 export class PaymentSystem {
     private _paymentSys: any;

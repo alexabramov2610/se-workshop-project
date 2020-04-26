@@ -1,9 +1,8 @@
 import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
-import * as Req from "../../../src/api-ext/Request";
-import * as Res from "../../../src/api-ext/Response";
+import {Req, Res} from 'se-workshop-20-interfaces'
 import utils from "./utils"
 import {Product} from "../../../src/trading_system/data/Product";
-import {ProductCategory} from "../../../src/api-ext/Enums";
+import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 
 describe("Registered User Integration Tests", () => {
     const username: string = "username";

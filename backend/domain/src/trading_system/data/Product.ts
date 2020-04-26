@@ -1,4 +1,4 @@
-import {ProductCategory, Rating} from "../../api-ext/Enums";
+import {ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Discount} from "../../store/discounts/Discount";
 
 export class Product {
