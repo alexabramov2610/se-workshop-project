@@ -1,7 +1,5 @@
-import {getInstance, CreateInstance} from "domain_layer/dist/src/api-ext/external_api";
-import * as Req from "domain_layer/dist/src/api-ext/Request";
-import * as Res from "domain_layer/dist/src/api-ext/Response";
-import {TradingSystemState} from "domain_layer/dist/src/api-ext/Enums";
+import {getInstance, createInstance} from "domain_layer/";
+import {Req, Res, Enums,CommonInterface} from "se-workshop-20-interfaces"
 import * as UserService from '../user_service/UserService'
 import * as StoreService from '../store_service/StoreService'
 import * as BuyingService from '../buying_service/BuyingService'
@@ -198,7 +196,7 @@ export const deliver = (req: Req.DeliveryRequest): Res.DeliveryResponse => {
 /*
 correctness-constraints
  */
-export const setPurchasePolicy = (req: Req.SetPaymentPolicyRequest): Res.BoolResponse => {
+export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, StoreService.setPurchasePolicy);
 }
 
@@ -210,16 +208,16 @@ export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.Bool
 Utils
  */
 export const reset = (): void => {
-    tradingSystem = CreateInstance();
+    tradingSystem = createInstance();
 }
 export const startNewSession = (): string => {
     return tradingSystem.startNewSession();
 }
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.getTradeSystemState(isOpenReq).data.state !== TradingSystemState.OPEN)
+    if (tradingSystem.getTradeSystemState(isOpenReq).data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
-    return fn.call(this, req, tradingSystem);
+    return fn.call(this, req);
 }
 
-export {Req, Res};
+export {tradingSystem}

@@ -11,8 +11,6 @@ import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "../api-ext/CommonInterface";
 import {Receipt} from "./internal_api";
-import {TradingSystemManager as TS} from "../../dist/src/trading_system/TradingSystemManager";
-
 const logger = loggerW(__filename)
 
 export class TradingSystemManager {
