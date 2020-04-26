@@ -28,3 +28,7 @@ export const pay = (req: Req.PayRequest, ts: TS): Res.PaymentResponse => {
     return ts.pay(req)
 
 };
+
+export const deliver = (req: Req.DeliveryRequest, ts: TS): Res.DeliveryResponse => {
+    return ts.deliver(req)
+};

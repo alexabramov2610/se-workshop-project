@@ -4,6 +4,7 @@ import {TradingSystemManager as TS} from "domain_layer/dist/src/trading_system/T
 
 export const registerUser = (req: Req.RegisterRequest, ts: TS): Res.BoolResponse => {
     // TODO 1.verify credentials  2.register
+    const isCredentialsOk :Res.BoolResponse =ts.verifyNewCredentials({body: {username: req.body.username, password: req.body.password},token:req.token})
 
     return ts.register(req);
 }
