@@ -23,6 +23,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "domain_layer": "file:../domain"
+    "domain_layer": "file:../domain",
+    "se-workshop-20-interfaces": "file:../../se-workshop-20-interfaces"
   }
 }

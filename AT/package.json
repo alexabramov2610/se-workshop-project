@@ -15,7 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "tsc": "^1.20150623.0",
-    "service_layer": "file:../backend/service"
+    "service_layer": "file:../backend/service",
+    "se-workshop-20-interfaces": "file:../se-workshop-20-interfaces"
   },
   "devDependencies": {
     "@types/jest": "^25.1.5",
