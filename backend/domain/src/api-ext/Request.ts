@@ -67,7 +67,7 @@ interface RegisterRequest extends Request {
 }
 
 interface VerifyCredentialsReq extends Request {
-    body: { username: string, password: string}
+    body: { username: string, password: string }
 }
 
 interface LoginRequest extends Request {
@@ -86,8 +86,9 @@ interface ViewShopPurchasesHistoryRequest extends Request {
 interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
 }
+
 interface ViewManagerPermissionRequest extends Request {
-    body: { managerToView: string, storeName: string}
+    body: { managerToView: string, storeName: string }
 }
 
 interface ViewBuyerPurchasesHistoryRequest extends Request {
@@ -99,7 +100,7 @@ interface StoreInfoRequest extends Request {
 }
 
 interface AddDiscountRequest extends Request {
-    body: { storeName: string, catalogNumber: number, discount:IDiscount }
+    body: { storeName: string, catalogNumber: number, discount: IDiscount }
 }
 
 interface RemoveDiscountRequest extends Request {
@@ -183,8 +184,22 @@ interface CalcFinalPriceReq extends Request {
     body: {}
 }
 
-interface VerifyStoreName extends Request{
-    body:{storeName: string}
+interface VerifyStoreName extends Request {
+    body: { storeName: string }
+}
+
+interface DeliveryRequest extends Request {
+    body: {
+        userDetails: { country: string, city: string, address: string }
+    }
+}
+
+interface VerifyNewCredentials extends Request {
+    body: {
+        userName: string,
+        password: string
+    }
+
 }
 
 interface SetDiscountsPolicyRequest extends Request {
@@ -196,6 +211,8 @@ interface SetPurchasePolicyRequest extends Request {
 }
 
 export {
+    VerifyNewCredentials,
+    DeliveryRequest,
     SetPurchasePolicyRequest,
     SetDiscountsPolicyRequest,
     RemoveDiscountRequest,
