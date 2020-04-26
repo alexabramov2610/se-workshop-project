@@ -90,3 +90,11 @@ export const addProductDiscount = (req: Req.AddDiscountRequest, ts: TS): Res.Add
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest, ts: TS): Res.BoolResponse => {
     return ts.removeProductDiscount(req)
 }
+
+export const setPurchasePolicy = (req: Req.SetPaymentPolicyRequest, ts: TS): Res.BoolResponse => {
+    return ts.setPurchasePolicy(req);
+}
+
+export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest, ts: TS): Res.BoolResponse => {
+    return ts.setDiscountsPolicy(req);
+}

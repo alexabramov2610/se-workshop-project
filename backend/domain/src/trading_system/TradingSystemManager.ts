@@ -11,6 +11,7 @@ import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "../api-ext/CommonInterface";
 import {Receipt} from "./internal_api";
+import {TradingSystemManager as TS} from "../../dist/src/trading_system/TradingSystemManager";
 
 const logger = loggerW(__filename)
 
@@ -449,6 +450,15 @@ export class TradingSystemManager {
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
+    }
+
+
+    setPurchasePolicy (req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
+        return { data: {result: false }};
+    }
+
+    setDiscountsPolicy (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
+        return { data: {result: false }};
     }
 
 }
