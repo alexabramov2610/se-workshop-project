@@ -1,5 +1,6 @@
 import { Bridge, Proxy } from "../..";
 import { Credentials, User, Store, Product } from "./types";
+import { Res } from "se-workshop-20-interfaces"
 import { ServiceFacade } from "service_layer";
 
 class Driver {
