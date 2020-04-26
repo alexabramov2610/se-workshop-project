@@ -12,7 +12,7 @@ import {
     SearchFilters,
     SearchQuery
 } from "../../../backend/domain/dist/src/api-ext/CommonInterface";
-import {Req} from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Req } from "se-workshop-20-interfaces"
 import {Rating} from "../../../backend/domain/dist/src/api-ext/Enums";
 
 

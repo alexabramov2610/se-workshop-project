@@ -3,7 +3,7 @@ import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "./mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
-import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Req, Res } from "se-workshop-20-interfaces"
 import { ISearchResponse } from "./mocks/responses";
 
 let token;

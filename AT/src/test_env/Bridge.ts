@@ -8,7 +8,7 @@ import {
   Product,
 } from "./types";
 import * as DummyTypes from "./mocks/responses";
-import { Res, Req } from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Req, Res } from "se-workshop-20-interfaces"
 
 export interface Bridge {
   setReal?(real: Bridge): void;

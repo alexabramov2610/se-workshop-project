@@ -1,6 +1,6 @@
 import {Response, Product, PERMISSION} from "../types";
 import {ProductCatalogNumber, ProductCategory, ProductInStore} from "../../../../backend/domain/src/api-ext/CommonInterface";
-import {Res} from "service_layer/dist/src/service_facade/ServiceFacade";
+import { Res } from "se-workshop-20-interfaces"
 
 export interface IResponse extends Response {
     data: any;
