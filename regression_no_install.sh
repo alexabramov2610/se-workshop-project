@@ -15,54 +15,6 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 
-##### CLEAN #####
-
-#####  api
-echo -e "${RED}cleaning api folder...${NC}"
-cd $api
-rm -r node_modules logs package-lock.json dist coverage
-
-#####  domain
-echo -e "${RED}cleaning domain folder...${NC}"
-cd $domain
-rm -r node_modules logs package-lock.json dist coverage
-
-#####  service
-echo -e "${RED}cleaning service folder...${NC}"
-cd $service
-rm -r node_modules logs package-lock.json dist coverage
-
-#####  AT
-echo -e "${RED}cleaning AT folder...${NC}"
-cd $AT
-rm -r node_modules logs package-lock.json coverage
-
-
-
-##### INSTALL #####
-
-#####  api
-echo -e "${BLUE}installing api...${NC}"
-cd $api
-npm i
-
-#####  domain
-echo -e "${BLUE}installing domain...${NC}"
-cd $domain
-npm i
-
-#####  service
-echo -e "${BLUE}installing service...${NC}"
-cd $service
-npm i
-
-#####  AT
-echo -e "${BLUE}installing AT...${NC}"
-cd $AT
-npm i
-
-
-
 ##### COMPILE #####
 
 #####  api
