@@ -66,7 +66,7 @@ export class PaymentSystem {
         } else {
             const today: Date = new Date();
             const expOk: boolean = (Number.parseInt(creditCard.expYear,10) > today.getFullYear()  || (parseInt(creditCard.expYear,10) === today.getFullYear() && parseInt(creditCard.expMonth,10) >= today.getMonth()+1))
-            return creditCard.holderName && creditCard.number && creditCard.ccv && expOk;
+            return creditCard.holderName && creditCard.number && creditCard.cvv && expOk;
         }
     }
 }

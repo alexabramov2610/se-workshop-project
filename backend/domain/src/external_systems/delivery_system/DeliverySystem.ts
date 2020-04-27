@@ -59,6 +59,7 @@ export class DeliverySystem {
     }
 
     private validateDelivery(country: string, city: string, address: string) {
-        return country.length > 0 && city.length > 0 && address.length > 0;
+        const invalid = country.length <= 0 || city.length <= 0 || address.length <= 0;
+        return !invalid;
     }
 }

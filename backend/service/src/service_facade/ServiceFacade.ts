@@ -1,8 +1,8 @@
 import {getInstance, createInstance} from "domain_layer/";
-import {Req, Res, Enums, CommonInterface} from "se-workshop-20-interfaces"
-import * as UserService from '../user_service/UserService'
-import * as StoreService from '../store_service/StoreService'
-import * as BuyingService from '../buying_service/BuyingService'
+import {Req, Res, Enums, CommonInterface} from "se-workshop-20-interfaces";
+import * as UserService from '../user_service/UserService';
+import * as StoreService from '../store_service/StoreService';
+import * as BuyingService from '../buying_service/BuyingService';
 
 let tradingSystem = getInstance();
 /*

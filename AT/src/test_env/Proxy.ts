@@ -15,7 +15,7 @@ import {
     IProductsRemovalResponse,
     IResponse,
 } from "./mocks/responses";
-import { Req, Res } from "se-workshop-20-interfaces"
+import { Res, Req } from "se-workshop-20-interfaces";
 
 let real: Partial<Bridge> = Adapter;
 
@@ -237,6 +237,14 @@ const Proxy: Bridge = {
     ): Res.ViewManagerPermissionResponse {
         return real.viewManagerPermissions && real.viewManagerPermissions(req);
     },
+    pay(req: Req.PayRequest): Res.PaymentResponse {
+        return real.pay ? real.pay(req) : {data: {result: true, payment: {lastCC4: "5555", totalCharged: 80}}}
+    },
+
+    deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
+        return real.deliver ? real.deliver(req) : {data: {result: true}};
+    }
+
 };
 
 export {Proxy};

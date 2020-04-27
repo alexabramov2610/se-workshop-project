@@ -362,7 +362,7 @@ describe("Guest Integration Tests", () => {
         const req: Req.PayRequest = {
             body: {
                 payment: {
-                    cardDetails: {holderName: "tal", number: "152", expYear: "2021", expMonth: "5", ccv: "40"},
+                    cardDetails: {holderName: "tal", number: "152", expYear: "2021", expMonth: "5", cvv: "40"},
                     address: "batyam",
                     city: "batya",
                     country: "israel"
@@ -395,7 +395,7 @@ describe("Guest Integration Tests", () => {
                         number: "152",
                         expYear: "2021",
                         expMonth: "5",
-                        ccv: "40"
+                        cvv: "40"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: token

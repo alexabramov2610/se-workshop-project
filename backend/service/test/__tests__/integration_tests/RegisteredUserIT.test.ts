@@ -62,7 +62,7 @@ describe("Registered User Integration Tests", () => {
                         number: "1234-4567-7890-" + lastCC4,
                         expYear: "2021",
                         expMonth: "5",
-                        ccv: "400"
+                        cvv: "400"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: token

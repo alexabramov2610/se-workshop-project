@@ -111,7 +111,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem connection - pay - success", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { ccv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: PaymentSystemMockPaySuccess = new PaymentSystemMockPaySuccess();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -121,7 +121,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem connection - pay - Exception", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { ccv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: PaymentSystemMockPayException = new PaymentSystemMockPayException();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -131,7 +131,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem connection - pay - failure - can't connect", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { ccv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: RealSystemMockFailure = new RealSystemMockFailure();
         paymentSystem.setPaymentSys(mockDelSystem);

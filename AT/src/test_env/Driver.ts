@@ -2,6 +2,7 @@ import { Bridge, Proxy } from "../..";
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
 import { ServiceFacade } from "service_layer";
+import {PayRequest} from "se-workshop-20-interfaces/dist/src/Request";
 
 class Driver {
   private mutant: { p: Product[]; s: Store; u: User };
@@ -21,7 +22,7 @@ class Driver {
           number: "4242424242424242",
           expMonth: "12",
           expYear: "2028",
-          ccv: "123",
+          cvv: "123",
         },
         address: "St. Cats 123",
         city: "Cat City",
