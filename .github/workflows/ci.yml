@@ -82,18 +82,18 @@ jobs:
           npm test
           cd ..
           cd ..
-#      - name: Acceptance Tests
-#        run: |
-#          cd AT
-#          npm test
-#          cd ..
-#      - uses: devmasx/coverage-check-action@v1.1.0
-#        with:
-#          type: simplecov
-#          result_path: backend/domain/coverage/coverage-final.json
-#          min_coverage: 90
-#          token: ${{secrets.SEC_TOKEN}}
-      - uses: ziishaned/jest-reporter-action@v0.0.1
+      - name: Acceptance Tests
+        run: |
+          cd AT
+          npm test
+          cd ..
+      - uses: devmasx/coverage-check-action@v1.1.0
         with:
-          github-token: ${{ secrets.SEC_TOKEN }}
-          test-command: "cd backend/domain ; npm run test:cov"
+          type: simplecov
+          result_path: backend/domain/coverage/coverage-final.json
+          min_coverage: 90
+          token: ${{secrets.SEC_TOKEN}}
+#      - uses: ziishaned/jest-reporter-action@v0.0.1
+#        with:
+#          github-token: ${{ secrets.SEC_TOKEN }}
+#          test-command: "cd backend/domain ; npm run test:cov"
