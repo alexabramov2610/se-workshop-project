@@ -76,11 +76,6 @@ describe("Guest Integration Tests", () => {
         expect(storeInfoRes.data.info.productsNames).toMatchObject(["p1"]);
     });
 
-    it("test", done => {
-        expect(true).toBe(true);
-        // throw "asd"
-    })
-
     it("View product information IT test", () => {
         const storeName: string = "store name";
         const itemsNumber: number = 1;
