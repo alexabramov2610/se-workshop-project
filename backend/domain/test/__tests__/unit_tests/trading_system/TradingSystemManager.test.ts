@@ -25,6 +25,7 @@ jest.mock('../../../../src/user/UserManager');
 jest.mock('../../../../src/store/StoreManagement');
 jest.mock('../../../../src/external_systems/ExternalSystemsManager');
 jest.mock('../../../../src/external_systems/payment_system/PaymentSystem')
+
 describe("Store Management Unit Tests", () => {
     let tradingSystemManager: TradingSystemManager;
     let store: Store;
