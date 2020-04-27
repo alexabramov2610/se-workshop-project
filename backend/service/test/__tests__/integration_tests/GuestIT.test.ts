@@ -76,6 +76,11 @@ describe("Guest Integration Tests", () => {
         expect(storeInfoRes.data.info.productsNames).toMatchObject(["p1"]);
     });
 
+    it("test", done => {
+        expect(true).toBe(true);
+        // throw "asd"
+    })
+
     it("View product information IT test", () => {
         const storeName: string = "store name";
         const itemsNumber: number = 1;
@@ -110,7 +115,7 @@ describe("Guest Integration Tests", () => {
         expect(productInfoResponse.data.info.catalogNumber).toEqual(productCatalogNumber);
     });
 
-    it("Search IT test", done => {
+    it("Search IT", done => {
         const storeName1: string = "store name1";
         const storeName2: string = "store name2";
         const storeName3: string = "store name3";
@@ -166,7 +171,7 @@ describe("Guest Integration Tests", () => {
         searchRes.data.products.forEach(product => {
             const storeNamePredicate: number = product.storeName === storeName1 ? 1 : product.storeName === storeName2 ? 2 : product.storeName === storeName3 ? 3 : undefined;
             if (!storeNamePredicate)
-                done.fail("invalid store name retrieved from search IT");
+                done.fail(new Error("invalid store name retrieved from search IT"));
             expect(product.product.catalogNumber).toBe(storeNamePredicate === 1 ? catalogNumber1 : storeNamePredicate === 2 ? catalogNumber2 : catalogNumber3);
             expect(product.product.category).toBe(storeNamePredicate === 1 ? prodCategory1 : storeNamePredicate === 2 ? prodCategory2 : prodCategory3);
             expect(product.product.name).toBe(storeNamePredicate === 1 ? prodName1 : storeNamePredicate === 2 ? prodName2 : prodName3);
@@ -212,7 +217,7 @@ describe("Guest Integration Tests", () => {
         searchRes.data.products.forEach(product => {
             const storeNamePredicate: number = product.storeName === storeName2 ? 2 : product.storeName === storeName3 ? 3 : undefined;
             if (!storeNamePredicate)
-                done.fail("invalid store name retrieved from search IT");
+                done.fail(new Error("invalid store name retrieved from search IT"));
             expect(product.product.catalogNumber).toBe(storeNamePredicate === 2 ? catalogNumber2 : catalogNumber3);
             expect(product.product.category).toBe(storeNamePredicate === 2 ? prodCategory2 : prodCategory3);
             expect(product.product.name).toBe(storeNamePredicate === 2 ? prodName2 : prodName3);
@@ -293,6 +298,8 @@ describe("Guest Integration Tests", () => {
 
         expect(searchRes.data.result).toBeTruthy();
         expect(searchRes.data.products).toHaveLength(0);
+
+        done();
     });
 
     it("Save items in cart IT test", () => {
