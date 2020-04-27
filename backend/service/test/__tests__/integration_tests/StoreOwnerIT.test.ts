@@ -702,7 +702,7 @@ describe("Store Owner Integration Tests", () => {
                         number: "152",
                         expYear: "2021",
                         expMonth: "5",
-                        ccv: "40"
+                        cvv: "40"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: token
@@ -737,7 +737,7 @@ describe("Store Owner Integration Tests", () => {
                         number: "152",
                         expYear: "2021",
                         expMonth: "5",
-                        ccv: "40"
+                        cvv: "40"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: token

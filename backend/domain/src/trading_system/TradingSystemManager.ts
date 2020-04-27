@@ -467,9 +467,9 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const isDeliver: boolean = this._externalSystems.deliverySystem.deliver(req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address);
 
-        return {
-            data: {result: true, deliveryID: "1"}
-        }
+        return isDeliver
+            ? {data: {result: true, deliveryID: "1"}}
+            : {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
     }
 
     verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {

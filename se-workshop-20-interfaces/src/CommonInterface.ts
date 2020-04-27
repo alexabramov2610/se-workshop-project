@@ -56,7 +56,7 @@ export interface CreditCard {
     number: string;
     expMonth: string;
     expYear: string;
-    ccv: string;
+    cvv: string;
 }
 
 export interface ProductWithQuantity extends ProductCatalogNumber {
