@@ -1,9 +1,14 @@
-name: CI
+name: se-workshop pipe
 
 on:
-  push:
+  [push:
     branches:
       - master
+  ,
+   pull_request:
+      branches:
+        - master
+  ]
 
 jobs:
   build:
@@ -12,7 +17,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 8.x]
+        node-version: 10.x
+#        node-version: [10.x, 8.x]
 
     steps:
       - uses: actions/checkout@v1
@@ -21,15 +27,57 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: yarn install
+      - name: Install
         run: |
-          yarn install
-      - name: yarn test
+          cd se-workshop-20-interfaces
+          npm install
+          cd ..
+          cd backend
+          cd domain
+          npm install
+          cd ..
+          cd service
+          npm install
+          cd ..
+          cd ..
+          cd AT
+          npm install
+          cd ..
+      - name: Compile
         run: |
-          yarn test
+          cd se-workshop-20-interfaces
+          npm run compe
+          cd ..
+          cd backend
+          cd domain
+          npm run compe
+          cd ..
+          cd service
+          npm run compe
+          cd ..
+          cd ..
+          cd AT
+          npm run compe
+          cd ..
+      - name: Unit Tests
+        run: |
+          cd backend
+          cd domain
+          npm TEST_MODE=1 SILENT=1 jest
+          cd ..
+          cd ..
+      - name: Integration Tests
+        run: |
+          cd backend
+          cd service
+          npm TEST_MODE=1 SILENT=1 jest
+          cd ..
+          cd ..
+      - name: Acceptance Tests
+        run: |
+          cd AT
+          npm TEST_MODE=1 SILENT=1 jest
+          cd ..
+      - name: publish
         env:
-          CI: true
-
-      - name: yarn build
-        run: |
-          yarn run build --if-present
+          CI:true
