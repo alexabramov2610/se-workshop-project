@@ -88,10 +88,15 @@ jobs:
 #          cd AT
 #          npm test
 #          cd ..
-      - name: Monitor coverage
+      - name: Monitor coverage 1
         uses: slavcodev/coverage-monitor-action@1.1.0
         with:
           github_token: ${{ secrets.SEC_TOKEN }}
           clover_file: "backend/domain/coverage/clover.xml"
           threshold_alert: 10
           threshold_warning: 50
+      - name: Monitor coverage 2
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.SEC_TOKEN }}
+          lcov-file: ./backend/domain/coverage/lcov.info
