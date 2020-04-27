@@ -94,5 +94,5 @@ jobs:
 #          cd ..
         uses: ziishaned/jest-reporter-action@v0.0.1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN }}
           test-command: "yarn jest --coverage"
