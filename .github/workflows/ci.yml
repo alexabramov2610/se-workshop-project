@@ -27,9 +27,6 @@ jobs:
       - name: yarn install
         run: |
           yarn install
-      - uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
@@ -98,3 +95,6 @@ jobs:
 #          npm test
 #          cd ..
 
+      - uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
