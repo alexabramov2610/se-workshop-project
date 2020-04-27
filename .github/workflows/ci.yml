@@ -2,11 +2,9 @@ name: se-workshop pipe
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-      branches:
-        - master
+    branches: [ master ]
   
 jobs:
   build:
@@ -94,10 +92,3 @@ jobs:
 #          cd AT
 #          npm test
 #          cd ..
-      - name: Integration Tests
-        run: |
-          cd backend
-          cd domain
-      - uses: mattallty/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
