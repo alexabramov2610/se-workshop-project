@@ -27,8 +27,11 @@ jobs:
       - name: yarn install
         run: |
           yarn install
-      - name: Use Jest Annotations & Coverage
-        uses: mattallty/jest-github-action@v1.0.2
+      - uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          test-command: "cd backend ; cd domain ; yarn test"
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
