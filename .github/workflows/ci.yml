@@ -92,6 +92,6 @@ jobs:
         uses: slavcodev/coverage-monitor-action@1.1.0
         with:
           github_token: ${{ secrets.SEC_TOKEN }}
-          clover_file: "backed/domain/coverage/clover.xml"
+          clover_file: "backend/domain/coverage/clover.xml"
           threshold_alert: 10
           threshold_warning: 50
