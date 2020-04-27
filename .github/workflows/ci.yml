@@ -1,15 +1,13 @@
 name: se-workshop pipe
 
 on:
-  [push:
+  push:
     branches:
       - master
-  ,
-   pull_request:
+  pull_request:
       branches:
         - master
-  ]
-
+  
 jobs:
   build:
 
@@ -17,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: 10.x
+        node-version: [10.x]
 #        node-version: [10.x, 8.x]
 
     steps:
@@ -78,6 +76,3 @@ jobs:
           cd AT
           npm TEST_MODE=1 SILENT=1 jest
           cd ..
-      - name: publish
-        env:
-          CI:true
