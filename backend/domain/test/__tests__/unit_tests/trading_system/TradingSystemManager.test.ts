@@ -1,26 +1,17 @@
-import {Store, StoreManagement} from "../../../../src/store/internal_api";
+import {mocked} from "ts-jest/utils";
 import {Req, Res} from 'se-workshop-20-interfaces'
-
+import { BagItem, IProduct as ProductReq, ProductCatalogNumber, ProductCategory,
+    Purchase, ProductWithQuantity } from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import { Rating, TradingSystemState } from "se-workshop-20-interfaces/dist/src/Enums";
+import {Store, StoreManagement} from "../../../../src/store/internal_api";
 import {RegisteredUser, StoreOwner} from "../../../../src/user/internal_api";
 import {TradingSystemManager} from "../../../../src/trading_system/TradingSystemManager";
 import {ContactUsMessage, Item, Product, Receipt} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from '../../../../src/external_systems/ExternalSystemsManager'
 import {UserManager} from '../../../../src/user/UserManager';
-import {mocked} from "ts-jest/utils";
-import {
-    BagItem,
-    IProduct as ProductReq,
-    ProductCatalogNumber,
-    ProductCategory,
-    Purchase,
-    ProductWithQuantity
-} from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {
-    Rating,
-    TradingSystemState
-} from "se-workshop-20-interfaces/dist/src/Enums";
 import {User} from "../../../../src/user/users/User";
 import {PaymentSystem} from "../../../../src/external_systems/payment_system/PaymentSystem";
+
 jest.mock('../../../../src/user/UserManager');
 jest.mock('../../../../src/store/StoreManagement');
 jest.mock('../../../../src/external_systems/ExternalSystemsManager');

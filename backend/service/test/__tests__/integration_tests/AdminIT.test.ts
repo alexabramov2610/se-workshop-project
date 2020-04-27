@@ -18,6 +18,10 @@ describe("Admin Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
+    it("dummy test", () => {
+        expect(true).toBe(true);
+    })
+
     it("System init test", () => {
         // const req: Req.InitReq = {body: {firstAdminName: adminUsername, firstAdminPassword: adminPassword}, token}
         // const registerRequest: Req.RegisterRequest = {

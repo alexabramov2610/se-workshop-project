@@ -20,23 +20,22 @@ NC='\033[0m' # No Color
 #####  api
 echo -e "${GREEN}compiling api...${NC}"
 cd $api
-npm run comp
+sudo npm run comp
 
 #####  domain
 echo -e "${GREEN}compiling domain...${NC}"
 cd $domain
-npm run comp
+sudo npm run comp
 
 #####  service
 echo -e "${GREEN}compiling service...${NC}"
 cd $service
-npm run comp
+sudo npm run comp
 
 #####  AT
 echo -e "${GREEN}compiling AT...${NC}"
 cd $AT
-npm run comp
-
+sudo npm run comp
 
 
 ##### TEST #####
@@ -44,17 +43,17 @@ npm run comp
 #####  domain
 echo -e "${RED}testing domain...${NC}"
 cd $domain
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest
 
 #####  service
 echo -e "${RED}testing service...${NC}"
 cd $service
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest
 
 #####  AT
 echo -e "${RED}testing AT...${NC}"
 cd $AT
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest

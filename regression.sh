@@ -20,22 +20,22 @@ NC='\033[0m' # No Color
 #####  api
 echo -e "${RED}cleaning api folder...${NC}"
 cd $api
-rm -r node_modules logs package-lock.json dist coverage
+sudo rm -r node_modules logs package-lock.json dist coverage
 
 #####  domain
 echo -e "${RED}cleaning domain folder...${NC}"
 cd $domain
-rm -r node_modules logs package-lock.json dist coverage
+sudo rm -r node_modules logs package-lock.json dist coverage
 
 #####  service
 echo -e "${RED}cleaning service folder...${NC}"
 cd $service
-rm -r node_modules logs package-lock.json dist coverage
+sudo rm -r node_modules logs package-lock.json dist coverage
 
 #####  AT
 echo -e "${RED}cleaning AT folder...${NC}"
 cd $AT
-rm -r node_modules logs package-lock.json coverage
+sudo rm -r node_modules logs package-lock.json coverage
 
 
 
@@ -68,22 +68,22 @@ sudo npm i
 #####  api
 echo -e "${GREEN}compiling api...${NC}"
 cd $api
-npm run comp
+sudo npm run comp
 
 #####  domain
 echo -e "${GREEN}compiling domain...${NC}"
 cd $domain
-npm run comp
+sudo npm run comp
 
 #####  service
 echo -e "${GREEN}compiling service...${NC}"
 cd $service
-npm run comp
+sudo npm run comp
 
 #####  AT
 echo -e "${GREEN}compiling AT...${NC}"
 cd $AT
-npm run comp
+sudo npm run comp
 
 
 
@@ -92,17 +92,17 @@ npm run comp
 #####  domain
 echo -e "${RED}testing domain...${NC}"
 cd $domain
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest
 
 #####  service
 echo -e "${RED}testing service...${NC}"
 cd $service
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest
 
 #####  AT
 echo -e "${RED}testing AT...${NC}"
 cd $AT
-npm start jest --clearCache
-npm run test:silent
+sudo jest --clearCache
+sudo TEST_MODE=1 SILENT=1 jest
