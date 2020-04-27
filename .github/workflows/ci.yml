@@ -77,18 +77,18 @@ jobs:
         run: |
           cd backend
           cd domain
-          npm TEST_MODE=1 SILENT=1 jest
+          npm test
           cd ..
           cd ..
       - name: Integration Tests
         run: |
           cd backend
           cd service
-          npm TEST_MODE=1 SILENT=1 jest
+          npm test
           cd ..
           cd ..
       - name: Acceptance Tests
         run: |
           cd AT
-          npm TEST_MODE=1 SILENT=1 jest
+          npm test
           cd ..
