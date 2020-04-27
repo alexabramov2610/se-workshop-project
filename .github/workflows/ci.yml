@@ -82,11 +82,11 @@ jobs:
           npm test
           cd ..
           cd ..
-      - name: Acceptance Tests
-        run: |
-          cd AT
-          npm test
-          cd ..
+#      - name: Acceptance Tests
+#        run: |
+#          cd AT
+#          npm test
+#          cd ..
 #      - uses: devmasx/coverage-check-action@v1.1.0
 #        with:
 #          type: simplecov
