@@ -65,13 +65,28 @@ export const removeProducts = (storeName: string, products: Product[], token: st
     expect(ServiceFacade.removeProducts({body: {storeName, products}, token}).data.result).toBe(true);
 }
 
-export const makeStoreWithProduct = (itemsNumber: number, username: string, password: string, storeName: string, ownerToken: string) => {
+export const makeStoreWithProduct = (catalogNumber: number, itemsNumber: number, username: string, password: string, storeName: string, ownerToken: string) => {
     // if ownerToken === undefined -> another user performs the creation
     if (!ownerToken)
         ownerToken = this.initSessionRegisterLogin(username, password);
     this.createStore(storeName, ownerToken);
-    const catalogNumber: number = 1;
     const products: Product[] = [new Product("bamba", catalogNumber, 20, ProductCategory.GENERAL)]
+    this.addNewProducts(storeName, products, ownerToken, true)
+    let items: IItem[] = [];
+
+    for (let i = 0; i < itemsNumber; i++ )
+        items = items.concat({catalogNumber: 1, id: i+1});
+    ServiceFacade.addItems({token: ownerToken, body: {storeName, items: items}});
+
+    return {ownerToken, products}
+}
+
+export const makeStoreWithProductWithProdDetails = (name: string, price: number, prodCategory: ProductCategory, catalogNumber: number, itemsNumber: number, username: string, password: string, storeName: string, ownerToken: string) => {
+    // if ownerToken === undefined -> another user performs the creation
+    if (!ownerToken)
+        ownerToken = this.initSessionRegisterLogin(username, password);
+    this.createStore(storeName, ownerToken);
+    const products: Product[] = [new Product(name, catalogNumber, price, prodCategory)]
     this.addNewProducts(storeName, products, ownerToken, true)
     let items: IItem[] = [];
 

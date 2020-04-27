@@ -38,12 +38,13 @@ describe("Registered User Integration Tests", () => {
 
     it("view purchases history IT test", () => {
         const storeName: string = "store name";
+        const catalogNumber: number = 1;
         let viewRUserPurchasesHistoryReq: Req.ViewRUserPurchasesHistoryReq = {body: {}, token}
         let viewRUserPurchasesHistoryRes: Res.ViewRUserPurchasesHistoryRes = ServiceFacade.viewRegisteredUserPurchasesHistory(viewRUserPurchasesHistoryReq);
         expect(viewRUserPurchasesHistoryRes.data.result).toBe(true);
         expect(viewRUserPurchasesHistoryRes.data.receipts).toEqual([]);
 
-        const {ownerToken, products} = utils.makeStoreWithProduct(3, ownerUsername, ownerPassword, storeName , undefined);
+        const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 3, ownerUsername, ownerPassword, storeName , undefined);
 
         const saveToCartRequest: Req.SaveToCartRequest = {
             body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},

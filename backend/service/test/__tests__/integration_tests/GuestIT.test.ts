@@ -1,8 +1,8 @@
 import {Req, Res} from 'se-workshop-20-interfaces'
 import * as utils from "./utils"
 import {Product} from "domain_layer/dist/src/trading_system/data/Product";
-import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums"
-import {Cart} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
+import {Cart, SearchFilters, SearchQuery} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 
 describe("Guest Integration Tests", () => {
@@ -49,7 +49,8 @@ describe("Guest Integration Tests", () => {
 
     it("View store information IT test", () => {
         const storeName: string = "store name";
-        const { ownerToken, products} = utils.makeStoreWithProduct(2, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber,2, ownerUsername, ownerPassword, storeName, undefined);
 
         const storeInfoReq: Req.StoreInfoRequest = {body: {storeName}, token};
         let storeInfoRes: Res.StoreInfoResponse = ServiceFacade.viewStoreInfo(storeInfoReq);
@@ -79,7 +80,8 @@ describe("Guest Integration Tests", () => {
         const storeName: string = "store name";
         const itemsNumber: number = 1;
         const productCatalogNumber: number = 1;
-        const { ownerToken, products } = utils.makeStoreWithProduct(itemsNumber, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products } = utils.makeStoreWithProduct(catalogNumber, itemsNumber, ownerUsername, ownerPassword, storeName, undefined);
 
         const productInfoRequest: Req.ProductInfoRequest = {body: {storeName, catalogNumber: productCatalogNumber}, token};
         let productInfoResponse: Res.ProductInfoResponse = ServiceFacade.viewProductInfo(productInfoRequest);
@@ -108,13 +110,195 @@ describe("Guest Integration Tests", () => {
         expect(productInfoResponse.data.info.catalogNumber).toEqual(productCatalogNumber);
     });
 
-    it("Search IT test", () => {    //todo
-        expect(true)
+    it("Search IT test", done => {
+        const storeName1: string = "store name1";
+        const storeName2: string = "store name2";
+        const storeName3: string = "store name3";
+        const itemsNumber: number = 2;
+        const prodName1: string = "bamba";
+        const prodName2: string = "cheese";
+        const prodName3: string = "laptop";
+        const price1: number = 100;
+        const price2: number = 200;
+        const price3: number = 300;
+        const catalogNumber1: number = 1;
+        const catalogNumber2: number = 2;
+        const catalogNumber3: number = 3;
+        const prodCategory1: ProductCategory = ProductCategory.CLOTHING;
+        const prodCategory2: ProductCategory = ProductCategory.ELECTRONICS;
+        const prodCategory3: ProductCategory = ProductCategory.GENERAL;
+        let totalItemsCatalogNumber1: number = 0;
+        let totalItemsCatalogNumber2: number = 0;
+        let totalItemsCatalogNumber3: number = 0;
+
+        // no items at all stores
+        let filters: SearchFilters = {}
+        let searchQuery: SearchQuery = {}
+        let searchReq: Req.SearchRequest = { body: { filters, searchQuery }, token };
+        let searchRes: Res.SearchResponse = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber1);
+
+        const {ownerToken, products} = utils.makeStoreWithProductWithProdDetails(prodName1, price1, prodCategory1, catalogNumber1, itemsNumber, ownerUsername, ownerPassword, storeName1, undefined);
+        totalItemsCatalogNumber1 = 1;
+        utils.makeStoreWithProductWithProdDetails(prodName2, price2, prodCategory2, catalogNumber2, itemsNumber, ownerUsername, ownerPassword, storeName2, ownerToken);
+        totalItemsCatalogNumber2 = 1;
+
+        // low rating - no items
+        filters = { storeRating: Rating.LOW }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(0);
+
+        // mid rating - all items
+        filters = { storeRating: Rating.MEDIUM }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber1 + totalItemsCatalogNumber2 + totalItemsCatalogNumber3);
+        expect(searchRes.data.result).toBeTruthy();
+        searchRes.data.products.forEach(product => {
+            const storeNamePredicate: number = product.storeName === storeName1 ? 1 : product.storeName === storeName2 ? 2 : product.storeName === storeName3 ? 3 : undefined;
+            if (!storeNamePredicate)
+                done.fail("invalid store name retrieved from search IT");
+            expect(product.product.catalogNumber).toBe(storeNamePredicate === 1 ? catalogNumber1 : storeNamePredicate === 2 ? catalogNumber2 : catalogNumber3);
+            expect(product.product.category).toBe(storeNamePredicate === 1 ? prodCategory1 : storeNamePredicate === 2 ? prodCategory2 : prodCategory3);
+            expect(product.product.name).toBe(storeNamePredicate === 1 ? prodName1 : storeNamePredicate === 2 ? prodName2 : prodName3);
+            expect(product.product.price).toBe(storeNamePredicate === 1 ? price1 : storeNamePredicate === 2 ? price2 : price3);
+        });
+
+        // prodCategory1
+        filters = { productCategory: prodCategory1 }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber1);
+
+        utils.makeStoreWithProductWithProdDetails(prodName3, price3, prodCategory3, catalogNumber3, itemsNumber, ownerUsername, ownerPassword, storeName3, ownerToken);
+        totalItemsCatalogNumber3 = 1;
+
+        // prodCategory3
+        filters = { productCategory: prodCategory3 }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber3);
+        searchRes.data.products.forEach(product => {
+            expect(product.storeName).toBe(storeName3);
+            expect(product.product.catalogNumber).toBe(catalogNumber3);
+            expect(product.product.category).toBe(prodCategory3);
+            expect(product.product.name).toBe(prodName3);
+            expect(product.product.price).toBe(price3);
+        });
+
+        // by price
+        filters = { priceRange: { min: 150, max: 300 } }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber2 + totalItemsCatalogNumber3);
+        searchRes.data.products.forEach(product => {
+            const storeNamePredicate: number = product.storeName === storeName2 ? 2 : product.storeName === storeName3 ? 3 : undefined;
+            if (!storeNamePredicate)
+                done.fail("invalid store name retrieved from search IT");
+            expect(product.product.catalogNumber).toBe(storeNamePredicate === 2 ? catalogNumber2 : catalogNumber3);
+            expect(product.product.category).toBe(storeNamePredicate === 2 ? prodCategory2 : prodCategory3);
+            expect(product.product.name).toBe(storeNamePredicate === 2 ? prodName2 : prodName3);
+            expect(product.product.price).toBe(storeNamePredicate === 2 ? price2 : price3);
+        });
+
+        // by price and prodCategory2
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory2 }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber2);
+        searchRes.data.products.forEach(product => {
+            expect(product.storeName).toBe(storeName2);
+            expect(product.product.catalogNumber).toBe(catalogNumber2);
+            expect(product.product.category).toBe(prodCategory2);
+            expect(product.product.name).toBe(prodName2);
+            expect(product.product.price).toBe(price2);
+        });
+
+        // by price and prodCategory1
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory1 }
+        searchQuery = {}
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(0);
+
+        // by price, prodCategory2, storeName2, prodName2
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory2 }
+        searchQuery = { storeName: storeName2, productName: prodName2 }
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber2);
+        searchRes.data.products.forEach(product => {
+            expect(product.storeName).toBe(storeName2);
+            expect(product.product.catalogNumber).toBe(catalogNumber2);
+            expect(product.product.category).toBe(prodCategory2);
+            expect(product.product.name).toBe(prodName2);
+            expect(product.product.price).toBe(price2);
+        });
+
+        // by price, prodCategory2, prodName2
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory2 }
+        searchQuery = { productName: prodName2 }
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(totalItemsCatalogNumber2);
+        searchRes.data.products.forEach(product => {
+            expect(product.storeName).toBe(storeName2);
+            expect(product.product.catalogNumber).toBe(catalogNumber2);
+            expect(product.product.category).toBe(prodCategory2);
+            expect(product.product.name).toBe(prodName2);
+            expect(product.product.price).toBe(price2);
+        });
+
+        // by price, prodCategory2, prodName2, storeName3
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory2 }
+        searchQuery = { storeName: storeName3, productName: prodName2 }
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(0);
+
+        // by price, prodCategory2, prodName2, storeName3
+        filters = { priceRange: { min: 150, max: 300 }, productCategory: prodCategory2 }
+        searchQuery = { storeName: storeName3, productName: prodName2 }
+        searchReq = { body: { filters, searchQuery }, token };
+        searchRes = ServiceFacade.search(searchReq);
+
+        expect(searchRes.data.result).toBeTruthy();
+        expect(searchRes.data.products).toHaveLength(0);
     });
 
     it("Save items in cart IT test", () => {
         const storeName: string = "store name";
-        const { ownerToken, products} = utils.makeStoreWithProduct(2, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 2, ownerUsername, ownerPassword, storeName, undefined);
 
         const req: Req.SaveToCartRequest = {
             body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -126,7 +310,8 @@ describe("Guest Integration Tests", () => {
 
     it("Remove items from cart IT test", () => {
         const storeName: string = "store name";
-        const { ownerToken, products} = utils.makeStoreWithProduct(2, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 2, ownerUsername, ownerPassword, storeName, undefined);
 
         const req: Req.SaveToCartRequest = {
             body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -148,7 +333,8 @@ describe("Guest Integration Tests", () => {
 
     it("Watch cart IT test", () => {
         const storeName: string = "store name";
-        const { ownerToken, products} = utils.makeStoreWithProduct(2, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 2, ownerUsername, ownerPassword, storeName, undefined);
 
         const req: Req.SaveToCartRequest = {
             body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -165,7 +351,7 @@ describe("Guest Integration Tests", () => {
         expect(watchRes.data.cart).toEqual(cart)
     });
 
-    test("pay test", () => {
+    it("pay test", () => {
         const req: Req.PayRequest = {
             body: {
                 payment: {
@@ -184,7 +370,8 @@ describe("Guest Integration Tests", () => {
 
     it("Buy items IT test", () => {
         const storeName: string = "store name";
-        const { ownerToken, products} = utils.makeStoreWithProduct(2, ownerUsername, ownerPassword, storeName, undefined);
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 2, ownerUsername, ownerPassword, storeName, undefined);
 
         const req: Req.SaveToCartRequest = {
             body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
