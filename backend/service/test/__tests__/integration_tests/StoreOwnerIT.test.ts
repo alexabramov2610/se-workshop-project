@@ -1,45 +1,40 @@
-import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
-import {Store} from "../../../src/store/Store";
-import {StoreOwner} from "../../../src/user/users/StoreOwner";
+import {Store} from "domain_layer/dist/src/store/Store";
+import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import {
-    ManagementPermission,
-    ProductCategory,
-} from "se-workshop-20-interfaces/dist/src/Enums";
-import {
-    IItem as ItemReq,
-    IProduct as ProductReq,
-    ProductWithQuantity
-} from 'se-workshop-20-interfaces/dist/src/CommonInterface'
-import {RegisteredUser} from "../../../src/user/users/RegisteredUser";
-import utils from "./utils"
-import {loggerW} from "../../../src/api-int/Logger";
-
+import { ManagementPermission, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import { IItem as ItemReq, IProduct as ProductReq, ProductWithQuantity } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
+import { RegisteredUser } from "domain_layer/dist/src/user/users/RegisteredUser";
+import * as utils from "./utils"
+import { loggerW } from "domain_layer/dist/src/api-int/Logger";
 const logger = loggerW(__filename)
+import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
+
+
 describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
     const storeOwnerPassword: string = "store-owner-pw";
     const storeName: string = "store-name";
 
-
-    let tradingSystemManager: TradingSystemManager;
     let store: Store;
     let storeOwnerRegisteredUser: RegisteredUser;
     let storeOwner: StoreOwner;
     let token: string;
 
 
+    beforeAll(() => {
+        utils.systemInit();
+    });
+
     beforeEach(() => {
+        utils.systemReset();
         storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
         store = new Store(storeName);
         storeOwner = new StoreOwner(storeOwnerName);
-        tradingSystemManager = new TradingSystemManager();
 
-        token = utils.initSessionRegisterLogin(tradingSystemManager, storeOwnerName, storeOwnerPassword);
+        token = utils.initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
         expect(token).toBeDefined();
 
-        const openStoreReq: Req.OpenStoreRequest = {body: {storeName}, token};
-        expect(tradingSystemManager.createStore(openStoreReq).data.result).toBeTruthy();
+        utils.createStore(storeName, token);
     });
 
 
@@ -51,7 +46,7 @@ describe("Store Owner Integration Tests", () => {
 
         // all products are valid
         let addProductsReq: Req.AddProductsRequest = {body: {storeName, products}, token};
-        let productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
+        let productAdditionRes: Res.ProductAdditionResponse = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
@@ -62,7 +57,7 @@ describe("Store Owner Integration Tests", () => {
 
         // all products are invalid
         addProductsReq = {body: {storeName, products}, token};
-        productAdditionRes = tradingSystemManager.addNewProducts(addProductsReq);
+        productAdditionRes = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeFalsy();
         expect(productAdditionRes.error).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
@@ -74,7 +69,7 @@ describe("Store Owner Integration Tests", () => {
 
         // one product is valid
         addProductsReq = {body: {storeName, products}, token};
-        productAdditionRes = tradingSystemManager.addNewProducts(addProductsReq);
+        productAdditionRes = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(1);
@@ -89,7 +84,7 @@ describe("Store Owner Integration Tests", () => {
         let items: ItemReq[] = [item1, item2];
 
         let addItemsReq: Req.ItemsAdditionRequest = {body: {storeName, items}, token};
-        let itemsAdditionRes: Res.ItemsAdditionResponse = tradingSystemManager.addItems(addItemsReq);
+        let itemsAdditionRes: Res.ItemsAdditionResponse = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeFalsy();
         expect(itemsAdditionRes.error).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -102,13 +97,13 @@ describe("Store Owner Integration Tests", () => {
 
         // all products are valid
         const addProductsReq: Req.AddProductsRequest = {body: {storeName, products}, token};
-        const productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
+        const productAdditionRes: Res.ProductAdditionResponse = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
         // new products addition doesn't affect invalid items
-        itemsAdditionRes = tradingSystemManager.addItems(addItemsReq);
+        itemsAdditionRes = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeFalsy();
         expect(itemsAdditionRes.error).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -120,7 +115,7 @@ describe("Store Owner Integration Tests", () => {
 
         // valid items
         addItemsReq = {body: {storeName, items}, token};
-        itemsAdditionRes = tradingSystemManager.addItems(addItemsReq);
+        itemsAdditionRes = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
         expect(itemsAdditionRes.error).toBeUndefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -132,7 +127,7 @@ describe("Store Owner Integration Tests", () => {
 
         // 1 valid item
         addItemsReq = {body: {storeName, items}, token};
-        itemsAdditionRes = tradingSystemManager.addItems(addItemsReq);
+        itemsAdditionRes = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
         expect(itemsAdditionRes.error).toBeUndefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -144,7 +139,7 @@ describe("Store Owner Integration Tests", () => {
 
         // items already exist
         addItemsReq = {body: {storeName, items}, token};
-        itemsAdditionRes = tradingSystemManager.addItems(addItemsReq);
+        itemsAdditionRes = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeFalsy();
         expect(itemsAdditionRes.error).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -182,7 +177,7 @@ describe("Store Owner Integration Tests", () => {
 
         // all products are valid
         const addProductsReq: Req.AddProductsRequest = {body: {storeName, products}, token};
-        const productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
+        const productAdditionRes: Res.ProductAdditionResponse = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
@@ -195,12 +190,12 @@ describe("Store Owner Integration Tests", () => {
                 newName: newName1
             }, token
         }
-        let res: Res.BoolResponse = tradingSystemManager.changeProductName(changeProductNameRequest);
+        let res: Res.BoolResponse = ServiceFacade.changeProductName(changeProductNameRequest);
 
         expect(res.data.result).toBe(true);
 
         let viewStoreReq: Req.ProductInfoRequest = {body: {storeName, catalogNumber: catalogNumber1}, token};
-        let viewStoreRes: Res.ProductInfoResponse = tradingSystemManager.viewProductInfo(viewStoreReq);
+        let viewStoreRes: Res.ProductInfoResponse = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category1);
@@ -209,7 +204,7 @@ describe("Store Owner Integration Tests", () => {
         expect(viewStoreRes.data.info.name).toBe(newName1);
 
         viewStoreReq = {body: {storeName, catalogNumber: catalogNumber2}, token};
-        viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
+        viewStoreRes = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category2);
@@ -225,13 +220,13 @@ describe("Store Owner Integration Tests", () => {
                 newPrice: newPrice2
             }, token
         }
-        res = tradingSystemManager.changeProductPrice(changeProductPriceRequest);
+        res = ServiceFacade.changeProductPrice(changeProductPriceRequest);
 
         expect(res.data.result).toBe(true);
 
 
         viewStoreReq = {body: {storeName, catalogNumber: catalogNumber1}, token};
-        viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
+        viewStoreRes = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category1);
@@ -240,7 +235,7 @@ describe("Store Owner Integration Tests", () => {
         expect(viewStoreRes.data.info.name).toBe(newName1);
 
         viewStoreReq = {body: {storeName, catalogNumber: catalogNumber2}, token};
-        viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
+        viewStoreRes = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category2);
@@ -261,7 +256,7 @@ describe("Store Owner Integration Tests", () => {
 
         // items don't exist
         let removeItemsReq: Req.ItemsRemovalRequest = {body: {storeName, items}, token};
-        let removeItemsRes: Res.ItemsRemovalResponse = tradingSystemManager.removeItems(removeItemsReq);
+        let removeItemsRes: Res.ItemsRemovalResponse = ServiceFacade.removeItems(removeItemsReq);
         expect(removeItemsRes.data.result).toBeFalsy();
         expect(removeItemsRes.error).toBeDefined();
         expect(removeItemsRes.data.itemsNotRemoved).toBeDefined();
@@ -274,13 +269,13 @@ describe("Store Owner Integration Tests", () => {
 
         // all products are valid
         const addProductsReq: Req.AddProductsRequest = {body: {storeName, products}, token};
-        const productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
+        const productAdditionRes: Res.ProductAdditionResponse = ServiceFacade.addNewProducts(addProductsReq);
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
         // new products addition doesn't affect invalid items
-        removeItemsRes = tradingSystemManager.removeItems(removeItemsReq);
+        removeItemsRes = ServiceFacade.removeItems(removeItemsReq);
         expect(removeItemsRes.data.result).toBeFalsy();
         expect(removeItemsRes.error).toBeDefined();
         expect(removeItemsRes.data.itemsNotRemoved).toBeDefined();
@@ -295,7 +290,7 @@ describe("Store Owner Integration Tests", () => {
         // valid items
         // addition
         let addItemsReq: Req.ItemsAdditionRequest = {body: {storeName, items}, token};
-        let itemsAdditionRes: Res.ItemsAdditionResponse = tradingSystemManager.addItems(addItemsReq);
+        let itemsAdditionRes: Res.ItemsAdditionResponse = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
         expect(itemsAdditionRes.error).toBeUndefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -303,7 +298,7 @@ describe("Store Owner Integration Tests", () => {
 
         // removal
         removeItemsReq = {body: {storeName, items}, token};
-        removeItemsRes = tradingSystemManager.removeItems(removeItemsReq);
+        removeItemsRes = ServiceFacade.removeItems(removeItemsReq);
         expect(removeItemsRes.data.result).toBeTruthy();
         expect(removeItemsRes.error).toBeUndefined();
         expect(removeItemsRes.data.itemsNotRemoved).toBeDefined();
@@ -311,7 +306,7 @@ describe("Store Owner Integration Tests", () => {
 
         // addition
         addItemsReq = {body: {storeName, items}, token};
-        itemsAdditionRes = tradingSystemManager.addItems(addItemsReq);
+        itemsAdditionRes = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
         expect(itemsAdditionRes.error).toBeUndefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
@@ -327,7 +322,7 @@ describe("Store Owner Integration Tests", () => {
 
         // 2 valid items
         removeItemsReq = {body: {storeName, items}, token};
-        removeItemsRes = tradingSystemManager.removeItems(removeItemsReq);
+        removeItemsRes = ServiceFacade.removeItems(removeItemsReq);
         expect(removeItemsRes.data.result).toBeTruthy();
         expect(removeItemsRes.error).toBeUndefined();
         expect(removeItemsRes.data.itemsNotRemoved).toBeDefined();
@@ -342,7 +337,7 @@ describe("Store Owner Integration Tests", () => {
 
         // products don't exist
         let removeProductsReq: Req.ProductRemovalRequest = {body: {storeName, products}, token};
-        let removeProductsRes: Res.ProductRemovalResponse = tradingSystemManager.removeProducts(removeProductsReq);
+        let removeProductsRes: Res.ProductRemovalResponse = ServiceFacade.removeProducts(removeProductsReq);
 
         expect(removeProductsRes.data.result).toBe(false);
         expect(removeProductsRes.data.productsNotRemoved).toBeDefined();
@@ -350,21 +345,21 @@ describe("Store Owner Integration Tests", () => {
 
         // add valid products
         let addProductsReq: Req.AddProductsRequest = {body: {storeName, products}, token};
-        let productAdditionRes: Res.ProductAdditionResponse = tradingSystemManager.addNewProducts(addProductsReq);
+        let productAdditionRes: Res.ProductAdditionResponse = ServiceFacade.addNewProducts(addProductsReq);
 
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
         // remove valid products
-        removeProductsRes = tradingSystemManager.removeProducts(removeProductsReq);
+        removeProductsRes = ServiceFacade.removeProducts(removeProductsReq);
 
         expect(removeProductsRes.data.result).toBe(true);
         expect(removeProductsRes.data.productsNotRemoved).toBeDefined();
         expect(removeProductsRes.data.productsNotRemoved.length).toBe(0);
 
         // add valid products
-        productAdditionRes = tradingSystemManager.addNewProducts(addProductsReq);
+        productAdditionRes = ServiceFacade.addNewProducts(addProductsReq);
 
         expect(productAdditionRes.data.result).toBeTruthy();
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
@@ -389,7 +384,7 @@ describe("Store Owner Integration Tests", () => {
 
         products = [product1, product2, product3, product4, product5];
         removeProductsReq = {body: {storeName, products}, token};
-        removeProductsRes = tradingSystemManager.removeProducts(removeProductsReq);
+        removeProductsRes = ServiceFacade.removeProducts(removeProductsReq);
 
         expect(removeProductsRes.data.result).toBe(true);
         expect(removeProductsRes.data.productsNotRemoved).toBeDefined();
@@ -398,7 +393,7 @@ describe("Store Owner Integration Tests", () => {
         // add 2 valid products
         products = [product1, product2];
         addProductsReq = {body: {storeName, products}, token};
-        productAdditionRes = tradingSystemManager.addNewProducts(addProductsReq);
+        productAdditionRes = ServiceFacade.addNewProducts(addProductsReq);
 
         expect(productAdditionRes.data.result).toBe(true);
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
@@ -419,7 +414,7 @@ describe("Store Owner Integration Tests", () => {
         const quantityToRemove2: number = 4;
 
         const addItemsReq: Req.ItemsAdditionRequest = {body: {storeName, items}, token};
-        const itemsAdditionRes: Res.ItemsAdditionResponse = tradingSystemManager.addItems(addItemsReq);
+        const itemsAdditionRes: Res.ItemsAdditionResponse = ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
         expect(itemsAdditionRes.data.itemsNotAdded).toBeDefined();
         expect(itemsAdditionRes.data.itemsNotAdded).toHaveLength(0);
@@ -434,14 +429,14 @@ describe("Store Owner Integration Tests", () => {
                 products: prodToRemove
             }, token
         };
-        const removeProductsWithQuantityRes: Res.ProductRemovalResponse = tradingSystemManager.removeProductsWithQuantity(removeProductsWithQuantityReq);
+        const removeProductsWithQuantityRes: Res.ProductRemovalResponse = ServiceFacade.removeProductsWithQuantity(removeProductsWithQuantityReq);
 
         expect(removeProductsWithQuantityRes.data.result).toBeTruthy();
         expect(removeProductsWithQuantityRes.data.productsNotRemoved).toBeDefined();
         expect(removeProductsWithQuantityRes.data.productsNotRemoved).toHaveLength(0);
 
         let viewStoreReq: Req.ProductInfoRequest = {body: {storeName, catalogNumber: catalog1}, token};
-        let viewStoreRes: Res.ProductInfoResponse = tradingSystemManager.viewProductInfo(viewStoreReq);
+        let viewStoreRes: Res.ProductInfoResponse = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category1);
@@ -451,7 +446,7 @@ describe("Store Owner Integration Tests", () => {
         expect(viewStoreRes.data.info.quantity).toBe(4 - quantityToRemove1);
 
         viewStoreReq = {body: {storeName, catalogNumber: catalog2}, token};
-        viewStoreRes = tradingSystemManager.viewProductInfo(viewStoreReq);
+        viewStoreRes = ServiceFacade.viewProductInfo(viewStoreReq);
 
         expect(viewStoreRes.data.result).toBe(true);
         expect(viewStoreRes.data.info.category).toBe(category2);
@@ -469,38 +464,38 @@ describe("Store Owner Integration Tests", () => {
         const newUser1: RegisteredUser = new RegisteredUser(newUsername1, newPassword);
         const newUser2: RegisteredUser = new RegisteredUser(newUsername2, newPassword);
 
-        utils.registerNewUser(tradingSystemManager, newUser1, token, true);
-        utils.registerNewUser(tradingSystemManager, newUser2, token, false);
-        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
+        utils.registerUser(newUser1.name, newUser1.password, token, true);
+        utils.registerUser(newUser2.name, newUser2.password, token, false);
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
 
         // assign valid store owner
         let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {
             body: {storeName, usernameToAssign: newUser1.name},
             token
         };
-        let assignStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        let assignStoreOwnerResponse: Res.BoolResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
         // assign circular store owner
-        utils.loginAsExistingUser(tradingSystemManager, newUser1, token, true);
+        utils.loginUser(newUser1.name, newUser1.password, token, true);
 
         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: storeOwnerRegisteredUser.name}, token};
-        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(false);
 
         // assign invalid store owner
-        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
 
         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: "invalid-username"}, token};
-        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(false);
 
         // store owner tries to assign himself
         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: storeOwner.name}, token};
-        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(false);
 
@@ -511,25 +506,25 @@ describe("Store Owner Integration Tests", () => {
                 usernameToRemove: storeOwner.name
             }, token
         };
-        let removeStoreOwnerResponse: Res.BoolResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        let removeStoreOwnerResponse: Res.BoolResponse = ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
 
         expect(removeStoreOwnerResponse.data.result).toBe(false);
 
         // store owner tries to remove not assigned by him store owner //todo: add new store owner in same store , in another
         // same store
         // assign user2 by user1
-        utils.loginAsExistingUser(tradingSystemManager, newUser1, token, true);
+        utils.loginUser(newUser1.name, newUser1.password, token, true);
 
         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: newUser2.name}, token};
-        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
         // remove user2 by storeOwner
-        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
 
         removeStoreOwnerRequest = {body: {storeName, usernameToRemove: newUser2.name}, token};
-        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        removeStoreOwnerResponse = ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
 
         expect(removeStoreOwnerResponse.data.result).toBe(false);
 
@@ -537,25 +532,25 @@ describe("Store Owner Integration Tests", () => {
         // another store
         // user2 creates new store
         const storeName2: string = "new-store-name-user-2";
-        utils.loginAsExistingUser(tradingSystemManager, newUser2, token, true);
-        utils.createStore(tradingSystemManager, storeName2, token);
+        utils.loginUser(newUser2.name, newUser2.password, token, true);
+        utils.createStore(storeName2, token);
 
         // user2 assigns user1
         assignStoreOwnerRequest = {body: {storeName: storeName2, usernameToAssign: newUser1.name}, token};
-        assignStoreOwnerResponse = tradingSystemManager.assignStoreOwner(assignStoreOwnerRequest);
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
 
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
         // storeOwner tries to remove user1, user2 from storeName2
-        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, true);
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
 
         removeStoreOwnerRequest = {body: {storeName: storeName2, usernameToRemove: newUser1.name}, token};
-        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        removeStoreOwnerResponse = ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
 
         expect(removeStoreOwnerResponse.data.result).toBe(false);
 
         removeStoreOwnerRequest = {body: {storeName: storeName2, usernameToRemove: newUser2.name}, token};
-        removeStoreOwnerResponse = tradingSystemManager.removeStoreOwner(removeStoreOwnerRequest);
+        removeStoreOwnerResponse = ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
 
         expect(removeStoreOwnerResponse.data.result).toBe(false);
 
@@ -568,9 +563,9 @@ describe("Store Owner Integration Tests", () => {
         const newUser1: RegisteredUser = new RegisteredUser(newUsername1, newPassword);
         const newUser2: RegisteredUser = new RegisteredUser(newUsername2, newPassword);
 
-        utils.registerNewUser(tradingSystemManager, newUser1, token, true);
-        utils.registerNewUser(tradingSystemManager, newUser2, token, false);
-        utils.loginAsExistingUser(tradingSystemManager, storeOwnerRegisteredUser, token, false);
+        utils.registerUser(newUser1.name, newUser1.password, token, true);
+        utils.registerUser(newUser2.name, newUser2.password, token, false);
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
 
         // assign valid store manager
         let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {
@@ -579,12 +574,12 @@ describe("Store Owner Integration Tests", () => {
                 usernameToAssign: newUser1.name
             }, token
         };
-        let assignStoreManagerResponse: Res.BoolResponse = tradingSystemManager.assignStoreManager(assignStoreManagerRequest);
+        let assignStoreManagerResponse: Res.BoolResponse = ServiceFacade.assignStoreManager(assignStoreManagerRequest);
 
         expect(assignStoreManagerResponse.data.result).toBe(true);
 
         assignStoreManagerRequest = {body: {storeName, usernameToAssign: newUser2.name}, token};
-        assignStoreManagerResponse = tradingSystemManager.assignStoreManager(assignStoreManagerRequest);
+        assignStoreManagerResponse = ServiceFacade.assignStoreManager(assignStoreManagerRequest);
 
         expect(assignStoreManagerResponse.data.result).toBe(true);
 
@@ -595,7 +590,7 @@ describe("Store Owner Integration Tests", () => {
                 usernameToRemove: newUser1.name
             }, token
         };
-        const removeStoreManagerResponse: Res.BoolResponse = tradingSystemManager.removeStoreManager(removeStoreManagerRequest);
+        const removeStoreManagerResponse: Res.BoolResponse = ServiceFacade.removeStoreManager(removeStoreManagerRequest);
 
         expect(removeStoreManagerResponse.data.result).toBe(true);
 
@@ -612,7 +607,7 @@ describe("Store Owner Integration Tests", () => {
                 permissions: permissionsToChange
             }, token
         };
-        let changeManagerPermissionRes: Res.BoolResponse = tradingSystemManager.removeManagerPermissions(changeManagerPermissionReq);
+        let changeManagerPermissionRes: Res.BoolResponse = ServiceFacade.removeManagerPermissions(changeManagerPermissionReq);
 
         expect(changeManagerPermissionRes.data.result).toBe(true);
 
@@ -623,7 +618,7 @@ describe("Store Owner Integration Tests", () => {
                 permissions: permissionsToChange
             }, token
         };
-        changeManagerPermissionRes = tradingSystemManager.addManagerPermissions(changeManagerPermissionReq);
+        changeManagerPermissionRes = ServiceFacade.addManagerPermissions(changeManagerPermissionReq);
 
         expect(changeManagerPermissionRes.data.result).toBe(true);
 

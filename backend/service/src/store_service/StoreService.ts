@@ -59,6 +59,11 @@ export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest
     return ts.assignStoreOwner(req);
 }
 
+export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest
+): Res.BoolResponse => {
+    return ts.removeStoreOwner(req);
+}
+
 export const assignStoreManager = (req: Req.AssignStoreManagerRequest
 ): Res.BoolResponse => {
     return ts.assignStoreManager(req);
@@ -67,11 +72,6 @@ export const assignStoreManager = (req: Req.AssignStoreManagerRequest
 export const removeStoreManager = (req: Req.RemoveStoreManagerRequest
 ): Res.BoolResponse => {
     return ts.removeStoreManager(req);
-}
-
-export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest
-): Res.BoolResponse => {
-    return ts.removeStoreOwner(req);
 }
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest
