@@ -1,6 +1,6 @@
 import {RegisteredUser, UserManager} from "../user/internal_api";
 import {StoreManagement} from '../store/internal_api';
-import {Req,Res} from 'se-workshop-20-interfaces'
+import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
@@ -10,6 +10,7 @@ import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
+
 const logger = loggerW(__filename)
 
 export class TradingSystemManager {
@@ -450,12 +451,12 @@ export class TradingSystemManager {
     }
 
 
-    setPurchasePolicy (req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
-        return { data: {result: false }};
+    setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
+        return {data: {result: false}};
     }
 
-    setDiscountsPolicy (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
-        return { data: {result: false }};
+    setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
+        return {data: {result: false}};
     }
 
 
@@ -471,9 +472,15 @@ export class TradingSystemManager {
         }
     }
 
-    verifyNewCredentials(req:Req.VerifyCredentialsReq):Res.BoolResponse {
+    verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
         return this._userManager.verifyNewCredentials(req);
     }
 
+    verifyUserLoggedIn(req: Req.Request): Res.BoolResponse {
+        return this._userManager.getLoggedInUserByToken(req.token)? {data:{result:true}} : {data:{result:false}, error:{message: errorMsg.E_NOT_LOGGED_IN}}
+    }
 
+    verifyTokenExists(req: Req.Request): Res.BoolResponse {
+        return this._userManager.getUserByToken(req.token)? {data:{result:true}} : {data:{result:false}, error:{message: errorMsg.E_BAD_TOKEN}}
+    }
 }
