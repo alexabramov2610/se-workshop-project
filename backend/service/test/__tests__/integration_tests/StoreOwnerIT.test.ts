@@ -5,8 +5,6 @@ import { ManagementPermission, ProductCategory} from "se-workshop-20-interfaces/
 import { IItem as ItemReq, IProduct as ProductReq, ProductWithQuantity } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
 import { RegisteredUser } from "domain_layer/dist/src/user/users/RegisteredUser";
 import * as utils from "./utils"
-import { loggerW } from "domain_layer/dist/src/api-int/Logger";
-const logger = loggerW(__filename)
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 
 
@@ -39,7 +37,6 @@ describe("Store Owner Integration Tests", () => {
 
 
     it("add new products", () => {
-        logger.info("starting IT: add new products");
         let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
         let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
         let products: ProductReq[] = [product1, product2];
@@ -76,8 +73,6 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("add new items", () => {
-        logger.info("starting IT: add new items");
-
         // products don't exist
         let item1: ItemReq = {catalogNumber: 1, id: 6};
         let item2: ItemReq = {catalogNumber: 2, id: 5};
@@ -147,8 +142,6 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("change product details and view product info", () => {
-        logger.info("starting IT: change product details");
-
         const catalogNumber1: number = 5;
         const oldName1: string = "old-name1";
         const newName1: string = "newProdName";
@@ -182,7 +175,6 @@ describe("Store Owner Integration Tests", () => {
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
-        logger.info("IT: changing product name...")
         const changeProductNameRequest: Req.ChangeProductNameRequest = {
             body: {
                 storeName,
@@ -212,7 +204,6 @@ describe("Store Owner Integration Tests", () => {
         expect(viewStoreRes.data.info.price).toBe(oldPrice2);
         expect(viewStoreRes.data.info.name).toBe(oldName2);
 
-        logger.info("IT: chaning product price...")
         const changeProductPriceRequest: Req.ChangeProductPriceRequest = {
             body: {
                 storeName,
@@ -246,8 +237,6 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("remove items", () => {
-        logger.info("starting IT: remove items");
-
         let item1: ItemReq = {catalogNumber: 1, id: 6};
         let item2: ItemReq = {catalogNumber: 2, id: 5};
         let item3: ItemReq = {catalogNumber: 3, id: 5};
@@ -330,7 +319,6 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("remove products", () => {
-        logger.info("starting IT: remove products");
         let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
         let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
         let products: ProductReq[] = [product1, product2];
