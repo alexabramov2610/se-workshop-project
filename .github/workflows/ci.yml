@@ -25,37 +25,53 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install
+      - name: Install API
         run: |
           cd se-workshop-20-interfaces
           npm install
           cd ..
+      - name: Install Domain
+        run: |
           cd backend
           cd domain
           npm install
           cd ..
+          cd ..
+      - name: Install Service
+        run: |
+          cd backend
           cd service
           npm install
           cd ..
           cd ..
+      - name: Install AT
+        run: |
           cd AT
           npm install
           cd ..
-      - name: Compile
+      - name: Compile API
         run: |
           cd se-workshop-20-interfaces
-          npm run compe
+          npm run comp
           cd ..
+      - name: Compile Domain
+        run: |
           cd backend
           cd domain
-          npm run compe
+          npm run comp
           cd ..
+          cd ..
+      - name: Compile Service
+        run: |
+          cd backend
           cd service
-          npm run compe
+          npm run comp
           cd ..
           cd ..
+      - name: Compile AT
+        run: |
           cd AT
-          npm run compe
+          npm run comp
           cd ..
       - name: Unit Tests
         run: |
