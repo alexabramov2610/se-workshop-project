@@ -56,8 +56,13 @@ export const createStore = (storeName: string, token: string): void => {
     expect(ServiceFacade.createStore(req).data.result).toBe(true);
 }
 
-export const  addNewProducts = (storeName: string, products: Product[], token: string, expectedRes: boolean): void => {
+export const addNewProducts = (storeName: string, products: Product[], token: string, expectedRes: boolean): void => {
     const res: Res.ProductAdditionResponse = ServiceFacade.addNewProducts({body: {storeName, products}, token});
+    expect(res.data.result).toBe(expectedRes);
+}
+
+export const addNewItems = (storeName: string, items: IItem[], token: string, expectedRes: boolean): void => {
+    const res: Res.ItemsAdditionResponse = ServiceFacade.addItems({body: {storeName, items}, token});
     expect(res.data.result).toBe(expectedRes);
 }
 

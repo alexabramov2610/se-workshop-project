@@ -1,11 +1,17 @@
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import { ManagementPermission, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
-import { IItem as ItemReq, IProduct as ProductReq, ProductWithQuantity } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
-import { RegisteredUser } from "domain_layer/dist/src/user/users/RegisteredUser";
+import {ManagementPermission, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {
+    IItem,
+    IItem as ItemReq,
+    IProduct as ProductReq,
+    ProductWithQuantity
+} from 'se-workshop-20-interfaces/dist/src/CommonInterface'
+import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import * as utils from "./utils"
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
+import {Product} from "domain_layer/dist/src/trading_system/data/Product";
 
 
 describe("Store Owner Integration Tests", () => {
@@ -34,7 +40,6 @@ describe("Store Owner Integration Tests", () => {
 
         utils.createStore(storeName, token);
     });
-
 
     it("add new products", () => {
         let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
@@ -550,12 +555,13 @@ describe("Store Owner Integration Tests", () => {
         const newPassword: string = "new-assign-mock-pw";
         const newUser1: RegisteredUser = new RegisteredUser(newUsername1, newPassword);
         const newUser2: RegisteredUser = new RegisteredUser(newUsername2, newPassword);
+        const basicPermissions: ManagementPermission[] = [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS];
 
         utils.registerUser(newUser1.name, newUser1.password, token, true);
         utils.registerUser(newUser2.name, newUser2.password, token, false);
         utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
 
-        // assign valid store manager
+        // assign store manager 1
         let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {
             body: {
                 storeName,
@@ -566,6 +572,23 @@ describe("Store Owner Integration Tests", () => {
 
         expect(assignStoreManagerResponse.data.result).toBe(true);
 
+        // verify basic permissions
+        let managerPermissionReq: Req.ViewManagerPermissionRequest = { body:{ managerToView: newUser1.name, storeName: storeName }, token: token };
+        let managerPermissionRes: Res.ViewManagerPermissionResponse = ServiceFacade.viewManagerPermissions(managerPermissionReq);
+
+        expect(managerPermissionRes.data.result).toBe(true);
+        expect(managerPermissionRes.data.permissions).toHaveLength(3);
+        expect(managerPermissionRes.data.permissions).toContainEqual(basicPermissions[0]);
+        expect(managerPermissionRes.data.permissions).toContainEqual(basicPermissions[1]);
+        expect(managerPermissionRes.data.permissions).toContainEqual(basicPermissions[2]);
+
+        // not yet assigned (store manager 2)
+        managerPermissionReq = { body:{ managerToView: newUser2.name, storeName: storeName }, token: token };
+        managerPermissionRes = ServiceFacade.viewManagerPermissions(managerPermissionReq);
+
+        expect(managerPermissionRes.data.result).toBe(false);
+
+        // assign store manager 2
         assignStoreManagerRequest = {body: {storeName, usernameToAssign: newUser2.name}, token};
         assignStoreManagerResponse = ServiceFacade.assignStoreManager(assignStoreManagerRequest);
 
@@ -582,9 +605,10 @@ describe("Store Owner Integration Tests", () => {
 
         expect(removeStoreManagerResponse.data.result).toBe(true);
 
+        // remove permissions of manager 2
         const permission1: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
-        const permission2: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
-        const permission3: ManagementPermission = ManagementPermission.MANAGE_INVENTORY;
+        const permission2: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
+        const permission3: ManagementPermission = ManagementPermission.WATCH_USER_QUESTIONS;
 
         const permissionsToChange: ManagementPermission[] = [permission1, permission2, permission3];
 
@@ -599,6 +623,16 @@ describe("Store Owner Integration Tests", () => {
 
         expect(changeManagerPermissionRes.data.result).toBe(true);
 
+        // verify permissions were removed
+        managerPermissionReq = { body:{ managerToView: newUser2.name, storeName: storeName }, token: token };
+        managerPermissionRes = ServiceFacade.viewManagerPermissions(managerPermissionReq);
+
+        expect(managerPermissionRes.data.result).toBe(true);
+        expect(managerPermissionRes.data.permissions).not.toContainEqual(permission1);
+        expect(managerPermissionRes.data.permissions).not.toContainEqual(permission2);
+        expect(managerPermissionRes.data.permissions).not.toContainEqual(permission3);
+
+        // add permissions to manager 2
         changeManagerPermissionReq = {
             body: {
                 managerToChange: newUser2.name,
@@ -610,7 +644,148 @@ describe("Store Owner Integration Tests", () => {
 
         expect(changeManagerPermissionRes.data.result).toBe(true);
 
-        // todo: once get all permissions by user is implemented we can verify permissions were changed
+        // verify permissions were added
+        managerPermissionRes = ServiceFacade.viewManagerPermissions(managerPermissionReq);
+
+        expect(managerPermissionRes.data.result).toBe(true);
+        expect(managerPermissionRes.data.permissions).toContainEqual(permission1);
+        expect(managerPermissionRes.data.permissions).toContainEqual(permission2);
+        expect(managerPermissionRes.data.permissions).toContainEqual(permission3);
+    });
+
+    it("view store purchases history", () => {
+        const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
+        const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
+
+        const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
+        const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
+        const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
+        const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
+
+        const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
+        const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
+        const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
+        const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
+
+        const products: Product[] = [prod1, prod2, prod3, prod4];
+        const items: IItem[] = [item1, item2, item3, item4];
+
+        utils.addNewProducts(storeName, products, token, true);
+        utils.addNewItems(storeName, items, token, true);
+        utils.registerUser(buyer1.name, buyer1.password, token, true);
+        utils.registerUser(buyer2.name, buyer2.password, token, false);
+
+
+        // buyer 1 buys
+        utils.loginUser(buyer1.name, buyer1.password, token, false);
+        // save prod1, prod2
+        let saveProductToCartReq: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: token
+        }
+        let saveProductToCartRes: Res.BoolResponse = ServiceFacade.saveProductToCart(saveProductToCartReq)
+        expect(saveProductToCartRes.data.result).toBeTruthy();
+
+        saveProductToCartReq = {
+            body: {storeName, catalogNumber: products[1].catalogNumber, amount: 1},
+            token: token
+        }
+        saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
+        expect(saveProductToCartRes.data.result).toBeTruthy();
+
+        // buy
+        let purchaseReq: Req.PurchaseRequest = {
+            body: {
+                payment: {
+                    cardDetails: {
+                        holderName: "tal",
+                        number: "152",
+                        expYear: "2021",
+                        expMonth: "5",
+                        ccv: "40"
+                    }, address: "batyam", city: "batya", country: "israel"
+                }
+            }, token: token
+        }
+        let purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse.data.result).toBeTruthy();
+
+
+        // buyer 2 buys
+        utils.loginUser(buyer2.name, buyer2.password, token, true);
+        // save prod1, prod2
+        saveProductToCartReq = {
+            body: {storeName, catalogNumber: products[2].catalogNumber, amount: 1},
+            token: token
+        }
+        saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
+        expect(saveProductToCartRes.data.result).toBeTruthy();
+
+        saveProductToCartReq = {
+            body: {storeName, catalogNumber: products[3].catalogNumber, amount: 1},
+            token: token
+        }
+        saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
+        expect(saveProductToCartRes.data.result).toBeTruthy();
+
+        // buy
+        purchaseReq = {
+            body: {
+                payment: {
+                    cardDetails: {
+                        holderName: "tal",
+                        number: "152",
+                        expYear: "2021",
+                        expMonth: "5",
+                        ccv: "40"
+                    }, address: "batyam", city: "batya", country: "israel"
+                }
+            }, token: token
+        }
+        purchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse.data.result).toBeTruthy();
+
+
+        // get purchases history
+        utils.loginUser(storeOwnerName, storeOwnerPassword, token, true);
+        const viewPurchasesHistoryReq: Req.ViewShopPurchasesHistoryRequest = { body: { storeName: storeName }, token: token };
+        const viewPurchasesHistoryRes: Res.ViewShopPurchasesHistoryResponse = ServiceFacade.viewStorePurchasesHistory(viewPurchasesHistoryReq);
+        let idsTakes: number[] = [1, 1, 1, 1, 1];
+        let prodCatalogsTaken: number[] = [1, 1, 1, 1, 1];
+
+        expect(viewPurchasesHistoryRes.data.result).toBe(true);
+        expect(viewPurchasesHistoryRes.data.receipts).toHaveLength(2);
+        viewPurchasesHistoryRes.data.receipts.forEach(receipt => {
+            expect(receipt.purchases).toHaveLength(2);
+            expect(receipt.purchases[0].storeName).toBe(storeName);
+            expect(receipt.purchases[1].storeName).toBe(storeName);
+
+            let itemId: number = receipt.purchases[0].item.id;
+            expect(idsTakes[itemId]).toBe(1);
+            idsTakes[itemId] = 0;
+
+            let productCatalog: number = receipt.purchases[0].item.catalogNumber;
+            expect(prodCatalogsTaken[productCatalog]).toBe(1);
+            prodCatalogsTaken[productCatalog] = 0;
+
+            expect(receipt.purchases[0].price).toBe(products[productCatalog-1].price);
+            expect(receipt.purchases[0].userName).toBe(productCatalog <= 2 ? buyer1.name : buyer2.name);
+
+            itemId = receipt.purchases[1].item.id;
+            expect(idsTakes[itemId]).toBe(1);
+            idsTakes[itemId] = 0;
+
+            productCatalog = receipt.purchases[1].item.catalogNumber;
+            expect(prodCatalogsTaken[productCatalog]).toBe(1);
+            prodCatalogsTaken[productCatalog] = 0;
+
+            expect(receipt.purchases[1].price).toBe(products[productCatalog-1].price);
+            expect(receipt.purchases[1].userName).toBe(productCatalog <= 2 ? buyer1.name : buyer2.name);
+
+            // expect(receipt.payment.totalCharged).toBe(productCatalog >= 1 ? prod1.price + prod2.price : prod3.price + prod4.price);
+
+        })
+
     });
 
 });

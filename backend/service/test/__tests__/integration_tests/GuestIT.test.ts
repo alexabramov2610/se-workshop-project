@@ -34,14 +34,19 @@ describe("Guest Integration Tests", () => {
     });
 
     it("Register && Login IT test", () => {
-        const regReq: Req.RegisterRequest = {body: {username, password}, token};
-        ServiceFacade.registerUser(regReq);
+        // login without register
         const req: Req.LoginRequest = {body: {username, password}, token};
         let res: Res.BoolResponse = ServiceFacade.loginUser(req);
+        expect(res.data.result).toBe(false);
+
+        const regReq: Req.RegisterRequest = {body: {username, password}, token};
+        ServiceFacade.registerUser(regReq);
+        res = ServiceFacade.loginUser(req);
 
         expect(res.data.result).toBe(true);
         expect(res.error).toBeUndefined();
 
+        // login again
         res = ServiceFacade.loginUser(req);
         expect(res.data.result).toBe(false);
         expect(res.data.result).toBeDefined();
