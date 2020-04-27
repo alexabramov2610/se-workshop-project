@@ -10,6 +10,7 @@ import {
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
+
 describe("Store Management Unit Tests", () => {
     let store: Store;
     let storeOwner: StoreOwner;
