@@ -1,9 +1,15 @@
-import {Req, Res, Enums,CommonInterface} from "se-workshop-20-interfaces"
+import {Req, Res, Enums, CommonInterface} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const registerUser = (req: Req.RegisterRequest): Res.BoolResponse => {
-    // TODO 1.verify credentials  2.register
-    const isCredentialsOk :Res.BoolResponse =ts.verifyNewCredentials({body: {username: req.body.username, password: req.body.password},token:req.token})
+    const isCredentialsOk: Res.BoolResponse = ts.verifyNewCredentials({
+        body: {
+            username: req.body.username,
+            password: req.body.password
+        }, token: req.token
+    })
+    if (!isCredentialsOk.data.result)
+        return isCredentialsOk;
     return ts.register(req);
 }
 
@@ -25,7 +31,16 @@ export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
 }
 
 export const saveProductToCart = (req: Req.SaveToCartRequest): Res.BoolResponse => {
-    // TODO 1.check products are on stock  2.save to cart
+    const isProductsAvailable: Res.BoolResponse = ts.verifyProductOnStock({
+        body: {
+            storeName: req.body.storeName,
+            catalogNumber: req.body.catalogNumber,
+            amount: req.body.amount
+        }, token: req.token
+    })
+    if (!isProductsAvailable.data.result)
+        return isProductsAvailable
+
     return ts.saveProductToCart(req);
 }
 

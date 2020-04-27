@@ -483,4 +483,8 @@ export class TradingSystemManager {
     verifyTokenExists(req: Req.Request): Res.BoolResponse {
         return this._userManager.getUserByToken(req.token)? {data:{result:true}} : {data:{result:false}, error:{message: errorMsg.E_BAD_TOKEN}}
     }
+
+    verifyProductOnStock(req:Req.VerifyProductOnStock) : Res.BoolResponse{
+        return this._storeManager.verifyProductOnStock(req);
+    }
 }

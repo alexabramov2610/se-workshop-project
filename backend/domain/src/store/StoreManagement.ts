@@ -682,4 +682,16 @@ export class StoreManagement {
         return {data: {result: true}}
 
     }
+
+    verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
+        const store: Store = this.findStoreByName(req.body.storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        if (!store.getProductByCatalogNumber(req.body.catalogNumber))
+            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+        const stockAmount: number = store.getProductQuantity(req.body.catalogNumber)
+        if (stockAmount < req.body.amount) {
+            return {data: {result: false}, error: {message: errorMsg.E_STOCK, options: {available: stockAmount}}};
+        }
+    }
 }
