@@ -22,9 +22,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: yarn install
-        run: |
-          yarn install
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
