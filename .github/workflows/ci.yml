@@ -2,17 +2,13 @@ name: se-workshop pipe
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-      branches:
-        - master
-  
+    branches: [ master ]
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [10.x]
@@ -24,7 +20,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
@@ -77,7 +72,7 @@ jobs:
         run: |
           cd backend
           cd domain
-          npm test
+          npm run test:cov
           cd ..
           cd ..
       - name: Integration Tests
@@ -92,7 +87,3 @@ jobs:
 #          cd AT
 #          npm test
 #          cd ..
-        uses: ziishaned/jest-reporter-action@v0.0.1
-        with:
-          github-token: ${{ secrets.TOKEN }}
-          test-command: "yarn jest --coverage"
