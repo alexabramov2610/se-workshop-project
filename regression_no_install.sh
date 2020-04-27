@@ -47,6 +47,12 @@ cd $domain
 npm start jest --clearCache
 npm run test:silent
 
+#####  service
+echo -e "${RED}testing service...${NC}"
+cd $service
+npm start jest --clearCache
+npm run test:silent
+
 #####  AT
 echo -e "${RED}testing AT...${NC}"
 cd $AT

@@ -1,7 +1,7 @@
-import {TradingSystemManager} from "../../../src/trading_system/TradingSystemManager";
+import {TradingSystemManager} from "domain_layer/dist/src/trading_system/TradingSystemManager";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import utils from "./utils"
-import {StoreManager} from "../../../src/user/internal_api";
+import * as utils from "./utils"
+import {StoreManager} from "domain_layer/dist/src/user/internal_api";
 
 describe("Store Manager Integration Tests", () => {
     const storeManagerName: string = "store-manager";
@@ -13,14 +13,16 @@ describe("Store Manager Integration Tests", () => {
     let storeManager: StoreManager;
     let token: string;
 
+    beforeAll(() => {
+        utils.systemInit();
+    });
 
     beforeEach(() => {
-        tradingSystemManager = new TradingSystemManager();
-        token = utils.initSessionRegisterLogin(tradingSystemManager, storeManagerName, storeManagerPassword);
+        utils.systemReset();
+        token = utils.initSessionRegisterLogin(storeManagerName, storeManagerPassword);
         expect(token).toBeDefined();
-
-        storeManager = new StoreManager(storeManagerName);
     });
+
 
 
     it("dummy test",() => {

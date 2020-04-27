@@ -144,6 +144,12 @@ export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Res.BoolResp
     return runIfOpen(req, StoreService.assignStoreOwner);
 }
 /*
+UC-4.4
+ */
+export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Res.BoolResponse => {
+    return runIfOpen(req, StoreService.removeStoreOwner);
+}
+/*
 UC-4.5
  */
 export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
