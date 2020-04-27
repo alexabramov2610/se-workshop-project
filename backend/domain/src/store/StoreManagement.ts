@@ -690,8 +690,9 @@ export class StoreManagement {
         if (!store.getProductByCatalogNumber(req.body.catalogNumber))
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         const stockAmount: number = store.getProductQuantity(req.body.catalogNumber)
-        if (stockAmount < req.body.amount) {
+        if (stockAmount < req.body.amount)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK, options: {available: stockAmount}}};
-        }
+        return {data: {result: true}}
+
     }
 }
