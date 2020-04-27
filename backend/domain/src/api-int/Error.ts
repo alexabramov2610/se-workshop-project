@@ -25,6 +25,7 @@ const errorMsg:ErrorMessages = {
     E_USER_DOES_NOT_EXIST: "User does not exist.",
     E_ITEMS_ADD:  "Could not add items.",
     E_ITEMS_REM: "Could not remove items.",
+    E_BAD_TOKEN: "Bad token.",
     E_NOT_LOGGED_IN: "User is not logged in.",
     E_INVALID_STORE: "Store does not exist.",
     E_NOT_AUTHORIZED: "User is not authorized.",
