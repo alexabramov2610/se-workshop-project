@@ -27,11 +27,8 @@ jobs:
       - name: yarn install
         run: |
           yarn install
-      - name: Use Jest Code Coverage Report
-        uses: ziishaned/jest-reporter-action@0.1.1
-        with:
-          github-token: ${{ secrets.TOKEN }}
-          test-command: "npm run test:cov"
+      - name: Use Jest Annotations & Coverage
+        uses: mattallty/jest-github-action@v1.0.2
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
