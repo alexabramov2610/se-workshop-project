@@ -94,7 +94,10 @@ jobs:
 #          cd AT
 #          npm test
 #          cd ..
-
+      - name: Integration Tests
+        run: |
+          cd backend
+          cd domain
       - uses: mattallty/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
