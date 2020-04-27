@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          test-command: "cd backend ; cd domain ; yarn test"
+          test-command: "yarn test"
       - name: Install API
         run: |
           cd se-workshop-20-interfaces
