@@ -87,11 +87,11 @@ jobs:
           npm test
           cd ..
           cd ..
-      - name: Acceptance Tests
-        run: |
-          cd AT
-          npm test
-          cd ..
+#      - name: Acceptance Tests
+#        run: |
+#          cd AT
+#          npm test
+#          cd ..
       - name: Coverage Report
         uses: ziishaned/jest-reporter-action@0.1.1
         with:
