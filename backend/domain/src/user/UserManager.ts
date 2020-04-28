@@ -148,11 +148,6 @@ export class UserManager {
         this.guests.delete(token);
     }
 
-    private getAdminByToken(token: string): Admin {
-        const user: RegisteredUser = this.getLoggedInUserByToken(token);
-        return !user ? user : this.admins.find((a) => user.name === a.name)
-    }
-
     saveProductToCart(user: User, storeName: string, product: IProduct, amount: number): void {
         user.saveProductToCart(storeName, product, amount);
     }
@@ -186,15 +181,6 @@ export class UserManager {
         return {data: {result: true, cart: cartRes}}
     }
 
-    private transferToCartRes(cart: Map<string, BagItem[]>): Cart {
-        const cartProducts: CartProduct[] = [];
-        for (const [storeName, bagItems] of cart) {
-            cartProducts.push({storeName, bagItems})
-        }
-        const cartRes: Cart = {products: cartProducts}
-        return cartRes
-    }
-
     viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
         return {
             data: {
@@ -219,7 +205,7 @@ export class UserManager {
     }
 
     isValidUserName(username: string): boolean {
-        return this.getUserByName(username) === undefined;
+        return this.getUserByName(username) === undefined && username.length >= 2;
     }
 
     verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
@@ -230,6 +216,20 @@ export class UserManager {
         if (!validPass)
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         return {data: {result: true}}
+    }
+
+    private getAdminByToken(token: string): Admin {
+        const user: RegisteredUser = this.getLoggedInUserByToken(token);
+        return !user ? user : this.admins.find((a) => user.name === a.name)
+    }
+
+    private transferToCartRes(cart: Map<string, BagItem[]>): Cart {
+        const cartProducts: CartProduct[] = [];
+        for (const [storeName, bagItems] of cart) {
+            cartProducts.push({storeName, bagItems})
+        }
+        const cartRes: Cart = {products: cartProducts}
+        return cartRes
     }
 
 }
