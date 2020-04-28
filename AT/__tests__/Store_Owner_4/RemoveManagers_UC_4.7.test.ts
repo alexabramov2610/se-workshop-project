@@ -59,7 +59,6 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
         usernameToRemove: _newManagerCreds.userName,
       },
     });
-    console.log(error)
     expect(data.result).toBe(true);
     expect(error).toBeUndefined();
   });
