@@ -8,7 +8,7 @@ import {
   Product,
 } from "./types";
 import * as DummyTypes from "./mocks/responses";
-import { Req, Res } from "se-workshop-20-interfaces"
+import { Req, Res } from "se-workshop-20-interfaces";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
@@ -27,7 +27,7 @@ export interface Bridge {
   viewProduct(store: Store, product: Product): Res.ProductInfoResponse;
   removeUser(user: User): DummyTypes.IResponse;
   getUserByName(user: User): DummyTypes.IUserResponse;
-  login(credentials: Credentials): DummyTypes.IResponse;
+  login(credentials: Credentials, asAdmin?: boolean): DummyTypes.IResponse;
   register(credentials: Credentials): DummyTypes.IResponse;
   logout(): DummyTypes.IResponse;
   getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;

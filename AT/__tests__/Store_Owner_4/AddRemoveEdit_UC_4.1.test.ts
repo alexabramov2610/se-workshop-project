@@ -34,7 +34,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     const res = _serviceBridge.addItemsToStore(_storeInformation, [
       { id: 123, catalogNumber: productToAdd.catalogNumber },
     ]).data.result;
-    console.log("this is the result", res);
+    
     expect(res).toBe(true);
   });
 

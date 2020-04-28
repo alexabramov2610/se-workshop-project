@@ -5,7 +5,7 @@
   "scripts": {
     "comp": "tsc",
     "start": "tsc && node dist/AT/index.js",
-    "test": "DEBUG=1 jest",
+    "test": "SILENT=1 jest",
     "test:clear": "jest --clearCache",
     "test:silent": "TEST_MODE=1 SILENT=1 jest",
     "test:watch": "npm t -- --watch",

@@ -41,7 +41,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
         [],
         res.data.receipts.map((r) => r.purchases)
       ).map(e => e.item.catalogNumber).filter(cn => cn === _item.catalogNumber)
-      console.log('history',JSON.stringify(itemCatalogNumber))  
+      
 
     expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
   });
