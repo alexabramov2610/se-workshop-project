@@ -31,18 +31,16 @@ describe("Watch Purchases History, UC: 3.7", () => {
   test("logged in, with history", () => {
     _serviceBridge.login(_shopoholic);
     _driver.given.store(_store).products([_prodct]).makeABuy();
+    _serviceBridge.logout();
+    _serviceBridge.login(_driver.getInitDefaults());
     const res = _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
-
-    
     const itemCatalogNumber: any[] = [].concat
       .apply(
         [],
         res.data.receipts.map((r) => r.purchases)
       ).map(e => e.item.catalogNumber).filter(cn => cn === _item.catalogNumber)
-      
-
     expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
   });
 

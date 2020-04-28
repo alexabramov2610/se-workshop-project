@@ -23,7 +23,7 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge.logout();
     _serviceBridge.register(_newManagerCreds)
     _driver.loginWithDefaults();
-    console.log(_serviceBridge.assignManager(_storeInformation, _newManagerCreds));
+    
     _serviceBridge.logout();
   });
 
