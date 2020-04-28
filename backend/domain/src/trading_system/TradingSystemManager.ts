@@ -52,9 +52,6 @@ export class TradingSystemManager {
 
     register(req: Req.RegisterRequest): Res.BoolResponse {
         logger.info(`registering new user: ${req.body.username} `);
-        const user: User = this._userManager.getUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (rUser) {
             logger.debug(`logged in user cant register `);
@@ -88,76 +85,48 @@ export class TradingSystemManager {
     changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
         logger.info(`trying to change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
     changeProductPrice(req: Req.ChangeProductPriceRequest): Res.BoolResponse {
         logger.info(`trying to change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
 
     addItems(req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse {
         logger.info(`trying to add items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, itemsNotAdded: req.body.items}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        if (!user) return {
-            data: {result: false, itemsNotAdded: req.body.items},
-            error: {message: errorMsg.E_NOT_AUTHORIZED}
-        };
         return this._storeManager.addItems(user, req.body.storeName, req.body.items);
     }
 
     removeItems(req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse {
         logger.info(`trying to remove items from store: ${req.body.storeName} `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {
-            data: {result: false, itemsNotRemoved: req.body.items},
-            error: {message: errorMsg.E_NOT_AUTHORIZED}
-        };
         return this._storeManager.removeItems(user, req.body.storeName, req.body.items);
     }
 
     removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse {
         logger.info(`trying to remove items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {
-            data: {result: false, productsNotRemoved: req.body.products},
-            error: {message: errorMsg.E_NOT_AUTHORIZED}
-        };
         return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
     }
 
     addNewProducts(req: Req.AddProductsRequest): Res.ProductAdditionResponse {
         logger.info(`trying to add products to store: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {
-            data: {result: false, productsNotAdded: req.body.products},
-            error: {message: errorMsg.E_NOT_AUTHORIZED}
-        };
         return this._storeManager.addNewProducts(user, req.body.storeName, req.body.products);
     }
 
     removeProducts(req: Req.ProductRemovalRequest): Res.ProductRemovalResponse {
         logger.info(`trying to remove products from store: ${req.body.storeName} `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user) return {
-            data: {result: false, productsNotRemoved: req.body.products},
-            error: {message: errorMsg.E_NOT_AUTHORIZED}
-        };
         return this._storeManager.removeProducts(user, req.body.storeName, req.body.products);
     }
 
     assignStoreOwner(req: Req.AssignStoreOwnerRequest): Res.BoolResponse {
         logger.info(`requested to assign user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoAssigns)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
@@ -167,8 +136,6 @@ export class TradingSystemManager {
     assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
         logger.info(`requested to assign user: ${req.body.usernameToAssign} as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoAssigns)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
@@ -179,8 +146,6 @@ export class TradingSystemManager {
         logger.info(`user: ${JSON.stringify(req.token)} requested to remove user:
                 ${JSON.stringify(req.body.usernameToRemove)} as an owner in store: ${JSON.stringify(req.body.storeName)} `)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoRemoves)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
@@ -191,8 +156,6 @@ export class TradingSystemManager {
         logger.info(`user requested to remove user:
                 ${req.body.usernameToRemove} as a manager in store: ${req.body.storeName} `)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!usernameWhoRemoves)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
@@ -220,10 +183,8 @@ export class TradingSystemManager {
     createStore(req: Req.OpenStoreRequest): Res.BoolResponse {
         logger.info(`open store request: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, user);
-        return res;
+        return this._storeManager.addStore(req.body.storeName, user);
+
     }
 
     viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
@@ -234,33 +195,24 @@ export class TradingSystemManager {
     removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
         logger.info(`trying to remove user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
     addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
         logger.info(`trying to add user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
     viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
         logger.info(`trying to retrieve store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
         return res;
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
         logger.info(`view product info request for store ${req.body.storeName} product number ${req.body.catalogNumber} `)
-        const user: User = this._userManager.getUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         return this._storeManager.viewProductInfo(req);
     }
 
@@ -282,8 +234,6 @@ export class TradingSystemManager {
     removeProductFromCart(req: Req.RemoveFromCartRequest): Res.BoolResponse {
         logger.info(`request to remove product: ${req.body.catalogNumber} from cart`)
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const store = this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
@@ -305,8 +255,6 @@ export class TradingSystemManager {
     calculateFinalPrices(req: Req.CalcFinalPriceReq): Res.CartFinalPriceRes {
         logger.info(`calculate final prices of user cart`)
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let finalPrice: number = 0;
         for (const [storeName, bagItems] of cart.entries()) {
@@ -320,8 +268,6 @@ export class TradingSystemManager {
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
         logger.info(`Verify that products in cart are on stock`)
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         if (cart.size === 0)
             return {data: {result: false}, error: {message: errorMsg.E_EMPTY_CART}}
@@ -338,9 +284,6 @@ export class TradingSystemManager {
 
     pay(req: Req.PayRequest): Res.PaymentResponse {
         logger.info(`request to pay via external system`)
-        const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
@@ -353,8 +296,6 @@ export class TradingSystemManager {
     purchase(req: Req.UpdateStockRequest): Res.PurchaseResponse {
         logger.info(`request to update the stock of stores (purchase)`)
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let purchases: Purchase[] = []
@@ -371,9 +312,6 @@ export class TradingSystemManager {
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
         logger.info(`request to verify new store details`)
-        const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         if (this._storeManager.verifyStoreExists(req.body.storeName)) {
             return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
         }
@@ -382,27 +320,19 @@ export class TradingSystemManager {
 
     verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
         logger.info(`request to verify credentials`)
-        const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         return this._userManager.verifyCredentials(req);
     }
 
     viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
         logger.info(`request to view manager permissions`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const manager: RegisteredUser = this._userManager.getUserByName(req.body.managerToView);
-
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
     addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
         logger.info(`request to add discount at store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.addProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
         return {data: {result: true}}
     }
@@ -410,8 +340,6 @@ export class TradingSystemManager {
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
         logger.info(`request to remove discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         return this._storeManager.removeProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discountID)
         return {data: {result: true}}
     }
@@ -420,8 +348,6 @@ export class TradingSystemManager {
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
@@ -435,8 +361,6 @@ export class TradingSystemManager {
     viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
         logger.info(`Trying to get receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
     }
@@ -454,10 +378,7 @@ export class TradingSystemManager {
     deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
         logger.info(`request to deliver via external system`)
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const isDeliver: boolean = this._externalSystems.deliverySystem.deliver(req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address);
-
         return isDeliver
             ? {data: {result: true, deliveryID: "1"}}
             : {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
@@ -491,8 +412,6 @@ export class TradingSystemManager {
 
     verifyStorePermission(req: Req.VerifyStorePermission): Res.BoolResponse {
         const user = this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }
 }
