@@ -28,7 +28,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _serviceBridge.register(_shopoholic);
   });
 
-  test("logged in, with history", () => {
+  test("logged in, with history, without admin flag", () => {
     _serviceBridge.login(_shopoholic);
     _driver.given.store(_store).products([_prodct]).makeABuy();
     _serviceBridge.logout();
@@ -36,17 +36,18 @@ describe("Watch Purchases History, UC: 3.7", () => {
     const res = _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
-    const itemCatalogNumber: any[] = [].concat
-      .apply(
-        [],
-        res.data.receipts.map((r) => r.purchases)
-      ).map(e => e.item.catalogNumber).filter(cn => cn === _item.catalogNumber)
-    expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
+    expect(res.data.result).toBe(false);
+    expect(res.error.message).toBeDefined();
   });
 
-  test("logged in, no history", () => {
+  test("logged in, with history, with admin flag", () => {
     _serviceBridge.login(_shopoholic);
-    const res = _serviceBridge.viewUserPurchasesHistory({
+    _driver.given.store(_store).products([_prodct]).makeABuy();
+    _serviceBridge.logout();
+    const asAdmin=true;
+    _serviceBridge.login(_driver.getInitDefaults(),asAdmin);
+    const res = 
+    _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
     const itemCatalogNumber: any[] = [].concat
@@ -54,30 +55,44 @@ describe("Watch Purchases History, UC: 3.7", () => {
         [],
         res.data.receipts.map((r) => r.purchases)
       )
-      .filter((i) => i.catalogNumber === _prodct.catalogNumber);
-
-    expect(itemCatalogNumber[0]).toBeUndefined();
+      .map((e) => e.item.catalogNumber)
+      .filter((cn) => cn === _item.catalogNumber);
+    expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
+    
   });
 
-  test("logged out, with history", () => {
+  test("logged in, no history, with admin flag", () => {
+    const asAdmin=true;
+    _serviceBridge.login(_driver.getInitDefaults(),asAdmin);
+    const {error,data} = 
+    _serviceBridge.viewUserPurchasesHistory({
+      body: { userName: _shopoholic.userName },
+    });
+    expect(data.result).toBe(true);
+    expect(data.receipts.length).toBe(0);
+    expect(error).toBeUndefined();
+  });
+
+  test("logged in, with history, with admin flag, buyer history is shop manager", () => {
+    _serviceBridge.login(_driver.getLoginDefaults());
+    _serviceBridge.assignManager(_store,_shopoholic);
+    _serviceBridge.logout()
     _serviceBridge.login(_shopoholic);
     _driver.given.store(_store).products([_prodct]).makeABuy();
     _serviceBridge.logout();
-    const { error, data } = _serviceBridge.viewUserPurchasesHistory({
+    const asAdmin=true;
+    _serviceBridge.login(_driver.getInitDefaults(),asAdmin);
+    const res = 
+    _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
-    
-    expect(error.message).toBeDefined();
+    const itemCatalogNumber: any[] = [].concat
+      .apply(
+        [],
+        res.data.receipts.map((r) => r.purchases)
+      )
+      .map((e) => e.item.catalogNumber)
+      .filter((cn) => cn === _item.catalogNumber);
+    expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
   });
-
-  test("logged out, no history", () => {
-    _serviceBridge.logout();
-    const { error, data } = _serviceBridge.viewUserPurchasesHistory({
-      body: { userName: _shopoholic.userName },
-    });
-    
-    expect(error.message).toBeDefined();
-  });
-
-
 });

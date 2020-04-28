@@ -3,7 +3,7 @@ import * as Env from "../..";
 import { ServiceFacade } from "service_layer";
 import * as DummyTypes from "./mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
-import { Req, Res } from "se-workshop-20-interfaces"
+import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 
 let token;
@@ -47,10 +47,14 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: response.data };
   },
 
-  login(credentials: Types.Credentials): DummyTypes.IResponse {
+  login(
+    credentials: Types.Credentials,
+    asAdmin: boolean = false
+  ): DummyTypes.IResponse {
     const reqCred = {
       username: credentials.userName,
       password: credentials.password,
+      asAdmin
     };
     const { data, error } = ServiceFacade.loginUser(wrapWithToken(reqCred));
     return error
@@ -221,9 +225,7 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  saveProductToCart(
-    req: Req.SaveToCartRequest
-  ): Res.BoolResponse {
+  saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
     return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   },
 
@@ -243,23 +245,25 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   addProductDiscount(req: Req.AddDiscountRequest) {
-    const {data, error} =  ServiceFacade.addProductDiscount(wrapWithToken(req.body));
+    const { data, error } = ServiceFacade.addProductDiscount(
+      wrapWithToken(req.body)
+    );
     return error
-        ? {data: undefined, error: error}
-        : {data: data, error: undefined};
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
   },
 
   pay(req: Req.PayRequest) {
-    const {data, error} = ServiceFacade.pay(wrapWithToken(req.body));
+    const { data, error } = ServiceFacade.pay(wrapWithToken(req.body));
     return error
-        ? {data: undefined, error: error}
-        : {data: data, error: undefined};
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
   },
 
   deliver(req: Req.DeliveryRequest) {
-    const {data, error} = ServiceFacade.deliver(wrapWithToken(req.body));
+    const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));
     return error
-        ? {data: undefined, error: error}
-        : {data: data, error: undefined};
-  }
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 };
