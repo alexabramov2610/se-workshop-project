@@ -85,7 +85,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse{
+    changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
         logger.info(`trying to change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -93,7 +93,7 @@ export class TradingSystemManager {
         return this._storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
-    changeProductPrice(req: Req.ChangeProductPriceRequest): Res.BoolResponse{
+    changeProductPrice(req: Req.ChangeProductPriceRequest): Res.BoolResponse {
         logger.info(`trying to change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -231,7 +231,7 @@ export class TradingSystemManager {
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
-    removeManagerPermissions (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
+    removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
         logger.info(`trying to remove user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -251,7 +251,7 @@ export class TradingSystemManager {
         logger.info(`trying to retrieve store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return {data: {result: false,messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+            return {data: {result: false, messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
         return res;
     }
@@ -270,19 +270,10 @@ export class TradingSystemManager {
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
         const user = this._userManager.getUserByToken(req.token);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const store = this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_NF}}
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
-        if (!product)
-            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        const inStock: boolean = store.isProductAmountInStock(req.body.catalogNumber, req.body.amount);
-        if (!inStock) {
-            logger.debug(` product: ${req.body.catalogNumber} not in stock`)
-            return {data: {result: false}, error: {message: errorMsg.E_STOCK}};
-        }
         logger.debug(` product: ${req.body.catalogNumber} added to cart`)
         this._userManager.saveProductToCart(user, req.body.storeName, product, amount);
         return {data: {result: true}}

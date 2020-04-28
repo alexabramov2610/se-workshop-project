@@ -26,7 +26,6 @@ export abstract class User {
         }
     }
 
-
     saveProductToCart(storeName: string, product: IProduct, amount: number): void {
         logger.debug(`saving ${amount} of product ${product.name} to cart`)
         const storeBag: BagItem[] = this.cart.get(storeName);

@@ -1275,41 +1275,6 @@ describe("Store Management Unit Tests", () => {
 
     })
 
-    test("saveProductToCart not in stock-Fail test", () => {
-        prepareMockToSaveProduct()
-        tradingSystemManager = new TradingSystemManager();
-        const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
-        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(false);
-        jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
-
-        const req: Req.SaveToCartRequest = {
-            body: {storeName: store.storeName, catalogNumber: 12, amount: 3},
-            token: 'whatever'
-        }
-        const res = tradingSystemManager.saveProductToCart(req);
-
-        expect(user.cart.get(store.storeName)).toBeFalsy();
-        expect(res.data.result).toBeFalsy()
-
-    })
-
-    test("saveProductToCart no such product-Fail test", () => {
-        prepareMockToSaveProduct()
-        tradingSystemManager = new TradingSystemManager();
-        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(false);
-
-        const req: Req.SaveToCartRequest = {
-            body: {storeName: store.storeName, catalogNumber: 12, amount: 3},
-            token: mockToken
-        }
-        const res = tradingSystemManager.saveProductToCart(req);
-
-        expect(user.cart.get(store.storeName)).toBeFalsy();
-        expect(res.data.result).toBeFalsy()
-
-    })
-
-
     function prepareMockToVerifyCart(isSuccess: boolean): void {
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
             data: {result: false},
@@ -1360,7 +1325,6 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
 
     })
-
 
     /*
         function prepareMockToPay(isSuccess: boolean): void {
