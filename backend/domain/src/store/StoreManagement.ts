@@ -315,7 +315,7 @@ export class StoreManagement {
 
         const userManagerToRemove: StoreManager = store.getStoreManager(userToRemove.name);
         if (!userManagerToRemove) {   // not store owner
-            error = errorMsg.E_NOT_OWNER;
+            error = errorMsg.E_MANGER_NOT_EXISTS;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
