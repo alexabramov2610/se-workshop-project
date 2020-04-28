@@ -91,8 +91,8 @@ interface ViewRUserPurchasesHistoryRes extends Response {
   data: { result: boolean; receipts: IReceipt[] };
 }
 
-interface ViewCartRes extends Response {
-  data: { result: boolean; cart: Cart };
+interface ViewCartRes extends BoolResponse {
+  data: { result: boolean; cart?: Cart };
 }
 
 interface SearchResponse extends Response {

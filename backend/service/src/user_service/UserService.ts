@@ -49,6 +49,9 @@ export const removeProductFromCart = (req: Req.RemoveFromCartRequest): Res.BoolR
 }
 
 export const viewCart = (req: Req.ViewCartReq): Res.ViewCartRes => {
+    const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
+    if (!calcRes)
+        return calcRes
     return ts.viewCart(req);
 }
 

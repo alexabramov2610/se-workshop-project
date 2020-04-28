@@ -353,7 +353,7 @@ describe("Guest Integration Tests", () => {
         const watchReq: Req.ViewCartReq = {body: {}, token: token}
         const watchRes: Res.ViewCartRes = ServiceFacade.viewCart(watchReq)
 
-        const cart: Cart = {products: [{storeName, bagItems: [{product: products[0], amount: 1}]}]}
+        const cart: Cart = {products: [{storeName, bagItems: [{product: products[0], amount: 1, finalPrice: 20}]}]}
         expect(watchRes.data.result).toBeTruthy();
         expect(watchRes.data.cart).toEqual(cart)
     });
