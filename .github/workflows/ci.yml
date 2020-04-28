@@ -81,11 +81,11 @@ jobs:
           npm test
           cd ..
           cd ..
-#      - name: Acceptance Tests
-#        run: |
-#          cd AT
-#          npm test
-#          cd ..
+      - name: Acceptance Tests
+        run: |
+          cd AT
+          npm test
+          cd ..
       - name: Monitor coverage 1
         uses: slavcodev/coverage-monitor-action@1.1.0
         with:
