@@ -85,7 +85,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
+    changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse{
         logger.info(`trying to change product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -93,7 +93,7 @@ export class TradingSystemManager {
         return this._storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
-    changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
+    changeProductPrice(req: Req.ChangeProductPriceRequest): Res.BoolResponse{
         logger.info(`trying to change product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -231,7 +231,7 @@ export class TradingSystemManager {
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
-    removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
+    removeManagerPermissions (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
         logger.info(`trying to remove user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
@@ -239,7 +239,7 @@ export class TradingSystemManager {
         return this._storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
-    addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
+    addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
         logger.info(`trying to add user: ${req.body.managerToChange} permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)

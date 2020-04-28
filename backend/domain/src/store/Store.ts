@@ -28,8 +28,6 @@ interface ProductValidator {
 
 export class Store {
     private readonly _UUID: string;
-    private _rating: Rating;
-    private _products: Map<Product, Item[]>;
     private readonly _storeName: string;
     private _storeOwners: StoreOwner[];
     private _storeManagers: StoreManager[];
@@ -49,6 +47,26 @@ export class Store {
         this._rating = Rating.MEDIUM;
         this._discountTypes = [DiscountsTypes.SHOWN_DISCOUNT]
         this._buyingTypes = [BuyingTypes.IMMEDIATE_PURCHASE]
+    }
+
+    private _rating: Rating;
+
+    get rating(): Rating {
+        return this._rating;
+    }
+
+    private _products: Map<Product, Item[]>;
+
+    get products(): Map<Product, Item[]> {
+        return this._products;
+    }
+
+    get storeName(): string {
+        return this._storeName;
+    }
+
+    get UUID(): string {
+        return this._UUID;
     }
 
     addItems(items: Item[]): Res.ItemsAdditionResponse {
@@ -371,6 +389,46 @@ export class Store {
         return this._storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
+    getItemsFromStock(product: ProductReq, amount: number): Item[] {
+        const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
+        const items: Item[] = this._products.get(productInStore);
+        const itemsToReturn: Item[] = items.slice(0, amount);
+        const itemsRemaining: Item[] = items.slice(amount, items.length);
+        this._products.set(productInStore, itemsRemaining)
+        return itemsToReturn;
+
+    }
+
+    addReceipt(purchases: Purchase[], payment: IPayment) {
+        this._receipts.push(new Receipt(purchases, payment))
+    }
+
+    getProductFinalPrice(catalogNumber: number): number {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber)
+        const discounts: Discount[] = product.discounts;
+        let finalPrice: number = product.price;
+        for (const d of discounts) {
+            if (d.isValid())
+                finalPrice = d.calc(finalPrice);
+        }
+        return finalPrice
+    }
+
+    addDiscount(catalogNumber: number, discount: IDiscount): string {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber);
+        let newDiscount: Discount;
+        if (!discount.condition && !discount.coupon) {
+            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration)
+        }
+        product.addDiscount(newDiscount);
+        return newDiscount.id;
+
+    }
+
+    removeDiscount(catalogNumber: number, discountID: string): boolean {
+        const product: Product = this.getProductByCatalogNumber(catalogNumber);
+        return product.removeDiscount(discountID);
+    }
 
     private getItemById(items: Item[], id: number): Item {
         logger.debug(`searching item with id: ${id}`);
@@ -440,63 +498,6 @@ export class Store {
         if (typeof filters.productRating !== "undefined" && filters.productRating !== product.rating)
             return false;
         return true;
-    }
-
-    getItemsFromStock(product: ProductReq, amount: number): Item[] {
-        const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
-        const items: Item[] = this._products.get(productInStore);
-        const itemsToReturn: Item[] = items.slice(0, amount);
-        const itemsRemaining: Item[] = items.slice(amount, items.length);
-        this._products.set(productInStore, itemsRemaining)
-        return itemsToReturn;
-
-    }
-
-    get storeName(): string {
-        return this._storeName;
-    }
-
-    get products(): Map<Product, Item[]> {
-        return this._products;
-    }
-
-    get UUID(): string {
-        return this._UUID;
-    }
-
-    get rating(): Rating {
-        return this._rating;
-    }
-
-
-    addReceipt(purchases: Purchase[], payment: IPayment) {
-        this._receipts.push(new Receipt(purchases, payment))
-    }
-
-    getProductFinalPrice(catalogNumber: number): number {
-        const product: Product = this.getProductByCatalogNumber(catalogNumber)
-        const discounts: Discount[] = product.discounts;
-        let finalPrice: number = product.price;
-        for (const d of discounts) {
-            finalPrice = d.calc(finalPrice);
-        }
-        return finalPrice
-    }
-
-    addDiscount(catalogNumber: number, discount: IDiscount): string {
-        const product: Product = this.getProductByCatalogNumber(catalogNumber);
-        let newDiscount: Discount;
-        if (!discount.condition && !discount.coupon) {
-            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration)
-        }
-        product.addDiscount(newDiscount);
-        return newDiscount.id;
-
-    }
-
-    removeDiscount(catalogNumber: number, discountID: string): boolean {
-        const product: Product = this.getProductByCatalogNumber(catalogNumber);
-        return product.removeDiscount(discountID);
     }
 
 }
