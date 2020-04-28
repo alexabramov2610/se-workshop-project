@@ -22,7 +22,7 @@ interface Response {
   error?: Error;
 }
 
-interface ItemsAdditionResponse extends Response {
+interface ItemsAdditionResponse extends BoolResponse {
   data: { result: boolean; itemsNotAdded: IItem[] };
 }
 
@@ -66,8 +66,8 @@ interface ViewShopPurchasesHistoryResponse extends Response {
   data: { result: boolean; receipts: IReceipt[] };
 }
 
-interface ViewUsersContactUsMessagesResponse extends Response {
-  data: { messages: IContactUsMessage[] };
+interface ViewUsersContactUsMessagesResponse extends BoolResponse {
+  data: { result: boolean, messages: IContactUsMessage[] };
 }
 
 interface ProductInfoResponse extends Response {

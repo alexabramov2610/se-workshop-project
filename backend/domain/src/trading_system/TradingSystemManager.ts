@@ -3,7 +3,7 @@ import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {User} from "../user/users/User";
 import {Product} from "./data/Product";
@@ -251,7 +251,7 @@ export class TradingSystemManager {
         logger.info(`trying to retrieve store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return {data: {messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+            return {data: {result: false,messages: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
         return res;
     }
@@ -477,14 +477,31 @@ export class TradingSystemManager {
     }
 
     verifyUserLoggedIn(req: Req.Request): Res.BoolResponse {
-        return this._userManager.getLoggedInUserByToken(req.token)? {data:{result:true}} : {data:{result:false}, error:{message: errorMsg.E_NOT_LOGGED_IN}}
+        return this._userManager.getLoggedInUserByToken(req.token) ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.E_NOT_LOGGED_IN}
+        }
     }
 
     verifyTokenExists(req: Req.Request): Res.BoolResponse {
-        return this._userManager.getUserByToken(req.token)? {data:{result:true}} : {data:{result:false}, error:{message: errorMsg.E_BAD_TOKEN}}
+        return this._userManager.getUserByToken(req.token) ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.E_BAD_TOKEN}
+        }
     }
 
-    verifyProductOnStock(req:Req.VerifyProductOnStock) : Res.BoolResponse{
+    verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
         return this._storeManager.verifyProductOnStock(req);
+    }
+
+    verifyProducts(req: Req.VerifyProducts) {
+        return this._storeManager.verifyProducts(req);
+    }
+
+    verifyStorePermission(req: Req.VerifyStorePermission): Res.BoolResponse {
+        const user = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }
 }

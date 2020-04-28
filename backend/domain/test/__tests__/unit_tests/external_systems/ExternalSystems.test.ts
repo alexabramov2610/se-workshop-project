@@ -23,14 +23,14 @@ describe("External System Unit Tests", () => {
 
     class RealSystemMockException {
         connect() {
-            throw "Connection timeout";
+            throw new Error("Connection timeout");
         }
     }
 
     test("DeliverySystem connection - without external", () => {
         const deliverySystem: DeliverySystem = new DeliverySystem();
         const mockDelSystem: string = "mockDelSystem";
-        const res: Res.BoolResponse = deliverySystem.connect();     //todo: change
+        const res: Res.BoolResponse = deliverySystem.connect();     // todo: change
         expect(res.data.result).toBeTruthy();
     });
 
@@ -64,7 +64,7 @@ describe("External System Unit Tests", () => {
             return true;
         }
         pay() {
-            throw "timeout exception";
+            throw new Error("timeout exception");
         }
     }
 
@@ -81,7 +81,7 @@ describe("External System Unit Tests", () => {
     test("PaymentSystem connection - without external", () => {
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: string = "mockDelSystem";
-        const res: Res.BoolResponse = paymentSystem.connect();     //todo: change
+        const res: Res.BoolResponse = paymentSystem.connect();     // todo: change
         expect(res.data.result).toBeTruthy();
     });
 

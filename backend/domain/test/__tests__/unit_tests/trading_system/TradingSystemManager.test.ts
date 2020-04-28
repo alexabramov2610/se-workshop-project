@@ -1542,6 +1542,7 @@ describe("Store Management Unit Tests", () => {
         };
         const viewUsersContactUsMessagesResponse: Res.ViewUsersContactUsMessagesResponse = {
             data: {
+                result:succ,
                 messages: succ ? [new ContactUsMessage("hey its me")] : []
             }
         };

@@ -25,6 +25,10 @@ interface InitReq extends Request {
     body: { firstAdminName: string, firstAdminPassword: string };
 }
 
+interface VerifyProducts extends Request {
+    body: { storeName: string, productsCatalogNumbers: number[] }
+}
+
 interface ItemsAdditionRequest extends Request {
     body: { storeName: string, items: IItem[] }
 }
@@ -213,7 +217,12 @@ interface VerifyProductOnStock extends Request {
     body: { storeName: string, catalogNumber: number, amount: number }
 }
 
+interface VerifyStorePermission extends Request {
+    body: { storeName: string, permission: ManagementPermission }
+}
+
 export {
+    VerifyStorePermission,
     VerifyProductOnStock,
     VerifyNewCredentials,
     DeliveryRequest,
@@ -255,5 +264,7 @@ export {
     ViewRUserPurchasesHistoryReq,
     InitReq,
     ViewCartReq,
-    ViewManagerPermissionRequest
+    ViewManagerPermissionRequest,
+    VerifyProducts,
+
 };
