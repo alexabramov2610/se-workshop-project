@@ -5,7 +5,7 @@ import {
     Cart,
     CartProduct
 } from "se-workshop-20-interfaces/src/CommonInterface"
-import {Admin, RegisteredUser, StoreManager, StoreOwner} from "./internal_api";
+import {Admin, RegisteredUser} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'

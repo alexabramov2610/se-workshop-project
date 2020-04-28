@@ -12,8 +12,8 @@ export const createStore = (req: Req.OpenStoreRequest
 
 export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
-        return {data: {result: false,itemsNotAdded: req.body.items}, error: havePermission.error}
+    if (!havePermission.data.result)
+        return {data: {result: false, itemsNotAdded: req.body.items}, error: havePermission.error}
     return ts.addItems(req);
 }
 
@@ -23,7 +23,7 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse 
 
 export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
     const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
         body: {
@@ -52,33 +52,42 @@ export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.Bool
 
 export const removeItems = (req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false, itemsNotRemoved: req.body.items}, error: havePermission.error}
     return ts.removeItems(req);
 }
 
 export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
     return ts.removeProductsWithQuantity(req);
 }
 
 export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAdditionResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false, productsNotAdded: req.body.products}, error: havePermission.error}
     return ts.addNewProducts(req);
 }
 
 export const viewProductInfo = (req: Req.ProductInfoRequest): Res.ProductInfoResponse => {
+    const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
+        body: {
+            storeName: req.body.storeName,
+            productsCatalogNumbers: [req.body.catalogNumber]
+        },
+        token: req.token
+    })
+    if (!verifyProductsRes.data.result)
+        return verifyProductsRes
     return ts.viewProductInfo(req);
 }
 
 export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission)
-        return {data: {result: false,productsNotRemoved: req.body.products} , error: havePermission.error}
+    if (!havePermission.data.result)
+        return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
     return ts.removeProducts(req);
 }
 
@@ -100,7 +109,7 @@ export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Res.Bool
 
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.WATCH_PURCHASES_HISTORY, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false, receipts: []}, error: havePermission.error}
     return ts.viewStorePurchasesHistory(req);
 }
@@ -122,20 +131,20 @@ export const search = (req: Req.SearchRequest): Res.SearchResponse => {
 
 export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.WATCH_USER_QUESTIONS, req.token)
-    if (!havePermission)
-        return {data: {result: false,messages:[]}, error: havePermission.error}
+    if (!havePermission.data.result)
+        return {data: {result: false, messages: []}, error: havePermission.error}
     return ts.viewUsersContactUsMessages(req);
 }
 
 export const addProductDiscount = (req: Req.AddDiscountRequest): Res.AddDiscountResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
     return ts.addProductDiscount(req)
 }
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
-    if (!havePermission)
+    if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
     return ts.removeProductDiscount(req)
 }

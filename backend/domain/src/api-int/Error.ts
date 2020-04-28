@@ -30,6 +30,7 @@ const errorMsg:ErrorMessages = {
     E_INVALID_STORE: "Store does not exist.",
     E_NOT_AUTHORIZED: "User is not authorized.",
     E_STORE_EXISTS: "There is already store with his name.",
+    E_BAD_STORE_NAME: "This store name is illegal.",
     E_STORE_ADDITION: "Could not add store.",
     E_ASSIGN: "Failed assigning",
     E_INVALID_PROD: "Invalid product.",

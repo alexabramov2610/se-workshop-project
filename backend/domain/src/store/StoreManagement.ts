@@ -17,7 +17,6 @@ import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private
     private readonly _stores: Store[];
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
@@ -31,19 +30,11 @@ export class StoreManagement {
     }
 
     addStore(storeName: string, owner: RegisteredUser): Res.BoolResponse {
-        if (this.verifyStoreExists(storeName)) {
-            return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
-        }
-        if (!storeName || storeName === '') {
-            logger.warn(`failed adding store ${storeName} to system`)
-            return {data: {result: false}, error: {message: errorMsg.E_STORE_ADDITION}}
-        }
         const newStore = new Store(storeName);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
-        logger.info(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
+        logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
         return {data: {result: true}}
-
     }
 
     verifyStoreExists(storeName: string): boolean {
@@ -75,26 +66,17 @@ export class StoreManagement {
         if (!store)
             error = errorMsg.E_INVALID_STORE;
         else if (!store.verifyPermission(user.name, permission))
-            error = errorMsg.E_NOT_AUTHORIZED;
+            error = errorMsg.E_PERMISSION;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
     changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-
-        if (!operationValid.data.result)
-            return {data: {result: false}, error: operationValid.error};
-
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-
         const product: Product = store.getProductByCatalogNumber(catalogNumber);
-        if (!product)
-            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-
         product.name = newProductName;
         logger.debug(`changeProductName: successfully changed name`);
         return {data: {result: true}};
@@ -103,18 +85,11 @@ export class StoreManagement {
     changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-
-        if (!operationValid.data.result)
-            return {data: {result: false}, error: operationValid.error};
-
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
 
         const product: Product = store.getProductByCatalogNumber(catalogNumber);
-        if (!product)
-            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
 
         product.price = newPrice;
         logger.debug(`changeProductName: successfully changed price`);
@@ -122,23 +97,12 @@ export class StoreManagement {
     }
 
     addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsAdditionResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-
-        if (!operationValid.data.result) {
-            return {data: {result: false, itemsNotAdded: itemsReq}, error: operationValid.error};
-        }
-
         const store: Store = this.findStoreByName(storeName);
         const items: Item[] = this.getItemsFromRequest(itemsReq);
         return store.addItems(items);
     }
 
     removeItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (!operationValid.data.result) {
-            return {data: {result: false, itemsNotRemoved: itemsReq}, error: operationValid.error};
-        }
-
         const store: Store = this.findStoreByName(storeName);
         const items: Item[] = this.getItemsFromRequest(itemsReq);
         return store.removeItems(items);
@@ -146,32 +110,17 @@ export class StoreManagement {
     }
 
     removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (!operationValid.data.result) {
-            return {data: {result: false, productsNotRemoved: productsReq}, error: operationValid.error};
-        }
-
         const store: Store = this.findStoreByName(storeName);
         return store.removeProductsWithQuantity(productsReq, isReturnItems);
     }
 
     addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (!operationValid.data.result) {
-            return {data: {result: false, productsNotAdded: productsReq}, error: operationValid.error};
-        }
-
         const store: Store = this.findStoreByName(storeName);
         const products: Product[] = this.getProductsFromRequest(productsReq);
         return store.addNewProducts(products);
     }
 
     removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
-        const operationValid: Res.BoolResponse = this.verifyStoreOperation(storeName, user, ManagementPermission.MANAGE_INVENTORY);
-        if (!operationValid.data.result) {
-            return {data: {result: false, productsNotRemoved: products}, error: operationValid.error};
-        }
-
         const store: Store = this.findStoreByName(storeName);
         return store.removeProductsByCatalogNumber(products);
     }
@@ -315,7 +264,7 @@ export class StoreManagement {
 
         const userManagerToRemove: StoreManager = store.getStoreManager(userToRemove.name);
         if (!userManagerToRemove) {   // not store owner
-            error = errorMsg.E_MANGER_NOT_EXISTS;
+            error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
@@ -463,23 +412,20 @@ export class StoreManagement {
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
-        if (product) {
-            const quantity: number = store.getProductQuantity(product.catalogNumber);
-            return {
-                data: {
-                    result: true,
-                    info: {
-                        name: product.name,
-                        catalogNumber: product.catalogNumber,
-                        price: product.price,
-                        category: product.category,
-                        quantity,
-                        finalPrice: store.getProductFinalPrice(req.body.catalogNumber)
-                    }
+
+        const quantity: number = store.getProductQuantity(product.catalogNumber);
+        return {
+            data: {
+                result: true,
+                info: {
+                    name: product.name,
+                    catalogNumber: product.catalogNumber,
+                    price: product.price,
+                    category: product.category,
+                    quantity,
+                    finalPrice: store.getProductFinalPrice(req.body.catalogNumber)
                 }
             }
-        } else {
-            return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}}
         }
     }
 
@@ -580,10 +526,6 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        if (!store.verifyPermission(user.name, ManagementPermission.MODIFY_DISCOUNT)) return {
-            data: {result: false},
-            error: {message: errorMsg.E_PERMISSION}
-        }
         const discountID: string = store.addDiscount(catalogNumber, discount);
         return {data: {result: true, discountID}}
 
@@ -593,10 +535,6 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        if (!store.verifyPermission(user.name, ManagementPermission.MODIFY_DISCOUNT)) return {
-            data: {result: false},
-            error: {message: errorMsg.E_PERMISSION}
-        }
         const isRemoved: boolean = store.removeDiscount(catalogNumber, discountID);
         if (!isRemoved)
             return {

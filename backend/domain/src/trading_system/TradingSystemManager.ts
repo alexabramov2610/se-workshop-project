@@ -309,12 +309,15 @@ export class TradingSystemManager {
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
-
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
         logger.info(`request to verify new store details`)
+        if (!req.body.storeName || req.body.storeName === '') {
+            return {data: {result: false}, error: {message: errorMsg.E_BAD_STORE_NAME}}
+        }
         if (this._storeManager.verifyStoreExists(req.body.storeName)) {
             return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
         }
+
         return {data: {result: true}};
     }
 
