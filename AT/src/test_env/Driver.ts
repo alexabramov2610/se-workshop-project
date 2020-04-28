@@ -1,8 +1,8 @@
 import { Bridge, Proxy } from "../..";
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
-import { ServiceFacade } from "service_layer";
-import {PayRequest} from "se-workshop-20-interfaces/dist/src/Request";
+
+
 
 class Driver {
   private mutant: { p: Product[]; s: Store; u: User };
@@ -16,7 +16,7 @@ class Driver {
     this.bridge = Proxy;
     this.refMe = this.given;
     this._pi = {
-      payment: {
+      payment: {  
         cardDetails: {
           holderName: "Mr Cat",
           number: "4242424242424242",

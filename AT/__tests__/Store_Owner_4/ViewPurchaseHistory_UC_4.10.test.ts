@@ -44,15 +44,6 @@ describe("Watch Purchases History, UC: 3.7", () => {
     const res = _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
-    const itemCatalogNumber: any[] = [].concat
-      .apply(
-        [],
-        res.data.receipts.map((r) => r.purchases)
-      )
-      .map((e) => e.item.catalogNumber)
-      .filter((cn) => cn === _item.catalogNumber);
-
-    expect(itemCatalogNumber[0]).toBeUndefined();
     expect(res.error.message).toBeDefined();
   });
   test("logged in, with history", () => {
@@ -86,7 +77,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
       .map((e) => e.item.catalogNumber)
       .filter((cn) => cn === _item.catalogNumber);
 
-    expect(itemCatalogNumber[0]).toBeUndefined();
+      expect(itemCatalogNumber.length).toBe(0);
   });
 
   test("logged out, no history", () => {
@@ -94,13 +85,6 @@ describe("Watch Purchases History, UC: 3.7", () => {
     const { error, data } = _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
-    const itemCatalogNumber: any[] = [].concat
-      .apply(
-        [],
-        data.receipts.map((r) => r.purchases)
-      )
-      .filter((i) => i.catalogNumber === _prodct.catalogNumber);
-    expect(itemCatalogNumber[0]).toBeUndefined();
     expect(error.message).toBeDefined();
   });
 });

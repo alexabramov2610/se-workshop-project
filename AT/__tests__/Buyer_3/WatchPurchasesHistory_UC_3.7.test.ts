@@ -68,13 +68,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     const { error, data } = _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
-    const itemCatalogNumber: any[] = [].concat
-      .apply(
-        [],
-        data.receipts.map((r) => r.purchases)
-      )
-      .filter((i) => i.catalogNumber === _prodct.catalogNumber);
-    expect(itemCatalogNumber[0]).toBeUndefined();
+    
     expect(error.message).toBeDefined();
   });
 
@@ -83,13 +77,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     const { error, data } = _serviceBridge.viewUserPurchasesHistory({
       body: { userName: _shopoholic.userName },
     });
-    const itemCatalogNumber: any[] = [].concat
-      .apply(
-        [],
-        data.receipts.map((r) => r.purchases)
-      )
-      .filter((i) => i.catalogNumber === _prodct.catalogNumber);
-    expect(itemCatalogNumber[0]).toBeUndefined();
+    
     expect(error.message).toBeDefined();
   });
 
