@@ -11,6 +11,9 @@ export const createStore = (req: Req.OpenStoreRequest
 }
 
 export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
+    const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
+    if (!havePermission)
+        return {data: {result: false,itemsNotAdded: req.body.items}, error: havePermission.error}
     return ts.addItems(req);
 }
 
@@ -19,6 +22,9 @@ export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse 
 }
 
 export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
+    const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
+    if (!havePermission)
+        return {data: {result: false}, error: havePermission.error}
     const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
