@@ -9,6 +9,14 @@ let tradingSystem = getInstance();
 UC-1.1
  */
 export const systemInit = (req: Req.InitReq): Res.BoolResponse => {
+    const isCredentialsOk: Res.BoolResponse = tradingSystem.verifyNewCredentials({
+        body: {
+            username: req.body.firstAdminName,
+            password: req.body.firstAdminPassword
+        }, token: req.token
+    })
+    if (!isCredentialsOk.data.result)
+        return isCredentialsOk;
     const registerRequest: Req.RegisterRequest = {
         body: {
             username: req.body.firstAdminName,

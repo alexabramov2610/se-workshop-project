@@ -36,8 +36,6 @@ export class UserManager {
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
             return {data: {result: false}, error: {message: errorMsg.E_BU}}
-        } else if (!this.isValidPassword(password)) {
-            return {data: {result: false}, error: {message: errorMsg.E_BP}}
         } else {
             logger.debug(`${userName} has registered to the system `);
             this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
@@ -47,12 +45,8 @@ export class UserManager {
 
     login(req: Req.LoginRequest): Res.BoolResponse {
         const userName = req.body.username;
-        const password = req.body.password;
         const user = this.getUserByName(userName)
-        if (!user) {
-            logger.warn(`failed to login ${userName}, user not found `);
-            return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
-        } else if (this.isLoggedIn(userName)) { // already logged in
+        if (this.isLoggedIn(userName)) { // already logged in
             logger.warn(`failed to login ${userName}, user is already logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
         } else if (req.body.asAdmin && !this.isAdmin(user)) {
@@ -67,15 +61,9 @@ export class UserManager {
     }
 
     logout(req: Req.LogoutRequest): Res.BoolResponse {
-        const user: RegisteredUser = this.getLoggedInUserByToken(req.token);
-        if (!user) { // user not logged in
-            logger.warn(`logging out fail, user is not logged in  `);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        } else {
-            logger.debug(`logging out ${user.name} success`);
-            this.loggedInUsers.delete(req.token)
-            return {data: {result: true}}
-        }
+        logger.debug(`logging out success`);
+        this.loggedInUsers.delete(req.token)
+        return {data: {result: true}}
     }
 
     verifyPassword(userName: string, password: string, hashed: string): boolean {
@@ -172,11 +160,6 @@ export class UserManager {
 
     viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
         const user = this.getUserByToken(req.token)
-
-        if (!user) {
-            return {data: {result: false, cart: undefined}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        }
-
         const cartRes: Cart = this.transferToCartRes(user.cart)
         return {data: {result: true, cart: cartRes}}
     }
@@ -193,7 +176,6 @@ export class UserManager {
 
     getUserCart(user: User) {
         return user.cart;
-
     }
 
     verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {

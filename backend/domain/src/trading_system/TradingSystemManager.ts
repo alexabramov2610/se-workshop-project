@@ -3,9 +3,8 @@ import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {ManagementPermission, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
-import {User} from "../user/users/User";
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
