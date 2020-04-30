@@ -31,11 +31,13 @@ const myLogger = winston.createLogger({
         // - Write all logs with level `error` and below to `error.log`
         // - Write all logs with level `debug` and below to `events.log`
         new daily({
+            format: myFormat,
             filename: testMode ? `logs/%DATE%/error-TEST.log` : `logs/%DATE%/error-%DATE%.log`,
             level: 'error',
             silent
         }),
         new daily({
+            format: myFormat,
             filename: testMode ? `logs/%DATE%/events-TEST%DATE%.log` : 'logs/%DATE%/events-%DATE%.log',
             level: debug ? 'debug' : 'info',
             silent
