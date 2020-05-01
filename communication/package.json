@@ -1,0 +1,30 @@
+{
+  "name": "communication",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "babel src -d dist",
+    "start": "NODE_ENV=development PORT=4000 nodemon --exec babel-node src/index.js",
+    "start:prod": "NODE_ENV=production npm run build && npm run serve",
+    "serve": "node dist/index.js",
+    "clean": "sudo rm -rf dist",
+    "clean:hard": "sudo rm -rf dist node_modules",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "service_layer": "file:../backend/service"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.6",
+    "nodemon": "^2.0.3"
+  }
+}
