@@ -1,14 +1,17 @@
-import socket from 'socket.io'
+const WebSocket = require('ws'); // new
 
-const io = server => {
-    const socketIO = socket(server);
-    socketIO.on('connection', client => {
-        console.log("newconnect")
-        client.on('tal', data => {
-            client.emit('hey')
+export default (port) => {
+    console.log(`WebSocket running on port ${port}`);
+    const socketServer = new WebSocket.Server({port: port});
+
+    socketServer.on('connection', (socketClient) => {
+        // socketClient.send('hola');
+
+        socketClient.on(('message'), (data) => {
+            // socketClient.send('1111111111hola');
+        });
+
+        socketClient.on('close', (data) => {
         });
     });
-
 }
-
-export default io

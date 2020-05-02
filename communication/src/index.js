@@ -1,27 +1,12 @@
 import server from "./config/server";
 import routes from "./routes/routes";
-import io from "./config/websocket";
-const httpServer = require('http').createServer(server);
+import webSocketInit from "./config/websocket";
 const PORT = process.env.PORT || 4000;
+const WS_PORT = process.env.WS_PORT || 3000;
 
 routes(server);
-io(httpServer);
-
-httpServer.listen(3000, () => {
-    console.log(`web socket running on port 3000`);
-});
+webSocketInit(WS_PORT);
 
 server.listen(PORT, () => {
     console.log(`app running on port ${PORT}`);
 });
-
-
-
-// const server = require('http').createServer();
-// const io = require('socket.io')(server);
-// io.on('connection', client => {
-//     console.log("newconnect")
-//     client.on('tal', data => {     console.log("newevent")
-//     });
-// });
-
