@@ -19,6 +19,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "service_layer": "file:../backend/service",
+    "url": "^0.11.0",
+    "url-parse": "^1.4.7",
     "ws": "^7.2.5"
   },
   "devDependencies": {
