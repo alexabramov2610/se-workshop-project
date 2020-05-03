@@ -4,7 +4,7 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
-import HomePage from './pages/home-page/home-page';
+import HomePageCotainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 
 class App extends React.Component {
@@ -13,7 +13,7 @@ class App extends React.Component {
             <div>
                 {/*<Header/>*/}
                 <Switch>
-                    <Route exact path="/" component={HomePage}/>
+                    <Route exact path="/" component={HomePageCotainer}/>
                     <Route path="/category" component={CategoryPage}/>
                     {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
                     {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
