@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 const CategoryPage = () => {
-    return <div>Category Page</div>;
-}
+  return <div data-testid="category-page">Category Page</div>;
+};
 
 export default CategoryPage;
