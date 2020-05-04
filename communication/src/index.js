@@ -10,3 +10,6 @@ webSocketInit(WS_PORT);
 server.listen(PORT, () => {
     console.log(`app running on port ${PORT}`);
 });
+
+
+export * as socket from "./config/websocket"
