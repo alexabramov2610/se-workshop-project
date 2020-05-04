@@ -16,11 +16,9 @@
     "jest": "^25.2.7",
     "ts-jest": "^25.3.0",
     "tslint": "^6.1.1",
-    "typescript": "^3.8.3",
-    "winston": "^3.2.1"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "winston-daily-rotate-file": "^4.4.2",
     "se-workshop-20-interfaces": "file:../se-workshop-20-interfaces",
     "communication": "file:../communication"
   },
