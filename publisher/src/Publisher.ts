@@ -1,6 +1,7 @@
 import {StoreOwnerNotificationsSubscriber} from "./subscribers/StoreOwnerNotificationsSubscriber";
 import { Event } from "se-workshop-20-interfaces"
 
+
 export class Publisher {
 
     private storeOwnerNotificationsSubscribers: Map<String, StoreOwnerNotificationsSubscriber[]>;
