@@ -7,3 +7,13 @@ export async function register(req,res) {
     const result =  ServiceFacade.registerUser(req.body);
     return res.send(result)
 }
+
+export async function login(req,res) {
+    const result =  ServiceFacade.loginUser(req.body);
+    return res.send(result)
+}
+
+export async function logout(req,res) {
+    const result =  ServiceFacade.logoutUser(req.body);
+    return res.send(result)
+}
