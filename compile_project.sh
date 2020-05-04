@@ -13,6 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 
+
 ##### COMPILE #####
 
 #####  api
@@ -63,36 +64,6 @@ echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $AT
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
-
-
-##### TEST #####
-
-#####  domain
-echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}================= RUNNING DOMAIN UNIT TESTS ================${NC}"
-echo -e "${BLUE}============================================================${NC}"
-cd $domain
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
-#####  service
-echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}================ RUNNING INTEGRATION TESTS =================${NC}"
-echo -e "${BLUE}============================================================${NC}"
-cd $service
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
-#####  AT
-echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}================= RUNNING ACCEPTANCE TESTS =================${NC}"
-echo -e "${BLUE}============================================================${NC}"
-cd $AT
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
-
 
 
 echo -e "${BLUE}==========================================================${NC}"
