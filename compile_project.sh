@@ -6,7 +6,7 @@ domain="$CWD/backend/domain"
 service="$CWD/backend/service"
 client="$CWD/client"
 communication="$CWD/communication"
-publisher="$CWD/publisher"
+publisher="$CWD/backend/node_modules/publisher"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -30,6 +30,13 @@ echo -e "${BLUE}==========================================================${NC}"
 cd $client
 #sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
+#####  publisher
+echo -e "${BLUE}==========================================================${NC}"
+echo -e "${BLUE}=================== COMPILING PUBLISHER ==================${NC}"
+echo -e "${BLUE}==========================================================${NC}"
+cd $publisher
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+
 #####  domain
 echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}==================== COMPILING DOMAIN ====================${NC}"
@@ -51,12 +58,6 @@ echo -e "${BLUE}==========================================================${NC}"
 cd $communication
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
-#####  publisher
-echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}=================== COMPILING PUBLISHER ==================${NC}"
-echo -e "${BLUE}==========================================================${NC}"
-cd $publisher
-sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  AT
 echo -e "${BLUE}==========================================================${NC}"
@@ -64,6 +65,9 @@ echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $AT
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+
+
+
 
 
 echo -e "${BLUE}==========================================================${NC}"
