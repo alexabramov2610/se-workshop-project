@@ -2,7 +2,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import * as utils from "./utils"
 import {Product} from "domain_layer/dist/src/trading_system/data/Product";
 import {ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
-import {Cart, SearchFilters, SearchQuery} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Cart, IDiscount, SearchFilters, SearchQuery} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 
 describe("Guest Integration Tests", () => {
@@ -404,6 +404,111 @@ describe("Guest Integration Tests", () => {
         expect(purchaseResponse.data.result).toBeTruthy();
     });
 
+    it("Buy items with simple discount IT test", () => {
+        const storeName: string = "store name";
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 2, ownerUsername, ownerPassword, storeName, undefined);
+
+        const startDate: Date = new Date()
+        const duration: number = 3;
+        const simpleDiscount: IDiscount = {
+            startDate,
+            duration,
+            products: [1],
+            percentage: 50,
+        }
+
+        const discountReq: Req.AddDiscountRequest = {body: {catalogNumber, storeName, discount:simpleDiscount}, token: ownerToken}
+        const makeDiscountRes : Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+
+
+        const req: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token
+        }
+        const res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+        expect(res.data.result).toBeTruthy();
+
+        const purchaseReq: Req.PurchaseRequest = {
+            body: {
+                payment: {
+                    cardDetails: {
+                        holderName: "tal",
+                        number: "152",
+                        expYear: "2021",
+                        expMonth: "5",
+                        cvv: "40"
+                    }, address: "batyam", city: "batya", country: "israel"
+                }
+            }, token: token
+        }
+        const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse.data.result).toBeTruthy();
+        expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(10);
+        const simpleDiscount2: IDiscount = {
+            startDate,
+            duration,
+            products: [1],
+            percentage: 80,
+
+        }
+        const discountReq2: Req.AddDiscountRequest = {body: {catalogNumber, storeName, discount:simpleDiscount2}, token: ownerToken}
+        const makeDiscountRes2 : Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq2);
+
+        const req2: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+            token: token
+        }
+        const res2: Res.BoolResponse = ServiceFacade.saveProductToCart(req2)
+        expect(res2.data.result).toBeTruthy();
+
+        const purchaseResponse2: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse2.data.result).toBeTruthy();
+        expect(purchaseResponse2.data.receipt.payment.totalCharged).toEqual(4);
+    });
+    it("Buy items with simple cond discount IT test", () => {
+        const storeName: string = "store name";
+        const catalogNumber: number = 1;
+        const { ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
+
+        const startDate: Date = new Date()
+        const duration: number = 3;
+        const simpleDiscount: IDiscount = {
+            startDate,
+            duration,
+            products: [1],
+            percentage: 50,
+            condition: {minAmount: 1}
+        }
+
+        const discountReq: Req.AddDiscountRequest = {body: {catalogNumber, storeName, discount:simpleDiscount}, token: ownerToken}
+        const makeDiscountRes : Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+
+
+        const req: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 4},
+            token: token
+        }
+        const res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+        expect(res.data.result).toBeTruthy();
+
+        const purchaseReq: Req.PurchaseRequest = {
+            body: {
+                payment: {
+                    cardDetails: {
+                        holderName: "tal",
+                        number: "152",
+                        expYear: "2021",
+                        expMonth: "5",
+                        cvv: "40"
+                    }, address: "batyam", city: "batya", country: "israel"
+                }
+            }, token: token
+        }
+        const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse.data.result).toBeTruthy();
+        expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(60);
+    });
 
 });
 

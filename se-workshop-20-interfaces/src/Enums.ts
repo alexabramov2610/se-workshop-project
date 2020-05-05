@@ -30,14 +30,16 @@ export enum Rating {
     VERY_HIGH
 }
 
-export enum DiscountsTypes {
-    SHOWN_DISCOUNT,
-    COND_DISCOUNT,
-    HIDDEN_DISCOUNT
-}
 
 export enum BuyingTypes {
     IMMEDIATE_PURCHASE,
     Auction,
     Lottery
+}
+
+export enum DiscountOperators {
+    OR,
+    AND,
+    XOR,
+    IFTHEN
 }

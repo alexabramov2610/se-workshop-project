@@ -305,6 +305,7 @@ export class TradingSystemManager {
         if (rUser) {
             rUser.addReceipt(receipt)
         }
+        user.resetCart();
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
@@ -337,6 +338,15 @@ export class TradingSystemManager {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.addProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
         return {data: {result: true}}
+    }
+
+    addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount policy to store ${req.body.storeName} to products ${req.body.discount.products}`)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (req.body.discount.percentage) {
+            return this._storeManager.addSimpleDiscountPolicy(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
+        }
+        return this._storeManager.addSimpleDiscountPolicy(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
     }
 
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {

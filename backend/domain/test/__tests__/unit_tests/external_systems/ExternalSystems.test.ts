@@ -75,6 +75,12 @@ describe("External System Unit Tests", () => {
         pay() {
             return true;
         }
+        validateCreditCard(){
+            return true;
+        }
+        validateBalance(){
+            return true;
+        }
     }
 
 

@@ -5,6 +5,7 @@ import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
+    BagItem, IComplexDiscount,
     IDiscount,
     IPayment,
     IProduct as ProductReq,
@@ -15,9 +16,11 @@ import {
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {BuyingTypes, DiscountsTypes, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
+import {BuyingTypes, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Discount} from "./discounts/Discount";
 import {ShownDiscount} from "./discounts/ShownDiscount";
+import {CondProductDiscount} from "./discounts/CondProductDiscount";
+import {DiscountPolicy} from "./discounts/DiscountPolicy";
 
 const logger = loggerW(__filename)
 
@@ -34,7 +37,7 @@ export class Store {
     private _receipts: Receipt[];
     private _contactUsMessages: ContactUsMessage[];
     private _firstOwner: StoreOwner;
-    private _discountTypes: DiscountsTypes[];
+    private _discountPolicy: DiscountPolicy;
     private _buyingTypes: BuyingTypes[];
 
     constructor(storeName: string) {
@@ -45,7 +48,7 @@ export class Store {
         this._storeManagers = [];
         this._receipts = [];
         this._rating = Rating.MEDIUM;
-        this._discountTypes = [DiscountsTypes.SHOWN_DISCOUNT]
+        this._discountPolicy = new DiscountPolicy();
         this._buyingTypes = [BuyingTypes.IMMEDIATE_PURCHASE]
     }
 
@@ -404,31 +407,51 @@ export class Store {
     }
 
     getProductFinalPrice(catalogNumber: number): number {
+        return 5;
+        /*
         const product: Product = this.getProductByCatalogNumber(catalogNumber)
-        const discounts: Discount[] = product.discounts;
         let finalPrice: number = product.price;
-        for (const d of discounts) {
+        for (const d of this._discountPolicy) {
             if (d.isValid())
-                finalPrice = d.calc(finalPrice);
+                finalPrice = d.calc(finalPrice, 0);
         }
         return finalPrice
+        */
+
+    }
+
+    calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
+     //  return  this._discountPolicy.getBestBagPrices(bagItems);
+        for (const bagItem of bagItems) {
+            const finalBagItemPrice = this._discountPolicy.getBestPrice(bagItems, bagItem);
+            bagItem.finalPrice = finalBagItemPrice;
+        }
+        return bagItems;
+    }
+
+    addSimpleProductsDiscountPolicy(catalogNumber: number, discount: IDiscount): string {
+        return this._discountPolicy.addSimpleProductsDiscountPolicy(catalogNumber, discount)
+    }
+
+    addComplexDiscountPolicy(catalogNumber: number, discount: IComplexDiscount): string {
+        // TODO
+        return this._discountPolicy.addComplexDiscountPolicy(catalogNumber, discount)
     }
 
     addDiscount(catalogNumber: number, discount: IDiscount): string {
-        const product: Product = this.getProductByCatalogNumber(catalogNumber);
         let newDiscount: Discount;
         if (!discount.condition && !discount.coupon) {
-            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration)
+            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration, discount.products)
         }
-        product.addDiscount(newDiscount);
         return newDiscount.id;
-
     }
 
     removeDiscount(catalogNumber: number, discountID: string): boolean {
         const product: Product = this.getProductByCatalogNumber(catalogNumber);
-        return product.removeDiscount(discountID);
+        // return product.removeDiscount(discountID);
+        return true;
     }
+
 
     private getItemById(items: Item[], id: number): Item {
         logger.debug(`searching item with id: ${id}`);
@@ -499,5 +522,6 @@ export class Store {
             return false;
         return true;
     }
+
 
 }

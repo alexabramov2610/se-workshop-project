@@ -1,12 +1,23 @@
 import {v4 as uuid} from 'uuid';
+import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export abstract class Discount {
-    protected constructor(startDate: Date, percentage: number, duration: number) {
+
+    protected productsInDiscount: number[];
+
+    protected constructor(startDate: Date, percentage: number, duration: number, productsInDiscount: number[]) {
         this._id = uuid();
         this._percentage = percentage;
         this._duration = duration;
         this._startDate = startDate;
+        this.productsInDiscount = productsInDiscount;
     }
+
+    abstract calc(price: number, amount: number, bag: BagItem[]): number;
+    abstract isRelevant(bag: BagItem[]): boolean;
+    abstract add(discount: Discount): void;
+    abstract remove(discount: Discount): void;
+    public abstract isComposite(): boolean;
 
     private _id: string;
 
@@ -46,9 +57,8 @@ export abstract class Discount {
         return today < endDate;
     }
 
-    abstract calc(price: number): number;
 
-    protected addMinutes(date, minutes) {
+    protected addMinutes(date, minutes): Date {
         return new Date(date.getTime() + minutes * 60000);
     }
 }
