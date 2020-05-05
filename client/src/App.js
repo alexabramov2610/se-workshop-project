@@ -6,15 +6,15 @@ import {
 } from "react-router-dom";
 import HomePageCotainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
-
+import { Header } from './components/header'
 class App extends React.Component {
     render() {
         return (
             <div>
-                {/*<Header/>*/}
+                <Header />
                 <Switch>
-                    <Route exact path="/" component={HomePageCotainer}/>
-                    <Route path="/category" component={CategoryPage}/>
+                    <Route exact path="/" component={HomePageCotainer} />
+                    <Route path="/category" component={CategoryPage} />
                     {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
                     {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
                     {/*<Route exact path="/contact" component={ContactPage}/>*/}

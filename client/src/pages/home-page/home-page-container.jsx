@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import HomePage from "./home-page";
 import { HomePageCtx } from "./home-page-ctx";
 export default class HomePageContainer extends React.Component {
