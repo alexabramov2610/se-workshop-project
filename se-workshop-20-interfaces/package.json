@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "se-workshop-20-interfaces": "file:../se-workshop-20-interfaces",
     "typescript": "^3.8.3"
   }
 }

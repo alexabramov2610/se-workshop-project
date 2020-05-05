@@ -9,7 +9,7 @@ import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
-import {Publisher} from "../../../../publisher";
+import { Publisher } from "publisher"
 
 const logger = loggerW(__filename)
 
@@ -18,8 +18,11 @@ export class TradingSystemManager {
     private _storeManager: StoreManagement;
     private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
+    private _publisher: Publisher;
 
-    constructor() {
+    constructor(initPublisher?: boolean) {
+        if (initPublisher)
+            this._publisher = new Publisher();
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);

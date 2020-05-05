@@ -1,72 +1,103 @@
 const WebSocket = require('ws'); // new
 const url = require('url');
+const WS_PORT = process.env.WS_PORT || 3000;
+let socket;
+export class Socket {
 
-const LOGGED_IN_CLIENTS = new Map;
-const GUESTS = new Map;
-const GUEST_NAME = 'GUEST';
-let i = 0;
+    constructor (port) {
+        this.LOGGED_IN_CLIENTS = new Map();
+        this.GUESTS = new Map();
+        this.GUEST_NAME = 'GUEST';
+        this.i = 0;
 
-export default (port) => {
+        console.log(`WebSocket running on port ${port}`);
+        const socketServer = new WebSocket.Server({port: port});
 
-    console.log(`WebSocket running on port ${port}`);
-    const socketServer = new WebSocket.Server({port: port});
-
-    socketServer.on('connection', (socketClient, req) => {
-        const username = url.parse(req.url, true).query.name;
-        const guest = !username ? `${GUEST_NAME}_${i++}` : undefined;
-        if (username) {
-            console.log(`${username} connected`);
-            LOGGED_IN_CLIENTS.set(username, socketClient)
-            socketClient.send(`hola ${username}`);
-        }
-        else {
-            console.log(`guest connected: ${guest}`);
-            GUESTS.set(guest, socketClient)
-            socketClient.send(`hola ${guest}`);
-        }
-
-        socketClient.on(('message'), (data) => {
-            socketClient.send(`message back to ${username? username: guest}`);
-            sendAll(`broadcast from ${username?username: guest} motherfuckers, message: ${data}`)
-        });
-
-        socketClient.on('close', (asd ,data) => {
+        socketServer.on('connection', (socketClient, req) => {  // usage: /?name=ahmed
+            const username = url.parse(req.url, true).query.name;
+            const guest = !username ? `${this.GUEST_NAME}_${i++}` : undefined;
             if (username) {
-                console.log(username + ' byebyebeye ' + i)
-                LOGGED_IN_CLIENTS.delete(username);
+                console.log(`${username} connected`);
+                this.LOGGED_IN_CLIENTS.set(username, socketClient)
+                socketClient.send(`hola ${username}`);
             }
             else {
-                console.log(guest + ' byebyebeye ' + i)
-                GUESTS.delete(guest);
+                console.log(`guest connected: ${guest}`);
+                this.GUESTS.set(guest, socketClient)
+                socketClient.send(`hola ${guest}`);
             }
+
+            socketClient.on(('message'), (data) => {
+                socketClient.send(`message back to ${username? username: guest}`);
+                this.sendAll(`broadcast from ${username?username: guest} motherfuckers, message: ${data}`)
+            });
+
+            socketClient.on('close', (asd ,data) => {
+                if (username) {
+                    console.log(username + ' byebyebeye ' + i)
+                    this.LOGGED_IN_CLIENTS.delete(username);
+                }
+                else {
+                    console.log(guest + ' byebyebeye ' + i)
+                    this.GUESTS.delete(guest);
+                }
+            });
         });
-    });
+    }
+
+    sendAll(message) {
+        this.sendToAllLoggedInUsers(message);
+        this.sendToAllGuests(message);
+    }
+
+    sendToAllGuests(message) {
+        for (let client of this.GUESTS.values())
+            client.send(message)
+    }
+
+    sendToAllLoggedInUsers(message) {
+        for (let client of this.LOGGED_IN_CLIENTS.values())
+            client.send(message);
+    }
+
+    sendToGroup(usersGroup, message) {
+        for (let client of usersGroup)
+            client.send(message)
+    }
+
+    isConnected(username) {
+        return this.LOGGED_IN_CLIENTS.keys().include(username);
+    }
+
+    getSocketByUsername(username) {
+        return this.LOGGED_IN_CLIENTS.get(username);
+    }
+
+    sendMessageTo(username, message) {
+        console.log(`got ${username}`)
+        const client = this.LOGGED_IN_CLIENTS.get(username);
+        console.log(`${client ? "ok": "not ok"}`)
+        if (client) {
+            try {
+                console.log(`sending`)
+                client.send(message);
+                console.log(`send message to ${username}`)
+                return true;
+            } catch (e) {
+                console.log('websocket: failed sending message, error: ' + e)
+            }
+        }
+        console.log(`didn't send`)
+        return false;
+    }
+
 }
 
-export function sendAll(message) {
-    sendToAllLoggedInUsers(message);
-    sendToAllGuests(message);
+const getInstance = () => {
+    if (socket)
+        return socket;
+    socket = new Socket(WS_PORT);
+    return socket;
 }
 
-export function sendToAllGuests(message) {
-    for (let client of GUESTS.values())
-        client.send(message)
-}
-
-export function sendToAllLoggedInUsers(message) {
-    for (let client of LOGGED_IN_CLIENTS.values())
-        client.send(message);
-}
-
-export function sendToGroup(usersGroup, message) {
-    for (let client of usersGroup)
-        client.send(message)
-}
-
-export function isConnected(username) {
-    return LOGGED_IN_CLIENTS.keys().include(username);
-}
-
-export function getSocketByUsername(username) {
-    return LOGGED_IN_CLIENTS.get(username);
-}
+export { getInstance };
