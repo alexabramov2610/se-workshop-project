@@ -168,7 +168,7 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $AT
-sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 
@@ -195,8 +195,8 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}================= RUNNING ACCEPTANCE TESTS =================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $AT
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo jest --clearCache
+#sudo TEST_MODE=1 SILENT=1 jest && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 
