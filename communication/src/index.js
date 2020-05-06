@@ -11,6 +11,8 @@ const socket = new Socket(WS_PORT);
 
 ServiceFacade.setSendMessageFunction(socket.sendMessageTo);
 
+
+
 // set up http server
 routes(server);
 server.listen(PORT, () => {

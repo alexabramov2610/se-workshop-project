@@ -1,15 +1,18 @@
 import {User} from "./User";
 import {UserRole} from "../../api-int/Enums";
 import {Receipt} from "../../trading_system/data/Receipt";
+import {Event} from "se-workshop-20-interfaces/dist/src/Event";
 
 export class RegisteredUser extends User {
     protected readonly _name: string;
     protected _password: string;
     protected _role: UserRole;
     private _receipts: Receipt[];
+    private _pendingEvents: Event[];
 
     constructor(name?: string, password?: string) {
         super();
+        this._pendingEvents = [];
         this._name = name;
         this._password = password;
         this._receipts = [];
@@ -37,5 +40,14 @@ export class RegisteredUser extends User {
 
     get receipts(): Receipt[] {
         return this._receipts;
+    }
+
+    saveNotification(event: Event) {
+        this._pendingEvents.push(event);
+    }
+
+
+    get pendingEvents(): Event[] {
+        return this._pendingEvents;
     }
 }

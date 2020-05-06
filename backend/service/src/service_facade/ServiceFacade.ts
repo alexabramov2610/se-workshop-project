@@ -255,7 +255,7 @@ const runIfLoggedIn = (fn: any): any => {
     return f;
 }
 
-const setSendMessageFunction = (func: (username: string, message: string) => boolean) : void => {
+export const setSendMessageFunction = (func: (username: string, message: string) => boolean) : void => {
     tradingSystem.setSendMessageFunction(func);
 };
 
