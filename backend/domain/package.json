@@ -33,6 +33,7 @@
     "bcrypt": "^4.0.1",
     "uuid": "^7.0.3",
     "winston-daily-rotate-file": "^4.4.2",
+    "publisher": "file:../../publisher",
     "se-workshop-20-interfaces": "file:../../se-workshop-20-interfaces"
   }
 }

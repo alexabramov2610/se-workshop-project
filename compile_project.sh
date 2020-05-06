@@ -6,7 +6,7 @@ domain="$CWD/backend/domain"
 service="$CWD/backend/service"
 client="$CWD/client"
 communication="$CWD/communication"
-publisher="$CWD/backend/node_modules/publisher"
+publisher="$CWD/publisher"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -65,9 +65,6 @@ echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $AT
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
-
-
 
 
 echo -e "${BLUE}==========================================================${NC}"

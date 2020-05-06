@@ -1,8 +1,7 @@
 const WebSocket = require('ws'); // new
 const url = require('url');
-const WS_PORT = process.env.WS_PORT || 3000;
-let socket;
-export class Socket {
+
+export default class Socket {
 
     constructor (port) {
         this.LOGGED_IN_CLIENTS = new Map();
@@ -93,11 +92,11 @@ export class Socket {
 
 }
 
-const getInstance = () => {
-    if (socket)
-        return socket;
-    socket = new Socket(WS_PORT);
-    return socket;
-}
-
-export { getInstance };
+// const getInstance = () => {
+//     if (socket)
+//         return socket;
+//     socket = new Socket(WS_PORT);
+//     return socket;
+// }
+//
+// export { getInstance };
