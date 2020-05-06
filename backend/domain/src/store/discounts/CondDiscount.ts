@@ -6,6 +6,7 @@ import {Condition} from "./conditions/Condition";
 export class CondDiscount extends Discount {
     private _conditions: Map<Condition, Operators>;
 
+
     public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>) {
         super(startDate, duration, percentage, productsInDiscount);
         this._conditions = conditions;
@@ -32,14 +33,19 @@ export class CondDiscount extends Discount {
     }
     */
     calc(bag: BagItem[]): BagItem[] {
+        if(!this.isSatisfied(bag)) return bag;
+
         const res: BagItem[] = [];
         for (const bagItem of bag) {
-            if (this.isProductInDiscount(bagItem.product.catalogNumber) && this.isSatisfied(bag)) {
-              //  const diffAmount = Math.floor(bagItem.amount / (this.minAmount + 1));
+            if (this.isProductInDiscount(bagItem.product.catalogNumber)) {
+                const minAmount = this.findMinAmount(bagItem.product.catalogNumber);
+                let diffAmount = 1;
+                if(minAmount !== -1)
+                    diffAmount=  Math.floor(bagItem.amount / (minAmount + 1)) /bagItem.amount;
                 res.push({
                     product: bagItem.product,
                     amount: bagItem.amount,
-                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage) / (100 * bagItem.amount))
+                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage*diffAmount) / (100))
                 })
             } else
                 res.push({product: bagItem.product, amount: bagItem.amount, finalPrice: bagItem.finalPrice})
@@ -73,4 +79,14 @@ export class CondDiscount extends Discount {
         return false;
     }
 
+    private findMinAmount(catalogNumber: number) {
+        const conditions:Condition[] = Array.from(this._conditions.keys());
+        for(const c of conditions){
+            if(c.getCatalogNumber() === catalogNumber){
+                return c.getMin();
+            }
+        }
+        return -1;
+
+    }
 }

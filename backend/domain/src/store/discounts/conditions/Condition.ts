@@ -16,4 +16,12 @@ export abstract class Condition {
 
     abstract isSatisfied(bag: BagItem[]): boolean;
 
+    getCatalogNumber(): number {
+        return 0
+    }
+
+    getMin(): number {
+        return 0;
+    }
+
 }

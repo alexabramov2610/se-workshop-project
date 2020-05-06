@@ -482,9 +482,9 @@ describe("Guest Integration Tests", () => {
         const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
         const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
         expect(purchaseResponse.data.result).toBeTruthy();
-        expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(70);
+        expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(60);
     });
-    /*
+
         it("Buy items with XOR discount", () => {
             const storeName: string = "store name";
             const catalogNumber: number = 1;
@@ -511,13 +511,12 @@ describe("Guest Integration Tests", () => {
                 percentage: 50,
             }
 
-
-                    const xorDiscount: IDiscount = {startDate, duration,}
-                    const discountReq: Req.AddDiscountRequest = {
-                        body: {storeName, discount: xorDiscount},
-                        token: ownerToken
-                    }
-                    const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+            const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.XOR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+            const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+                body: {storeName, policy},
+                token: ownerToken
+            }
+            const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
             let req: Req.SaveToCartRequest = {
                 body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
@@ -538,6 +537,7 @@ describe("Guest Integration Tests", () => {
             expect(purchaseResponse.data.result).toBeTruthy();
             expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(80); // 20*2*(50%) + 30*2 - one item with discount
         });
+
 
             it("Buy items with AND discount", () => {
                 const storeName: string = "store name";
@@ -565,18 +565,13 @@ describe("Guest Integration Tests", () => {
                     percentage: 20,
                 }
 
-                const complex: IComplexDiscount = {
-                    startDate,
-                    duration,
-                    operator: Operators.AND,
-                    children: [simpleDiscount, simpleDiscount2]
-                }
-                const discount: IDiscount = {startDate, duration, complex}
-                const discountReq: Req.AddDiscountRequest = {
-                    body: {catalogNumber, storeName, discount},
+
+                const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND},{discount: simpleDiscount2, operator: Operators.AND} ]}
+                const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+                    body: {storeName, policy},
                     token: ownerToken
                 }
-                const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+                const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
                 // add two products to cart
                 let req: Req.SaveToCartRequest = {
@@ -598,177 +593,174 @@ describe("Guest Integration Tests", () => {
                 expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(76); // 20*2*(50%)*(20%) + 30*2 - one item with discount
             });
 
-            it("Buy items with OR discount", () => {
-                const storeName: string = "store name";
-                const catalogNumber: number = 1;
-                const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
-                const products2: Product[] = [new Product("bisli", catalogNumber + 1, 30, ProductCategory.GENERAL)]
-                utils.addNewProducts(storeName, products2, ownerToken, true);
-                let items: IItem[] = [];
-                for (let i = 0; i < 5; i++)
-                    items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
-                utils.addNewItems(storeName, items, ownerToken, true);
+  it("Buy items with OR discount", () => {
+      const storeName: string = "store name";
+      const catalogNumber: number = 1;
+      const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
+      const products2: Product[] = [new Product("bisli", catalogNumber + 1, 30, ProductCategory.GENERAL)]
+      utils.addNewProducts(storeName, products2, ownerToken, true);
+      let items: IItem[] = [];
+      for (let i = 0; i < 5; i++)
+          items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+      utils.addNewItems(storeName, items, ownerToken, true);
 
-                const startDate: Date = new Date()
-                const duration: number = 3;
-                const simpleDiscount: IDiscount = {
-                    startDate,
-                    duration,
-                    products: [1],
-                    percentage: 50,
-                }
-                const simpleDiscount2: IDiscount = {
-                    startDate,
-                    duration,
-                    products: [1],
-                    percentage: 20,
-                }
+      const startDate: Date = new Date()
+      const duration: number = 3;
+      const simpleDiscount: IDiscount = {
+          startDate,
+          duration,
+          products: [1],
+          percentage: 50,
+      }
+      const simpleDiscount2: IDiscount = {
+          startDate,
+          duration,
+          products: [1],
+          percentage: 20,
+      }
 
-                const complex: IComplexDiscount = {
-                    startDate,
-                    duration,
-                    operator: Operators.OR,
-                    children: [simpleDiscount, simpleDiscount2]
-                }
-                const discount: IDiscount = {startDate, duration, complex}
-                const discountReq: Req.AddDiscountRequest = {
-                    body: {catalogNumber, storeName, discount},
-                    token: ownerToken
-                }
-                const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
 
-                // add two products to cart
-                let req: Req.SaveToCartRequest = {
-                    body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
-                req = {
-                    body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                res = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
+      const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.OR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+      const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+          body: {storeName, policy},
+          token: ownerToken
+      }
+      const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
-                const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
-                const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
-                expect(purchaseResponse.data.result).toBeTruthy();
-                expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(80); // 20*2*(50%) + 30*2 - one item with discount
-            });
+      // add two products to cart
+      let req: Req.SaveToCartRequest = {
+          body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+          token: token
+      }
+      let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
+      req = {
+          body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
+          token: token
+      }
+      res = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
 
-            it("Buy items with STORE COND discount", () => {
-                const storeName: string = "store name";
-                const catalogNumber: number = 1;
-                const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
-                const products2: Product[] = [new Product("bisli", catalogNumber + 1, 100, ProductCategory.GENERAL)]
-                utils.addNewProducts(storeName, products2, ownerToken, true);
-                let items: IItem[] = [];
-                for (let i = 0; i < 5; i++)
-                    items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
-                utils.addNewItems(storeName, items, ownerToken, true);
+      const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
+      const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+      expect(purchaseResponse.data.result).toBeTruthy();
+      expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(80); // 20*2*(50%) + 30*2 - one item with discount (OR)
+  });
 
-                const startDate: Date = new Date()
-                const duration: number = 3;
-                const discount: IDiscount = {
-                    startDate,
-                    duration,
-                    percentage: 5,
-                    condition: {minPay: 200}
-                }
+  it("Buy items with STORE COND discount", () => {
+      const storeName: string = "store name";
+      const catalogNumber: number = 1;
+      const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
+      const products2: Product[] = [new Product("bisli", catalogNumber + 1, 100, ProductCategory.GENERAL)]
+      utils.addNewProducts(storeName, products2, ownerToken, true);
+      let items: IItem[] = [];
+      for (let i = 0; i < 5; i++)
+          items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+      utils.addNewItems(storeName, items, ownerToken, true);
 
-                const discountReq: Req.AddDiscountRequest = {
-                    body: {catalogNumber, storeName, discount},
-                    token: ownerToken
-                }
-                const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+      const startDate: Date = new Date()
+      const duration: number = 3;
+      const condDiscount: IDiscount = {
+          startDate,
+          duration,
+          products: [1,2],
+          percentage: 5,
+          condition: [{condition: {minPay: 200}, operator: Operators.AND}]
+      }
 
-                // add two products to cart
-                let req: Req.SaveToCartRequest = {
-                    body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
-                req = {
-                    body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                res = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
+      const policy: IPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}]}
+      const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+          body: {storeName, policy},
+          token: ownerToken
+      }
+      const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
-                const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
-                const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
-                expect(purchaseResponse.data.result).toBeTruthy();
-                expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(228); //  100*2*(5%) + 20*2*(5%) - one item with discount
-            });
+      // add two products to cart
+      let req: Req.SaveToCartRequest = {
+          body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+          token: token
+      }
+      let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
+      req = {
+          body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
+          token: token
+      }
+      res = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
 
-            it("Buy items with IFTHEN discount", () => {
-                const storeName: string = "store name";
-                const catalogNumber: number = 1;
-                const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
-                const products2: Product[] = [new Product("bisli", catalogNumber + 1, 100, ProductCategory.GENERAL)]
-                utils.addNewProducts(storeName, products2, ownerToken, true);
-                let items: IItem[] = [];
-                for (let i = 0; i < 5; i++)
-                    items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
-                utils.addNewItems(storeName, items, ownerToken, true);
+      const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
+      const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+      expect(purchaseResponse.data.result).toBeTruthy();
+      expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(228); //  100*2*(5%) + 20*2*(5%) - one item with discount
+  });
+    /*
+  it("Buy items with IFTHEN discount", () => {
+      const storeName: string = "store name";
+      const catalogNumber: number = 1;
+      const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
+      const products2: Product[] = [new Product("bisli", catalogNumber + 1, 100, ProductCategory.GENERAL)]
+      utils.addNewProducts(storeName, products2, ownerToken, true);
+      let items: IItem[] = [];
+      for (let i = 0; i < 5; i++)
+          items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+      utils.addNewItems(storeName, items, ownerToken, true);
 
-                const startDate: Date = new Date()
-                const duration: number = 3;
+      const startDate: Date = new Date()
+      const duration: number = 3;
 
-                const ifClause: IDiscount = {
-                    startDate,
-                    duration,
-                    ifCondClause: {productInBag: 1}
-                }
-                const thenClause: IDiscount = {
-                    startDate,
-                    duration,
-                    products: [2],
-                    percentage: 50
-                }
+      const ifClause: IDiscount = {
+          startDate,
+          duration,
+          ifCondClause: {productInBag: 1}
+      }
+      const thenClause: IDiscount = {
+          startDate,
+          duration,
+          products: [2],
+          percentage: 50
+      }
 
-                const complex: IComplexDiscount = {
-                    startDate,
-                    duration,
-                    operator: Operators.IFTHEN,
-                    ifClause,
-                    thenClause
+      const complex: IComplexDiscount = {
+          startDate,
+          duration,
+          operator: Operators.IFTHEN,
+          ifClause,
+          thenClause
 
-                }
-                const discount: IDiscount = {
-                    startDate,
-                    duration,
-                    complex
-                }
+      }
+      const discount: IDiscount = {
+          startDate,
+          duration,
+          complex
+      }
 
-                const discountReq: Req.AddDiscountRequest = {
-                    body: {catalogNumber, storeName, discount},
-                    token: ownerToken
-                }
-                const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
+      const discountReq: Req.AddDiscountRequest = {
+          body: {catalogNumber, storeName, discount},
+          token: ownerToken
+      }
+      const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.addDiscountPolicy(discountReq);
 
-                // add two products to cart
-                let req: Req.SaveToCartRequest = {
-                    body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
-                req = {
-                    body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
-                    token: token
-                }
-                res = ServiceFacade.saveProductToCart(req)
-                expect(res.data.result).toBeTruthy();
+      // add two products to cart
+      let req: Req.SaveToCartRequest = {
+          body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+          token: token
+      }
+      let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
+      req = {
+          body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
+          token: token
+      }
+      res = ServiceFacade.saveProductToCart(req)
+      expect(res.data.result).toBeTruthy();
 
-                const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
-                const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
-                expect(purchaseResponse.data.result).toBeTruthy();
-                expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(140); //  100*2*(50%) + 20*2 - one item with discount
-            });
-        */
+      const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
+      const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+      expect(purchaseResponse.data.result).toBeTruthy();
+      expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(140); //  100*2*(50%) + 20*2 - one item with discount
+  });
+*/
 
 });
 

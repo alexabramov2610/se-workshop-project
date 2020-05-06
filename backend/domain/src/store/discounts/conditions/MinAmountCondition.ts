@@ -16,5 +16,11 @@ export class MinAmountCondition extends Condition {
         return bagItem && bagItem.amount > this._minAmount
     }
 
+    getCatalogNumber(){
+        return this._catalogNumber;
+    }
+    getMin(){
+        return this._minAmount;
+    }
 
 }

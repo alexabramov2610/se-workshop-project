@@ -12,8 +12,10 @@ export class MinPayCondition extends Condition {
     }
 
     isSatisfied(bag: BagItem[]): boolean {
-        return true;
+        return this.getBagTotalPrice(bag) > this._minPay;
     }
 
-
+    private getBagTotalPrice(bag: BagItem[]): number {
+        return bag.reduce((prev, curr) => prev + curr.finalPrice , 0);
+    }
 }
