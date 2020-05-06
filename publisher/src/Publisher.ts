@@ -70,6 +70,8 @@ export class Publisher {
     notify(event: Event.Event): string[] {
         let notificationNotSent: string[] = [];
         const key: string = this.getKeyFromEvent(event);
+        if (!this._subscriptions.has(event.code) || !this._subscriptions.get(event.code).has(key))
+            return notificationNotSent;
         for (const subscriber of this._subscriptions.get(event.code).get(key)) {
             if (!subscriber.update(event)) {
                 notificationNotSent.push(subscriber.username());
