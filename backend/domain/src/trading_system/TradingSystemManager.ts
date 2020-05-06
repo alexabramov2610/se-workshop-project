@@ -24,15 +24,11 @@ export class TradingSystemManager {
     private _publisher: Publisher;
 
     constructor() {
-        this._publisher = new Publisher();
+        this._publisher = new Publisher(this.forceLogout);
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
         this.state = TradingSystemState.CLOSED;
-    }
-
-    setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean): void {
-        this._publisher.setSendMessageFunction(func);
     }
 
     startNewSession(): string {
@@ -481,6 +477,10 @@ export class TradingSystemManager {
     subscribeNewStoreOwner(username: string, storeName: string) {
         this._publisher.subscribe(username, EventCode.STORE_OWNER_EVENTS, storeName, storeName);
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
+    }
+
+    terminateSocket() {
+        this._publisher.terminateSocket();
     }
 
 }

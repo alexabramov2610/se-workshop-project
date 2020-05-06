@@ -21,6 +21,14 @@ describe("Registered User Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
+    afterEach(() => {
+        utils.terminateSocket();
+    });
+
+    afterAll(() => {
+        utils.terminateSocket();
+    });
+
     it("logout IT test", () => {
         const logoutReq: Req.LogoutRequest = {token, body: {}};
         const logoutRes: Res.BoolResponse = ServiceFacade.logoutUser(logoutReq);

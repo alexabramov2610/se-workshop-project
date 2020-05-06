@@ -29,6 +29,14 @@ describe("Guest Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
+    afterEach(() => {
+        utils.terminateSocket();
+    });
+
+    afterAll(() => {
+       utils.terminateSocket();
+    });
+
     it("Register IT test", () => {
         const req: Req.RegisterRequest = {body: {username, password}, token};
         let res: Res.BoolResponse = ServiceFacade.registerUser(req);

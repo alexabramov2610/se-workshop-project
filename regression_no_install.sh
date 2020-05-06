@@ -5,7 +5,8 @@ AT="$CWD/AT"
 domain="$CWD/backend/domain"
 service="$CWD/backend/service"
 client="$CWD/client"
-communication="$CWD/communication"
+http="$CWD/communication/http"
+websocket="$CWD/communication/websocket"
 publisher="$CWD/publisher"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -13,8 +14,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 
-
-##### COMPILE #####
+#################################################################################
+##############################       COMPILE       ##############################
+#################################################################################
 
 #####  api
 echo -e "${BLUE}==========================================================${NC}"
@@ -29,6 +31,13 @@ echo -e "${BLUE}==================== COMPILING CLIENT ====================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $client
 #sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+
+#####  websocket
+echo -e "${BLUE}==========================================================${NC}"
+echo -e "${BLUE}=================== COMPILING WEBSOCKET ==================${NC}"
+echo -e "${BLUE}==========================================================${NC}"
+cd $websocket
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  publisher
 echo -e "${BLUE}==========================================================${NC}"
@@ -51,13 +60,12 @@ echo -e "${BLUE}==========================================================${NC}"
 cd $service
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
-#####  communication
+#####  http
 echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}================= COMPILING COMMUNICATION ================${NC}"
+echo -e "${BLUE}===================== COMPILING HTTP =====================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
-cd $communication
+cd $http
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
-
 
 #####  AT
 echo -e "${BLUE}==========================================================${NC}"
@@ -68,7 +76,9 @@ cd $AT
 
 
 
-##### TEST #####
+#################################################################################
+###############################       TEST       ################################
+#################################################################################
 
 #####  domain
 echo -e "${BLUE}============================================================${NC}"

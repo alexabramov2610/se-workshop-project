@@ -1,23 +1,23 @@
 import {StoreOwnerNotificationsSubscriber} from "./subscribers/StoreOwnerNotificationsSubscriber";
 import { Event } from "se-workshop-20-interfaces"
 import {EventCode} from "se-workshop-20-interfaces/dist/src/Enums";
-import {Subscriber} from "./subscribers/subscriber";
-import {LotteryNotificationsSubscriber} from "./subscribers/LotteryNotificationsSubscriber";
+import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
+import { Socket } from "websocket";
 
 export class Publisher {
 
-    private _sendMessageFunction: (username: string, message: Event.Notification) => boolean;
     private _subscriptions: Map<EventCode, Map<string, any>>;
+    private readonly _socket: Socket;
 
     /**
      STORE_OWNER_EVENTS                 | map<store name, subscriber[]>     |   STORE_OWNER_EVENTS
      NEW_PURCHASE                       |              "                    |   STORE_OWNER_EVENTS
      STORE_CLOSED                       |              "                    |   STORE_OWNER_EVENTS
      STORE_OPENED                       |              "                    |   STORE_OWNER_EVENTS
-     ASSIGNED_AS_STORE_OWNER            |              //TODO               |   USER_EVENTS
+     ASSIGNED_AS_STORE_OWNER            | map<username, subscriber>         |   USER_EVENTS
      REMOVED_AS_STORE_OWNER             |              "                    |   USER_EVENTS
      ----------------------------------------------------------------------------
      AUCTION_EVENTS                     | map<auction id, subscriber[]>     |   AUCTION_EVENTS
@@ -28,17 +28,14 @@ export class Publisher {
      LOTTERY_DESTINATION_PRICE_REACHED  |              "                    |   LOTTERY_EVENTS
      */
 
-    constructor() {
+    constructor(logoutFunction: (username: string) => void) {
+        this._socket = new Socket(3000, logoutFunction);
         this._subscriptions = new Map();
-    }
-
-    setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean) {
-        this._sendMessageFunction = func;
     }
 
     /** subscribe **/
     subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void {
-        const eventType: number = this.getEventFromEventCode(eventCode);
+        const eventType: number = this.getEventFromEventCode(eventCode.valueOf());
         if (eventType === -1)
             return;
 
@@ -65,7 +62,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(storeName, []);
 
         const subscriber: StoreOwnerNotificationsSubscriber = new StoreOwnerNotificationsSubscriber(username, storeName);
-        subscriber.setSendMessageFunction(this._sendMessageFunction);
+        subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(storeName).push(subscriber);
     }
 
@@ -73,7 +70,7 @@ export class Publisher {
         const eventType: EventCode = EventCode.USER_EVENTS;
 
         const subscriber: RegisteredUserEventsSubscriber = new RegisteredUserEventsSubscriber(username);
-        subscriber.setSendMessageFunction(this._sendMessageFunction);
+        subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).set(username, subscriber);
     }
 
@@ -84,7 +81,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(auctionId, []);
 
         const subscriber: AuctionNotificationsSubscriber = new AuctionNotificationsSubscriber(username, auctionId, storeName);
-        subscriber.setSendMessageFunction(this._sendMessageFunction);
+        subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(auctionId).push(subscriber);
     }
 
@@ -95,7 +92,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(lotteryId, []);
 
         const subscriber: AuctionNotificationsSubscriber = new AuctionNotificationsSubscriber(username, lotteryId, storeName);
-        subscriber.setSendMessageFunction(this._sendMessageFunction);
+        subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(lotteryId).push(subscriber);
     }
 
@@ -222,7 +219,7 @@ export class Publisher {
         return notificationNotSent;
     }
 
-    private getEventFromEventCode(eventCode: number): number {
+    private getEventFromEventCode(eventCode: EventCode): number {
         if (eventCode === EventCode.STORE_OWNER_EVENTS ||
             eventCode === EventCode.NEW_PURCHASE ||
             eventCode === EventCode.STORE_CLOSED ||
@@ -243,5 +240,9 @@ export class Publisher {
             return EventCode.LOTTERY_EVENTS;
 
         return -1;
+    }
+
+    terminateSocket() {
+        this._socket.terminate();
     }
 }

@@ -97,9 +97,6 @@ export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
 /*
 UC-3.1
  */
-export const forceLogout = (username: string): void => {
-    return runIfOpen({ body: {}, token: ""}, UserService.forceLogout)
-}
 export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(UserService.logoutUser))
 }
@@ -259,8 +256,5 @@ const runIfLoggedIn = (fn: any): any => {
     return f;
 }
 
-export const setSendMessageFunction = (func: (username: string, message: Event.Notification) => boolean) : void => {
-    tradingSystem.setSendMessageFunction(func);
-};
 
 export {tradingSystem}

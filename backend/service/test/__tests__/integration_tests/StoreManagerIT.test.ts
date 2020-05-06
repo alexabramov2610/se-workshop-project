@@ -18,6 +18,13 @@ describe("Store Manager Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
+    afterEach(() => {
+        utils.terminateSocket();
+    });
+
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
 
     it("dummy test",() => {

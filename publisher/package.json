@@ -19,7 +19,8 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "se-workshop-20-interfaces": "file:../se-workshop-20-interfaces"
+    "se-workshop-20-interfaces": "file:../se-workshop-20-interfaces",
+    "websocket": "file:../communication/websocket"
   },
   "description": ""
 }

@@ -1,7 +1,8 @@
 import {Event} from "se-workshop-20-interfaces";
+import { Socket } from "websocket";
 
 export interface Subscriber {
     update: (event: Event.Event) => boolean;
-    setSendMessageFunction: (func: (username: string, message: Event.Notification) => boolean) => void;
+    setSocket: (socket: Socket) => void;
     username: () => string;
 }
