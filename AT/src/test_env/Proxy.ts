@@ -112,9 +112,9 @@ const Proxy: Bridge = {
     return real.watchCart ? real.watchCart() : DummyValues.CartResponse;
   },
 
-  addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
-    return real.addProductDiscount
-      ? real.addProductDiscount(req)
+  addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+    return real.addDiscountPolicy
+      ? real.addDiscountPolicy(req)
       : {
           data: {
             result: true,
