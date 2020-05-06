@@ -7,7 +7,7 @@ import {
     RemoveButtonContainer
 } from "./notification.styles";
 
-const Notification = ({message, clearItemFromCart}) => {
+const Notification = ({key, message, removeNotification}) => {
     return (
         <NotificationContainer>
             <NotificationDetailsContainer>
@@ -15,8 +15,7 @@ const Notification = ({message, clearItemFromCart}) => {
                 <NotificationMessageContainer>
                     {message}
                 </NotificationMessageContainer>
-                <RemoveButtonContainer onClick={() => {
-                }}>
+                <RemoveButtonContainer onClick={() => removeNotification(key)}>
                     &#10005;
                 </RemoveButtonContainer>
             </NotificationDetailsContainer>

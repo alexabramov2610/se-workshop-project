@@ -42,6 +42,12 @@ export enum BuyingTypes {
 }
 
 export enum EventCode {
+    STORE_OWNER_EVENTS,
+    AUCTION_EVENTS,
+    LOTTERY_EVENTS,
+    USER_EVENTS,
+
+
     NEW_PURCHASE,
     STORE_CLOSED,
     STORE_OPENED,
@@ -59,4 +65,12 @@ export enum Operators {
     OR,
     AND,
     XOR,
+
+
+export enum NotificationsColors {
+    RED,
+    BLUE,
+    GREEN,
+    ORANGE
+
 }

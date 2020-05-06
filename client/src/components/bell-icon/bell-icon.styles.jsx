@@ -23,3 +23,8 @@ export const NotificationCountContainer = styled.span`
   font-weight: bold;
   bottom: 12px;
 `;
+
+export const PopupNotificationContainer = styled.div`
+    position: fixed;
+    top: 1200;
+`

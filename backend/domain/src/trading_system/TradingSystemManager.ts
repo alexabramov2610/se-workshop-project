@@ -2,9 +2,9 @@ import {RegisteredUser, UserManager} from "../user/internal_api";
 import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
-import {notification} from "../api-int/Notifications";
+import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {EventCode, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {EventCode, NotificationsColors, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
@@ -31,7 +31,7 @@ export class TradingSystemManager {
         this.state = TradingSystemState.CLOSED;
     }
 
-    setSendMessageFunction(func: (username: string, message: string) => boolean): void {
+    setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean): void {
         this._publisher.setSendMessageFunction(func);
     }
 
@@ -74,7 +74,9 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = this._userManager.login(req);
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
+            this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
             this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
+                event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
             })
         }
@@ -91,6 +93,11 @@ export class TradingSystemManager {
                 logger.info(`logged out user: ${user.name}`);
         }
         return res;
+    }
+
+    forceLogout(username: string): void {
+        const token: string = this._userManager.getTokenOfLoggedInUser(username);
+        this._userManager.logout({ body: {}, token});
     }
 
     changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
@@ -141,7 +148,18 @@ export class TradingSystemManager {
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        return this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        const res: Res.BoolResponse = this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        if (res.data.result) {
+            this.subscribeNewStoreOwner(req.body.usernameToAssign, req.body.storeName);
+            const storeName: string = req.body.storeName;
+            const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
+            const event: Event.StoreOwnerEvent = { username: req.body.usernameToAssign, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName: storeName,
+                notification: { notificationColor: NotificationsColors.GREEN, message: msg }
+            };
+            if (this._publisher.notify(event).length !== 0)
+                usernameToAssign.saveNotification(event);
+        }
+        return res;
     }
 
     assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
@@ -160,7 +178,19 @@ export class TradingSystemManager {
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        return this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
+        const res: Res.BoolResponse = this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
+        if (res.data.result) {
+            const storeName: string = req.body.storeName;
+            const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
+            const event: Event.StoreOwnerEvent = { username: req.body.usernameToRemove, code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
+                notification: { notificationColor: NotificationsColors.GREEN, message: msg }
+            };
+            if (this._publisher.notify(event).length !== 0)
+                usernameToRemove.saveNotification(event);
+
+            this._publisher.unsubscribe(req.body.usernameToRemove, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
+        }
+        return res;
     }
 
     removeStoreManager(req: Req.RemoveStoreManagerRequest): Res.BoolResponse {
@@ -194,8 +224,11 @@ export class TradingSystemManager {
     createStore(req: Req.OpenStoreRequest): Res.BoolResponse {
         logger.info(`open store request: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addStore(req.body.storeName, user);
 
+        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, user);
+        if (res.data.result)
+            this.subscribeNewStoreOwner(user.name, req.body.storeName);
+        return res;
     }
 
     viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
@@ -320,7 +353,9 @@ export class TradingSystemManager {
 
         for (const storeName of cart.keys()) {
             const username: string = rUser ? rUser.name: 'guest';
-            const event: Event.NewPurchaseEvent = { code: EventCode.NEW_PURCHASE, username, storeName, message: formatString(notification.M_NEW_PURCHASE, [storeName, username]) };
+
+            const notification: Event.Notification = { message: formatString(notificationMsg.M_NEW_PURCHASE, [storeName, username]), notificationColor: NotificationsColors.GREEN};
+            const event: Event.NewPurchaseEvent = { username: username, code: EventCode.NEW_PURCHASE, storeName: storeName, notification };
             this._publisher.notify(event).forEach(userToNotify => {
                 this._userManager.getUserByName(userToNotify).saveNotification(event);
             });
@@ -439,4 +474,10 @@ export class TradingSystemManager {
         const user = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }
+
+    subscribeNewStoreOwner(username: string, storeName: string) {
+        this._publisher.subscribe(username, EventCode.STORE_OWNER_EVENTS, storeName, storeName);
+        this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
+    }
+
 }

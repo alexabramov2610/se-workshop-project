@@ -26,6 +26,10 @@ export const loginUser = (req: Req.LoginRequest): Res.BoolResponse => {
     return ts.login(req);
 }
 
+export const forceLogout = (username: string): void => {
+    return ts.forceLogout(username);
+}
+
 export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return ts.logout(req);
 }

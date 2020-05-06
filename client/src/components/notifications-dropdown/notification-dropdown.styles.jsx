@@ -1,17 +1,17 @@
 import styled from "styled-components";
-import CustomButton from "../custom-button/custom-button.component";
+import {CustomButton} from "../custom-button/custom-button.component";
 
 export const NotificationsDropdownContainer = styled.div`
   position: absolute;
-  width: 320px;
-  height: 440px;
+  width: 500px;
+  height: 500px;
   display: flex;
   flex-direction: column;
   padding: 20px;
   border: 1px solid black;
   background-color: white;
   top: 90px;
-  right: 40px;
+  right: 110px;
   z-index: 5;
   font-weight: lighter;
 `;
@@ -29,7 +29,7 @@ export const EmptyMessageContainer = styled.span`
 `;
 
 export const NotificationsContainer = styled.div`
-  height: 330px;
+  height: 400px;
   display: flex;
   flex-direction: column;
   white-space: nowrap;

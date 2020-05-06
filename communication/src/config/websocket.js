@@ -14,7 +14,7 @@ export default class Socket {
 
         socketServer.on('connection', (socketClient, req) => {  // usage: /?name=ahmed
             const username = url.parse(req.url, true).query.name;
-            const guest = !username ? `${this.GUEST_NAME}_${i++}` : undefined;
+            const guest = !username ? `${this.GUEST_NAME}_${this.i++}` : undefined;
             if (username) {
                 console.log(`${username} connected`);
                 this.LOGGED_IN_CLIENTS.set(username, socketClient)
@@ -33,6 +33,7 @@ export default class Socket {
 
             socketClient.on('close', (asd ,data) => {
                 if (username) {
+                    ServiceFacade.forceLogout(username);
                     console.log(username + ' byebyebeye ' + i)
                     this.LOGGED_IN_CLIENTS.delete(username);
                 }
