@@ -35,7 +35,10 @@ describe("Store Management Unit Tests", () => {
         mocked(StoreManagement).mockClear();
         mocked(PaymentSystem).mockClear();
         mocked(ExternalSystemsManager).mockReset();
+    });
 
+    afterEach(() => {
+        tradingSystemManager.terminateSocket();
     });
 
 

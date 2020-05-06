@@ -1,13 +1,12 @@
 {
-  "name": "communication",
+  "name": "websocket",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "babel src -d dist && cp server.cert ./dist/ && cp server.key ./dist/",
-    "start": "NODE_ENV=development PORT=4000 nodemon --exec babel-node src/index.js",
-    "start:prod": "NODE_ENV=production npm run comp && npm run serve",
+    "comp": "babel src -d dist",
+    "start": "babel-node src/index.js",
     "serve": "node dist/index.js",
     "clean": "sudo rm -rf dist",
     "clean:hard": "sudo rm -rf dist node_modules",
@@ -16,19 +15,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "fs": "0.0.1-security",
-    "https": "^1.0.0",
-    "service_layer": "file:../backend/service",
     "url": "^0.11.0",
     "url-parse": "^1.4.7",
     "ws": "^7.2.5",
     "wss": "^3.3.4"
   },
   "devDependencies": {
-    "typescript": "^3.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-transform-runtime": "^7.9.6",
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.6",
     "@babel/node": "^7.8.7",

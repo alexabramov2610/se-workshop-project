@@ -41,6 +41,14 @@ describe("Store Owner Integration Tests", () => {
         utils.createStore(storeName, token);
     });
 
+    afterEach(() => {
+        utils.terminateSocket();
+    });
+
+    afterAll(() => {
+        utils.terminateSocket();
+    });
+
     it("add new products", () => {
         let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
         let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};

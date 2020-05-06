@@ -5,8 +5,6 @@ import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 import {IItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 
-
-
 const adminName: string = "admin";
 const adminPassword: string = "admin123123";
 let adminToken: string;
@@ -19,7 +17,6 @@ export const systemInit = (): void => {
     adminToken = getGuestSession();
     const initReq: Req.InitReq = {  body: { firstAdminName: adminName, firstAdminPassword: adminPassword } , token: adminToken};
     expect(ServiceFacade.systemInit(initReq).data.result).toBeTruthy();
-    ServiceFacade.setSendMessageFunction(sendMessageFunction);
 }
 
 export const systemReset = (): void => {
@@ -122,6 +119,6 @@ export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
     }
 }
 
-const sendMessageFunction = (username: string, message: Event.Notification): boolean => {
-    return true;
+export const terminateSocket = (): void => {
+    ServiceFacade.tradingSystem.terminateSocket();
 }

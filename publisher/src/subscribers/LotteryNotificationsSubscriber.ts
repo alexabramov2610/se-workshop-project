@@ -1,22 +1,28 @@
 import { Event } from "se-workshop-20-interfaces"
-import {Subscriber} from "./subscriber";
+import {Subscriber} from "./Subscriber";
+import { Socket } from "websocket";
+import {NotificationMessage} from "./NotificationMessage";
 
 export class LotteryNotificationsSubscriber implements Subscriber {
 
     private readonly _username: string;
     private readonly _storeName: string;
     private readonly _lottery_id: string;
-    private _sendMessageFunction: (username: string, message: Event.Notification) => boolean;
+    private _socket: Socket;
+    private id: number;
 
 
     constructor(storeOwnerName: string, storeName: string, lottery_id: string) {
         this._username = storeOwnerName;
         this._storeName = storeName;
         this._lottery_id = lottery_id;
+        this.id = 0;
     }
 
     update(event: Event.Event) : boolean {
-        return this._sendMessageFunction(this._username, event.notification);
+        this.id ++;
+        const notification: NotificationMessage = { id: this.id, message: event.notification.message, notificationColor: event.notification.notificationColor}
+        return this._socket.sendMessageTo(this._username, notification);
     }
 
     username(): string {
@@ -31,8 +37,8 @@ export class LotteryNotificationsSubscriber implements Subscriber {
         return this._lottery_id;
     }
 
-    setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean): void {
-        this._sendMessageFunction = func;
+    setSocket(socket: Socket): void {
+        this._socket = socket;
     }
 }
 
