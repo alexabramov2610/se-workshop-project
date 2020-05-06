@@ -1,5 +1,6 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class IfLeaf extends Discount {
     _productInDiscount: number;
@@ -16,7 +17,7 @@ export class IfLeaf extends Discount {
     }
 
     // tslint:disable-next-line:no-empty
-    add(discount: Discount): void {
+    add(discount: Discount, operator: Operators): void {
     }
 
     isRelevant(bag: BagItem[]): boolean {

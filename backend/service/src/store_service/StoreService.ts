@@ -136,19 +136,18 @@ export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRe
     return ts.viewUsersContactUsMessages(req);
 }
 
-export const addDiscountPolicy = (req: Req.AddDiscountRequest): Res.AddDiscountResponse => {
+export const addDiscount = (req: Req.AddDiscountRequest): Res.AddDiscountResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
     if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
-    return ts.addDiscountPolicy(req)
-
+    return ts.addDiscount(req)
 }
 
-export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
+export const removeDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
     if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
-    return ts.removeProductDiscount(req)
+    return ts.removeDiscount(req)
 }
 
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {

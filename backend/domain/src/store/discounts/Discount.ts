@@ -1,11 +1,11 @@
 import {v4 as uuid} from 'uuid';
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export abstract class Discount {
-
     protected _productsInDiscount: number[];
 
-    protected constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[]) {
+    constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[]) {
         this._id = uuid();
         this._percentage = percentage;
         this._duration = duration;
@@ -25,16 +25,6 @@ export abstract class Discount {
         return this._startDate;
     }
 
-    private _percentage: number;
-
-    get percentage(): number {
-        return this._percentage;
-    }
-
-    set percentage(value: number) {
-        this._percentage = value;
-    }
-
     private _duration: number;
 
     get duration(): number {
@@ -45,13 +35,23 @@ export abstract class Discount {
         this._duration = value;
     }
 
+    private _percentage: number;
+
+    get percentage(): number {
+        return this._percentage;
+    }
+
+    set percentage(value: number) {
+        this._percentage = value;
+    }
+
     abstract calc(bag: BagItem[]): BagItem[];
 
     isRelevant(bag: BagItem[]): boolean {
-        return this.isValid() && bag.some((bagItem)=> this.isProductInDiscount(bagItem.product.catalogNumber));
+        return this.isValid() && bag.some((bagItem) => this.isProductInDiscount(bagItem.product.catalogNumber));
     }
 
-    abstract add(discount: Discount): void;
+    abstract add(discount: Discount, operator: Operators): void;
 
     abstract remove(discount: Discount): void;
 
@@ -64,7 +64,7 @@ export abstract class Discount {
     }
 
     protected isProductInDiscount(catalogNumber: number): boolean {
-        return  this._productsInDiscount.indexOf(catalogNumber) !== -1
+        return this._productsInDiscount.indexOf(catalogNumber) !== -1
     }
 
     protected addMinutes(date, minutes): Date {
