@@ -13,6 +13,12 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+##### publisher
+echo -e "${BLUE}==========================================================${NC}"
+echo -e "${BLUE}==================== COMPILING PUBLISHER =================${NC}"
+echo -e "${BLUE}==========================================================${NC}"
+cd $publisher
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 #####  domain

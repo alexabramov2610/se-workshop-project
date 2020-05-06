@@ -23,8 +23,8 @@ export class TradingSystemManager {
     private state: TradingSystemState;
     private _publisher: Publisher;
 
-    constructor() {
-        this._publisher = new Publisher(this.forceLogout);
+    constructor(socket?: any) {
+        this._publisher = new Publisher(this.forceLogout, socket);
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
@@ -478,6 +478,10 @@ export class TradingSystemManager {
 
     terminateSocket() {
         this._publisher.terminateSocket();
+    }
+
+    getSocket():any {
+        return this._publisher.socket;
     }
 
 }

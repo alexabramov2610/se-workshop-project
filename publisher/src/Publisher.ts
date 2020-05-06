@@ -28,8 +28,8 @@ export class Publisher {
      LOTTERY_DESTINATION_PRICE_REACHED  |              "                    |   LOTTERY_EVENTS
      */
 
-    constructor(logoutFunction: (username: string) => void) {
-        this._socket = new Socket(3000, logoutFunction);
+    constructor(logoutFunction: (username: string) => void, socket?: any) {
+        this._socket = socket ? socket : new Socket(3000, logoutFunction);
         this._subscriptions = new Map();
     }
 
@@ -244,5 +244,10 @@ export class Publisher {
 
     terminateSocket() {
         this._socket.terminate();
+    }
+
+
+    get socket(): Socket{
+        return this._socket;
     }
 }

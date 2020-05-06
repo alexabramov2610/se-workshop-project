@@ -7,7 +7,10 @@ const getInstance = (): TradingSystemManager => {
 }
 const createInstance = (): TradingSystemManager => {
     // tradingSystemInstance.terminateSocket();
-    tradingSystemInstance = new TradingSystemManager();
+    let socket = undefined;
+    if (tradingSystemInstance)
+        socket = tradingSystemInstance.getSocket();
+    tradingSystemInstance = new TradingSystemManager(socket);
     return tradingSystemInstance;
 }
 export {getInstance, createInstance};
