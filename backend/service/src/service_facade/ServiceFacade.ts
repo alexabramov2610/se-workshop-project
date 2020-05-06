@@ -137,9 +137,10 @@ export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAddition
 export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeProducts));
 }
-export const addProductDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.addProductDiscount));
+export const addDiscountPolicy = (req: Req.AddDiscountRequest): Res.BoolResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.addDiscountPolicy));
 }
+
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeProductDiscount));
 }
@@ -254,5 +255,9 @@ const runIfLoggedIn = (fn: any): any => {
     }
     return f;
 }
+
+export const setSendMessageFunction = (func: (username: string, message: string) => boolean) : void => {
+    tradingSystem.setSendMessageFunction(func);
+};
 
 export {tradingSystem}

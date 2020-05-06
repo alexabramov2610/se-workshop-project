@@ -139,7 +139,8 @@ describe("Store Management Unit Tests", () => {
         mocked(UserManager).mockImplementation((): any => {
             return {
                 login: () => mockRes,
-                removeGuest: () => true
+                removeGuest: () => true,
+                getUserByName: () => new RegisteredUser('mockname', 'mockpw')
             }
         });
     }

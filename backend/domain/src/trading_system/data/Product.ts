@@ -7,7 +7,6 @@ export class Product {
     private _price: number;
     private _category: ProductCategory;
     private _rating: Rating;
-    private _discounts: Discount[];
 
     constructor(name: string, catalogNumber: number, price: number, productCategory: ProductCategory) {
         this._category = productCategory;
@@ -15,7 +14,6 @@ export class Product {
         this._catalogNumber = catalogNumber;
         this._price = price;
         this._rating = Rating.MEDIUM;
-        this._discounts = [];
     }
 
     set price(price: number) {
@@ -49,23 +47,6 @@ export class Product {
 
     get catalogNumber(): number {
         return this._catalogNumber;
-    }
-
-
-    get discounts(): Discount[] {
-        return this._discounts;
-    }
-
-    addDiscount(discount: Discount): void {
-        this._discounts.push(discount);
-    }
-
-
-    removeDiscount(discountID: string): boolean {
-        const discountToRemove : Discount = this._discounts.find((d)=> d.id === discountID);
-        if(!discountToRemove) return false;
-        this._discounts = this._discounts.filter((d) => d.id !== discountID);
-        return true;
     }
 
 }

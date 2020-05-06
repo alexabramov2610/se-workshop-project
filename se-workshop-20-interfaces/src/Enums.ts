@@ -41,3 +41,24 @@ export enum BuyingTypes {
     Auction,
     Lottery
 }
+
+export enum EventCode {
+    NEW_PURCHASE,
+    STORE_CLOSED,
+    STORE_OPENED,
+    ASSIGNED_AS_STORE_OWNER,
+    REMOVED_AS_STORE_OWNER,
+
+    HIGHER_AUCTION_OFFER,
+    AUCTION_WINNER,
+
+    LOTTERY_DESTINATION_PRICE_REACHED,
+
+}
+
+export enum DiscountOperators {
+    OR,
+    AND,
+    XOR,
+    IFTHEN
+}

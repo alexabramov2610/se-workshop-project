@@ -2,14 +2,17 @@ import {RegisteredUser, UserManager} from "../user/internal_api";
 import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
+import {notification} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {EventCode, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
 import {BagItem, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
-import { Publisher } from "publisher"
+import {Publisher} from "publisher";
+import { Event } from "se-workshop-20-interfaces/dist";
+import { formatString } from "../api-int/utils";
 
 const logger = loggerW(__filename)
 
@@ -20,13 +23,16 @@ export class TradingSystemManager {
     private state: TradingSystemState;
     private _publisher: Publisher;
 
-    constructor(initPublisher?: boolean) {
-        if (initPublisher)
-            this._publisher = new Publisher();
+    constructor() {
+        this._publisher = new Publisher();
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
         this.state = TradingSystemState.CLOSED;
+    }
+
+    setSendMessageFunction(func: (username: string, message: string) => boolean): void {
+        this._publisher.setSendMessageFunction(func);
     }
 
     startNewSession(): string {
@@ -49,7 +55,6 @@ export class TradingSystemManager {
     }
 
     getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
-        logger.info(`retrieving trading system state...`);
         return {data: {state: this.state}};
     }
 
@@ -69,6 +74,9 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = this._userManager.login(req);
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
+            this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
+                this._publisher.notify(event);
+            })
         }
         return res;
     }
@@ -309,6 +317,15 @@ export class TradingSystemManager {
         if (rUser) {
             rUser.addReceipt(receipt)
         }
+
+        for (const storeName of cart.keys()) {
+            const username: string = rUser ? rUser.name: 'guest';
+            const event: Event.NewPurchaseEvent = { code: EventCode.NEW_PURCHASE, username: username, storeName: storeName, message: formatString(notification.M_NEW_PURCHASE, [storeName, username]) };
+            this._publisher.notify(event).forEach(userToNotify => {
+                this._userManager.getUserByName(userToNotify).saveNotification(event);
+            });
+        }
+        user.resetCart();
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
@@ -341,6 +358,12 @@ export class TradingSystemManager {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.addProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
         return {data: {result: true}}
+    }
+
+    addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount policy to store ${req.body.storeName} to products ${req.body.discount.products}`)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.addDiscountPolicy(user, req.body.storeName, req.body.discount)
     }
 
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
