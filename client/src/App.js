@@ -4,16 +4,18 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
-import HomePageCotainer from './pages/home-page/home-page-container';
+import HomePageContainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
+
+
 class App extends React.Component {
     render() {
         return (
             <div>
                 <Header />
                 <Switch>
-                    <Route exact path="/" component={HomePageCotainer} />
+                    <Route exact path="/" component={HomePageContainer} />
                     <Route path="/category" component={CategoryPage} />
                     {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
                     {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
