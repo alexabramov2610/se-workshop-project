@@ -1,5 +1,6 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class IfThenDiscount extends Discount {
     protected ifClause: Discount;
@@ -21,7 +22,7 @@ export class IfThenDiscount extends Discount {
     }
 
     // tslint:disable-next-line:no-empty
-    add(discount: Discount): void {
+    add(discount: Discount, operator: Operators): void {
     }
 
     // tslint:disable-next-line:no-empty

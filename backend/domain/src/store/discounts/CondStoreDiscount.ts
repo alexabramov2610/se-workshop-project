@@ -1,5 +1,6 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class CondStoreDiscount extends Discount {
     private minPay: number;
@@ -22,7 +23,7 @@ export class CondStoreDiscount extends Discount {
     }
 
     // tslint:disable-next-line:no-empty
-    add(discount: Discount): void {
+    add(discount: Discount, operator: Operators): void {
     }
 
     isRelevant(bag: BagItem[]): boolean {

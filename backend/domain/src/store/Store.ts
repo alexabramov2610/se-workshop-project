@@ -5,22 +5,30 @@ import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {v4 as uuid} from 'uuid';
 import {
-    BagItem, IComplexDiscount,
-    IDiscount,
+    BagItem, ICondition, IConditionOfDiscount,
+    IDiscount, IDiscountInPolicy,
     IPayment,
     IProduct as ProductReq,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
-    ProductWithQuantity, Purchase,
+    ProductWithQuantity,
+    Purchase,
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {BuyingTypes, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
-import {Discount} from "./discounts/Discount";
+import {BuyingTypes, Operators, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ShownDiscount} from "./discounts/ShownDiscount";
-import {CondProductDiscount} from "./discounts/CondProductDiscount";
+import {CondDiscount} from "./discounts/CondDiscount";
+import {Discount} from "./discounts/Discount";
+import {CondStoreDiscount} from "./discounts/CondStoreDiscount";
+import {IfThenDiscount} from "./discounts/IfThenDiscount";
+import {LogicDiscount} from "./discounts/LogicDiscount";
+import {IfLeaf} from "./discounts/IfLeaf";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
+import {Condition} from "./discounts/conditions/Condition";
+import {MinPayCondition} from "./discounts/conditions/MinPayCondition";
+import {MinAmountCondition} from "./discounts/conditions/MinAmountCondition";
 
 const logger = loggerW(__filename)
 
@@ -37,7 +45,7 @@ export class Store {
     private _receipts: Receipt[];
     private _contactUsMessages: ContactUsMessage[];
     private _firstOwner: StoreOwner;
-    private _discountPolicy: DiscountPolicy;
+    private _discountPolicy: Discount;
     private _buyingTypes: BuyingTypes[];
 
     constructor(storeName: string) {
@@ -399,7 +407,6 @@ export class Store {
         const itemsRemaining: Item[] = items.slice(amount, items.length);
         this._products.set(productInStore, itemsRemaining)
         return itemsToReturn;
-
     }
 
     addReceipt(purchases: Purchase[], payment: IPayment) {
@@ -417,26 +424,10 @@ export class Store {
         }
         return finalPrice
         */
-
     }
 
-    calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-      return  this._discountPolicy.getBestBagPrices(bagItems);
-      /*
-        for (const bagItem of bagItems) {
-            const finalBagItemPrice = this._discountPolicy.getBestPrice(bagItems, bagItem);
-            bagItem.finalPrice = finalBagItemPrice;
-        }
-        return bagItems;
 
-       */
-    }
-
-    addDiscountPolicy(discount: IDiscount): string {
-        return this._discountPolicy.addDiscountPolicy(discount)
-    }
-
-    addDiscount(catalogNumber: number, discount: IDiscount): string {
+    addDiscount(discount: IDiscount): string {
         let newDiscount: Discount;
         if (!discount.condition && !discount.coupon) {
             newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration, discount.products)
@@ -450,6 +441,27 @@ export class Store {
         return true;
     }
 
+    setDiscountPolicy(discounts: IDiscountInPolicy[]): string {
+        const newPolicy: Discount = new DiscountPolicy();
+        for (const discountInPolicy of discounts) {
+            const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
+            this._discountPolicy.add(newDiscount, discountInPolicy.operator);
+        }
+        return newPolicy.id;
+    }
+
+    calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
+        const bagItemAfterDiscount: BagItem[] = this._discountPolicy.calc(bagItems);
+        return bagItemAfterDiscount;
+    }
+
+    getBagPrice(bagItems: BagItem[]): number {
+        let finalPrice: number = 0;
+        for (const bagItem of bagItems) {
+            finalPrice += bagItem.finalPrice;
+        }
+        return finalPrice;
+    }
 
     private getItemById(items: Item[], id: number): Item {
         logger.debug(`searching item with id: ${id}`);
@@ -519,6 +531,27 @@ export class Store {
         if (typeof filters.productRating !== "undefined" && filters.productRating !== product.rating)
             return false;
         return true;
+    }
+
+    private parseIDiscount(iDiscount: IDiscount): Discount {
+        if (iDiscount.condition) {
+            const conditions: Map<Condition, Operators> = new Map();
+            for (const iCondition of iDiscount.condition) {
+                const nextCondition: Condition = this.parseICondition(iCondition.condition);
+                conditions.set(nextCondition, iCondition.operator);
+            }
+            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions)
+        }
+        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products)
+    }
+
+    private parseICondition(ifCondition: ICondition): Condition {
+        if (ifCondition.minPay) {
+            return new MinPayCondition(ifCondition.catalogNumber, ifCondition.minPay);
+        } else if (ifCondition.minAmount) {
+            return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
+
+        }
     }
 
 

@@ -140,12 +140,20 @@ export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAddition
 export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeProducts));
 }
-export const addDiscountPolicy = (req: Req.AddDiscountRequest): Res.BoolResponse => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.addDiscountPolicy));
-}
 
+
+/*
+UC-4.2 discounts
+ */
+
+export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.setDiscountsPolicy));
+}
+export const addDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.addDiscount));
+}
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.removeProductDiscount));
+    return runIfOpen(req, runIfLoggedIn(StoreService.removeDiscount));
 }
 
 /*
@@ -217,9 +225,7 @@ export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolRe
     return runIfOpen(req, runIfLoggedIn(StoreService.setPurchasePolicy));
 }
 
-export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.setDiscountsPolicy));
-}
+
 
 /*
 Utils

@@ -22,7 +22,9 @@ https.createServer({
 }, server)
     .listen(PORT, function () {
         console.log(`app running on port ${PORT}`)
-    })/*
+    })
+
+/*
 server.listen(PORT, () => {
     console.log(`app running on port ${PORT}`);
 });
