@@ -320,7 +320,7 @@ export class TradingSystemManager {
 
         for (const storeName of cart.keys()) {
             const username: string = rUser ? rUser.name: 'guest';
-            const event: Event.NewPurchaseEvent = { code: EventCode.NEW_PURCHASE, username: username, storeName: storeName, message: formatString(notification.M_NEW_PURCHASE, [storeName, username]) };
+            const event: Event.NewPurchaseEvent = { code: EventCode.NEW_PURCHASE, username, storeName, message: formatString(notification.M_NEW_PURCHASE, [storeName, username]) };
             this._publisher.notify(event).forEach(userToNotify => {
                 this._userManager.getUserByName(userToNotify).saveNotification(event);
             });
@@ -353,20 +353,14 @@ export class TradingSystemManager {
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
-    addProductDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
-        logger.info(`request to add discount at store ${req.body.storeName} to product ${req.body.catalogNumber}`)
+
+    addDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount to store ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
-        return {data: {result: true}}
+        return this._storeManager.addDiscount(user, req.body.storeName, req.body.discount)
     }
 
-    addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
-        logger.info(`request to add discount policy to store ${req.body.storeName} to products ${req.body.discount.products}`)
-        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addDiscountPolicy(user, req.body.storeName, req.body.discount)
-    }
-
-    removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
+    removeDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
         logger.info(`request to remove discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discountID)
@@ -400,7 +394,9 @@ export class TradingSystemManager {
     }
 
     setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
-        return {data: {result: false}};
+        logger.info(`request to set discount policy to store ${req.body.storeName} `)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.setDiscountPolicy(user, req.body.storeName, req.body.policy)
     }
 
 

@@ -1,10 +1,11 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class ShownDiscount extends Discount {
 
-    public constructor(startDate: Date, duration: number, percentage: number,productsInDiscount: number[]) {
-        super(startDate,duration, percentage, productsInDiscount)
+    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[]) {
+        super(startDate, duration, percentage, productsInDiscount)
     }
 
     calc(bag: BagItem[]): BagItem[] {
@@ -24,7 +25,7 @@ export class ShownDiscount extends Discount {
     }
 
     // tslint:disable-next-line:no-empty
-    add(discount: Discount): void {
+    add(discount: Discount, operator: Operators): void {
     }
 
 

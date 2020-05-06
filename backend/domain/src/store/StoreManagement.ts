@@ -3,12 +3,20 @@ import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {
-    BagItem, IDiscount,
-    IItem, IPayment,
+    BagItem,
+    IDiscount,
+    IItem,
+    IPayment,
     IProduct as ProductReq,
     IReceipt,
-    ProductCatalogNumber, ProductInStore,
-    ProductWithQuantity, Purchase, SearchFilters, SearchQuery, IContactUsMessage, IComplexDiscount
+    ProductCatalogNumber,
+    ProductInStore,
+    ProductWithQuantity,
+    Purchase,
+    SearchFilters,
+    SearchQuery,
+    IContactUsMessage,
+    IPolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -520,19 +528,20 @@ export class StoreManagement {
         return {data: {result: true, permissions}}
     }
 
-    addProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discount: IDiscount): Res.AddDiscountResponse {
+
+    addDiscount(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addDiscount(catalogNumber, discount);
+        const discountID: string = store.addDiscount(discount);
         return {data: {result: true, discountID}}
     }
 
-    addDiscountPolicy(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
+    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IPolicy): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addDiscountPolicy(discount);
+        const discountID: string = store.setDiscountPolicy(discounts.discounts);
         return {data: {result: true, discountID}}
     }
 

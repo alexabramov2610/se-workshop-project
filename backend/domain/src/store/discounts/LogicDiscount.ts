@@ -1,12 +1,12 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {DiscountOperators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class LogicDiscount extends Discount {
-    protected operator: DiscountOperators;
+    protected operator: Operators;
     protected children: Discount[] = [];
 
-    public constructor(startDate: Date, duration: number, operator: DiscountOperators, children: Discount[]) {
+    public constructor(startDate: Date, duration: number, operator: Operators, children: Discount[]) {
         super(startDate, duration, 0, [])
         this.operator = operator;
         this.children = children;
@@ -14,14 +14,14 @@ export class LogicDiscount extends Discount {
 
     calc(bag: BagItem[]): BagItem[] {
         switch (this.operator) {
-            case DiscountOperators.OR: {
+            case Operators.OR: {
                 for (const discount of this.children) {
                     if (discount.isRelevant(bag))
                         return discount.calc(bag);
                 }
             }
                 break;
-            case DiscountOperators.AND: {
+            case Operators.AND: {
                 let bagAND: BagItem[] = bag;
                 for (const discount of this.children) {
                     if (discount.isRelevant(bag)) {
@@ -32,7 +32,7 @@ export class LogicDiscount extends Discount {
                 return bagAND;
             }
                 break;
-            case DiscountOperators.XOR: {
+            case Operators.XOR: {
                 let trueCounter: number = 0;
                 let bagXOR: BagItem[] = bag;
                 for (const discount of this.children) {
@@ -61,21 +61,21 @@ export class LogicDiscount extends Discount {
             if (!this.isValid()) return false;
             let ans: boolean;
             switch (this.operator) {
-                case DiscountOperators.OR: {
+                case Operators.OR: {
                     ans = false;
                     for (const discount of this.children) {
                         ans = ans || discount.isRelevant(bag)
                     }
                 }
                     break;
-                case DiscountOperators.AND: {
+                case Operators.AND: {
                     ans = true;
                     for (const discount of this.children) {
                         ans = ans && discount.isRelevant(bag)
                     }
                 }
                     break;
-                case DiscountOperators.XOR: {
+                case Operators.XOR: {
                   //  let trueCounter: number = 0;
                     for (const discount of this.children) {
                         if (discount.isRelevant(bag))
@@ -97,7 +97,7 @@ export class LogicDiscount extends Discount {
         return false;
     }
 
-    add(discount: Discount): void {
+    add(discount: Discount, operator: Operators): void {
         this.children.push(discount);
     }
 

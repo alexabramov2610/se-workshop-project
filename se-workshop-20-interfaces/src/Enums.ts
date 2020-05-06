@@ -1,5 +1,4 @@
-
-export enum TradingSystemState{
+export enum TradingSystemState {
     CLOSED,
     OPEN
 }
@@ -23,10 +22,10 @@ export enum ProductCategory {
 }
 
 export enum Rating {
-    VERY_LOW ,
-    LOW ,
+    VERY_LOW,
+    LOW,
     MEDIUM,
-    HIGH ,
+    HIGH,
     VERY_HIGH
 }
 
@@ -56,9 +55,8 @@ export enum EventCode {
 
 }
 
-export enum DiscountOperators {
+export enum Operators {
     OR,
     AND,
     XOR,
-    IFTHEN
 }

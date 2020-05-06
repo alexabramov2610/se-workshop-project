@@ -1,4 +1,4 @@
-import {DiscountOperators, ProductCategory, Rating} from "./Enums";
+import {Operators, ProductCategory, Rating} from "./Enums";
 
 export {ProductCategory};
 
@@ -62,20 +62,32 @@ export interface CreditCard {
 export interface ProductWithQuantity extends ProductCatalogNumber {
     quantity: number;
 }
+
 /*
  duration - in days
  simple discount (Shown/Cond) - provide products, percentage, condition?
-
  */
 export interface IDiscount {
     startDate: Date;
     duration: number;
-    products?: number[];
-    percentage?: number;
-    condition?: ICondition;
-    coupon?: string;
-    complex?: IComplexDiscount;
-    ifCondClause?: IifClause;
+    products: number[];
+    percentage: number;
+    condition?: IConditionOfDiscount[];
+    coupon?: string
+}
+
+export interface IDiscountInPolicy {
+    discount: IDiscount,
+    operator: Operators
+}
+
+export interface IPolicy {
+    discounts: IDiscountInPolicy[]
+}
+
+export interface IConditionOfDiscount {
+    condition: ICondition,
+    operator: Operators
 }
 /*
 choose one of
@@ -83,25 +95,11 @@ minAmount - product discount
 minPay -    store discount
  */
 export interface ICondition {
+    catalogNumber?: number;
     minAmount?: number;
     minPay?: number;
 }
-/*
-choose one of operator,
-children - for AND\XOR\OR
-if+then -  for IFTHEN
- */
-export interface IComplexDiscount extends IDiscount {
-    operator: DiscountOperators;
-    children?: IDiscount[];
-    ifClause?: IDiscount;
-    thenClause?: IDiscount;
-}
 
-export interface IifClause {
-    productInBag?: number;
-    productInDiscount?: number;
-}
 
 export interface PriceRange {
     min: number;
