@@ -1,13 +1,26 @@
-import {EventCode} from "./Enums";
+import {EventCode, NotificationsColors} from "./Enums";
+
+interface Notification {
+    message: string,
+    notificationColor: NotificationsColors
+}
 
 interface Event {
-    message: string,
-    username: string,
-    code: EventCode
+    notification: Notification,
+    code: EventCode,
+    username: string
 }
 
 interface AuctionEvent extends Event {
-    auctionId: string
+    auctionId: string,
+}
+
+interface HighOfferAuctionEvent extends AuctionEvent {
+    newOffer: number
+}
+
+interface AuctionWinnerEvent extends AuctionEvent {
+    winner: string
 }
 
 interface LotteryEvent extends Event {
@@ -23,6 +36,9 @@ interface NewPurchaseEvent extends StoreOwnerEvent {
 }
 
 export {
+    HighOfferAuctionEvent,
+    AuctionWinnerEvent,
+    Notification,
     Event,
     AuctionEvent,
     LotteryEvent,

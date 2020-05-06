@@ -1,4 +1,4 @@
-import {Req, Res} from 'se-workshop-20-interfaces'
+import {Event, Req, Res} from 'se-workshop-20-interfaces'
 import {Product} from "domain_layer/dist/src/trading_system/internal_api";
 import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
@@ -19,6 +19,7 @@ export const systemInit = (): void => {
     adminToken = getGuestSession();
     const initReq: Req.InitReq = {  body: { firstAdminName: adminName, firstAdminPassword: adminPassword } , token: adminToken};
     expect(ServiceFacade.systemInit(initReq).data.result).toBeTruthy();
+    ServiceFacade.setSendMessageFunction(sendMessageFunction);
 }
 
 export const systemReset = (): void => {
@@ -119,4 +120,8 @@ export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
             }
         }, token: token
     }
+}
+
+const sendMessageFunction = (username: string, message: Event.Notification): boolean => {
+    return true;
 }

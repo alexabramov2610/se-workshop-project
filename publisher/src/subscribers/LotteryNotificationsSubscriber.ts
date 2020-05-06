@@ -6,7 +6,7 @@ export class LotteryNotificationsSubscriber implements Subscriber {
     private readonly _username: string;
     private readonly _storeName: string;
     private readonly _lottery_id: string;
-    private _sendMessageFunction: (username: string, message: string) => boolean;
+    private _sendMessageFunction: (username: string, message: Event.Notification) => boolean;
 
 
     constructor(storeOwnerName: string, storeName: string, lottery_id: string) {
@@ -15,8 +15,8 @@ export class LotteryNotificationsSubscriber implements Subscriber {
         this._lottery_id = lottery_id;
     }
 
-    update(event: Event.NewPurchaseEvent): boolean {
-        return this._sendMessageFunction(this._username, event.message);
+    update(event: Event.Event) : boolean {
+        return this._sendMessageFunction(this._username, event.notification);
     }
 
     username(): string {
@@ -31,7 +31,7 @@ export class LotteryNotificationsSubscriber implements Subscriber {
         return this._lottery_id;
     }
 
-    setSendMessageFunction(func: (username: string, message: string) => boolean) {
+    setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean): void {
         this._sendMessageFunction = func;
     }
 }
