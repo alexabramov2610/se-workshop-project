@@ -7,6 +7,7 @@ import {
 import HomePageContainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
+// import { SignUp } from './pages/signup/sign-up.component'
 
 
 class App extends React.Component {
@@ -17,6 +18,7 @@ class App extends React.Component {
                 <Switch>
                     <Route exact path="/" component={HomePageContainer} />
                     <Route path="/category" component={CategoryPage} />
+                    {/* <Route path="/signup" component={SignUp} /> */}
                     {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
                     {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
                     {/*<Route exact path="/contact" component={ContactPage}/>*/}
