@@ -13,6 +13,10 @@ export abstract class User {
     }
 
 
+    get cart() {
+        return this._cart;
+    }
+
     removeProductFromCart(storeName: string, product: IProduct, amount: number): void {
         const storeCart: BagItem[] = this.cart.get(storeName);
         const oldBagItem: BagItem = storeCart.find((b) => b.product.catalogNumber === product.catalogNumber);
@@ -42,9 +46,8 @@ export abstract class User {
         this.cart.set(storeName, newStoreBag)
     }
 
-    get cart() {
-        return this._cart;
+    resetCart() {
+        this._cart = new Map();
     }
-
 
 }

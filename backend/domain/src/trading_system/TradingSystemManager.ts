@@ -55,7 +55,6 @@ export class TradingSystemManager {
     }
 
     getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
-        logger.info(`retrieving trading system state...`);
         return {data: {state: this.state}};
     }
 
@@ -326,6 +325,7 @@ export class TradingSystemManager {
                 this._userManager.getUserByName(userToNotify).saveNotification(event);
             });
         }
+        user.resetCart();
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
@@ -360,6 +360,12 @@ export class TradingSystemManager {
         return {data: {result: true}}
     }
 
+    addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+        logger.info(`request to add discount policy to store ${req.body.storeName} to products ${req.body.discount.products}`)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.addDiscountPolicy(user, req.body.storeName, req.body.discount)
+    }
+
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
         logger.info(`request to remove discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
@@ -387,7 +393,6 @@ export class TradingSystemManager {
         const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
         return res;
     }
-
 
 
     setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {

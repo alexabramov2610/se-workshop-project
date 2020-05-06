@@ -4,6 +4,9 @@ import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 import {IItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
+
+
+
 const adminName: string = "admin";
 const adminPassword: string = "admin123123";
 let adminToken: string;
@@ -100,4 +103,20 @@ export const makeStoreWithProductWithProdDetails = (name: string, price: number,
     ServiceFacade.addItems({token: ownerToken, body: {storeName, items: items}});
 
     return {ownerToken, products}
+}
+
+export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
+    return {
+        body: {
+            payment: {
+                cardDetails: {
+                    holderName: "tal",
+                    number: "152",
+                    expYear: "2021",
+                    expMonth: "5",
+                    cvv: "40"
+                }, address: "batyam", city: "batya", country: "israel"
+            }
+        }, token: token
+    }
 }

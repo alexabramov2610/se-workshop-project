@@ -8,7 +8,7 @@ import {
     IProduct as ProductReq,
     IReceipt,
     ProductCatalogNumber, ProductInStore,
-    ProductWithQuantity, Purchase, SearchFilters, SearchQuery, IContactUsMessage
+    ProductWithQuantity, Purchase, SearchFilters, SearchQuery, IContactUsMessage, IComplexDiscount
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -499,13 +499,11 @@ export class StoreManagement {
 
     calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
         const store: Store = this.findStoreByName(storeName);
-        return bagItems.map((bagItem): BagItem => {
-            return {
-                product: bagItem.product,
-                amount: bagItem.amount,
-                finalPrice: store.getProductFinalPrice(bagItem.product.catalogNumber)
-            }
-        })
+        // reset prices from last check
+        for (const bagItem of bagItems) {
+            bagItem.finalPrice = bagItem.product.price * bagItem.amount;
+        }
+        return store.calculateFinalPrices(bagItems)
     }
 
     viewManagerPermissions(owner: RegisteredUser, manager: RegisteredUser, req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
@@ -528,7 +526,14 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const discountID: string = store.addDiscount(catalogNumber, discount);
         return {data: {result: true, discountID}}
+    }
 
+    addDiscountPolicy(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const discountID: string = store.addDiscountPolicy(discount);
+        return {data: {result: true, discountID}}
     }
 
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {

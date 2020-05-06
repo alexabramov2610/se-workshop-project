@@ -6,7 +6,7 @@ import {
   ItemCountContainer,
 } from "./cart-icon.styles";
 
-import "../../assets/animations.scss";
+// import "../../assets/animations.scss";
 
 const CartIcon = ({ toggleCartHidden, itemCount }) => {
   const [animate, setAnimate] = useState(false);
@@ -20,7 +20,7 @@ const CartIcon = ({ toggleCartHidden, itemCount }) => {
     }
   }, [itemCount]);
 
-  const className = `hvr-underline-from-center ${animate ? "spin" : ""}`;
+  const className = `animated hvr-underline-from-center ${animate ? "spin" : ""}`;
   return (
     <div className={className} onAnimationEnd={() => setAnimate(false)}>
       <CartContainer onClick={toggleCartHidden}>

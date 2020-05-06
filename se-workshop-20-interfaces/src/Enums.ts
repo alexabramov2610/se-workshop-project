@@ -56,3 +56,10 @@ export enum EventCode {
     LOTTERY_DESTINATION_PRICE_REACHED,
 
 }
+
+export enum DiscountOperators {
+    OR,
+    AND,
+    XOR,
+    IFTHEN
+}
