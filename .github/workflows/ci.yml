@@ -24,6 +24,21 @@ jobs:
           cd se-workshop-20-interfaces
           npm install
           cd ..
+#      - name: Install Client
+#        run: |
+#          cd client
+#          npm install
+#          cd ..
+      - name: Install Websocket
+        run: |
+          cd communication/domain
+          npm install
+          cd ../..
+      - name: Install Publisher
+        run: |
+          cd publisher
+          npm install
+          cd ..
       - name: Install Domain
         run: |
           cd backend
@@ -38,6 +53,11 @@ jobs:
           npm install
           cd ..
           cd ..
+      - name: Install HTTP
+        run: |
+          cd communication/http
+          npm install
+          cd ../..
       - name: Install AT
         run: |
           cd AT
@@ -46,6 +66,21 @@ jobs:
       - name: Compile API
         run: |
           cd se-workshop-20-interfaces
+          npm run comp
+          cd ..
+      #      - name: Install Client
+      #        run: |
+      #          cd client
+      #          npm install
+      #          cd ..
+      - name: Compile Websocket
+        run: |
+          cd communication/domain
+          npm run comp
+          cd ../..
+      - name: Compile Publisher
+        run: |
+          cd publisher
           npm run comp
           cd ..
       - name: Compile Domain
@@ -61,6 +96,11 @@ jobs:
           cd service
           npm run comp
           cd ..
+          cd ..
+      - name: Compile HTTP
+        run: |
+          cd communication/http
+          npm run comp
           cd ..
 #      - name: Compile AT
 #        run: |
