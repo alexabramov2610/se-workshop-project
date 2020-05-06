@@ -6,12 +6,13 @@ import {
     NotificationsDropdownContainer
 } from "../notifications-dropdown/notification-dropdown.styles.jsx";
 
-const NotificationDropdown = ({ notifications }) => (
+const NotificationDropdown = ({ notifications, isVisible, clearNotifications, removeNotification }) => (
+    isVisible ?
     <NotificationsDropdownContainer>
         <NotificationsContainer>
             {notifications && notifications.length ? (
                 notifications.map((notification) => (
-                    <Notification key={notification.id} message={notification.message} />
+                    <Notification key={notification.id} message={notification.message} removeNotification={removeNotification}/>
                 ))
             ) : (
                 <EmptyMessageContainer>You don't have notifications yet</EmptyMessageContainer>
@@ -19,12 +20,12 @@ const NotificationDropdown = ({ notifications }) => (
         </NotificationsContainer>
         <NotificationsDropdownButton
             onClick={() => {
-                //TODO: clear all notifications
+                clearNotifications();
             }}
         >
-            Clear notifications
+            Clear
         </NotificationsDropdownButton>
-    </NotificationsDropdownContainer>
+    </NotificationsDropdownContainer> : null
 );
 
 export default NotificationDropdown;
