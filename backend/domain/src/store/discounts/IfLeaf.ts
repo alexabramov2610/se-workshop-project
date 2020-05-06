@@ -24,7 +24,8 @@ export class IfLeaf extends Discount {
         if (this._productsInBag) {
             ans = bag.some((bag) => bag.product.catalogNumber === this._productsInBag)
         } else if (this._productsInDiscount) {
-
+            // TODO
+            ans = true;
         }
         return this.isValid() && ans;
     }
