@@ -6,11 +6,12 @@ const logger = loggerW(__filename)
 
 export abstract class User {
 
+    private _cart: Map<string, BagItem[]>;          // storename -> items
+
     constructor() {
         this._cart = new Map();
     }
 
-    private _cart: Map<string, BagItem[]>;
 
     get cart() {
         return this._cart;
