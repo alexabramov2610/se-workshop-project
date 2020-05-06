@@ -3,6 +3,7 @@ import CardGroup from "react-bootstrap/CardGroup";
 import Card from "react-bootstrap/Card";
 import { AiTwotoneShop } from "react-icons/ai";
 import { OptionLink } from "../header/Header-styles";
+import { Link } from "react-router-dom";
 
 export const JoinCards = () => {
   return (
@@ -11,14 +12,19 @@ export const JoinCards = () => {
         <Card.Body>
           <Card.Title>
             <AiTwotoneShop
-              style={{ marginRight: "6px", marginBottom: "2px" }}
+              style={{ marginRight: "-6px", marginBottom: "2px" }}
             />{" "}
             <OptionLink
               as="a"
               className="hvr-underline-from-center"
               to="/contact"
             >
-              Shop With Us
+              <Link
+                style={{ textDecoration: "none", color: "black" }}
+                to="/signup"
+              >
+                Shop With Us
+              </Link>
             </OptionLink>
           </Card.Title>
           <Card.Text>
@@ -31,14 +37,20 @@ export const JoinCards = () => {
         <Card.Body>
           <Card.Title>
             <AiTwotoneShop
-              style={{ marginRight: "6px", marginBottom: "2px" }}
+              style={{ marginRight: "-6px", marginBottom: "2px" }}
             />{" "}
             <OptionLink
               as="div"
               className="hvr-underline-from-center"
               to="/contact"
             >
-              Create Your Own Store
+              <Link
+                style={{ textDecoration: "none", color: "black" }}
+                to="/category"
+              >
+                {" "}
+                Create Your Own Store
+              </Link>
             </OptionLink>
           </Card.Title>
           <Card.Text>
