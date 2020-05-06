@@ -62,11 +62,11 @@ jobs:
           npm run comp
           cd ..
           cd ..
-      - name: Compile AT
-        run: |
-          cd AT
-          npm run comp
-          cd ..
+#      - name: Compile AT
+#        run: |
+#          cd AT
+#          npm run comp
+#          cd ..
       - name: Unit Tests
         run: |
           cd backend
@@ -81,9 +81,9 @@ jobs:
           npm test
           cd ..
           cd ..
-      - name: Acceptance Tests
-        run: |
-          cd AT
-          npm test
-          cd ..
+#      - name: Acceptance Tests
+#        run: |
+#          cd AT
+#          npm test
+#          cd ..
     
