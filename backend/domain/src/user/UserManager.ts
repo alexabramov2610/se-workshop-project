@@ -96,6 +96,17 @@ export class UserManager {
         return this.loggedInUsers.get(token);
     }
 
+    getTokenOfLoggedInUser(username: string): string {
+        const mapIterator = this.loggedInUsers.entries();
+        let currentEntry = mapIterator.next();
+        while (currentEntry) {
+            if (currentEntry.value[1] === username)
+                return currentEntry.value[0];
+            currentEntry = mapIterator.next();
+        }
+        return "";
+    }
+
     isAdmin(u: RegisteredUser): boolean {
         for (const user of this.admins) {
             if (u.name === user.name)

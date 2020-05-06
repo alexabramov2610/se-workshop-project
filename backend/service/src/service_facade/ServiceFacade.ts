@@ -1,5 +1,5 @@
 import {getInstance, createInstance} from "domain_layer/";
-import {Req, Res, Enums, CommonInterface} from "se-workshop-20-interfaces";
+import {Req, Res, Enums, CommonInterface, Event} from "se-workshop-20-interfaces";
 import * as UserService from '../user_service/UserService';
 import * as StoreService from '../store_service/StoreService';
 import * as BuyingService from '../buying_service/BuyingService';
@@ -97,6 +97,9 @@ export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
 /*
 UC-3.1
  */
+export const forceLogout = (username: string): void => {
+    return runIfOpen({ body: {}, token: ""}, UserService.forceLogout)
+}
 export const logoutUser = (req: Req.LogoutRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(UserService.logoutUser))
 }
@@ -256,7 +259,7 @@ const runIfLoggedIn = (fn: any): any => {
     return f;
 }
 
-export const setSendMessageFunction = (func: (username: string, message: string) => boolean) : void => {
+export const setSendMessageFunction = (func: (username: string, message: Event.Notification) => boolean) : void => {
     tradingSystem.setSendMessageFunction(func);
 };
 
