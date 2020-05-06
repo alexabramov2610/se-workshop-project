@@ -501,7 +501,7 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(storeName);
         // reset prices from last check
         for (const bagItem of bagItems) {
-            bagItem.finalPrice = bagItem.product.price;
+            bagItem.finalPrice = bagItem.product.price * bagItem.amount;
         }
         return store.calculateFinalPrices(bagItems)
     }
@@ -528,19 +528,11 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
-    addSimpleDiscountPolicy(user: RegisteredUser, storeName: string, catalogNumber: number, discount: IDiscount): Res.AddDiscountResponse {
+    addDiscountPolicy(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addSimpleProductsDiscountPolicy(catalogNumber, discount);
-        return {data: {result: true, discountID}}
-    }
-
-    addComplexDiscountPolicy(user: RegisteredUser, storeName: string, catalogNumber: number, discount: IComplexDiscount): Res.AddDiscountResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addComplexDiscountPolicy(catalogNumber, discount);
+        const discountID: string = store.addDiscountPolicy(discount);
         return {data: {result: true, discountID}}
     }
 

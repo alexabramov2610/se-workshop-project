@@ -6,38 +6,44 @@ export class LogicDiscount extends Discount {
     protected operator: DiscountOperators;
     protected children: Discount[] = [];
 
-    protected constructor(startDate: Date, percentage: number, duration: number, productsInDiscount: number[], operator: DiscountOperators) {
-        super(startDate, percentage, duration, productsInDiscount)
+    public constructor(startDate: Date, duration: number, operator: DiscountOperators, children: Discount[]) {
+        super(startDate, duration, 0, [])
         this.operator = operator;
+        this.children = children;
     }
 
-    calc(price: number, amount: number, bag: BagItem[]): number {
+    calc(bag: BagItem[]): BagItem[] {
         switch (this.operator) {
             case DiscountOperators.OR: {
                 for (const discount of this.children) {
                     if (discount.isRelevant(bag))
-                        return discount.calc(price, amount, bag);
+                        return discount.calc(bag);
                 }
             }
                 break;
             case DiscountOperators.AND: {
+                let bagAND: BagItem[] = bag;
                 for (const discount of this.children) {
-                    return this.children.reduce((prev, curr) => curr.calc(prev, amount, bag), price);
+                    if (discount.isRelevant(bag)) {
+                        bagAND = discount.calc(bagAND);
+                    }
+                    // return this.children.reduce((prev, curr) => curr.calc(prev), bag);
                 }
+                return bagAND;
             }
                 break;
             case DiscountOperators.XOR: {
                 let trueCounter: number = 0;
-                let finalXORPrice:number = price*amount;
+                let bagXOR: BagItem[] = bag;
                 for (const discount of this.children) {
-                    if (discount.isRelevant(bag)){
+                    if (discount.isRelevant(bag)) {
                         trueCounter++;
-                        if(trueCounter % 2 !== 0){
-                            finalXORPrice = discount.calc(price, amount, bag);
+                        if (trueCounter % 2 !== 0) {
+                            bagXOR = discount.calc(bagXOR);
                         }
                     }
                 }
-                return finalXORPrice;
+                return bagXOR;
             }
                 break;
         }
@@ -50,35 +56,45 @@ export class LogicDiscount extends Discount {
 
      */
 
+    /*
+        isRelevant(bag: BagItem[]): boolean {
+            if (!this.isValid()) return false;
+            let ans: boolean;
+            switch (this.operator) {
+                case DiscountOperators.OR: {
+                    ans = false;
+                    for (const discount of this.children) {
+                        ans = ans || discount.isRelevant(bag)
+                    }
+                }
+                    break;
+                case DiscountOperators.AND: {
+                    ans = true;
+                    for (const discount of this.children) {
+                        ans = ans && discount.isRelevant(bag)
+                    }
+                }
+                    break;
+                case DiscountOperators.XOR: {
+                  //  let trueCounter: number = 0;
+                    for (const discount of this.children) {
+                        if (discount.isRelevant(bag))
+                            return true;
+                    }
+                    // ans = (trueCounter % 2 !== 0) // ODD number of TRUE = TRUE (XOR RULE)
+                }
+                    break;
+            }
+            return ans;
+        }
+    */
     isRelevant(bag: BagItem[]): boolean {
         if (!this.isValid()) return false;
-        let ans: boolean;
-        switch (this.operator) {
-            case DiscountOperators.OR: {
-                ans = false;
-                for (const discount of this.children) {
-                    ans = ans || discount.isRelevant(bag)
-                }
-            }
-                break;
-            case DiscountOperators.AND: {
-                ans = true;
-                for (const discount of this.children) {
-                    ans = ans && discount.isRelevant(bag)
-                }
-            }
-                break;
-            case DiscountOperators.XOR: {
-                let trueCounter: number = 0;
-                for (const discount of this.children) {
-                    if (discount.isRelevant(bag))
-                        trueCounter++;
-                }
-                ans = (trueCounter % 2 !== 0) // ODD number of TRUE = TRUE (XOR RULE)
-            }
-                break;
+        for (const discount of this.children) {
+            if (discount.isRelevant(bag))
+                return true;
         }
-        return ans;
+        return false;
     }
 
     add(discount: Discount): void {

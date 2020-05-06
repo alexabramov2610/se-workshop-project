@@ -140,6 +140,7 @@ export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemov
 export const addDiscountPolicy = (req: Req.AddDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addDiscountPolicy));
 }
+
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeProductDiscount));
 }

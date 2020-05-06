@@ -45,7 +45,6 @@ export class TradingSystemManager {
     }
 
     getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
-        logger.info(`retrieving trading system state...`);
         return {data: {state: this.state}};
     }
 
@@ -343,10 +342,7 @@ export class TradingSystemManager {
     addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
         logger.info(`request to add discount policy to store ${req.body.storeName} to products ${req.body.discount.products}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        if (req.body.discount.percentage) {
-            return this._storeManager.addSimpleDiscountPolicy(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
-        }
-        return this._storeManager.addSimpleDiscountPolicy(user, req.body.storeName, req.body.catalogNumber, req.body.discount)
+        return this._storeManager.addDiscountPolicy(user, req.body.storeName, req.body.discount)
     }
 
     removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
@@ -385,7 +381,6 @@ export class TradingSystemManager {
     setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
         return {data: {result: false}};
     }
-
 
     deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
         logger.info(`request to deliver via external system`)

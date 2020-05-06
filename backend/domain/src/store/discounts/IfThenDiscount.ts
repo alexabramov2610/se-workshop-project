@@ -5,14 +5,14 @@ export class IfThenDiscount extends Discount {
     protected ifClause: Discount;
     protected thenClause: Discount;
 
-    protected constructor(startDate: Date, percentage: number, duration: number, productsInDiscount: number[], ifClause: Discount, thenClause: Discount) {
-        super(startDate, percentage, duration, productsInDiscount)
+    public constructor(startDate: Date, duration: number, ifClause: Discount, thenClause: Discount) {
+        super(startDate, duration, 0, [])
         this.ifClause = ifClause;
         this.thenClause = thenClause;
     }
 
-    calc(price: number, amount: number, bag: BagItem[]): number {
-        return this.thenClause.calc(price, amount, bag);
+    calc(bag: BagItem[]): BagItem[] {
+        return this.thenClause.calc(bag);
     }
 
     isRelevant(bag: BagItem[]): boolean {

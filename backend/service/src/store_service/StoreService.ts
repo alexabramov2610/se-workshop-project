@@ -141,7 +141,9 @@ export const addDiscountPolicy = (req: Req.AddDiscountRequest): Res.AddDiscountR
     if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
     return ts.addDiscountPolicy(req)
+
 }
+
 export const removeProductDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
     if (!havePermission.data.result)

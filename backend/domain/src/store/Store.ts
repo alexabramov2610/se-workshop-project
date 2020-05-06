@@ -421,21 +421,19 @@ export class Store {
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-     //  return  this._discountPolicy.getBestBagPrices(bagItems);
+      return  this._discountPolicy.getBestBagPrices(bagItems);
+      /*
         for (const bagItem of bagItems) {
             const finalBagItemPrice = this._discountPolicy.getBestPrice(bagItems, bagItem);
             bagItem.finalPrice = finalBagItemPrice;
         }
         return bagItems;
+
+       */
     }
 
-    addSimpleProductsDiscountPolicy(catalogNumber: number, discount: IDiscount): string {
-        return this._discountPolicy.addSimpleProductsDiscountPolicy(catalogNumber, discount)
-    }
-
-    addComplexDiscountPolicy(catalogNumber: number, discount: IComplexDiscount): string {
-        // TODO
-        return this._discountPolicy.addComplexDiscountPolicy(catalogNumber, discount)
+    addDiscountPolicy(discount: IDiscount): string {
+        return this._discountPolicy.addDiscountPolicy(discount)
     }
 
     addDiscount(catalogNumber: number, discount: IDiscount): string {
