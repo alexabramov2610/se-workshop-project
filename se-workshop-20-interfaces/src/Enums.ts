@@ -65,12 +65,11 @@ export enum Operators {
     OR,
     AND,
     XOR,
-
+}
 
 export enum NotificationsColors {
     RED,
     BLUE,
     GREEN,
     ORANGE
-
 }
