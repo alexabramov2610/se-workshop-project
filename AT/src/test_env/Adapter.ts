@@ -244,8 +244,8 @@ export const Adapter: Partial<Env.Bridge> = {
     return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
   },
 
-  addProductDiscount(req: Req.AddDiscountRequest) {
-    const { data, error } = ServiceFacade.addProductDiscount(
+  addDiscountPolicy(req: Req.AddDiscountRequest) {
+    const { data, error } = ServiceFacade.addDiscountPolicy(
       wrapWithToken(req.body)
     );
     return error
