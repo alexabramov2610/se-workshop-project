@@ -28,5 +28,6 @@ export class StoreOwnerNotificationsSubscriber implements Subscriber{
     setSendMessageFunction(func: (username: string, message: Event.Notification) => boolean): void {
         this._sendMessageFunction = func;
     }
+
 }
 

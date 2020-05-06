@@ -188,7 +188,7 @@ export class TradingSystemManager {
             if (this._publisher.notify(event).length !== 0)
                 usernameToRemove.saveNotification(event);
 
-            this._publisher.unsubscribeStoreOwnerEvents(req.body.usernameToRemove, req.body.storeName);
+            this._publisher.unsubscribe(req.body.usernameToRemove, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
         }
         return res;
     }
