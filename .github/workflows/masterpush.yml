@@ -31,7 +31,7 @@ jobs:
       #          cd ..
       - name: Install Websocket
         run: |
-          cd communication/domain
+          cd communication/websocket
           npm install
           cd ../..
       - name: Install Publisher
@@ -75,7 +75,7 @@ jobs:
       #          cd ..
       - name: Compile Websocket
         run: |
-          cd communication/domain
+          cd communication/websocket
           npm run comp
           cd ../..
       - name: Compile Publisher
