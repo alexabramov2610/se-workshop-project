@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "babel src -d dist",
+    "comp": "babel src -d dist && cp server.cert ./dist/ && cp server.key ./dist/",
     "start": "NODE_ENV=development PORT=4000 nodemon --exec babel-node src/index.js",
     "start:prod": "NODE_ENV=production npm run comp && npm run serve",
     "serve": "node dist/index.js",
@@ -19,10 +19,13 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
     "service_layer": "file:../backend/service",
     "url": "^0.11.0",
     "url-parse": "^1.4.7",
-    "ws": "^7.2.5"
+    "ws": "^7.2.5",
+    "wss": "^3.3.4"
   },
   "devDependencies": {
     "typescript": "^3.8.3",
