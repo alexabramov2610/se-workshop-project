@@ -4,7 +4,7 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard
+    SearchFilters, IPayment, IDiscount, CreditCard, IComplexDiscount
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 
@@ -104,6 +104,11 @@ interface StoreInfoRequest extends Request {
 
 interface AddDiscountRequest extends Request {
     body: { storeName: string, catalogNumber: number, discount: IDiscount }
+}
+
+
+interface AddComplexDiscountRequest extends Request {
+    body: { storeName: string, catalogNumber: number, discount: IComplexDiscount }
 }
 
 interface RemoveDiscountRequest extends Request {
@@ -266,5 +271,5 @@ export {
     ViewCartReq,
     ViewManagerPermissionRequest,
     VerifyProducts,
-
+    AddComplexDiscountRequest
 };

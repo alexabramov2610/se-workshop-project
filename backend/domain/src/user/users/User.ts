@@ -6,12 +6,15 @@ const logger = loggerW(__filename)
 
 export abstract class User {
 
-    private _cart: Map<string, BagItem[]>;
-
     constructor() {
         this._cart = new Map();
     }
 
+    private _cart: Map<string, BagItem[]>;
+
+    get cart() {
+        return this._cart;
+    }
 
     removeProductFromCart(storeName: string, product: IProduct, amount: number): void {
         const storeCart: BagItem[] = this.cart.get(storeName);
@@ -42,9 +45,8 @@ export abstract class User {
         this.cart.set(storeName, newStoreBag)
     }
 
-    get cart() {
-        return this._cart;
+    resetCart() {
+        this._cart = new Map();
     }
-
 
 }
