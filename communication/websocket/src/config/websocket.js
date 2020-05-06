@@ -8,7 +8,7 @@ export default class Socket {
     constructor (port, onCloseEvent) {
         this.#LOGGED_IN_CLIENTS = new Map();
 
-        console.log(`WebSocket running on port ${port}`);
+        // console.log(`WebSocket running on port ${port}`);
         this.socketServer = new WebSocket.Server({port: port});
 
         this.socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
@@ -70,6 +70,7 @@ export default class Socket {
     }
 
     async terminate() {
+        // console.log('closing websocket connection')
         // this.socketServer.close();
         await this.socketServer.close();
     }

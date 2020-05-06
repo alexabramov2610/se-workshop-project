@@ -20,6 +20,7 @@ export const systemInit = (): void => {
 }
 
 export const systemReset = (): void => {
+    ServiceFacade.tradingSystem.terminateSocket();
     ServiceFacade.reset();
     this.systemInit();
 }

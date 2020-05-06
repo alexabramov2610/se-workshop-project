@@ -41,9 +41,9 @@ describe("Store Owner Integration Tests", () => {
         utils.createStore(storeName, token);
     });
 
-    afterEach(() => {
-        utils.terminateSocket();
-    });
+    // afterEach(() => {
+    //     utils.terminateSocket();
+    // });
 
     afterAll(() => {
         utils.terminateSocket();

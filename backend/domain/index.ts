@@ -6,7 +6,7 @@ const getInstance = (): TradingSystemManager => {
     return tradingSystemInstance;
 }
 const createInstance = (): TradingSystemManager => {
-    tradingSystemInstance.terminateSocket();
+    // tradingSystemInstance.terminateSocket();
     tradingSystemInstance = new TradingSystemManager();
     return tradingSystemInstance;
 }

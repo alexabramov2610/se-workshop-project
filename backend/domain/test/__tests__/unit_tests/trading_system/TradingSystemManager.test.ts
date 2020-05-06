@@ -41,6 +41,10 @@ describe("Store Management Unit Tests", () => {
         tradingSystemManager.terminateSocket();
     });
 
+    afterAll(() => {
+        tradingSystemManager.terminateSocket();
+    });
+
 
     test("startNewSession success", () => {
         tradingSystemManager = new TradingSystemManager();
