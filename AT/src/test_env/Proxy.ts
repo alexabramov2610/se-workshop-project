@@ -112,16 +112,16 @@ const Proxy: Bridge = {
     return real.watchCart ? real.watchCart() : DummyValues.CartResponse;
   },
 
-  addDiscountPolicy(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
-    return real.addDiscountPolicy
-      ? real.addDiscountPolicy(req)
-      : {
-          data: {
-            result: true,
-            discountID: "5646-435U3%^13513-5165",
-          },
-        };
-  },
+  // addDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
+  //   return real.addDiscount
+  //     ? real.addDiscount(req)
+  //     : {
+  //         data: {
+  //           result: true,
+  //           discountID: "5646-435U3%^13513-5165",
+  //         },
+  //       };
+  // },
 
   setDiscountToStore(store: Store, discount: Discount) {
     return real.setDiscountToStore
@@ -253,6 +253,22 @@ const Proxy: Bridge = {
   deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
     return real.deliver ? real.deliver(req) : { data: { result: true } };
   },
+//discounts
+
+setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse{
+  return real.setDiscountsPolicy ? real.setDiscountsPolicy(req) : { data: { result: true } }
+},
+
+addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse{
+  return real.addDiscount ? real.addDiscount(req) : { data: { result: true } }
+},
+removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
+  return real.removeProductDiscount ? real.removeProductDiscount(req) : { data: { result: true } }
+
+}
+
+
+
 };
 
 export { Proxy };

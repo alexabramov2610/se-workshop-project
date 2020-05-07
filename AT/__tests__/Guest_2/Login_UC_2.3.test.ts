@@ -1,4 +1,6 @@
 import { Bridge, Driver, Credentials } from "../..";
+import * as utils from "../utils"
+
 
 describe("Guest Login, UC: 2.3", () => {
   let _serviceBridge: Bridge;
@@ -10,6 +12,10 @@ describe("Guest Login, UC: 2.3", () => {
     _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
     _credentials = { userName: "test-username", password: "test-Password132" };
   });
+
+  afterAll(() => {
+    utils.terminateSocket();
+ });
 
   test("Valid details and registered", () => {
     _credentials.userName = "validUsername";
