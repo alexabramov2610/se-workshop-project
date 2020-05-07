@@ -38,7 +38,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     afterEach(() => {
-        tradingSystemManager.terminateSocket();
+        // tradingSystemManager.terminateSocket();
     });
 
     afterAll(() => {

@@ -120,6 +120,6 @@ export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
     }
 }
 
-export const terminateSocket = (): void => {
-    ServiceFacade.tradingSystem.terminateSocket();
+export const terminateSocket = async () => {
+    await ServiceFacade.tradingSystem.terminateSocket()
 }

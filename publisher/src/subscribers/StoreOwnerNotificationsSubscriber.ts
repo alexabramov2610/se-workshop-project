@@ -1,13 +1,12 @@
 import { Event } from "se-workshop-20-interfaces"
 import {Subscriber} from "./Subscriber";
-import { Socket } from "websocket";
 import {NotificationMessage} from "./NotificationMessage";
+import {sendMessageTo} from "websocket"
 
 export class StoreOwnerNotificationsSubscriber implements Subscriber{
 
     private readonly _username: string;
     private readonly _storeName: string;
-    private _socket: Socket;
 
 
     constructor(storeOwnerName: string, storeName: string) {
@@ -17,7 +16,7 @@ export class StoreOwnerNotificationsSubscriber implements Subscriber{
 
     update(event: Event.Event, notificationId: number): boolean {
         const notification: NotificationMessage = { id: notificationId, message: event.notification.message, notificationColor: event.notification.notificationColor}
-        return this._socket.sendMessageTo(this._username, notification);
+        return sendMessageTo(this._username, notification);
     }
 
     username(): string {
@@ -28,8 +27,7 @@ export class StoreOwnerNotificationsSubscriber implements Subscriber{
         return this._storeName;
     }
 
-    setSocket(socket: Socket): void {
-        this._socket = socket;
+    setSocket(socket: any): void {
     }
 
 }
