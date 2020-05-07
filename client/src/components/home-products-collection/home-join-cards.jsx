@@ -21,7 +21,7 @@ export const JoinCards = () => {
             >
               <Link
                 style={{ textDecoration: "none", color: "black" }}
-                to="/signup"
+                to="/signupsignin"
               >
                 Shop With Us
               </Link>
