@@ -33,6 +33,7 @@ jobs:
         run: |
           cd communication/websocket
           npm install
+          npm i @types/node
           cd ../..
       - name: Install Publisher
         run: |
