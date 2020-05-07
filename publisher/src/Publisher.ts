@@ -9,6 +9,7 @@ import { Socket } from "websocket";
 
 export class Publisher {
 
+    private notificationId: number;
     private _subscriptions: Map<EventCode, Map<string, any>>;
     private readonly _socket: Socket;
 
@@ -31,6 +32,7 @@ export class Publisher {
     constructor(logoutFunction: (username: string) => void, socket?: any) {
         this._socket = socket ? socket : new Socket(3000, logoutFunction);
         this._subscriptions = new Map();
+        this.notificationId = 0;
     }
 
     /** subscribe **/
@@ -212,8 +214,9 @@ export class Publisher {
 
     private updateSubscribers(subscribers: Subscriber[], event: Event.Event): string[] {
         let notificationNotSent: string[] = [];
+        const notificationId = this.notificationId++;
         for (const subscriber of subscribers) {
-            if (!subscriber.update(event))
+            if (!subscriber.update(event, notificationId))
                 notificationNotSent.push(subscriber.username());
         }
         return notificationNotSent;

@@ -9,19 +9,16 @@ export class LotteryNotificationsSubscriber implements Subscriber {
     private readonly _storeName: string;
     private readonly _lottery_id: string;
     private _socket: Socket;
-    private id: number;
 
 
     constructor(storeOwnerName: string, storeName: string, lottery_id: string) {
         this._username = storeOwnerName;
         this._storeName = storeName;
         this._lottery_id = lottery_id;
-        this.id = 0;
     }
 
-    update(event: Event.Event) : boolean {
-        this.id ++;
-        const notification: NotificationMessage = { id: this.id, message: event.notification.message, notificationColor: event.notification.notificationColor}
+    update(event: Event.Event, notificationId: number) : boolean {
+        const notification: NotificationMessage = { id: notificationId, message: event.notification.message, notificationColor: event.notification.notificationColor}
         return this._socket.sendMessageTo(this._username, notification);
     }
 

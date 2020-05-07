@@ -11,22 +11,19 @@ export class AuctionNotificationsSubscriber implements Subscriber {
     private readonly _storeName: string;
     private readonly _auctionId: string;
     private _socket: Socket;
-    private id: number;
 
     constructor(username: string, storeName: string, auctionId: string) {
         this._username = username;
         this._storeName = storeName;
         this._auctionId = auctionId;
-        this.id = 0;
     }
 
-    update(event: Event.AuctionEvent): boolean {
+    update(event: Event.AuctionEvent, notificationId: number): boolean {
         let newEvent: Event.Event = event;
         if (this.instanceOfAuctionWinnerEvent(event)) {
             newEvent = this.makeCorrectEvent(<AuctionWinnerEvent> event);
         }
-        this.id ++;
-        const notification: NotificationMessage = { id: this.id, message: event.notification.message, notificationColor: event.notification.notificationColor}
+        const notification: NotificationMessage = { id: notificationId, message: newEvent.notification.message, notificationColor: newEvent.notification.notificationColor}
         return this._socket.sendMessageTo(this._username, notification);
     }
 
