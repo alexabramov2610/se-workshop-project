@@ -9,7 +9,7 @@ export class ProductBuilder {
       catalogNumber: 123,
       name: "default-product-name",
       category: ProductCategory.CLOTHING,
-      price: 666,
+      price: 10,
     };
   }
 

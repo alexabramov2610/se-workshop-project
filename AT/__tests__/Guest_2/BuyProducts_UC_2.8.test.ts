@@ -33,6 +33,7 @@ describe("Guest buy items, UC: 2.8", () => {
     let _testItem6: Item;
     let _testExpensiveItem: Item;
     let _testSimpleDiscount1: IDiscount;
+    let _testSimpleDiscount2: IDiscount;
     let _testCondDiscount1:IDiscount;
 
     beforeEach(() => {
@@ -47,7 +48,7 @@ describe("Guest buy items, UC: 2.8", () => {
         _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
         _testProduct2 = new ProductBuilder().withName("testProduct2").withCatalogNumber(456).getProduct();
         _testProduct3 = new ProductBuilder().withName("testProduct3").withCatalogNumber(789).getProduct();
-        _testProduct4 = new ProductBuilder().withName("testProduct4").withCatalogNumber(555).withPrice(10).getProduct();
+        _testProduct4 = new ProductBuilder().withName("testProduct4").withCatalogNumber(555).withPrice(50).getProduct();
         _testExpensiveProduct = new ProductBuilder().withName("testExpensiveProduct").withCatalogNumber(777).withPrice(999999).getProduct();
 
         _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
@@ -64,12 +65,13 @@ describe("Guest buy items, UC: 2.8", () => {
         _testStore1 = {name: "testStore1Name"};
         _testStore2 = {name: "testStore2Name"};
 
-        _testSimpleDiscount1 = {startDate: new Date(), percentage: 50, duration: 5,products:[_testProduct1.catalogNumber]};
+        _testSimpleDiscount1 = {startDate: new Date(), percentage: 50, duration: 5,products:[_testProduct4.catalogNumber]};
+        _testSimpleDiscount2 = {startDate: new Date(), percentage: 50, duration: 5,products:[_testProduct1.catalogNumber]};
 
 
          _testCondDiscount1  = {startDate: new Date(), percentage: 50, duration: 5,
             products:[_testProduct4.catalogNumber],
-            condition: [{condition: {catalogNumber: 4, minAmount: 1},operator: Operators.AND}]}
+            condition: [{condition: {catalogNumber: 555, minAmount: 1},operator: Operators.AND}]}
 
 
         _serviceBridge.createStore(_testStore1);
@@ -185,7 +187,7 @@ describe("Guest buy items, UC: 2.8", () => {
     test("Non empty cart, items in stock, with simple discount" ,() => { 
 
     const storeName = _testStore1.name
-    const policy:IPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.AND}]}
+    const policy:IPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
     const setPolicyReq: Req.SetDiscountsPolicyRequest = {
                     body: {storeName, policy},
                     token: '123'
@@ -214,31 +216,58 @@ describe("Guest buy items, UC: 2.8", () => {
     expect(totalCharged).toEqual(reducedPrice);
 });
 
-    // test('Non empty cart, items in stock, with Cond discount',()=>{
-    //     const storeName = _testStore1.name
-    //     const policy: IPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
+    test(" Buy items with XOR discount",()=>{
+        const storeName=_testStore1.name
+        const policy: IPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.XOR},{discount: _testSimpleDiscount2, operator: Operators.AND} ]}
+        const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+            body: {storeName, policy},
+            token: "123"
+        }
 
-    //     const setPolicyReq: Req.SetDiscountsPolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
+        _driver.loginWithDefaults();
+        const makeDiscountRes= _serviceBridge.setDiscountsPolicy(setPolicyReq);
+        _serviceBridge.logout()
 
-    //     _driver.loginWithDefaults();
-    //     const makeDiscountRes= _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount
+        const {data, error} = _driver.given.store(_testStore1).products([_testProduct1,_testProduct4]).makeABuy(2);
+        expect(data).toBeDefined();
+        expect(error).toBeUndefined();
+        const totalCharged=data.receipt.payment.totalCharged
+        expect(totalCharged).toEqual(70); //(50*2)*0.5 + 10*2 =70
+
+
+
         
-    //     _serviceBridge.logout();
-
-    //     const {data, error} = _driver.given.store(_testStore1).products([_testProduct4]).makeABuy(2); //buys 2 items
 
 
-    //     expect(makeDiscountRes.data.result).toBeTruthy()
+
+
+    })
+
+    test('Non empty cart, items in stock, with Cond discount',()=>{
+        const storeName = _testStore1.name
+        const policy: IPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
+
+        const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+
+        _driver.loginWithDefaults();
+        const makeDiscountRes= _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount
         
-    //     expect(error).toBeUndefined()
-    //     expect(data.result).toBeTruthy()
-    //     expect(data.receipt.purchases.length).toEqual(2)
-    //     expect(data.receipt.payment.totalCharged).toEqual(15)   //recived 20 .. 
+        _serviceBridge.logout();
 
-    // });
+        const {data, error} = _driver.given.store(_testStore1).products([_testProduct4]).makeABuy(2); //buys 2 items
+
+
+        expect(makeDiscountRes.data.result).toBeTruthy()
+        
+        expect(error).toBeUndefined()
+        expect(data.result).toBeTruthy()
+        expect(data.receipt.purchases.length).toEqual(2)
+        expect(data.receipt.payment.totalCharged).toEqual(75)   //(50*2)*0.5
+
+    });
 
     
 
