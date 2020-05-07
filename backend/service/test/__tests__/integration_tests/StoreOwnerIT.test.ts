@@ -18,6 +18,8 @@ describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
     const storeOwnerPassword: string = "store-owner-pw";
     const storeName: string = "store-name";
+    const storeDesc: string = "store-Description";
+
 
     let store: Store;
     let storeOwnerRegisteredUser: RegisteredUser;
@@ -32,7 +34,7 @@ describe("Store Owner Integration Tests", () => {
     beforeEach(() => {
         utils.systemReset();
         storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
-        store = new Store(storeName);
+        store = new Store(storeName,storeDesc);
         storeOwner = new StoreOwner(storeOwnerName);
 
         token = utils.initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);

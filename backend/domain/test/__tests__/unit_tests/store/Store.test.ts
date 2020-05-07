@@ -16,7 +16,7 @@ describe("Store Management Unit Tests", () => {
     let storeManager: StoreManager;
 
     beforeEach(() => {
-        store = new Store("store");
+        store = new Store("store", "storeDescription");
         storeOwner = new StoreOwner("name");
         storeManager = new StoreManager("name");
     });

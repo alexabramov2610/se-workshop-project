@@ -132,6 +132,7 @@ export interface IPayment {
 
 export interface StoreInfo {
     storeName: string;
+    description: string;
     storeRating: Rating;
     storeOwnersNames: string[];
     storeManagersNames: string[];
