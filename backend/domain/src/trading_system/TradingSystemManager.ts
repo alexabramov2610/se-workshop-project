@@ -221,7 +221,7 @@ export class TradingSystemManager {
         logger.info(`open store request: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
 
-        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, user);
+        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName,req.body.description, user);
         if (res.data.result)
             this.subscribeNewStoreOwner(user.name, req.body.storeName);
         return res;

@@ -48,9 +48,10 @@ export class Store {
     private _discountPolicy: Discount;
     private _buyingTypes: BuyingTypes[];
 
-    constructor(storeName: string) {
+    constructor(storeName: string, description) {
         this._UUID = uuid();
         this._storeName = storeName;
+        this._description = description;
         this._products = new Map();
         this._storeOwners = [];
         this._storeManagers = [];
@@ -58,6 +59,16 @@ export class Store {
         this._rating = Rating.MEDIUM;
         this._discountPolicy = new DiscountPolicy();
         this._buyingTypes = [BuyingTypes.IMMEDIATE_PURCHASE]
+    }
+
+    private _description: string;
+
+    get description(): string {
+        return this._description;
+    }
+
+    set description(value: string) {
+        this._description = value;
     }
 
     private _rating: Rating;
@@ -299,6 +310,7 @@ export class Store {
                 result: true,
                 info: {
                     storeName: this.storeName,
+                    description: this._description,
                     storeRating: this.rating,
                     storeOwnersNames: this._storeOwners.map((owner) => owner.name),
                     storeManagersNames: this._storeManagers.map((manager) => manager.name),

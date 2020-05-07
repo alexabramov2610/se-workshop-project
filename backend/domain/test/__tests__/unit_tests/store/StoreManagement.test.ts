@@ -15,34 +15,36 @@ import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
 
-
+const storeReq = {storeName: "mock-store", description: "storeDescription"}
+let store: Store = new Store("name", "storeDesc");
 describe("Store Management Unit Tests", () => {
     let storeManagement: StoreManagement;
     beforeEach(() => {
         storeManagement = new StoreManagement(new ExternalSystemsManager());
+        store = new Store("store-name", "storeDesc");
     });
 
 
     test("verifyStore success", () => {
-        const storeToCheck: Store = new Store("mock-store");
+        const storeToCheck: Store = new Store("mock-store", "storeDescription");
         expect(storeManagement.isStoreLegal(storeToCheck)).toBe(true);
     });
 
     test("verifyStore failure", () => {
-        const storeToCheck: Store = new Store("");
+        const storeToCheck: Store = new Store("", "storeDescription");
         expect(storeManagement.isStoreLegal(storeToCheck)).toBe(false);
     });
 
 
     test("addStore success", () => {
         const user: RegisteredUser = new RegisteredUser("tal", "tal12345");
-        const res: Res.BoolResponse = storeManagement.addStore("new store name", user);
+        const res: Res.BoolResponse = storeManagement.addStore("new store name", "storeDescription", user);
         expect(res.data.result).toBeTruthy();
 
     });
 
     test("verifyStoreOwner success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(true);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
@@ -50,7 +52,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("verifyStoreOwner failure", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         jest.spyOn(store, "verifyIsStoreOwner").mockReturnValue(false);
         const user: StoreOwner = new StoreOwner("name");
         expect(storeManagement.verifyStoreOwner(store.storeName, user)).toBeFalsy();
@@ -58,7 +60,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("verifyStoreManager success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(true);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
@@ -66,7 +68,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("verifyStoreManager failure", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         const user: StoreOwner = new StoreOwner("name");
         jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(false);
         expect(storeManagement.verifyStoreManager(store.storeName, user)).toBeFalsy();
@@ -74,7 +76,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("verifyStoreOperation success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(true);
         jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(true);
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
@@ -84,7 +86,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("verifyStoreOperation failure - store doesn't exist", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "storeDescription");
         jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(false);
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
 
@@ -96,7 +98,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("verifyStoreOperation failure - not owner or manager", () => {
-        const store: Store = new Store("name");
         jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(true);
         jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(false);
         jest.spyOn(storeManagement, "verifyStoreManager").mockReturnValue(false);
@@ -109,7 +110,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("assignStoreOwner success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -127,7 +128,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreOwner failure - store doesn't exist", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -145,7 +146,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreOwner failure - invalid assigner", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -163,7 +163,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreOwner failure - already owner", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -182,7 +182,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("assignStoreManager success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -200,7 +200,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreManager failure - store doesn't exist", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -218,7 +218,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreManager failure - invalid assigner", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -236,7 +236,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("assignStoreManager failure - already manager", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -255,7 +255,7 @@ describe("Store Management Unit Tests", () => {
 
 
     test("removeStoreOwner success", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -275,7 +275,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreOwner failure - store doesn't exist", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -295,7 +295,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreOwner failure - invalid assigner", () => {
-        const store: Store = new Store("name");
+        const store: Store = new Store("name", "store desc");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -315,7 +315,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreOwner failure - already manager", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const ownerToAssign: StoreOwner = new StoreOwner("name2");
@@ -335,7 +334,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreOwner failure - not assigner", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("alreadyOwnerName");
         const ownerToAssign1: StoreOwner = new StoreOwner("name1");
@@ -359,7 +357,6 @@ describe("Store Management Unit Tests", () => {
 
 
     test("removeStoreManager success", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -379,7 +376,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreManager failure - store doesn't exist", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -399,7 +395,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreManager failure - invalid assigner", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -419,7 +414,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreManager failure - already manager", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("name1");
         const managerToAssign: StoreManager = new StoreManager("name2");
@@ -439,7 +433,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("removeStoreManager failure - not assigner", () => {
-        const store: Store = new Store("name");
         const isOperationValid: Res.BoolResponse = {data: {result: true}};
         const alreadyOwner: StoreOwner = new StoreOwner("alreadyOwnerName");
         const ownerToAssign1: StoreOwner = new StoreOwner("name1");
@@ -464,7 +457,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Success", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
@@ -485,7 +477,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Failure: store doesn't exist", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
@@ -506,7 +497,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Failure: manager doesn't exist", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
@@ -527,7 +517,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Failure: owner is not assigner of manager", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
@@ -548,7 +537,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Failure: is not store owner", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
@@ -569,7 +557,6 @@ describe("Store Management Unit Tests", () => {
 
     test("removeManagerPermissions - Failure: invalid permission", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = -2;
@@ -591,7 +578,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Success", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
@@ -612,7 +598,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Failure: store doesn't exist", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
@@ -633,7 +618,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Failure: manager doesn't exist", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
@@ -654,7 +638,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Failure: owner is not assigner of manager", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
@@ -675,7 +658,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Failure: is not store owner", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
@@ -696,7 +678,6 @@ describe("Store Management Unit Tests", () => {
 
     test("addManagerPermissions - Failure: invalid permission", () => {
         const isSuccessVerify: boolean = true;
-        const store: Store = new Store("store-mock");
         const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
         const storeManager: StoreManager = new StoreManager("storeManager-mock");
         const permissionToRemove: ManagementPermission = -2;
@@ -722,7 +703,6 @@ describe("Store Management Unit Tests", () => {
         const catalogNumber: number = 5;
         const category: number = 5;
         const product: Product = new Product('name', catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newName: string = "newProductName";
 
@@ -745,7 +725,6 @@ describe("Store Management Unit Tests", () => {
         const category: number = 5;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newName: string = "newProductName";
 
@@ -766,7 +745,6 @@ describe("Store Management Unit Tests", () => {
         const category: number = 5;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newName: string = "newProductName";
 
@@ -788,7 +766,6 @@ describe("Store Management Unit Tests", () => {
         const category: number = 5;
         const prodName: string = "mockname";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newPrice: number = 20;
 
@@ -811,7 +788,6 @@ describe("Store Management Unit Tests", () => {
         const category: number = 5;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newPrice: number = 20;
 
@@ -832,7 +808,6 @@ describe("Store Management Unit Tests", () => {
         const category: number = 5;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
-        const store: Store = new Store("store-mock");
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newPrice: number = 20;
 
@@ -850,7 +825,7 @@ describe("Store Management Unit Tests", () => {
     test("verifyStoreExists Success", () => {
         const storeName: string = 'mock-store';
         const user: RegisteredUser = new StoreOwner("usermock");
-        expect(storeManagement.addStore(storeName, user).data.result).toBeTruthy();
+        expect(storeManagement.addStore(storeName, "storeDesc", user).data.result).toBeTruthy();
 
         expect(storeManagement.verifyStoreExists(storeName)).toBeTruthy();
     });
@@ -867,7 +842,6 @@ describe("Store Management Unit Tests", () => {
         const itemsReq: ItemReq[] = [{catalogNumber: 1, id: 1}];
         const mockRes: Res.ItemsAdditionResponse = {data: {result: isSuccessFlow, itemsNotAdded: itemsReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
-        const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "addItems").mockReturnValue(mockRes);
 
@@ -883,7 +857,6 @@ describe("Store Management Unit Tests", () => {
         const itemsReq: ItemReq[] = [];
         const mockRes: Res.ItemsRemovalResponse = {data: {result: isSuccessFlow, itemsNotRemoved: itemsReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
-        const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "removeItems").mockReturnValue(mockRes);
 
@@ -899,7 +872,6 @@ describe("Store Management Unit Tests", () => {
         const itemsReq: ProductWithQuantity[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
-        const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "removeProductsWithQuantity").mockReturnValue(mockRes);
 
@@ -920,7 +892,6 @@ describe("Store Management Unit Tests", () => {
         }];
         const mockRes: Res.ProductAdditionResponse = {data: {result: isSuccessFlow, productsNotAdded: prodReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
-        const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "addNewProducts").mockReturnValue(mockRes);
 
@@ -936,7 +907,6 @@ describe("Store Management Unit Tests", () => {
         const itemsReq: ProductCatalogNumber[] = [];
         const mockRes: Res.ProductRemovalResponse = {data: {result: isSuccessFlow, productsNotRemoved: itemsReq}};
         const user: RegisteredUser = new StoreOwner("usermock");
-        const store: Store = new Store("store-mock");
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(mockRes);
 
@@ -948,7 +918,7 @@ describe("Store Management Unit Tests", () => {
     test("findStoreByName Success", () => {
         const storeName: string = 'mock-store';
         const user: RegisteredUser = new StoreOwner("usermock");
-        expect(storeManagement.addStore(storeName, user).data.result).toBeTruthy();
+        expect(storeManagement.addStore(storeName, "storedesc", user).data.result).toBeTruthy();
 
         expect(storeManagement.findStoreByName(storeName)).toBeTruthy();
     });
@@ -966,7 +936,6 @@ describe("Store Management Unit Tests", () => {
 
     test('viewStoreInfo Success ', () => {
         const storeName: string = 'mock-store';
-        const store: Store = new Store(storeName);
         const response: Res.StoreInfoResponse = {data: {result: true}};
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'viewStoreInfo').mockReturnValueOnce(response);
@@ -977,11 +946,10 @@ describe("Store Management Unit Tests", () => {
 
     test('viewProductInfo success test', () => {
         const p = new Product('my product', 12345, 15.90, ProductCategory.GENERAL)
-        const store = new Store('my store')
         store.addNewProducts([p]);
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(store);
         const res = storeManagement.viewProductInfo({
-            body: {storeName: 'my store', catalogNumber: 12345},
+            body: {storeName: 'store-name', catalogNumber: 12345},
             token: "lala"
         })
         expect(res.data.result).toBeTruthy();
@@ -993,10 +961,9 @@ describe("Store Management Unit Tests", () => {
 
     test('viewProductInfo fail - store not found', () => {
         const p = new Product('my product', 12345, 15.90, ProductCategory.GENERAL)
-        const store = new Store('my store')
         jest.spyOn(storeManagement, "findStoreByName").mockReturnValueOnce(undefined);
         const res = storeManagement.viewProductInfo({
-            body: {storeName: 'my store', catalogNumber: 12345},
+            body: {storeName: 'store-name', catalogNumber: 12345},
             token: "lala"
         })
         expect(res.data.result).toBeFalsy()
@@ -1013,7 +980,6 @@ describe("Store Management Unit Tests", () => {
 
 
     test("search - success with store name matching rating", () => {
-        const store: Store = new Store('my store');
 
         const productsInStore: ProductInStore[] = [{
             product: {
@@ -1039,7 +1005,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("search - success with store name not matching rating", () => {
-        const store: Store = new Store('my store');
 
         const productsInStore: ProductInStore[] = [];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
@@ -1060,7 +1025,6 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("search - failed with store name", () => {
-        const store: Store = new Store('my store');
 
         const productsInStore: ProductInStore[] = [];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
@@ -1079,7 +1043,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("search - success without store name", () => {
-        expect(storeManagement.addStore("storename", new RegisteredUser('name', 'pw')).data.result).toBe(true);
+        expect(storeManagement.addStore("storename", "storedesc", new RegisteredUser('name', 'pw')).data.result).toBe(true);
         const productsInStore: ProductInStore[] = [];
 
         const filters: SearchFilters = {};

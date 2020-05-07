@@ -14,7 +14,7 @@ interface Request {
 }
 
 interface OpenStoreRequest extends Request {
-    body: { storeName: string };
+    body: { storeName: string, description: string };
 }
 
 interface SetAdminRequest extends Request {
