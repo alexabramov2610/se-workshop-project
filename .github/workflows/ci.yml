@@ -119,7 +119,7 @@ jobs:
         run: |
           cd backend
           cd service
-          npm test
+          npm run test
           cd ..
           cd ..
 #      - name: Acceptance Tests

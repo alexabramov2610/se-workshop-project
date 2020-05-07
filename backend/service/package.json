@@ -8,7 +8,7 @@
     "comp": "tsc",
     "start": "tsc && node dist/index.js",
     "start:comp": "cd ../domain && tsc && cd ../service && tsc && node dist/index.js",
-    "test": "jest --verbose --coverage --forceExit --watchAll --maxWorkers=1",
+    "test": "jest --maxWorkers=1 --forceExit",
     "test:clear": "jest --maxWorkers=1 --clearCache",
     "test:silent": "TEST_MODE=1 SILENT=1 jest --maxWorkers=1",
     "test:watch": "npm t -- --watch"

@@ -3,6 +3,7 @@ const url = require('url');
 
 const port = 3000;
 const LOGGED_IN_CLIENTS = new Map();
+let onCloseEvent;
 
 let socketServer = new WebSocketServer({port: port});
 console.log(`WebSocket running on port ${port}`);
@@ -22,7 +23,7 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
 
     socketClient.on('close', (asd ,data) => {
         if (username) {
-            // onCloseEvent(username);
+            onCloseEvent(username);
             // console.log(username + ' byebyebeye ')
             LOGGED_IN_CLIENTS.delete(username);
         }
@@ -59,6 +60,8 @@ async function terminate() {
     }
 }
 
+function setOnCloseEvent(func) {
+    onCloseEvent = func;
+}
 
-
-export { sendMessageTo, terminate };
+export { sendMessageTo, terminate, setOnCloseEvent };

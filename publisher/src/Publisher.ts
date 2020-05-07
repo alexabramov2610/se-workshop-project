@@ -5,7 +5,7 @@ import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { terminate } from "websocket";
+import { terminate, setOnCloseEvent } from "websocket";
 
 export class Publisher {
 
@@ -33,6 +33,7 @@ export class Publisher {
         // this._socket = getInstance();
         this._subscriptions = new Map();
         this.notificationId = 0;
+        setOnCloseEvent(logoutFunction)
     }
 
     /** subscribe **/
