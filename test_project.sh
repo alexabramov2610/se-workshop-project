@@ -32,14 +32,14 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}==================== COMPILING DOMAIN ====================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $domain
-sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  service
 echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}==================== COMPILING SERVICE ===================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $service
-sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 
@@ -52,16 +52,16 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}================= RUNNING DOMAIN UNIT TESTS ================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo jest --clearCache
+#sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}================ RUNNING INTEGRATION TESTS =================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $service
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo jest --clearCache
+#sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 
