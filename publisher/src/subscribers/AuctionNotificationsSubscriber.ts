@@ -2,15 +2,15 @@ import {Event} from "se-workshop-20-interfaces"
 import {Subscriber} from "./Subscriber";
 import {NotificationsColors} from "se-workshop-20-interfaces/dist/src/Enums";
 import {AuctionWinnerEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { Socket } from "websocket";
 import {NotificationMessage} from "./NotificationMessage";
+import {sendMessageTo} from "websocket"
 
 export class AuctionNotificationsSubscriber implements Subscriber {
 
     private readonly _username: string;
     private readonly _storeName: string;
     private readonly _auctionId: string;
-    private _socket: Socket;
+    // private _socket: any;
 
     constructor(username: string, storeName: string, auctionId: string) {
         this._username = username;
@@ -24,7 +24,7 @@ export class AuctionNotificationsSubscriber implements Subscriber {
             newEvent = this.makeCorrectEvent(<AuctionWinnerEvent> event);
         }
         const notification: NotificationMessage = { id: notificationId, message: newEvent.notification.message, notificationColor: newEvent.notification.notificationColor}
-        return this._socket.sendMessageTo(this._username, notification);
+        return sendMessageTo(this._username, notification);
     }
 
     makeCorrectEvent(event: AuctionWinnerEvent): AuctionWinnerEvent {       //todo: remove this
@@ -48,8 +48,8 @@ export class AuctionNotificationsSubscriber implements Subscriber {
         return this._auctionId;
     }
 
-    setSocket(socket: Socket): void {
-        this._socket = socket;
+    setSocket(socket: any): void {
+        // this._socket = socket;
     }
 
     instanceOfAuctionWinnerEvent(object: any): object is AuctionWinnerEvent {

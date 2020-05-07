@@ -21,12 +21,12 @@ describe("Registered User Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
-    // afterEach(() => {
-    //     utils.terminateSocket();
+    // afterEach(async () => {
+    //     await utils.terminateSocket();
     // });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterAll(async () => {
+        await utils.terminateSocket();
     });
 
     it("logout IT test", () => {

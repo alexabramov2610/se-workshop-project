@@ -43,12 +43,12 @@ describe("Store Owner Integration Tests", () => {
         utils.createStore(storeName, token);
     });
 
-    // afterEach(() => {
-    //     utils.terminateSocket();
+    // afterEach(async () => {
+    //     await utils.terminateSocket();
     // });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterAll(async () => {
+        await utils.terminateSocket();
     });
 
     it("add new products", () => {

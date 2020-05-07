@@ -5,13 +5,13 @@ import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { Socket } from "websocket";
+import { terminate } from "websocket";
 
 export class Publisher {
 
     private notificationId: number;
     private _subscriptions: Map<EventCode, Map<string, any>>;
-    private readonly _socket: Socket;
+    // private readonly _socket;
 
     /**
      STORE_OWNER_EVENTS                 | map<store name, subscriber[]>     |   STORE_OWNER_EVENTS
@@ -29,8 +29,8 @@ export class Publisher {
      LOTTERY_DESTINATION_PRICE_REACHED  |              "                    |   LOTTERY_EVENTS
      */
 
-    constructor(logoutFunction: (username: string) => void, socket?: any) {
-        this._socket = socket ? socket : new Socket(3000, logoutFunction);
+    constructor(logoutFunction: (username: string) => void) {
+        // this._socket = getInstance();
         this._subscriptions = new Map();
         this.notificationId = 0;
     }
@@ -64,7 +64,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(storeName, []);
 
         const subscriber: StoreOwnerNotificationsSubscriber = new StoreOwnerNotificationsSubscriber(username, storeName);
-        subscriber.setSocket(this._socket);
+        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(storeName).push(subscriber);
     }
 
@@ -72,7 +72,7 @@ export class Publisher {
         const eventType: EventCode = EventCode.USER_EVENTS;
 
         const subscriber: RegisteredUserEventsSubscriber = new RegisteredUserEventsSubscriber(username);
-        subscriber.setSocket(this._socket);
+        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).set(username, subscriber);
     }
 
@@ -83,7 +83,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(auctionId, []);
 
         const subscriber: AuctionNotificationsSubscriber = new AuctionNotificationsSubscriber(username, auctionId, storeName);
-        subscriber.setSocket(this._socket);
+        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(auctionId).push(subscriber);
     }
 
@@ -94,7 +94,7 @@ export class Publisher {
             this._subscriptions.get(eventType).set(lotteryId, []);
 
         const subscriber: AuctionNotificationsSubscriber = new AuctionNotificationsSubscriber(username, lotteryId, storeName);
-        subscriber.setSocket(this._socket);
+        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(lotteryId).push(subscriber);
     }
 
@@ -245,12 +245,8 @@ export class Publisher {
         return -1;
     }
 
-    terminateSocket() {
-        this._socket.terminate();
+    async terminateSocket() {
+        await terminate()
     }
 
-
-    get socket(): Socket{
-        return this._socket;
-    }
 }

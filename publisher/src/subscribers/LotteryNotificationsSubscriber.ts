@@ -1,14 +1,14 @@
 import { Event } from "se-workshop-20-interfaces"
 import {Subscriber} from "./Subscriber";
-import { Socket } from "websocket";
 import {NotificationMessage} from "./NotificationMessage";
+import {sendMessageTo} from "websocket"
 
 export class LotteryNotificationsSubscriber implements Subscriber {
 
     private readonly _username: string;
     private readonly _storeName: string;
     private readonly _lottery_id: string;
-    private _socket: Socket;
+    // private _socket: any;
 
 
     constructor(storeOwnerName: string, storeName: string, lottery_id: string) {
@@ -19,7 +19,7 @@ export class LotteryNotificationsSubscriber implements Subscriber {
 
     update(event: Event.Event, notificationId: number) : boolean {
         const notification: NotificationMessage = { id: notificationId, message: event.notification.message, notificationColor: event.notification.notificationColor}
-        return this._socket.sendMessageTo(this._username, notification);
+        return sendMessageTo(this._username, notification);
     }
 
     username(): string {
@@ -34,8 +34,8 @@ export class LotteryNotificationsSubscriber implements Subscriber {
         return this._lottery_id;
     }
 
-    setSocket(socket: Socket): void {
-        this._socket = socket;
+    setSocket(socket: any): void {
+        // this._socket = socket;
     }
 }
 
