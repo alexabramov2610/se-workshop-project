@@ -13,7 +13,7 @@ export class MinAmountCondition extends Condition {
 
     isSatisfied(bag: BagItem[]): boolean {
         const bagItem: BagItem = bag.find((b) => b.product.catalogNumber === this._catalogNumber)
-        return bagItem && bagItem.amount > this._minAmount
+        return bagItem && bagItem.amount >= this._minAmount
     }
 
     getCatalogNumber(){
