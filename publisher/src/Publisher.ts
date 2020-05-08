@@ -32,7 +32,6 @@ export class Publisher {
     constructor(logoutFunction: (username: string) => void) {
         this._subscriptions = new Map();
         this.notificationId = 0;
-        console.log('here!')
         setOnCloseEvent(logoutFunction)
     }
 
