@@ -17,14 +17,11 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
     }
     socketClient.on(('message'), (data) => {
         socketClient.send(`message back to ${username? username: ""}`);
-        // sendToAllLoggedInUsers(`broadcast from ${username?username: ""} motherfuckers, message: ${data}`);
-        socketServer = new WebSocketServer({port: port});
     });
 
-    socketClient.on('close', (asd ,data) => {
+    socketClient.on('close', () => {
         if (username) {
             onCloseEvent(username);
-            // console.log(username + ' byebyebeye ')
             LOGGED_IN_CLIENTS.delete(username);
         }
     });
@@ -37,15 +34,15 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
 function sendMessageTo(username, message) {
     // console.log(`got ${username}`)
     const client = LOGGED_IN_CLIENTS.get(username);
-    // console.log(`${client ? "ok": "not ok"}`)
+    // console.log(`${username} :::: ${client ? "ok- client found": "not ok - client NOT FOUND!!!!!!!!!!!!!!!!!"}`)
     if (client) {
         try {
-            // console.log(`sending`)
-            client.send(message);
+            // console.log(`trying to send ${JSON.stringify(message)} to ${username}`)
+            client.send(JSON.stringify(message));
             // console.log(`send message to ${username}`)
             return true;
         } catch (e) {
-            // console.log('websocket: failed sending message, error: ' + e)
+            console.log('websocket: failed sending message, error: ' + e)
         }
     }
     // console.log(`didn't send`)

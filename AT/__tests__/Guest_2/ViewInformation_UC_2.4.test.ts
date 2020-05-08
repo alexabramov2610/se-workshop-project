@@ -1,6 +1,8 @@
 import {Bridge, Driver, Item, Store, Product} from "../../";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
+import * as utils from "../utils"
+
 
 // const ITEM_NOT_FOUND = "Item not found";
 // const STORE_NOT_FOUND = "Store not found";
@@ -26,6 +28,10 @@ describe("Guest - View Information, UC: 2.4", () => {
         _testItem = new ItemBuilder().withId(1).withCatalogNumber(123).getItem();
 
     });
+
+    afterAll(() => {
+        utils.terminateSocket();
+     });
 
     test("View valid product", () => {
         _serviceBridge.createStore(_testStore);
