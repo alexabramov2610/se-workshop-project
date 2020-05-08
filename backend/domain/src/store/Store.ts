@@ -567,4 +567,7 @@ export class Store {
     }
 
 
+    get storeOwners(): StoreOwner[] {
+        return this._storeOwners;
+    }
 }

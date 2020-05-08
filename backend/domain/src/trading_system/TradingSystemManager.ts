@@ -13,6 +13,7 @@ import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
 import { Event } from "se-workshop-20-interfaces/dist";
 import { formatString } from "../api-int/utils";
+import { logoutUserByName } from "../../index";
 
 const logger = loggerW(__filename)
 
@@ -24,7 +25,7 @@ export class TradingSystemManager {
     private _publisher: Publisher;
 
     constructor() {
-        this._publisher = new Publisher(this.forceLogout);
+        this._publisher = new Publisher(logoutUserByName);
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
@@ -71,6 +72,7 @@ export class TradingSystemManager {
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
+            if (this._userManager.getUserByName(req.body.username).pendingEvents.length === 0)
             this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
                 event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
@@ -92,8 +94,16 @@ export class TradingSystemManager {
     }
 
     forceLogout(username: string): void {
+        logger.info(`logging out user: ${username}... `);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);
-        this._userManager.logout({ body: {}, token});
+        const req: Req.LogoutRequest = { body: {}, token};
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(token);
+        const res: Res.BoolResponse = this._userManager.logout(req);
+        if (res.data.result) {
+            this._userManager.addGuestToken(req.token);
+            if (user)
+                logger.info(`logged out user: ${user.name}`);
+        }
     }
 
     changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
@@ -346,18 +356,25 @@ export class TradingSystemManager {
         if (rUser) {
             rUser.addReceipt(receipt)
         }
-
-        for (const storeName of cart.keys()) {
-            const username: string = rUser ? rUser.name: 'guest';
-
-            const notification: Event.Notification = { message: formatString(notificationMsg.M_NEW_PURCHASE, [storeName, username]), notificationColor: NotificationsColors.GREEN};
-            const event: Event.NewPurchaseEvent = { username: username, code: EventCode.NEW_PURCHASE, storeName: storeName, notification };
-            this._publisher.notify(event).forEach(userToNotify => {
-                this._userManager.getUserByName(userToNotify).saveNotification(event);
-            });
-        }
         user.resetCart();
+
+        const username: string = rUser ? rUser.name: 'guest';
+        this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
+
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
+    }
+
+    notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string) {
+        storeNames.forEach(storeName => {
+            const notification: Event.Notification = { message: formatString(notificationMsg.M_NEW_PURCHASE,
+                    [storeName, buyer]), notificationColor: NotificationsColors.GREEN};
+            this._storeManager.findStoreByName(storeName).storeOwners.forEach(storeOwner => {
+                const event: Event.NewPurchaseEvent = { username: storeOwner.name, code: EventCode.NEW_PURCHASE, storeName: storeName, notification };
+                this._publisher.notify(event).forEach(userToNotify => {
+                    this._userManager.getUserByName(userToNotify).saveNotification(event);
+                });
+            });
+        });
     }
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {

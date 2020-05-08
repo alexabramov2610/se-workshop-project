@@ -30,7 +30,6 @@ export class Publisher {
      */
 
     constructor(logoutFunction: (username: string) => void) {
-        // this._socket = getInstance();
         this._subscriptions = new Map();
         this.notificationId = 0;
         setOnCloseEvent(logoutFunction)
@@ -65,15 +64,12 @@ export class Publisher {
             this._subscriptions.get(eventType).set(storeName, []);
 
         const subscriber: StoreOwnerNotificationsSubscriber = new StoreOwnerNotificationsSubscriber(username, storeName);
-        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).get(storeName).push(subscriber);
     }
 
     private subscribeRegisteredUserEvents(username: string): void {
         const eventType: EventCode = EventCode.USER_EVENTS;
-
         const subscriber: RegisteredUserEventsSubscriber = new RegisteredUserEventsSubscriber(username);
-        // subscriber.setSocket(this._socket);
         this._subscriptions.get(eventType).set(username, subscriber);
     }
 
@@ -188,28 +184,30 @@ export class Publisher {
     private handleStoreOwnerEvent(event: Event.StoreOwnerEvent): string[] {
         const eventType: EventCode = EventCode.STORE_OWNER_EVENTS;
         if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.storeName))
-            return [];
+            return [event.username];
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.storeName), event);
     }
 
     private handleRegisteredUserEvent(event: Event.Event): string[] {
         const eventType: EventCode = EventCode.USER_EVENTS;
-        if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username))
+        if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username)) {
+            console.log("event wasn't sent")
             return [event.username];
+        }
         return this.updateSubscribers([this._subscriptions.get(eventType).get(event.username)], event);
     }
 
     private handleAuctionEvent(event: Event.AuctionEvent): string[] {
         const eventType: EventCode = EventCode.AUCTION_EVENTS;
         if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.auctionId))
-            return [];
+            return [event.username];
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.auctionId), event);
     }
 
     private handleLotteryEvent(event: Event.LotteryEvent): string[] {
         const eventType: EventCode = EventCode.LOTTERY_EVENTS;
         if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.lotteryId))
-            return [];
+            return [event.username];
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.lotteryId), event);
     }
 
@@ -231,6 +229,7 @@ export class Publisher {
             return EventCode.STORE_OWNER_EVENTS;
 
         else if (eventCode === EventCode.ASSIGNED_AS_STORE_OWNER ||
+             eventCode === EventCode.USER_EVENTS ||
              eventCode === EventCode.REMOVED_AS_STORE_OWNER)
             return EventCode.USER_EVENTS;
 
@@ -242,7 +241,6 @@ export class Publisher {
             eventCode === EventCode.AUCTION_WINNER ||
             eventCode === EventCode.LOTTERY_DESTINATION_PRICE_REACHED)
             return EventCode.LOTTERY_EVENTS;
-
         return -1;
     }
 

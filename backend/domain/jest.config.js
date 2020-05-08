@@ -4,8 +4,8 @@ module.exports = {
         "src"
     ],
     "testMatch": [
-        "**/__tests__/**/*.test.ts",
-        "**/__tests__/*.test.ts",
+        "**/__tests__/**/*.testSocket.ts",
+        "**/__tests__/*.testSocket.ts",
         "**/?(*.)+(spec|test).+(ts|tsx|js)"
     ],
     "transform": {
