@@ -1,7 +1,6 @@
 import {TradingSystemManager} from "./src/trading_system/TradingSystemManager";
 
 const logoutUserByName = (username: string): void => {
-    console.log("ASDASD")
     if (tradingSystemInstance)
         tradingSystemInstance.forceLogout(username);
 }

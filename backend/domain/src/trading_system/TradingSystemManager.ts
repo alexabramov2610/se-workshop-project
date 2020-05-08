@@ -94,8 +94,16 @@ export class TradingSystemManager {
     }
 
     forceLogout(username: string): void {
+        logger.info(`logging out user: ${username}... `);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);
-        this.logout({ body: {}, token});
+        const req: Req.LogoutRequest = { body: {}, token};
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(token);
+        const res: Res.BoolResponse = this._userManager.logout(req);
+        if (res.data.result) {
+            this._userManager.addGuestToken(req.token);
+            if (user)
+                logger.info(`logged out user: ${user.name}`);
+        }
     }
 
     changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
