@@ -88,7 +88,7 @@ describe("Guest buy items, UC: 2.8", () => {
         
     });
 
-    afterAll(() => {
+    afterEach(() => {
         utils.terminateSocket();
      });
 
@@ -184,7 +184,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
    //discounts
 
-    test("Non empty cart, items in stock, with simple discount" ,() => { 
+    test("Non empty cart, items in stock, with simple discount(50% on milk)" ,() => { 
 
     const storeName = _testStore1.name
     const policy:IPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
@@ -234,13 +234,6 @@ describe("Guest buy items, UC: 2.8", () => {
         const totalCharged=data.receipt.payment.totalCharged
         expect(totalCharged).toEqual(70); //(50*2)*0.5 + 10*2 =70
 
-
-
-        
-
-
-
-
     })
 
     test('Non empty cart, items in stock, with Cond discount',()=>{
@@ -268,6 +261,8 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(data.receipt.payment.totalCharged).toEqual(75)   //(50*2)*0.5
 
     });
+
+    test('')
 
     
 

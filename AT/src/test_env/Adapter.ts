@@ -70,7 +70,7 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   createStore(store: Types.Store): DummyTypes.IStoreResponse {
-    const req = wrapWithToken({ storeName: store.name });
+    const req = wrapWithToken({ storeName: store.name,description:'blabla' });
     const { error, data } = ServiceFacade.createStore(req);
     if (error || !data.result) return { data: undefined, error: error.message };
     else if (data.result) return { data: { name: store.name } };
