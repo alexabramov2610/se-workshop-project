@@ -37,8 +37,8 @@ export class StoreManagement {
         this._storeOwnerAssigners = new Map();
     }
 
-    addStore(storeName: string, owner: RegisteredUser): Res.BoolResponse {
-        const newStore = new Store(storeName);
+    addStore(storeName: string, description: string, owner: RegisteredUser): Res.BoolResponse {
+        const newStore = new Store(storeName, description);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
         logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
@@ -497,7 +497,7 @@ export class StoreManagement {
             const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
             for (const item of items) {
                 const outputItem: IItem = {catalogNumber: item.catalogNumber, id: item.id}
-                purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice})
+                purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice / bagItem.amount})
             }
         }
 

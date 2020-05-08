@@ -1,8 +1,10 @@
 import {mocked} from "ts-jest/utils";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import { BagItem, IProduct as ProductReq, ProductCatalogNumber, ProductCategory,
-    Purchase, ProductWithQuantity } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import { Rating, TradingSystemState } from "se-workshop-20-interfaces/dist/src/Enums";
+import {
+    BagItem, IProduct as ProductReq, ProductCatalogNumber, ProductCategory,
+    Purchase, ProductWithQuantity
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Rating, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Store, StoreManagement} from "../../../../src/store/internal_api";
 import {RegisteredUser, StoreOwner} from "../../../../src/user/internal_api";
 import {TradingSystemManager} from "../../../../src/trading_system/TradingSystemManager";
@@ -23,13 +25,17 @@ describe("Store Management Unit Tests", () => {
     let user: StoreOwner;
     const mockToken: string = "mock-token";
     const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
+    const createStoreRequest: Req.OpenStoreRequest = {
+        body: {storeName: "new store", description: "new store desc"},
+        token: "1"
+    };
     cart.set("storeName", [{
         product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
         amount: 2
     }])
 
     beforeEach(() => {
-        store = new Store("store");
+        store = new Store("store", "store desc");
         user = new StoreOwner("name");
         mocked(UserManager).mockClear();
         mocked(StoreManagement).mockClear();
@@ -38,7 +44,7 @@ describe("Store Management Unit Tests", () => {
     });
 
     afterEach(() => {
-        tradingSystemManager.terminateSocket();
+        // tradingSystemManager.terminateSocket();
     });
 
     afterAll(() => {
@@ -863,7 +869,6 @@ describe("Store Management Unit Tests", () => {
 
     test("createStore success", () => {
         prepareMocksForStoreManagement(true, true);
-        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeTruthy();
@@ -871,7 +876,6 @@ describe("Store Management Unit Tests", () => {
 
     test("createStore failure", () => {
         prepareMocksForStoreManagement(false, true);
-        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeFalsy();
@@ -879,7 +883,7 @@ describe("Store Management Unit Tests", () => {
 
     test("createStore failure - invalid user", () => {
         prepareMocksForStoreManagement(false, false);
-        const createStoreRequest: Req.OpenStoreRequest = {body: {storeName: "new store"}, token: "1"};
+
         tradingSystemManager = new TradingSystemManager();
         const res: Res.BoolResponse = tradingSystemManager.createStore(createStoreRequest);
         expect(res.data.result).toBeFalsy();
@@ -891,6 +895,7 @@ describe("Store Management Unit Tests", () => {
         const mockRes: Res.StoreInfoResponse = {
             data: {
                 result: true, info: {
+                    description: "new store desc",
                     productsNames: ["aa"], storeManagersNames: ["aa"],
                     storeName: "store-name", storeOwnersNames: ["aa"], storeRating: Rating.LOW
                 }
@@ -1228,7 +1233,7 @@ describe("Store Management Unit Tests", () => {
     function prepareVerifyNewStoreMock(isStoreExists: boolean, isUserValid: boolean) {
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                verifyStoreExists: () => isStoreExists ? new Store("new-store-mock") : undefined,
+                verifyStoreExists: () => isStoreExists ? new Store("new-store-mock", "store description") : undefined,
             }
         });
 
@@ -1278,7 +1283,7 @@ describe("Store Management Unit Tests", () => {
         };
         const viewUsersContactUsMessagesResponse: Res.ViewUsersContactUsMessagesResponse = {
             data: {
-                result:succ,
+                result: succ,
                 messages: succ ? [new ContactUsMessage("hey its me")] : []
             }
         };

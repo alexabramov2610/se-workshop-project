@@ -21,12 +21,12 @@ describe("Registered User Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
-    // afterEach(() => {
-    //     utils.terminateSocket();
+    // afterEach(async () => {
+    //     await utils.terminateSocket();
     // });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterAll(async () => {
+        await utils.terminateSocket();
     });
 
     it("logout IT test", () => {
@@ -37,7 +37,7 @@ describe("Registered User Integration Tests", () => {
 
     it("create store IT test", () => {
         const storeName: string = "store name";
-        const req: Req.OpenStoreRequest = {body: {storeName}, token};
+        const req: Req.OpenStoreRequest = {body: {storeName, description:"desc"}, token};
         let res: Res.BoolResponse = ServiceFacade.createStore(req)
         expect(res.data.result).toBe(true);
         res = ServiceFacade.createStore(req);

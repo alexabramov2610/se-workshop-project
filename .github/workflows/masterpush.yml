@@ -33,6 +33,7 @@ jobs:
         run: |
           cd communication/websocket
           npm install
+          npm i @types/node
           cd ../..
       - name: Install Publisher
         run: |
@@ -118,7 +119,7 @@ jobs:
         run: |
           cd backend
           cd service
-          npm test
+          npm run test
           cd ..
           cd ..
 #      - name: Acceptance Tests

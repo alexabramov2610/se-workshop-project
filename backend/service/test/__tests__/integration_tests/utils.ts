@@ -54,7 +54,7 @@ export const initSessionRegisterLogin = (username: string, password: string): st
 }
 
 export const createStore = (storeName: string, token: string): void => {
-    const req: Req.StoreInfoRequest = {body: {storeName}, token};
+    const req: Req.OpenStoreRequest = {body: {storeName, description: "store desc"}, token};
     expect(ServiceFacade.createStore(req).data.result).toBe(true);
 }
 
@@ -120,6 +120,6 @@ export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
     }
 }
 
-export const terminateSocket = (): void => {
-    ServiceFacade.tradingSystem.terminateSocket();
+export const terminateSocket = async () => {
+    await ServiceFacade.tradingSystem.terminateSocket()
 }

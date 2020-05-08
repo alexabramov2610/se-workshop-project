@@ -23,8 +23,8 @@ export class TradingSystemManager {
     private state: TradingSystemState;
     private _publisher: Publisher;
 
-    constructor(socket?: any) {
-        this._publisher = new Publisher(this.forceLogout, socket);
+    constructor() {
+        this._publisher = new Publisher(this.forceLogout);
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
@@ -221,7 +221,7 @@ export class TradingSystemManager {
         logger.info(`open store request: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
 
-        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, user);
+        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName,req.body.description, user);
         if (res.data.result)
             this.subscribeNewStoreOwner(user.name, req.body.storeName);
         return res;
@@ -476,12 +476,12 @@ export class TradingSystemManager {
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
     }
 
-    terminateSocket() {
-        this._publisher.terminateSocket();
+    async terminateSocket() {
+        await this._publisher.terminateSocket();
     }
 
-    getSocket():any {
-        return this._publisher.socket;
-    }
+    // getSocket():any {
+    //     return this._publisher.socket;
+    // }
 
 }

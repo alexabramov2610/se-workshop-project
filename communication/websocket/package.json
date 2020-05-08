@@ -5,12 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "babel src -d dist",
-    "start": "babel-node src/index.js",
-    "serve": "node dist/index.js",
-    "clean": "sudo rm -rf dist",
-    "clean:hard": "sudo rm -rf dist node_modules",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "comp": "tsc",
+    "start": "tsc && node dist/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,12 +17,6 @@
     "wss": "^3.3.4"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
-    "nodemon": "^2.0.3"
+    "typescript": "^3.8.3"
   }
 }
