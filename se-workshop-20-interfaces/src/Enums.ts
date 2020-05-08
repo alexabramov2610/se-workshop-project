@@ -67,7 +67,7 @@ export enum Operators {
     XOR,
 }
 
-export enum NotificationsColors {
+export enum NotificationsType {
     RED,
     BLUE,
     GREEN,

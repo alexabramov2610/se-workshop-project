@@ -15,7 +15,7 @@ export class StoreOwnerNotificationsSubscriber implements Subscriber{
     }
 
     update(event: Event.Event, notificationId: number): boolean {
-        const notification: NotificationMessage = { id: notificationId, message: event.notification.message, notificationColor: event.notification.notificationColor}
+        const notification: NotificationMessage = { id: notificationId, message: event.notification.message, type: event.notification.type}
         return sendMessageTo(this._username, notification);
     }
 
