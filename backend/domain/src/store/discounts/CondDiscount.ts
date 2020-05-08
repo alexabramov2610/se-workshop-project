@@ -87,6 +87,9 @@ export class CondDiscount extends Discount {
             }
         }
         return -1;
+    }
 
+    get conditions(): Map<Condition, Operators> {
+        return this._conditions;
     }
 }

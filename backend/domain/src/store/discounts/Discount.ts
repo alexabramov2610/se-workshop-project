@@ -70,4 +70,11 @@ export abstract class Discount {
     protected addMinutes(date, minutes): Date {
         return new Date(date.getTime() + minutes * 60000);
     }
+
+
+    get productsInDiscount(): number[] {
+        return this._productsInDiscount;
+    }
+
+
 }

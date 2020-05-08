@@ -16,11 +16,13 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy
+    IPolicy, IDiscountInPolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+import {Discount} from "./discounts/Discount";
+import {DiscountPolicy} from "./discounts/DiscountPolicy";
 
 const logger = loggerW(__filename)
 
@@ -545,6 +547,20 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
+    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IPolicy {
+        const store: Store = this.findStoreByName(storeName);
+        const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
+        const children: Map<Discount, Operators> = discount.children;
+        const discountInPolicy: IDiscountInPolicy[] = [];
+        for (const [discount, operator] of children) {
+            const iDiscount = this.convertDiscountToIDiscount(discount);
+            discountInPolicy.push({discount: iDiscount, operator});
+        }
+        const policy: IPolicy = {discounts: discountInPolicy}
+
+        return policy;
+    }
+
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
@@ -591,6 +607,12 @@ export class StoreManagement {
 
     }
 
+    private convertDiscountToIDiscount(discount: Discount): IDiscount {
+        // todo conidtios
+        return {startDate: discount.startDate, duration: discount.duration, percentage:discount.percentage,products: discount.productsInDiscount}
+
+    }
+
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
         const products: Product[] = [];
         for (const productReq of productsReqs) {
@@ -608,4 +630,6 @@ export class StoreManagement {
         }
         return items;
     }
+
+
 }
