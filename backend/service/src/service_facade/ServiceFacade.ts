@@ -263,4 +263,14 @@ const runIfLoggedIn = (fn: any): any => {
 }
 
 
+
+// --------------------------------- testing socket
+import {t1, t2} from "../testSocket";
+export const test1 = () : any => {
+    t1();
+}
+export const test2 = () : any => {
+    t2();
+}
+
 export {tradingSystem}

@@ -15,3 +15,8 @@ export async function systemInit(req,res) {
     const result =  ServiceFacade.systemInit(req.body);
     return res.send(result)
 }
+
+// export async function test(req,res) {
+//     const result =  ServiceFacade.test(req.body);
+//     return res.send(result)
+// }

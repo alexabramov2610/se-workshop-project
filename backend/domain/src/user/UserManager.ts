@@ -97,13 +97,10 @@ export class UserManager {
     }
 
     getTokenOfLoggedInUser(username: string): string {
-        const mapIterator = this.loggedInUsers.entries();
-        let currentEntry = mapIterator.next();
-        while (currentEntry) {
-            if (currentEntry.value[1] === username)
-                return currentEntry.value[0];
-            currentEntry = mapIterator.next();
-        }
+        this.loggedInUsers.forEach((user, token) => {
+           if (user.name === username)
+               return token;
+        });
         return "";
     }
 
