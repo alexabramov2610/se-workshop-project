@@ -70,7 +70,7 @@ export const Adapter: Partial<Env.Bridge> = {
   },
 
   createStore(store: Types.Store): DummyTypes.IStoreResponse {
-    const req = wrapWithToken({ storeName: store.name });
+    const req = wrapWithToken({ storeName: store.name,description:'blabla' });
     const { error, data } = ServiceFacade.createStore(req);
     if (error || !data.result) return { data: undefined, error: error.message };
     else if (data.result) return { data: { name: store.name } };
@@ -244,8 +244,8 @@ export const Adapter: Partial<Env.Bridge> = {
     return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
   },
 
-  addDiscountPolicy(req: Req.AddDiscountRequest) {
-    const { data, error } = ServiceFacade.addDiscountPolicy(
+  addDiscount(req: Req.AddDiscountRequest) {
+    const { data, error } = ServiceFacade.addDiscount(
       wrapWithToken(req.body)
     );
     return error
@@ -266,4 +266,19 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+
+  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
+    const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined }; 
+  },
+
+  removeProductDiscount(req: Req.RemoveDiscountRequest){
+    const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined }; 
+  }
+
 };
