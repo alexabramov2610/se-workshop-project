@@ -5,8 +5,10 @@ const logoutUserByName = (username: string): void => {
         tradingSystemInstance.forceLogout(username);
 }
 
-let tradingSystemInstance = new TradingSystemManager();
+let tradingSystemInstance;
 const getInstance = (): TradingSystemManager => {
+    if (!tradingSystemInstance)
+        tradingSystemInstance = new TradingSystemManager();
     return tradingSystemInstance;
 }
 const createInstance = (): TradingSystemManager => {
