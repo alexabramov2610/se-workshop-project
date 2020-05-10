@@ -6,7 +6,8 @@ const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 
 let socketServer = new WebSocketServer({port: port});
-console.log(`WebSocket running on port ${port}`);
+if (process.env.NODE_ENV == "development")
+    console.log(`WebSocket running on port ${port}`);
 
 socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
     const username = url.parse(req.url, true).query.name;
@@ -16,7 +17,7 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
         socketClient.send(`hola ${username}`);
     }
     socketClient.on(('message'), (data) => {
-        socketClient.send(`message back to ${username? username: ""}`);
+        socketClient.send(`message back to ${username ? username : ""}`);
     });
 
     socketClient.on('close', () => {
@@ -52,7 +53,7 @@ function sendMessageTo(username, message) {
 async function terminate() {
     try {
         await socketServer.close();
-    } catch(err) {
+    } catch (err) {
         console.log(err)
     }
 }
@@ -61,4 +62,4 @@ function setOnCloseEvent(func) {
     onCloseEvent = func;
 }
 
-export { sendMessageTo, terminate, setOnCloseEvent };
+export {sendMessageTo, terminate, setOnCloseEvent};
