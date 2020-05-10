@@ -191,7 +191,7 @@ export class Publisher {
     private handleRegisteredUserEvent(event: Event.Event): string[] {
         const eventType: EventCode = EventCode.USER_EVENTS;
         if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username)) {
-            console.log("event wasn't sent")
+            // console.log("event wasn't sent")
             return [event.username];
         }
         return this.updateSubscribers([this._subscriptions.get(eventType).get(event.username)], event);
