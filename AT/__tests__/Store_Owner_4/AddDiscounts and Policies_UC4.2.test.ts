@@ -85,7 +85,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         _testCondDiscount2={startDate: new Date(), percentage: 50, duration: 5,                 // 50% on cola if
             products:[_testCola.catalogNumber],
             condition: [{condition: {catalogNumber: _testEggs.catalogNumber ,minAmount:1},operator: Operators.OR},  //buy eggs  OR   
-            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:2},operator:Operators.AND},                 // buy 2+ banana and milk 
+            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:1},operator:Operators.AND},                 // buy 2+ banana and milk 
             {condition:{catalogNumber:_testMilk.catalogNumber,minAmount:1},operator:Operators.AND}]}
 
 
@@ -274,8 +274,6 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
 
     })
-
-    
 
 
 });
