@@ -3,7 +3,7 @@ import {
     Driver,
     Store,
     Product, Item
-} from "../../";
+} from "../..";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 import {IDiscount, Purchase,IPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
@@ -15,7 +15,7 @@ import * as utils from "../utils"
 
 
 
-describe("Guest buy items, UC: 2.8", () => {
+describe("Store owner add Disconts and policies , UC: 4.2", () => {
     let _driver = new Driver();
     let _serviceBridge: Bridge;
     let _testStore1: Store;
@@ -111,97 +111,7 @@ describe("Guest buy items, UC: 2.8", () => {
         utils.terminateSocket();
      });
 
-    test("Non empty cart, items in stock, no discount",() => {
-        const {data, error} = _driver.given.store(_testStore1).products([_testMilk]).makeABuy();
-        expect(data).toBeDefined();
-        expect(error).toBeUndefined();
-
-        const {receipt} = data;
-        const today = new Date();
-        receipt.date.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-        expect(receipt.date).toEqual(today);
-
-        const purchases: Purchase[] = receipt.purchases;
-        expect(purchases.length).toEqual(1);
-        expect(purchases[0].storeName).toEqual(_testStore1.name);
-        expect(purchases[0].price).toEqual(_testMilk.price);
-        expect(purchases[0].item.id).toEqual(_testMilk1.id);
-        expect(purchases[0].item.catalogNumber).toEqual(_testMilk.catalogNumber);
-
-        const {lastCC4, totalCharged} = receipt.payment;
-        const last4IdxStart = _driver.getPaymentInfo().payment.cardDetails.number.length - 4;
-        const last4: string = _driver.getPaymentInfo().payment.cardDetails.number.substring(last4IdxStart, last4IdxStart + 4);
-        expect(lastCC4).toEqual(last4);
-        expect(totalCharged).toEqual(_testMilk.price);
-    });
-
-    test(" empty cart, no discount",() => {
-        const req = {token: "123", body: {payment: _driver.getPaymentInfo().payment}};
-        const {error} = _serviceBridge.purchase(req);
-        expect(error).toBeDefined();
-    });
-
   
-
-    test('Non empty cart, items not stock',()=>{
-     const res=_driver.given.store(_testStore2).products([_testEggs]).makeABuy();
-     expect(res.data.result).toBeTruthy()
-     expect(res.data.receipt).toBeDefined()
-     expect(res.error).toBeUndefined()
-     const res2 = _driver.given.store(_testStore2).products([_testEggs]).makeABuy();
-     
-     expect(res2.error.message).toEqual('The cart is empty')
-     expect(res2.data.result).toBeFalsy()
-     expect(res2.data.receipt).toBeUndefined()
-     
-    })
-    test('Non empty cart, items in stock,card expaired,check stock ',()=>{
-
-        
-        const ItemStockBefore=_serviceBridge.viewProduct(_testStore1,_testMilk).data.info.quantity
-         
-        _serviceBridge.addToCart(_testStore1,_testMilk,1);
-        const req={body:{   
-                payment: {  
-                  cardDetails: {
-                    holderName: "Mr Cat",
-                    number: "4242424242424242",
-                    expMonth: "12",
-                    expYear: "2008",
-                    cvv: "123",
-                  },
-                  address: "St. Cats 123",
-                  city: "Cat City",
-                  country: "CatZone",
-                }
-                }};
-
-        const res=_serviceBridge.purchase(req);
-        expect(res.data.result).toBeFalsy()
-        expect(res.error.message).toEqual('Payment failure.')
-
-        const ItemStockAfter=_serviceBridge.viewProduct(_testStore1,_testMilk).data.info.quantity
-        expect(ItemStockBefore).toEqual(ItemStockAfter)
-         
-    })
-
-    test('Non empty cart, items in stock,no money',()=>{
-        const {data,error}=_driver.given.store(_testStore1).products([_testGold]).makeABuy();
-        expect(error).toBeDefined
-        expect(data.result).toBeFalsy()
-    })
-
-    test('logged in user, Non empty cart, items in stock',()=>{
-        
-        _driver.loginWithDefaults()
-        const res=_driver.given.store(_testStore1).products([_testMilk]).makeABuy();
-        expect(res.data.result).toBeTruthy()
-        expect(res.error).toBeUndefined();
-        expect(res.data.receipt.purchases.length).toEqual(1)
-    })
-
-   //discounts
 
     test("Non empty cart, items in stock, with simple discount(50% on milk)" ,() => { 
 
@@ -336,51 +246,36 @@ describe("Guest buy items, UC: 2.8", () => {
     })
 
 
-        test('store discount ,get 50% discount on milk if you buy in more then 100$',()=>{
-            const storeName = _testStore1.name
+    test('store discount ,get 50% discount on milk if you buy in more then 100$',()=>{
+        const storeName = _testStore1.name
 
-            const storeContDiscout={startDate: new Date(), percentage: 50, duration: 5,
-                products:[_testMilk.catalogNumber],
-                condition: [{condition: {minPay : 90},operator: Operators.AND}]} 
+        const storeContDiscout={startDate: new Date(), percentage: 50, duration: 5,
+            products:[_testMilk.catalogNumber],
+            condition: [{condition: {minPay : 90},operator: Operators.AND}]} 
 
-            const policy: IPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
-            const setPolicyReq: Req.SetDiscountsPolicyRequest = {
-                body: {storeName, policy},
-                token: '123'
-            }
+        const policy: IPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
 
-            _driver.loginWithDefaults();
-            const makeDiscountRes= _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount    
+        _driver.loginWithDefaults();
+        const makeDiscountRes= _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount    
 
-            const _testBanana2= new ItemBuilder().withId(17).withCatalogNumber(_testBanana.catalogNumber).getItem();
-            _serviceBridge.addItemsToStore(_testStore1,[_testBanana2]);
+        const _testBanana2= new ItemBuilder().withId(17).withCatalogNumber(_testBanana.catalogNumber).getItem();
+        _serviceBridge.addItemsToStore(_testStore1,[_testBanana2]);
 
-            _serviceBridge.logout();
+        _serviceBridge.logout();
 
-            const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana,_testMilk]).makeABuy(2); 
-            expect(data.result).toBeTruthy()
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana,_testMilk]).makeABuy(2); 
+        expect(data.result).toBeTruthy()
 
-            const expectedCharge=(2*_testCondDiscount2.percentage *_testMilk.price/100) + (2*_testBanana.price+2*_testCola.price);
-            expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
+        const expectedCharge=(2*_testCondDiscount2.percentage *_testMilk.price/100) + (2*_testBanana.price+2*_testCola.price);
+        expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
 
-        })
+    })
 
     
-
-
-
-
-
-   
-
-
-
-
-
-
-
-        
-
 
 
 });
