@@ -86,7 +86,7 @@ echo -e "${BLUE}================= RUNNING DOMAIN UNIT TESTS ================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
 sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1  --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"
@@ -94,7 +94,7 @@ echo -e "${BLUE}================ RUNNING INTEGRATION TESTS =================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $service
 sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1  --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  AT
 echo -e "${BLUE}============================================================${NC}"
@@ -102,7 +102,7 @@ echo -e "${BLUE}================= RUNNING ACCEPTANCE TESTS =================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $AT
 #sudo jest --clearCache
-#sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1  --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 

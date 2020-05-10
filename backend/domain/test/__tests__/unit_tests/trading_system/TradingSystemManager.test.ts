@@ -1178,7 +1178,8 @@ describe("Store Management Unit Tests", () => {
         }
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                purchaseFromStore: () => [purchase]
+                purchaseFromStore: () => [purchase],
+                findStoreByName: () => store
             }
         });
         const res: Res.PurchaseResponse = isSuccess ? {

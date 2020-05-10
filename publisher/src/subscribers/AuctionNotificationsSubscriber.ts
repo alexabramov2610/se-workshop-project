@@ -1,6 +1,6 @@
 import {Event} from "se-workshop-20-interfaces"
 import {Subscriber} from "./Subscriber";
-import {NotificationsColors} from "se-workshop-20-interfaces/dist/src/Enums";
+import {NotificationsType} from "se-workshop-20-interfaces/dist/src/Enums";
 import {AuctionWinnerEvent} from "se-workshop-20-interfaces/dist/src/Event";
 import {NotificationMessage} from "./NotificationMessage";
 import {sendMessageTo} from "websocket"
@@ -23,14 +23,14 @@ export class AuctionNotificationsSubscriber implements Subscriber {
         if (this.instanceOfAuctionWinnerEvent(event)) {
             newEvent = this.makeCorrectEvent(<AuctionWinnerEvent> event);
         }
-        const notification: NotificationMessage = { id: notificationId, message: newEvent.notification.message, notificationColor: newEvent.notification.notificationColor}
+        const notification: NotificationMessage = { id: notificationId, message: newEvent.notification.message, type: newEvent.notification.type}
         return sendMessageTo(this._username, notification);
     }
 
     makeCorrectEvent(event: AuctionWinnerEvent): AuctionWinnerEvent {       //todo: remove this
         const isWinner: boolean = event.winner === this._username;
         return { code: event.code, auctionId: event.auctionId, winner: event.winner, username: event.username,
-                notification: { notificationColor: isWinner ? NotificationsColors.BLUE : NotificationsColors.RED,
+                notification: { type: isWinner ? NotificationsType.BLUE : NotificationsType.RED,
                 message: event.notification.message + isWinner ? "won!" : "lost!"
             }
         }

@@ -1,8 +1,8 @@
-import {EventCode, NotificationsColors} from "./Enums";
+import {EventCode, NotificationsType} from "./Enums";
 
 interface Notification {
     message: string,
-    notificationColor: NotificationsColors
+    type: NotificationsType
 }
 
 interface Event {

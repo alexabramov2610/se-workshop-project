@@ -85,13 +85,8 @@ describe("Guest buy items, UC: 2.8", () => {
         _testCondDiscount2={startDate: new Date(), percentage: 50, duration: 5,                 // 50% on cola if
             products:[_testCola.catalogNumber],
             condition: [{condition: {catalogNumber: _testEggs.catalogNumber ,minAmount:1},operator: Operators.OR},  //buy eggs  OR   
-            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:2},operator:Operators.AND},                 // buy 2+ banana and milk 
+            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:1},operator:Operators.AND},                 // buy 2+ banana and milk
             {condition:{catalogNumber:_testMilk.catalogNumber,minAmount:1},operator:Operators.AND}]}
-
-
-
-        
-
 
         _serviceBridge.createStore(_testStore1);
         _serviceBridge.createStore(_testStore2);
@@ -303,9 +298,6 @@ describe("Guest buy items, UC: 2.8", () => {
 
         const expectedCharge=(2*_testCondDiscount2.percentage *_testCola.price/100) + (2*_testEggs.price);
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
-
-
-
         
     })
 
@@ -335,6 +327,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
     })
 
+<<<<<<< HEAD
 
         test('store discount ,get 50% discount on milk if you buy in more then 100$',()=>{
             const storeName = _testStore1.name
@@ -383,4 +376,6 @@ describe("Guest buy items, UC: 2.8", () => {
 
 
 
+=======
+>>>>>>> f450bf92306ca6ec964503d177cc23ab1f94ccd5
 });

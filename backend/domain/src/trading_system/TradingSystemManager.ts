@@ -4,7 +4,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {EventCode, NotificationsColors, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {EventCode, NotificationsType, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
@@ -160,7 +160,7 @@ export class TradingSystemManager {
             const storeName: string = req.body.storeName;
             const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
             const event: Event.StoreOwnerEvent = { username: req.body.usernameToAssign, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName: storeName,
-                notification: { notificationColor: NotificationsColors.GREEN, message: msg }
+                notification: { type: NotificationsType.GREEN, message: msg }
             };
             if (this._publisher.notify(event).length !== 0)
                 usernameToAssign.saveNotification(event);
@@ -189,7 +189,7 @@ export class TradingSystemManager {
             const storeName: string = req.body.storeName;
             const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
             const event: Event.StoreOwnerEvent = { username: req.body.usernameToRemove, code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
-                notification: { notificationColor: NotificationsColors.GREEN, message: msg }
+                notification: { type: NotificationsType.GREEN, message: msg }
             };
             if (this._publisher.notify(event).length !== 0)
                 usernameToRemove.saveNotification(event);
@@ -367,7 +367,7 @@ export class TradingSystemManager {
     notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string) {
         storeNames.forEach(storeName => {
             const notification: Event.Notification = { message: formatString(notificationMsg.M_NEW_PURCHASE,
-                    [storeName, buyer]), notificationColor: NotificationsColors.GREEN};
+                    [storeName, buyer]), type: NotificationsType.GREEN};
             this._storeManager.findStoreByName(storeName).storeOwners.forEach(storeOwner => {
                 const event: Event.NewPurchaseEvent = { username: storeOwner.name, code: EventCode.NEW_PURCHASE, storeName: storeName, notification };
                 this._publisher.notify(event).forEach(userToNotify => {
