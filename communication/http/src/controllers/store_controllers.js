@@ -1,4 +1,5 @@
 import {ServiceFacade} from "service_layer"
+import {wrapHttp} from "./http_request_wrapper";
 
 /*
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"username": "tnewusername", "password": "newuser"}, "token": "a8658714-a66b-45c7-9c40-cc9bb6f188dd"}'   http://localhost:4000/users/register
@@ -99,31 +100,31 @@ export async function addManagerPermissions(req,res) {
 }
 
 export async function removeManagerPermissions(req,res) {
-    const result = ServiceFacade.removeManagerPermissions(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.removeManagerPermissions);
     return res.send(result)
 }
 
 export async function viewManagerPermissions(req,res) {
-    const result = ServiceFacade.viewManagerPermissions(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.viewManagerPermissions);
     return res.send(result)
 }
 
 export async function removeStoreManager(req,res) {
-    const result = ServiceFacade.removeStoreManager(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.removeStoreManager);
     return res.send(result)
 }
 
 export async function viewUsersContactUsMessages(req,res) {
-    const result = ServiceFacade.viewUsersContactUsMessages(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.viewUsersContactUsMessages);
     return res.send(result)
 }
 
 export async function viewStorePurchasesHistory(req,res) {
-    const result = ServiceFacade.viewStorePurchasesHistory(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.viewStorePurchasesHistory);
     return res.send(result)
 }
 
 export async function setPurchasePolicy(req,res) {
-    const result = ServiceFacade.setPurchasePolicy(req.body);
+    const result = wrapHttp(req.body, ServiceFacade.setPurchasePolicy);
     return res.send(result)
 }
