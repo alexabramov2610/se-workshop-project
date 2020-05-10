@@ -1,4 +1,4 @@
-import {Operators, ProductCategory, Rating} from "./Enums";
+import {Operators, ProductCategory, Rating, WeekDays} from "./Enums";
 
 export {ProductCategory};
 
@@ -81,7 +81,7 @@ export interface IDiscountInPolicy {
     operator: Operators
 }
 
-export interface IPolicy {
+export interface IDiscountPolicy {
     discounts: IDiscountInPolicy[]
 }
 
@@ -89,6 +89,7 @@ export interface IConditionOfDiscount {
     condition: ICondition,
     operator: Operators
 }
+
 /*
 choose one of
 minAmount - product discount
@@ -100,6 +101,45 @@ export interface ICondition {
     minPay?: number;
 }
 
+
+// *******************START PURCHASE POLICY************************** //
+
+export interface IProductPurchasePolicy {
+    products: number[];
+    minAmount: number;
+    maxAmount: number;
+}
+
+export interface IBagPurchasePolicy {
+    minAmount: number;
+    maxAmount: number;
+}
+
+export interface ISystemPurchasePolicy {
+    notForSellDays: WeekDays[]
+}
+
+export interface IUserPurchasePolicy {
+    countries: string[]
+}
+
+export interface ISimplePurchasePolicy {
+    productPolicy?: IProductPurchasePolicy;
+    bagPolicy?: IBagPurchasePolicy;
+    systemPolicy?: ISystemPurchasePolicy;
+    userPolicy?: IUserPurchasePolicy;
+}
+
+export interface IPurchasePolicyElement {
+    operator: Operators
+    policy: ISimplePurchasePolicy
+}
+
+export interface IPurchasePolicy {
+    policy: IPurchasePolicyElement[]
+}
+
+// *******************END PURCHASE POLICY************************** //
 
 export interface PriceRange {
     min: number;

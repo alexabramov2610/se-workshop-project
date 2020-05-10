@@ -9,7 +9,7 @@ import {
   Cart,
   IPayment,
   IContactUsMessage,
-  Error, IPolicy,
+  Error, IDiscountPolicy, IPurchasePolicy,
 } from "./CommonInterface";
 import {
   ManagementPermission,
@@ -89,10 +89,11 @@ interface AddDiscountResponse extends BoolResponse {
 }
 
 interface ViewStoreDiscountsPolicyResponse extends Response{
-  data: { policy: IPolicy;};
-
+  data: { policy: IDiscountPolicy;};
 }
-
+interface ViewStorePurchasePolicyResponse extends Response{
+  data: { policy: IPurchasePolicy;};
+}
 interface ViewRUserPurchasesHistoryRes extends Response {
   data: { result: boolean; receipts: IReceipt[] };
 }
@@ -138,4 +139,5 @@ export {
   ViewRUserPurchasesHistoryRes,
   ViewCartRes,
   ViewStoreDiscountsPolicyResponse,
+  ViewStorePurchasePolicyResponse
 };

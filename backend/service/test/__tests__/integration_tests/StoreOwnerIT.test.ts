@@ -6,7 +6,7 @@ import {
     IDiscount,
     IItem,
     IItem as ItemReq,
-    IPolicy,
+    IDiscountPolicy,
     IProduct as ProductReq,
     ProductWithQuantity
 } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
@@ -824,7 +824,7 @@ describe("Store Owner Integration Tests", () => {
             condition: [{condition: {minPay: 200}, operator: Operators.AND}]
         }
 
-        const policy: IPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}, {discount: simpleDiscount, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}, {discount: simpleDiscount, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: token

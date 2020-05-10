@@ -4,7 +4,7 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard, IPolicy
+    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 
@@ -109,6 +109,9 @@ interface AddDiscountRequest extends Request {
 interface ViewStoreDiscountsPolicyRequest extends Request {
     body: { storeName: string }
 }
+interface ViewStorePurchasePolicyRequest extends Request {
+    body: { storeName: string }
+}
 
 interface RemoveDiscountRequest extends Request {
     body: { storeName: string, catalogNumber: number, discountID: string }
@@ -210,11 +213,11 @@ interface VerifyNewCredentials extends Request {
 }
 
 interface SetDiscountsPolicyRequest extends Request {
-    body: { storeName: string, policy: IPolicy }
+    body: { storeName: string, policy: IDiscountPolicy }
 }
 
 interface SetPurchasePolicyRequest extends Request {
-    body: { policy: string }
+    body: { storeName: string, policy: IPurchasePolicy }
 }
 
 interface VerifyProductOnStock extends Request {
@@ -271,4 +274,5 @@ export {
     ViewManagerPermissionRequest,
     VerifyProducts,
     ViewStoreDiscountsPolicyRequest,
+    ViewStorePurchasePolicyRequest
 };

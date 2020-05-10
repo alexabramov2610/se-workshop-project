@@ -153,6 +153,9 @@ export const removeDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
     return ts.setPurchasePolicy(req);
 }
+export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse => {
+    return ts.viewPurchasePolicy(req);
+}
 
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return ts.setDiscountsPolicy(req);

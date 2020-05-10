@@ -16,7 +16,7 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount
+    IDiscountPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount, IPurchasePolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -540,7 +540,7 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
-    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IPolicy): Res.AddDiscountResponse {
+    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -548,7 +548,7 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
-    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IPolicy {
+    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IDiscountPolicy {
         const store: Store = this.findStoreByName(storeName);
         const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
         const children: Map<Discount, Operators> = discount.children;
@@ -557,9 +557,12 @@ export class StoreManagement {
             const iDiscount = this.convertDiscountToIDiscount(discount);
             discountInPolicy.push({discount: iDiscount, operator});
         }
-        const policy: IPolicy = {discounts: discountInPolicy}
+        const policy: IDiscountPolicy = {discounts: discountInPolicy}
 
         return policy;
+    }
+    getStorePurchasePolicy(user: RegisteredUser, storeName: string): IPurchasePolicy {
+        return {policy: []};
     }
 
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {

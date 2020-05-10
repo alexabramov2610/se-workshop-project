@@ -73,3 +73,13 @@ export enum NotificationsType {
     GREEN,
     ORANGE
 }
+
+export enum WeekDays {
+    SUNDAY = 1,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY
+}
