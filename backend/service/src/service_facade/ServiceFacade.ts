@@ -146,6 +146,10 @@ UC-4.2 discounts
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.setDiscountsPolicy));
 }
+
+export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.viewDiscountsPolicy));
+}
 export const addDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addDiscount));
 }
