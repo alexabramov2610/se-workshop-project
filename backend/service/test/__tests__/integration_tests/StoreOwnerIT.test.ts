@@ -1,10 +1,12 @@
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import {ManagementPermission, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {
+    IDiscount,
     IItem,
     IItem as ItemReq,
+    IPolicy,
     IProduct as ProductReq,
     ProductWithQuantity
 } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
@@ -796,6 +798,42 @@ describe("Store Owner Integration Tests", () => {
 
         })
 
+    });
+
+    it("set policy and view policy", () => {
+        const products: Product[] = [new Product("bamba", 1, 20, ProductCategory.GENERAL)]
+        utils.addNewProducts(storeName,products,token,true);
+        let items: IItem[] = [];
+        for (let i = 0; i < 5; i++ )
+            items = items.concat({catalogNumber: 1, id: i+1});
+        utils.addNewItems(storeName, items, token, true);
+
+        const startDate: Date = new Date()
+        const duration: number = 3;
+        const simpleDiscount: IDiscount = {
+            startDate,
+            duration,
+            products: [1],
+            percentage: 50,
+        }
+        const condDiscount: IDiscount = {
+            startDate,
+            duration,
+            products: [1,2],
+            percentage: 5,
+            condition: [{condition: {minPay: 200}, operator: Operators.AND}]
+        }
+
+        const policy: IPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}, {discount: simpleDiscount, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+            body: {storeName, policy},
+            token: token
+        }
+        const makeDiscountRes: Res.AddDiscountResponse = ServiceFacade.setDiscountsPolicy(setPolicyReq);
+
+        const req : Req.ViewStoreDiscountsPolicyRequest = {body: {storeName}, token:token};
+        const res: Res.ViewStoreDiscountsPolicyResponse = ServiceFacade.viewDiscountsPolicy(req);
+        expect(res.data.policy).toEqual(policy);
     });
 
 });

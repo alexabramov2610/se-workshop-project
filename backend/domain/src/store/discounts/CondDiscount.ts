@@ -83,7 +83,7 @@ export class CondDiscount extends Discount {
         const conditions:Condition[] = Array.from(this._conditions.keys());
         for(const c of conditions){
             if(c.getCatalogNumber() === catalogNumber){
-                return c.getMin();
+                return c.getMinAmount();
             }
         }
         return -1;

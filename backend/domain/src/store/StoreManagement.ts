@@ -16,13 +16,14 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy, IDiscountInPolicy
+    IPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
+import {CondDiscount} from "./discounts/CondDiscount";
 
 const logger = loggerW(__filename)
 
@@ -608,8 +609,43 @@ export class StoreManagement {
     }
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
-        // todo conidtios
-        return {startDate: discount.startDate, duration: discount.duration, percentage:discount.percentage,products: discount.productsInDiscount}
+        const condDiscount: CondDiscount = discount as CondDiscount;
+        let conditions: IConditionOfDiscount[];
+        if (condDiscount.conditions && condDiscount.conditions.size !== 0) {
+            conditions = [];
+            for (const [condition, operator] of condDiscount.conditions) {
+                const catalogNumber: number = condition.getCatalogNumber();
+                const minPay: number = condition.getMinPay();
+                const minAmount: number = condition.getMinAmount();
+                if (!minAmount && !minPay) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber
+                        }, operator
+                    })
+                } else if (minPay) {
+                    conditions.push({
+                        condition: {
+                            minPay
+                        }, operator
+                    })
+                } else if (minAmount) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber,
+                            minAmount
+                        }, operator
+                    })
+                }
+            }
+        }
+        return {
+            startDate: discount.startDate,
+            duration: discount.duration,
+            percentage: discount.percentage,
+            products: discount.productsInDiscount,
+            condition: conditions
+        }
 
     }
 
