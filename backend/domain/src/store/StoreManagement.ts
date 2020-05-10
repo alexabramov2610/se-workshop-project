@@ -16,11 +16,14 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy
+    IPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+import {Discount} from "./discounts/Discount";
+import {DiscountPolicy} from "./discounts/DiscountPolicy";
+import {CondDiscount} from "./discounts/CondDiscount";
 
 const logger = loggerW(__filename)
 
@@ -545,6 +548,20 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
+    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IPolicy {
+        const store: Store = this.findStoreByName(storeName);
+        const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
+        const children: Map<Discount, Operators> = discount.children;
+        const discountInPolicy: IDiscountInPolicy[] = [];
+        for (const [discount, operator] of children) {
+            const iDiscount = this.convertDiscountToIDiscount(discount);
+            discountInPolicy.push({discount: iDiscount, operator});
+        }
+        const policy: IPolicy = {discounts: discountInPolicy}
+
+        return policy;
+    }
+
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
@@ -591,6 +608,47 @@ export class StoreManagement {
 
     }
 
+    private convertDiscountToIDiscount(discount: Discount): IDiscount {
+        const condDiscount: CondDiscount = discount as CondDiscount;
+        let conditions: IConditionOfDiscount[];
+        if (condDiscount.conditions && condDiscount.conditions.size !== 0) {
+            conditions = [];
+            for (const [condition, operator] of condDiscount.conditions) {
+                const catalogNumber: number = condition.getCatalogNumber();
+                const minPay: number = condition.getMinPay();
+                const minAmount: number = condition.getMinAmount();
+                if (!minAmount && !minPay) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber
+                        }, operator
+                    })
+                } else if (minPay) {
+                    conditions.push({
+                        condition: {
+                            minPay
+                        }, operator
+                    })
+                } else if (minAmount) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber,
+                            minAmount
+                        }, operator
+                    })
+                }
+            }
+        }
+        return {
+            startDate: discount.startDate,
+            duration: discount.duration,
+            percentage: discount.percentage,
+            products: discount.productsInDiscount,
+            condition: conditions
+        }
+
+    }
+
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
         const products: Product[] = [];
         for (const productReq of productsReqs) {
@@ -608,4 +666,6 @@ export class StoreManagement {
         }
         return items;
     }
+
+
 }

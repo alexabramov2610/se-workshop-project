@@ -85,13 +85,8 @@ describe("Guest buy items, UC: 2.8", () => {
         _testCondDiscount2={startDate: new Date(), percentage: 50, duration: 5,                 // 50% on cola if
             products:[_testCola.catalogNumber],
             condition: [{condition: {catalogNumber: _testEggs.catalogNumber ,minAmount:1},operator: Operators.OR},  //buy eggs  OR   
-            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:2},operator:Operators.AND},                 // buy 2+ banana and milk 
+            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:1},operator:Operators.AND},                 // buy 2+ banana and milk
             {condition:{catalogNumber:_testMilk.catalogNumber,minAmount:1},operator:Operators.AND}]}
-
-
-
-        
-
 
         _serviceBridge.createStore(_testStore1);
         _serviceBridge.createStore(_testStore2);
@@ -303,9 +298,6 @@ describe("Guest buy items, UC: 2.8", () => {
 
         const expectedCharge=(2*_testCondDiscount2.percentage *_testCola.price/100) + (2*_testEggs.price);
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
-
-
-
         
     })
 
@@ -334,26 +326,5 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
 
     })
-
-
-        test('')
-
-    
-
-
-
-
-
-   
-
-
-
-
-
-
-
-        
-
-
 
 });
