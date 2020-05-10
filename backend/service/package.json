@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "tsc",
+    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/",
     "start": "tsc && node dist/index.js",
     "start:comp": "cd ../domain && tsc && cd ../service && tsc && node dist/index.js",
     "test": "jest --maxWorkers=1 --forceExit --detectOpenHandles",

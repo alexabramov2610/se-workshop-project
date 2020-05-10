@@ -1,19 +1,23 @@
 // const WebSocketServer = require('ws').Server;
 const url = require('url');
-var fs = require('fs');
+import fs from "fs";
+var path = require('path');
 
 const port = 3000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 
 // read ssl certificate
-var privateKey = fs.readFileSync('server.key', 'utf8');
-var certificate = fs.readFileSync('server.cert', 'utf8');
+// var privateKey = fs.readFileSync('./server.key', 'utf8');
+// var certificate = fs.readFileSync('./server.cert', 'utf8');
 
-var credentials = { key: privateKey, cert: certificate };
+// var credentials = { key: privateKey, cert: certificate };
 var https = require('https');
 
-var httpsServer = https.createServer(credentials);
+var httpsServer = https.createServer({
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.cert')
+});
 httpsServer.listen(port);
 
 var WebSocketServer = require('ws').Server;
@@ -71,6 +75,7 @@ function sendMessageTo(username, message) {
 async function terminate() {
     try {
         await socketServer.close();
+        await httpsServer.close();
     } catch (err) {
         console.log(err)
     }

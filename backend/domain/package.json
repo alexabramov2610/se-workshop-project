@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "tsc",
+    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/",
     "start": "tsc && node dist/index.js",
     "start:silent": "tsc && SILENT=1 node dist/index.js",
     "debug": "tsc && DEBUG=1 node dist/index.js ",
