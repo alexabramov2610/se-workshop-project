@@ -16,7 +16,8 @@ const logger = loggerW(__filename)
 
 export class UserManager {
     private registeredUsers: RegisteredUser[];
-    private loggedInUsers: Map<string, RegisteredUser>;
+    private loggedInUsers: Map<string, RegisteredUser>;                  // token -> user
+    private loggedInRegisteredUsers: Map<string, RegisteredUser>;        // username -> user
     private guests: Map<string, Guest>;
     private admins: Admin[];
     private _externalSystems: ExternalSystemsManager;
@@ -25,6 +26,7 @@ export class UserManager {
         this._externalSystems = externalSystems;
         this.registeredUsers = [];
         this.loggedInUsers = new Map<string, RegisteredUser>();
+        this.loggedInRegisteredUsers = new Map<string, RegisteredUser>();
         this.guests = new Map<string, Guest>();
         this.admins = [];
     }
@@ -55,6 +57,7 @@ export class UserManager {
         } else {
             logger.info(`${userName} has logged in  `);
             this.loggedInUsers = this.loggedInUsers.set(req.token, user);
+            this.loggedInRegisteredUsers = this.loggedInRegisteredUsers.set(req.body.username, user);
             user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
             return {data: {result: true}};
         }
@@ -62,6 +65,8 @@ export class UserManager {
 
     logout(req: Req.LogoutRequest): Res.BoolResponse {
         logger.debug(`logging out success`);
+        if (this.getLoggedInUserByToken(req.token) && this.loggedInRegisteredUsers.has(this.getLoggedInUserByToken(req.token).name))
+            this.loggedInRegisteredUsers.delete(this.getLoggedInUserByToken(req.token).name);
         this.loggedInUsers.delete(req.token)
         return {data: {result: true}}
     }
@@ -84,6 +89,10 @@ export class UserManager {
 
     getUserByName(name: string): RegisteredUser {
         return this.registeredUsers.filter((u) => u.name === name).pop();
+    }
+
+    getLoggedInUserByName(name: string): RegisteredUser {
+        return this.loggedInRegisteredUsers.get(name);
     }
 
     getUserByToken(token: string): User {

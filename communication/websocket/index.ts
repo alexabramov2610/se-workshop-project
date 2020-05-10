@@ -61,4 +61,12 @@ function setOnCloseEvent(func) {
     onCloseEvent = func;
 }
 
-export { sendMessageTo, terminate, setOnCloseEvent };
+function removeClient(username) {
+    if (LOGGED_IN_CLIENTS.has(username)) {
+        const client = LOGGED_IN_CLIENTS.get(username);
+        LOGGED_IN_CLIENTS.delete(username);
+        client.terminate();
+    }
+}
+
+export { sendMessageTo, terminate, setOnCloseEvent, removeClient };

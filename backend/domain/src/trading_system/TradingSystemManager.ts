@@ -72,21 +72,24 @@ export class TradingSystemManager {
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
-            if (this._userManager.getUserByName(req.body.username).pendingEvents.length === 0)
             this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
                 event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
             })
         }
+        else {
+            this._publisher.removeClient(req.body.username);
+        }
         return res;
     }
 
     logout(req: Req.LogoutRequest): Res.BoolResponse {
-        logger.info(`logging out user... `);
+        logger.info(`request received: logging out user... `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         const res: Res.BoolResponse = this._userManager.logout(req);
         if (res.data.result) {
             this._userManager.addGuestToken(req.token);
+            this._publisher.removeClient(user.name);
             if (user)
                 logger.info(`logged out user: ${user.name}`);
         }
@@ -94,7 +97,7 @@ export class TradingSystemManager {
     }
 
     forceLogout(username: string): void {
-        logger.info(`logging out user: ${username}... `);
+        logger.info(`socket disconnected, logging out user: ${username}... `);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);
         const req: Req.LogoutRequest = { body: {}, token};
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(token);
@@ -370,7 +373,7 @@ export class TradingSystemManager {
                     [storeName, buyer]), type: NotificationsType.GREEN};
             this._storeManager.findStoreByName(storeName).storeOwners.forEach(storeOwner => {
                 const event: Event.NewPurchaseEvent = { username: storeOwner.name, code: EventCode.NEW_PURCHASE, storeName: storeName, notification };
-                this._publisher.notify(event).forEach(userToNotify => {
+                this._publisher.notify(event).forEach(userToNotify => { // if didn't send
                     this._userManager.getUserByName(userToNotify).saveNotification(event);
                 });
             });

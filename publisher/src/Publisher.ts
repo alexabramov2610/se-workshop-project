@@ -5,7 +5,7 @@ import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { terminate, setOnCloseEvent } from "websocket";
+import { terminate, setOnCloseEvent, removeClient } from "websocket";
 
 export class Publisher {
 
@@ -248,4 +248,7 @@ export class Publisher {
         await terminate()
     }
 
+    removeClient(username) {
+        removeClient(username);
+    }
 }
