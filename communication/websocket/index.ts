@@ -1,13 +1,31 @@
-const WebSocketServer = require('ws').Server;
+// const WebSocketServer = require('ws').Server;
 const url = require('url');
+var fs = require('fs');
 
 const port = 3000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 
-let socketServer = new WebSocketServer({port: port});
+// read ssl certificate
+var privateKey = fs.readFileSync('server.key', 'utf8');
+var certificate = fs.readFileSync('server.cert', 'utf8');
+
+var credentials = { key: privateKey, cert: certificate };
+var https = require('https');
+
+var httpsServer = https.createServer(credentials);
+httpsServer.listen(port);
+
+var WebSocketServer = require('ws').Server;
+var socketServer = new WebSocketServer({
+    server: httpsServer
+});
+
+
+// let socketServer = new WebSocketServer({port: port});
 if (process.env.NODE_ENV == "development")
     console.log(`WebSocket running on port ${port}`);
+console.log(`WebSocket running on port ${port}`);
 
 socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
     const username = url.parse(req.url, true).query.name;
