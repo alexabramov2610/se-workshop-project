@@ -5,7 +5,10 @@ const router = express.Router();
 
 router.post("/newtoken", SystemControllers.startNewSession);
 router.post("/init", SystemControllers.systemInit);
-// router.post("/test", SystemControllers.test);
+router.post("/isLoggedIn", SystemControllers.isLoggedIn);
+
+
+router.get("/status/", SystemControllers.getIsSystemUp);      // usage: stores/status
 
 
 export default router;

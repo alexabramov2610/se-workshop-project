@@ -51,7 +51,7 @@ export class TradingSystemManager {
         return {data: {result: true}};
     }
 
-    getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
+    getTradeSystemState(): Res.TradingSystemStateResponse {
         return {data: {state: this.state}};
     }
 
@@ -534,4 +534,8 @@ export class TradingSystemManager {
         return this._storeManager.getAllCategoriesInStore(storeName);
     }
 
+    isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        return { data: { username: user ? user.name : "undefined" } }
+    }
 }

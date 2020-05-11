@@ -233,17 +233,23 @@ export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.Ge
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
     return runIfOpen(req, StoreService.getStoresWithOffset);
 }
-
 export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
     return runIfOpen(req, StoreService.getAllProductsInStore);
 }
-
 export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
     return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
+export const isSystemUp = (): Res.BoolResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return { data: { result: tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
+}
 
+export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
+    return runIfOpen(req, UserService.isLoggedInUser);
+}
 
 /*
 Utils
@@ -256,7 +262,7 @@ export const startNewSession = (): string => {
 }
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.getTradeSystemState(isOpenReq).data.state !== Enums.TradingSystemState.OPEN)
+    if (tradingSystem.getTradeSystemState().data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req);
 }

@@ -129,8 +129,12 @@ interface GetAllCategoriesInStoreResponse extends Response {
   data: { categories: ProductCategory[] }
 }
 
+interface GetLoggedInUserResponse extends Response {
+  data: { username: string }
+}
 
 export {
+  GetLoggedInUserResponse,
   GetAllProductsInStoreResponse,
   GetAllCategoriesInStoreResponse,
   GetStoresWithOffsetResponse,
