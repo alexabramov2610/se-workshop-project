@@ -79,7 +79,7 @@ describe("Store Management Unit Tests", () => {
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(true);
-        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.OPEN);
+        expect(tradingSystemManager.getTradeSystemState().data.state).toBe(TradingSystemState.OPEN);
     });
 
     test("OpenTradeSystem - Fail, no session", () => {
@@ -92,7 +92,7 @@ describe("Store Management Unit Tests", () => {
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(false);
-        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.CLOSED);
+        expect(tradingSystemManager.getTradeSystemState().data.state).toBe(TradingSystemState.CLOSED);
     });
 
     test("OpenTradeSystem - Fail, not admin", () => {
@@ -105,7 +105,7 @@ describe("Store Management Unit Tests", () => {
         const res: Res.BoolResponse = tradingSystemManager.openTradeSystem(req);
 
         expect(res.data.result).toBe(false);
-        expect(tradingSystemManager.getTradeSystemState(req).data.state).toBe(TradingSystemState.CLOSED);
+        expect(tradingSystemManager.getTradeSystemState().data.state).toBe(TradingSystemState.CLOSED);
     });
 
 

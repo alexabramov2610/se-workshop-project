@@ -46,7 +46,8 @@ const errorMsg:ErrorMessages = {
     E_MANGER_NOT_EXISTS:"This user not manager in this store.",
     E_EMPTY_CART:"The cart is empty",
     E_MODIFY_DISCOUNT:"Modify discount failed",
-    E_USER_EXISTS:"User name is already taken"
+    E_USER_EXISTS:"User name is already taken",
+    E_INVALID_PARAM: "Invalid parameters"
 
 
 

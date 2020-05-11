@@ -16,9 +16,9 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IDiscountPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount, IPurchasePolicy
+    IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount, IPurchasePolicy, StoreInfo
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
@@ -29,6 +29,7 @@ const logger = loggerW(__filename)
 
 export class StoreManagement {
     private readonly _stores: Store[];
+    private _storeByStoreName: Map<string, Store>;
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _externalSystems: ExternalSystemsManager;
@@ -38,12 +39,14 @@ export class StoreManagement {
         this._stores = [];
         this._storeManagerAssigners = new Map();
         this._storeOwnerAssigners = new Map();
+        this._storeByStoreName = new Map();
     }
 
     addStore(storeName: string, description: string, owner: RegisteredUser): Res.BoolResponse {
         const newStore = new Store(storeName, description);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
+        this._storeByStoreName.set(newStore.storeName, newStore);
         logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
         return {data: {result: true}}
     }
@@ -561,6 +564,7 @@ export class StoreManagement {
 
         return policy;
     }
+
     getStorePurchasePolicy(user: RegisteredUser, storeName: string): IPurchasePolicy {
         return {policy: []};
     }
@@ -610,6 +614,62 @@ export class StoreManagement {
             }
 
     }
+
+    getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
+        const storeInfos: StoreInfo[] = [];
+        if (limit <= 0 || offset < 0 || offset >= this._stores.length)
+            return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
+
+        const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
+
+        while (offset < maxIndex) {
+            storeInfos.push(this._stores[offset].viewStoreInfo().data.info);
+            offset++;
+        }
+
+        return {data: {stores: storeInfos}};
+    }
+
+    getAllProductsInStore(storeName: string): Res.GetAllProductsInStoreResponse {
+        const productInStore: ProductInStore[] = [];
+        if (!this._storeByStoreName.has(storeName))
+            return {data: {products: []}};
+
+        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        let currProd: Product = prodIterator.next().value;
+        while (currProd) {
+            const currProductInStore: ProductInStore = {
+                storeName,
+                product: {
+                    catalogNumber: currProd.catalogNumber,
+                    price: currProd.price,
+                    name: currProd.name,
+                    category: currProd.category,
+                    rating: currProd.rating
+                }
+            }
+            productInStore.push(currProductInStore);
+            currProd = prodIterator.next().value;
+        }
+
+        return {data: {products: productInStore}};
+    }
+
+    getAllCategoriesInStore(storeName: string): Res.GetAllCategoriesInStoreResponse {
+        const categoriesInStore: ProductCategory[] = [];
+        if (!this._storeByStoreName.has(storeName))
+            return {data: {categories: []}};
+
+        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        let currProd: Product = prodIterator.next().value;
+        while (currProd) {
+            categoriesInStore.push(currProd.category);
+            currProd = prodIterator.next().value;
+        }
+
+        return {data: {categories: categoriesInStore}};
+    }
+
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;

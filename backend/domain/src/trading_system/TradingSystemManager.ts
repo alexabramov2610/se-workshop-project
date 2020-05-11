@@ -51,7 +51,7 @@ export class TradingSystemManager {
         return {data: {result: true}};
     }
 
-    getTradeSystemState(req: Req.Request): Res.TradingSystemStateResponse {
+    getTradeSystemState(): Res.TradingSystemStateResponse {
         return {data: {state: this.state}};
     }
 
@@ -521,8 +521,27 @@ export class TradingSystemManager {
         await this._publisher.terminateSocket();
     }
 
-    // getSocket():any {
-    //     return this._publisher.socket;
-    // }
+    getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse {
+        logger.info(`getStoresWithOffset request`)
+        const limit: number = req.body.limit;
+        const offset: number = req.body.offset;
+        return this._storeManager.getStoresWithOffset(+limit, +offset);
+    }
 
+    getAllProductsInStore(req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse {
+        logger.info(`getAllProductsInStore request`)
+        const storeName: string = req.body.storeName;
+        return this._storeManager.getAllProductsInStore(storeName);
+    }
+
+    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse {
+        logger.info(`getAllCategoriesInStore request`)
+        const storeName: string = req.body.storeName;
+        return this._storeManager.getAllCategoriesInStore(storeName);
+    }
+
+    isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        return { data: { username: user ? user.name : "undefined" } }
+    }
 }

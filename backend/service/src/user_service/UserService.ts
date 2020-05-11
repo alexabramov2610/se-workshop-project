@@ -62,3 +62,7 @@ export const viewCart = (req: Req.ViewCartReq): Res.ViewCartRes => {
 export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes => {
     return ts.viewRegisteredUserPurchasesHistory(req);
 }
+
+export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
+    return ts.isLoggedInUserByToken(req);
+}

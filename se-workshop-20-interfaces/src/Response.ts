@@ -117,7 +117,28 @@ interface ViewManagerPermissionResponse extends BoolResponse {
 interface DeliveryResponse extends BoolResponse {
   data: {result: boolean,  deliveryID?: string}
 }
+
+interface GetStoresWithOffsetResponse extends Response {
+  data: { stores: StoreInfo[] }
+}
+
+interface GetAllProductsInStoreResponse extends Response {
+  data: { products: ProductInStore[] }
+}
+
+interface GetAllCategoriesInStoreResponse extends Response {
+  data: { categories: ProductCategory[] }
+}
+
+interface GetLoggedInUserResponse extends Response {
+  data: { username: string }
+}
+
 export {
+  GetLoggedInUserResponse,
+  GetAllProductsInStoreResponse,
+  GetAllCategoriesInStoreResponse,
+  GetStoresWithOffsetResponse,
   DeliveryResponse,
   AddDiscountResponse,
   PaymentResponse,
