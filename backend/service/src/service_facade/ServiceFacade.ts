@@ -234,6 +234,16 @@ export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.Ge
     return runIfOpen(req, StoreService.getStoresWithOffset);
 }
 
+export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, StoreService.getAllProductsInStore);
+}
+
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, StoreService.getAllCategoriesInStore);
+}
+
 
 /*
 Utils

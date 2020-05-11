@@ -161,10 +161,6 @@ export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): R
     return ts.viewDiscountsPolicy(req);
 }
 
-export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
-    return ts.getStoresWithOffset(req);
-}
-
 const verifyPermission = (storeName: string, permission: ManagementPermission, token: string): Res.BoolResponse => {
     return ts.verifyStorePermission({
         body: {
@@ -172,4 +168,16 @@ const verifyPermission = (storeName: string, permission: ManagementPermission, t
             permission
         }, token
     })
+}
+
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    return ts.getStoresWithOffset(req);
+}
+
+export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
+    return ts.getAllProductsInStore(req);
+}
+
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+    return ts.getAllCategoriesInStore(req);
 }

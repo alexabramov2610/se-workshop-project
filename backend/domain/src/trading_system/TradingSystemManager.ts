@@ -521,4 +521,17 @@ export class TradingSystemManager {
         const offset: number = req.body.offset;
         return this._storeManager.getStoresWithOffset(+limit, +offset);
     }
+
+    getAllProductsInStore(req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse {
+        logger.info(`getAllProductsInStore request`)
+        const storeName: string = req.body.storeName;
+        return this._storeManager.getAllProductsInStore(storeName);
+    }
+
+    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse {
+        logger.info(`getAllCategoriesInStore request`)
+        const storeName: string = req.body.storeName;
+        return this._storeManager.getAllCategoriesInStore(storeName);
+    }
+
 }
