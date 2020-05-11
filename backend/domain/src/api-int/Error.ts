@@ -47,7 +47,8 @@ const errorMsg:ErrorMessages = {
     E_EMPTY_CART:"The cart is empty",
     E_MODIFY_DISCOUNT:"Modify discount failed",
     E_USER_EXISTS:"User name is already taken",
-    E_INVALID_PARAM: "Invalid parameters"
+    E_INVALID_PARAM: "Invalid parameters",
+    SET_POLICY_FAILED: "Set policy failed!"
 
 
 
