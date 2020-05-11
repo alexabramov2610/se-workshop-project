@@ -21,10 +21,6 @@ import {BuyingTypes, Operators, ManagementPermission, Rating} from "se-workshop-
 import {ShownDiscount} from "./discounts/ShownDiscount";
 import {CondDiscount} from "./discounts/CondDiscount";
 import {Discount} from "./discounts/Discount";
-import {CondStoreDiscount} from "./discounts/CondStoreDiscount";
-import {IfThenDiscount} from "./discounts/IfThenDiscount";
-import {LogicDiscount} from "./discounts/LogicDiscount";
-import {IfLeaf} from "./discounts/IfLeaf";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {Condition} from "./discounts/conditions/Condition";
 import {MinPayCondition} from "./discounts/conditions/MinPayCondition";
@@ -569,5 +565,10 @@ export class Store {
 
     get storeOwners(): StoreOwner[] {
         return this._storeOwners;
+    }
+
+
+    get discountPolicy(): Discount {
+        return this._discountPolicy;
     }
 }

@@ -157,6 +157,13 @@ export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolRe
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return ts.setDiscountsPolicy(req);
 }
+export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
+    return ts.viewDiscountsPolicy(req);
+}
+
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    return ts.getStoresWithOffset(req);
+}
 
 const verifyPermission = (storeName: string, permission: ManagementPermission, token: string): Res.BoolResponse => {
     return ts.verifyStorePermission({

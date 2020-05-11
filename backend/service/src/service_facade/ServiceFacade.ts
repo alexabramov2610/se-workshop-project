@@ -146,6 +146,10 @@ UC-4.2 discounts
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.setDiscountsPolicy));
 }
+
+export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.viewDiscountsPolicy));
+}
 export const addDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addDiscount));
 }
@@ -222,6 +226,13 @@ export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolRe
     return runIfOpen(req, runIfLoggedIn(StoreService.setPurchasePolicy));
 }
 
+/*
+Additional req from FE
+ */
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, StoreService.getStoresWithOffset);
+}
 
 
 /*
@@ -262,15 +273,21 @@ const runIfLoggedIn = (fn: any): any => {
     return f;
 }
 
+export {tradingSystem}
 
 
-// --------------------------------- testing socket
-import {t1, t2} from "../testSocket";
+
+
+
+/** --------------------------------- testing --------------------------------- */
+import {t1, t2, t3} from "../testSocket";
 export const test1 = () : any => {
     t1();
 }
 export const test2 = () : any => {
     t2();
 }
+export const test3 = () : any => {
+    t3();
+}
 
-export {tradingSystem}

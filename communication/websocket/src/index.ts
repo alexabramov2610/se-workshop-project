@@ -1,11 +1,34 @@
-const WebSocketServer = require('ws').Server;
+// const WebSocketServer = require('ws').Server;
 const url = require('url');
+import fs from "fs";
+var path = require('path');
 
 const port = 3000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 
-let socketServer = new WebSocketServer({port: port});
+// read ssl certificate
+// var privateKey = fs.readFileSync('./server.key', 'utf8');
+// var certificate = fs.readFileSync('./server.cert', 'utf8');
+
+// var credentials = { key: privateKey, cert: certificate };
+var https = require('https');
+
+var httpsServer = https.createServer({
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.cert')
+});
+httpsServer.listen(port);
+
+var WebSocketServer = require('ws').Server;
+var socketServer = new WebSocketServer({
+    server: httpsServer
+});
+
+
+// let socketServer = new WebSocketServer({port: port});
+if (process.env.NODE_ENV == "development")
+    console.log(`WebSocket running on port ${port}`);
 console.log(`WebSocket running on port ${port}`);
 
 socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
@@ -16,7 +39,7 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
         socketClient.send(`hola ${username}`);
     }
     socketClient.on(('message'), (data) => {
-        socketClient.send(`message back to ${username? username: ""}`);
+        socketClient.send(`message back to ${username ? username : ""}`);
     });
 
     socketClient.on('close', () => {
@@ -52,7 +75,8 @@ function sendMessageTo(username, message) {
 async function terminate() {
     try {
         await socketServer.close();
-    } catch(err) {
+        await httpsServer.close();
+    } catch (err) {
         console.log(err)
     }
 }
@@ -61,4 +85,12 @@ function setOnCloseEvent(func) {
     onCloseEvent = func;
 }
 
-export { sendMessageTo, terminate, setOnCloseEvent };
+function removeClient(username) {
+    if (LOGGED_IN_CLIENTS.has(username)) {
+        const client = LOGGED_IN_CLIENTS.get(username);
+        LOGGED_IN_CLIENTS.delete(username);
+        client.terminate();
+    }
+}
+
+export { sendMessageTo, terminate, setOnCloseEvent, removeClient };

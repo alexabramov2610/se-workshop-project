@@ -106,6 +106,9 @@ interface AddDiscountRequest extends Request {
     body: { storeName: string, discount: IDiscount }
 }
 
+interface ViewStoreDiscountsPolicyRequest extends Request {
+    body: { storeName: string }
+}
 
 interface RemoveDiscountRequest extends Request {
     body: { storeName: string, catalogNumber: number, discountID: string }
@@ -222,7 +225,12 @@ interface VerifyStorePermission extends Request {
     body: { storeName: string, permission: ManagementPermission }
 }
 
+interface GetStoresWithOffsetRequest extends Request {
+    body: { offset: number, limit: number }
+}
+
 export {
+    GetStoresWithOffsetRequest,
     VerifyStorePermission,
     VerifyProductOnStock,
     VerifyNewCredentials,
@@ -267,4 +275,5 @@ export {
     ViewCartReq,
     ViewManagerPermissionRequest,
     VerifyProducts,
+    ViewStoreDiscountsPolicyRequest,
 };

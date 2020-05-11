@@ -297,3 +297,115 @@ export function t2 (){
 
 
 }
+export function t3 (){
+    // prepare
+    const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
+    const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
+    const buyer3: RegisteredUser = new RegisteredUser("buyer3", "buyer2password");
+    const buyer4: RegisteredUser = new RegisteredUser("buyer4", "buyer2password");
+    const buyer5: RegisteredUser = new RegisteredUser("buyer5", "buyer2password");
+    const buyer6: RegisteredUser = new RegisteredUser("buyer6", "buyer2password");
+    const buyer7: RegisteredUser = new RegisteredUser("buyer7", "buyer2password");
+    const buyer8: RegisteredUser = new RegisteredUser("buyer8", "buyer2password");
+    const buyer9: RegisteredUser = new RegisteredUser("buyer9", "buyer2password");
+    const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
+
+    const storeName1: string = "store1";
+    const storeName2: string = "store2";
+    const storeName3: string = "store3";
+    const storeName4: string = "store4";
+    const storeName5: string = "store5";
+    const storeName6: string = "store6";
+    const storeName7: string = "store7";
+    const storeName8: string = "store8";
+    const storeName9: string = "store9";
+    const storeName10: string = "store10";
+
+
+    const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
+    const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
+    const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
+    const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
+
+    const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
+    const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
+    const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
+    const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
+
+    const products: Product[] = [prod1, prod2, prod3, prod4];
+    const items: IItem[] = [item1, item2, item3, item4];
+
+    systemInit();
+
+
+    // store 1
+    token = initSessionRegisterLogin(buyer1.name, buyer1.password);
+    createStore(storeName1, token);
+    addNewProducts(storeName1, products, token, true);
+    addNewItems(storeName1, items, token, true);
+
+    // store 2
+    registerUser(buyer2.name, buyer2.password, token, true);
+    loginUser(buyer2.name, buyer2.password, token, false);
+    createStore(storeName2, token);
+    addNewProducts(storeName2, products, token, true);
+    addNewItems(storeName2, items, token, true);
+
+    // store 3
+    registerUser(buyer3.name, buyer3.password, token, true);
+    loginUser(buyer3.name, buyer3.password, token, false);
+    createStore(storeName3, token);
+    addNewProducts(storeName3, products, token, true);
+    addNewItems(storeName3, items, token, true);
+
+    // store 4
+    registerUser(buyer4.name, buyer4.password, token, true);
+    loginUser(buyer4.name, buyer4.password, token, false);
+    createStore(storeName4, token);
+    addNewProducts(storeName4, products, token, true);
+    addNewItems(storeName4, items, token, true);
+
+    // store 5
+    registerUser(buyer5.name, buyer5.password, token, true);
+    loginUser(buyer5.name, buyer5.password, token, false);
+    createStore(storeName5, token);
+    addNewProducts(storeName5, products, token, true);
+    addNewItems(storeName5, items, token, true);
+
+    // store 6
+    registerUser(buyer6.name, buyer6.password, token, true);
+    loginUser(buyer6.name, buyer6.password, token, false);
+    createStore(storeName6, token);
+    addNewProducts(storeName6, products, token, true);
+    addNewItems(storeName6, items, token, true);
+
+    // store 7
+    registerUser(buyer7.name, buyer7.password, token, true);
+    loginUser(buyer7.name, buyer7.password, token, false);
+    createStore(storeName7, token);
+    addNewProducts(storeName7, products, token, true);
+    addNewItems(storeName7, items, token, true);
+
+    // store 8
+    registerUser(buyer8.name, buyer8.password, token, true);
+    loginUser(buyer8.name, buyer8.password, token, false);
+    createStore(storeName8, token);
+    addNewProducts(storeName8, products, token, true);
+    addNewItems(storeName8, items, token, true);
+
+    // store 9
+    registerUser(buyer9.name, buyer9.password, token, true);
+    loginUser(buyer9.name, buyer9.password, token, false);
+    createStore(storeName9, token);
+    addNewProducts(storeName9, products, token, true);
+    addNewItems(storeName9, items, token, true);
+
+    // store 10
+    registerUser(buyer10.name, buyer10.password, token, true);
+    loginUser(buyer10.name, buyer10.password, token, false);
+    createStore(storeName10, token);
+    addNewProducts(storeName10, products, token, true);
+    addNewItems(storeName10, items, token, true);
+
+    console.log(token)
+}

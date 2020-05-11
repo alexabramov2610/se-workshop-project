@@ -40,4 +40,9 @@ export class DiscountPolicy extends Discount {
     isComposite(): boolean {
         return true;
     }
+
+
+    get children(): Map<Discount, Operators> {
+        return this._children;
+    }
 }
