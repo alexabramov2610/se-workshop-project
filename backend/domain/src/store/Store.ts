@@ -539,7 +539,6 @@ export class Store {
                 isValid: false, error
             }
         }
-
     }
 
     private getStoreOwnerByName(username: string): StoreOwner {

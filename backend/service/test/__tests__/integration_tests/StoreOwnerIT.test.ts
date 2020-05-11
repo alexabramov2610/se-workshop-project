@@ -1,7 +1,7 @@
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory, WeekDays} from "se-workshop-20-interfaces/dist/src/Enums";
 import {
     IDiscount,
     IItem,
@@ -852,10 +852,15 @@ describe("Store Owner Integration Tests", () => {
         const simplePolicy2: ISimplePurchasePolicy = {
             bagPolicy:{minAmount: 2, maxAmount:3}
         }
+        const simplePolicy3: ISimplePurchasePolicy = {
+            systemPolicy:{notForSellDays:[WeekDays.FRIDAY]}
+        }
+        const simplePolicy4: ISimplePurchasePolicy = {
+            userPolicy:{countries: ["israel"]}
+        }
 
 
-
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND},{policy: simplePolicy3, operator: Operators.XOR}, {policy: simplePolicy4, operator: Operators.AND}]}
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: token
