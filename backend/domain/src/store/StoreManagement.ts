@@ -16,7 +16,7 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount
+    IPolicy, IDiscountInPolicy, ICondition, IConditionOfDiscount, StoreInfo
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -607,6 +607,23 @@ export class StoreManagement {
             }
 
     }
+
+    getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
+        let storeInfos: StoreInfo[] = [];
+        if (limit <= 0 || offset < 0 || offset >= this._stores.length)
+            return { data: { stores: [] }, error: {message: errorMsg.E_INVALID_PARAM} };
+
+        const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
+
+        while (offset < maxIndex) {
+            storeInfos.push(this._stores[offset].viewStoreInfo().data.info);
+            offset++;
+        }
+
+        return { data: { stores: storeInfos } };
+    }
+
+
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;

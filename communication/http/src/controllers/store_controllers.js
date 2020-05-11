@@ -1,5 +1,5 @@
 import {ServiceFacade} from "service_layer"
-import {wrapHttp} from "./http_request_wrapper";
+import {invalidRes, wrapHttp} from "./http_request_wrapper";
 
 /*
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"username": "tnewusername", "password": "newuser"}, "token": "a8658714-a66b-45c7-9c40-cc9bb6f188dd"}'   http://localhost:4000/users/register
@@ -127,4 +127,14 @@ export async function viewStorePurchasesHistory(req,res) {
 export async function setPurchasePolicy(req,res) {
     const result = wrapHttp(req.body, ServiceFacade.setPurchasePolicy);
     return res.send(result)
+}
+
+export async function getStoresWithLimit(req, res) {
+    try {
+        const getStoresWithLimitReq = { body: { offset: req.query.offset, limit: req.query.limit } };
+        const result = wrapHttp(getStoresWithLimitReq, ServiceFacade.getStoresWithOffset);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
 }

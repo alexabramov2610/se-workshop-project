@@ -515,8 +515,10 @@ export class TradingSystemManager {
         await this._publisher.terminateSocket();
     }
 
-    // getSocket():any {
-    //     return this._publisher.socket;
-    // }
-
+    getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse {
+        logger.info(`getStoresWithOffset request`)
+        const limit: number = req.body.limit;
+        const offset: number = req.body.offset;
+        return this._storeManager.getStoresWithOffset(+limit, +offset);
+    }
 }

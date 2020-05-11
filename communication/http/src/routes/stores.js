@@ -31,7 +31,7 @@ router.post("/viewStorePurchasesHistory", StoreController.viewStorePurchasesHist
 router.post("/setPurchasePolicy", StoreController.setPurchasePolicy);
 
 
-router.get("/", (req, res) => res.send('Hello World!'));
-router.get("/:storeName", (req, res) => res.send('Hello World!'));
+router.get("/", (req, res) => res.send('Hello World! -> /'));
+router.get("/getStores/", StoreController.getStoresWithLimit);      // usage: stores/getStores?offset=2&limit=3
 
 export default router;

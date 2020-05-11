@@ -225,7 +225,12 @@ interface VerifyStorePermission extends Request {
     body: { storeName: string, permission: ManagementPermission }
 }
 
+interface GetStoresWithOffsetRequest extends Request {
+    body: { offset: number, limit: number }
+}
+
 export {
+    GetStoresWithOffsetRequest,
     VerifyStorePermission,
     VerifyProductOnStock,
     VerifyNewCredentials,

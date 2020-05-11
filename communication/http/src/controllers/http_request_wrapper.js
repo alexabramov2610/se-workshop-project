@@ -1,4 +1,4 @@
-const invalidRes = { data: "", error: "invalid request" }
+export const invalidRes = { data: "", error: "invalid request" }
 
 export const wrapHttp = (req, fn) => {
     try {
