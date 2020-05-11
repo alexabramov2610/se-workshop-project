@@ -161,6 +161,9 @@ export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): R
     return ts.viewDiscountsPolicy(req);
 }
 
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    return ts.getStoresWithOffset(req);
+}
 
 const verifyPermission = (storeName: string, permission: ManagementPermission, token: string): Res.BoolResponse => {
     return ts.verifyStorePermission({

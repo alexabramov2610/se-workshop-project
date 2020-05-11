@@ -10,3 +10,8 @@ export async function test2(req,res) {
     const result = wrapHttp(req.body, ServiceFacade.test2);
     return res.send(result)
 }
+
+export async function test3(req,res) {
+    const result = wrapHttp(req.body, ServiceFacade.test3);
+    return res.send(result)
+}
