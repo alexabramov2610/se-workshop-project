@@ -138,3 +138,23 @@ export async function getStoresWithLimit(req, res) {
         return res.send(invalidRes);
     }
 }
+
+export async function getAllProductsInStore(req, res) {
+    try {
+        const getAllProductsReq = { body: { storeName: req.query.storeName } };
+        const result = wrapHttp(getAllProductsReq, ServiceFacade.getAllProductsInStore);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
+
+export async function getAllCategoriesInStore(req, res) {
+    try {
+        const getAllCategoriesReq = { body: { storeName: req.query.storeName } };
+        const result = wrapHttp(getAllCategoriesReq, ServiceFacade.getAllCategoriesInStore);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}

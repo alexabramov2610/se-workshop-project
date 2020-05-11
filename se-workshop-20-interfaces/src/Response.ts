@@ -121,7 +121,18 @@ interface GetStoresWithOffsetResponse extends Response {
   data: { stores: StoreInfo[] }
 }
 
+interface GetAllProductsInStoreResponse extends Response {
+  data: { products: ProductInStore[] }
+}
+
+interface GetAllCategoriesInStoreResponse extends Response {
+  data: { categories: ProductCategory[] }
+}
+
+
 export {
+  GetAllProductsInStoreResponse,
+  GetAllCategoriesInStoreResponse,
   GetStoresWithOffsetResponse,
   DeliveryResponse,
   AddDiscountResponse,
