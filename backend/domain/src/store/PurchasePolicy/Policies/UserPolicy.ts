@@ -1,13 +1,15 @@
 import {PurchasePolicy} from "../PurchasePolicy";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {RegisteredUser} from "../../../user/users/RegisteredUser";
 
 export class UserPolicy extends PurchasePolicy {
-    private _country: string;
+    private _countries: string[];
 
 
-    public constructor(catalogNumber: number, minAmount: number, maxAmount: number) {
+    public constructor(countries: string[]) {
         super()
+        this._countries = countries;
     }
 
 
@@ -24,12 +26,15 @@ export class UserPolicy extends PurchasePolicy {
         return false;
     }
 
-    isSatisfied(bagItems: BagItem[]): boolean {
+    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
         return true;
+    }
+    public getPolicyTag():string{
+        return "user";
     }
 
 
-
-
-
+    get countries(): string[] {
+        return this._countries;
+    }
 }

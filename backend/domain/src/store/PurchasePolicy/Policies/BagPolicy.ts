@@ -1,6 +1,7 @@
 import {PurchasePolicy} from "../PurchasePolicy";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {RegisteredUser} from "../../../user/users/RegisteredUser";
 
 export class BagPolicy extends PurchasePolicy {
     private _minAmount: number;
@@ -25,8 +26,19 @@ export class BagPolicy extends PurchasePolicy {
         return false;
     }
 
-    isSatisfied(bagItems: BagItem[]): boolean {
+    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
         return true;
     }
+    public getPolicyTag():string{
+        return "bag";
+    }
 
+
+    get minAmount(): number {
+        return this._minAmount;
+    }
+
+    get maxAmount(): number {
+        return this._maxAmount;
+    }
 }

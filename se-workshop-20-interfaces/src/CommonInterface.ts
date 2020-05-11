@@ -106,7 +106,7 @@ export interface ICondition {
 // *******************START PURCHASE POLICY************************** //
 
 export interface IProductPurchasePolicy {
-    products: number[];
+    catalogNumber: number;
     minAmount: number;
     maxAmount: number;
 }

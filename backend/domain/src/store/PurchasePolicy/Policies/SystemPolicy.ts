@@ -1,6 +1,7 @@
 import {PurchasePolicy} from "../PurchasePolicy";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators, WeekDays} from "se-workshop-20-interfaces/dist/src/Enums";
+import {RegisteredUser} from "../../../user/users/RegisteredUser";
 
 export class SystemPolicy extends PurchasePolicy {
     private _notForSellDays: WeekDays[];
@@ -22,8 +23,15 @@ export class SystemPolicy extends PurchasePolicy {
         return false;
     }
 
-    isSatisfied(bagItems: BagItem[]): boolean {
+    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
         return true;
     }
+    public getPolicyTag():string{
+        return "system";
+    }
 
+
+    get notForSellDays(): WeekDays[] {
+        return this._notForSellDays;
+    }
 }

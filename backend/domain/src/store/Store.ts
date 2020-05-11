@@ -8,7 +8,7 @@ import {
     BagItem, ICondition, IConditionOfDiscount,
     IDiscount, IDiscountInPolicy,
     IPayment,
-    IProduct as ProductReq,
+    IProduct as ProductReq, IPurchasePolicyElement, ISimplePurchasePolicy,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
@@ -25,6 +25,12 @@ import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {Condition} from "./discounts/conditions/Condition";
 import {MinPayCondition} from "./discounts/conditions/MinPayCondition";
 import {MinAmountCondition} from "./discounts/conditions/MinAmountCondition";
+import {PurchasePolicy} from "./PurchasePolicy/PurchasePolicy";
+import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
+import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
+import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
+import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
+import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 
 const logger = loggerW(__filename)
 
@@ -36,13 +42,11 @@ interface ProductValidator {
 export class Store {
     private readonly _UUID: string;
     private readonly _storeName: string;
-    private _storeOwners: StoreOwner[];
     private _storeManagers: StoreManager[];
     private _receipts: Receipt[];
     private _contactUsMessages: ContactUsMessage[];
     private _firstOwner: StoreOwner;
-    private _discountPolicy: Discount;
-    private _buyingTypes: BuyingTypes[];
+    private _purchasePolicy: PurchasePolicy;
 
     constructor(storeName: string, description) {
         this._UUID = uuid();
@@ -54,7 +58,19 @@ export class Store {
         this._receipts = [];
         this._rating = Rating.MEDIUM;
         this._discountPolicy = new DiscountPolicy();
-        this._buyingTypes = [BuyingTypes.IMMEDIATE_PURCHASE]
+        this._purchasePolicy = new PurchasePolicyImpl();
+    }
+
+    private _storeOwners: StoreOwner[];
+
+    get storeOwners(): StoreOwner[] {
+        return this._storeOwners;
+    }
+
+    private _discountPolicy: Discount;
+
+    get discountPolicy(): Discount {
+        return this._discountPolicy;
     }
 
     private _description: string;
@@ -434,13 +450,16 @@ export class Store {
         */
     }
 
-
     addDiscount(discount: IDiscount): string {
         let newDiscount: Discount;
         if (!discount.condition && !discount.coupon) {
             newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration, discount.products)
         }
         return newDiscount.id;
+    }
+
+    get purchasePolicy(): PurchasePolicy {
+        return this._purchasePolicy;
     }
 
     removeDiscount(catalogNumber: number, discountID: string): boolean {
@@ -453,8 +472,10 @@ export class Store {
         const newPolicy: Discount = new DiscountPolicy();
         for (const discountInPolicy of discounts) {
             const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
-            this._discountPolicy.add(newDiscount, discountInPolicy.operator);
+
+            newPolicy.add(newDiscount, discountInPolicy.operator);
         }
+        this._discountPolicy = newPolicy;
         return newPolicy.id;
     }
 
@@ -469,6 +490,18 @@ export class Store {
             finalPrice += bagItem.finalPrice;
         }
         return finalPrice;
+    }
+
+    setPurchasePolicy(policy: IPurchasePolicyElement[]): boolean {
+        const newPolicy: PurchasePolicy = new PurchasePolicyImpl();
+        for (const purchasePolicy of policy) {
+            const newPurchasePolicy: PurchasePolicy = this.parseIPurchasePolicy(purchasePolicy.policy);
+            if(!newPurchasePolicy)
+                return false;
+            newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
+        }
+        this._purchasePolicy = newPolicy;
+        return true;
     }
 
     private getItemById(items: Item[], id: number): Item {
@@ -558,17 +591,22 @@ export class Store {
             return new MinPayCondition(ifCondition.catalogNumber, ifCondition.minPay);
         } else if (ifCondition.minAmount) {
             return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
-
         }
+        logger.warn("parse condition failed")
+        return undefined;
     }
 
-
-    get storeOwners(): StoreOwner[] {
-        return this._storeOwners;
-    }
-
-
-    get discountPolicy(): Discount {
-        return this._discountPolicy;
+    private parseIPurchasePolicy(iPolicy: ISimplePurchasePolicy): PurchasePolicy {
+        let purchasePolicy: PurchasePolicy;
+        if (iPolicy.userPolicy) {
+            purchasePolicy = new UserPolicy(iPolicy.userPolicy.countries)
+        } else if (iPolicy.productPolicy) {
+            purchasePolicy = new ProductPolicy(iPolicy.productPolicy.catalogNumber, iPolicy.productPolicy.minAmount, iPolicy.productPolicy.maxAmount);
+        } else if (iPolicy.bagPolicy) {
+            purchasePolicy = new BagPolicy(iPolicy.bagPolicy.minAmount, iPolicy.bagPolicy.maxAmount);
+        } else if (iPolicy.systemPolicy) {
+            purchasePolicy = new SystemPolicy(iPolicy.systemPolicy.notForSellDays);
+        }
+        return purchasePolicy;
     }
 }

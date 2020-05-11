@@ -1,6 +1,7 @@
 import {PurchasePolicy} from "../PurchasePolicy";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {RegisteredUser} from "../../../user/users/RegisteredUser";
 
 export class ProductPolicy extends PurchasePolicy {
     private _catalogNumber: number;
@@ -29,8 +30,23 @@ export class ProductPolicy extends PurchasePolicy {
     }
 
 
-    isSatisfied(bagItems: BagItem[]): boolean {
+    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
         return false;
     }
+    public getPolicyTag():string{
+        return "product";
+    }
 
+
+    get catalogNumber(): number {
+        return this._catalogNumber;
+    }
+
+    get minAmount(): number {
+        return this._minAmount;
+    }
+
+    get maxAmount(): number {
+        return this._maxAmount;
+    }
 }

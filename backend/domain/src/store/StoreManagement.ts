@@ -16,7 +16,13 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount, IPurchasePolicy, StoreInfo
+    IDiscountPolicy,
+    IDiscountInPolicy,
+    IConditionOfDiscount,
+    IPurchasePolicy,
+    StoreInfo,
+    IPurchasePolicyElement,
+    ISimplePurchasePolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -24,6 +30,12 @@ import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {CondDiscount} from "./discounts/CondDiscount";
+import {PurchasePolicy} from "./PurchasePolicy/PurchasePolicy";
+import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
+import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
+import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
+import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
+import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 
 const logger = loggerW(__filename)
 
@@ -557,7 +569,7 @@ export class StoreManagement {
         const children: Map<Discount, Operators> = discount.children;
         const discountInPolicy: IDiscountInPolicy[] = [];
         for (const [discount, operator] of children) {
-            const iDiscount = this.convertDiscountToIDiscount(discount);
+            const iDiscount: IDiscount = this.convertDiscountToIDiscount(discount);
             discountInPolicy.push({discount: iDiscount, operator});
         }
         const policy: IDiscountPolicy = {discounts: discountInPolicy}
@@ -566,7 +578,17 @@ export class StoreManagement {
     }
 
     getStorePurchasePolicy(user: RegisteredUser, storeName: string): IPurchasePolicy {
-        return {policy: []};
+        const store: Store = this.findStoreByName(storeName);
+        const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
+        const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
+        const purchasePolicyElements: IPurchasePolicyElement[] = [];
+        for (const [policy, operator] of children) {
+            const iPurchasePolicy: ISimplePurchasePolicy = this.convertPolicyToISimplePurchasePolicy(policy);
+            purchasePolicyElements.push({policy: iPurchasePolicy, operator});
+        }
+        const policy: IPurchasePolicy = {policy: purchasePolicyElements}
+
+        return policy;
     }
 
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
@@ -670,6 +692,14 @@ export class StoreManagement {
         return {data: {categories: categoriesInStore}};
     }
 
+    setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Res.BoolResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const setPolicyOk: boolean = store.setPurchasePolicy(policy.policy);
+        return setPolicyOk ? {data: {result: true}} :
+            {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
+    }
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;
@@ -730,5 +760,41 @@ export class StoreManagement {
         return items;
     }
 
+    private convertPolicyToISimplePurchasePolicy(policy: PurchasePolicy): ISimplePurchasePolicy {
+        const tag: string = policy.getPolicyTag();
+        switch (tag) {
+            case "bag": {
+                const bagP: BagPolicy = policy as BagPolicy;
+                return {bagPolicy: {minAmount: bagP.minAmount, maxAmount: bagP.maxAmount}}
+                break;
+            }
+            case "product": {
+                const productP: ProductPolicy = policy as ProductPolicy;
+                return {
+                    productPolicy: {
+                        catalogNumber: productP.catalogNumber,
+                        minAmount: productP.minAmount,
+                        maxAmount: productP.maxAmount
+                    }
+                }
+                break;
+            }
+            case "system": {
+                const systemP: SystemPolicy = policy as SystemPolicy;
+                return {systemPolicy: {notForSellDays: systemP.notForSellDays}}
+                break;
+            }
+            case "user": {
+                const userP: UserPolicy = policy as UserPolicy;
+                return {userPolicy: {countries: userP.countries}}
+                break;
+            }
+            default: {
+                return undefined
+            }
+
+        }
+
+    }
 
 }

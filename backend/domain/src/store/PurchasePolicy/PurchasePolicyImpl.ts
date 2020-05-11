@@ -1,9 +1,10 @@
 import {PurchasePolicy} from "./PurchasePolicy";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {RegisteredUser} from "../../user/users/RegisteredUser";
 
 export class PurchasePolicyImpl extends PurchasePolicy {
-    private _children: Map<PurchasePolicy, Operators>;// storename -> items
+    private _children: Map<PurchasePolicy, Operators>;// storeName -> items
 
     public constructor() {
         super()
@@ -26,7 +27,11 @@ export class PurchasePolicyImpl extends PurchasePolicy {
         return this._children;
     }
 
-    isSatisfied(bagItems: BagItem[]): boolean {
+    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
         return false;
     }
+    public getPolicyTag():string{
+        return "impl";
+    }
+
 }

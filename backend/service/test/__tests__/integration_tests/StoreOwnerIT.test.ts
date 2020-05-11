@@ -8,7 +8,7 @@ import {
     IItem as ItemReq,
     IDiscountPolicy,
     IProduct as ProductReq,
-    ProductWithQuantity
+    ProductWithQuantity, ISimplePurchasePolicy, IPurchasePolicy
 } from 'se-workshop-20-interfaces/dist/src/CommonInterface'
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import * as utils from "./utils"
@@ -800,7 +800,7 @@ describe("Store Owner Integration Tests", () => {
 
     });
 
-    it("set policy and view policy", () => {
+    it("set and view discount policy ", () => {
         const products: Product[] = [new Product("bamba", 1, 20, ProductCategory.GENERAL)]
         utils.addNewProducts(storeName,products,token,true);
         let items: IItem[] = [];
@@ -833,6 +833,37 @@ describe("Store Owner Integration Tests", () => {
 
         const req : Req.ViewStoreDiscountsPolicyRequest = {body: {storeName}, token:token};
         const res: Res.ViewStoreDiscountsPolicyResponse = ServiceFacade.viewDiscountsPolicy(req);
+        expect(res.data.policy).toEqual(policy);
+    });
+
+    it("set and view purchase policy ", () => {
+        const products: Product[] = [new Product("bamba", 1, 20, ProductCategory.GENERAL)]
+        utils.addNewProducts(storeName,products,token,true);
+        let items: IItem[] = [];
+        for (let i = 0; i < 5; i++ )
+            items = items.concat({catalogNumber: 1, id: i+1});
+        utils.addNewItems(storeName, items, token, true);
+
+        const startDate: Date = new Date()
+        const duration: number = 3;
+        const simplePolicy1: ISimplePurchasePolicy = {
+            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+        }
+        const simplePolicy2: ISimplePurchasePolicy = {
+            bagPolicy:{minAmount: 2, maxAmount:3}
+        }
+
+
+
+        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: token
+        }
+        const makeDiscountRes: Res.BoolResponse = ServiceFacade.setPurchasePolicy(setPolicyReq);
+
+        const req : Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token:token};
+        const res: Res.ViewStorePurchasePolicyResponse = ServiceFacade.viewPurchasePolicy(req);
         expect(res.data.policy).toEqual(policy);
     });
 

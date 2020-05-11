@@ -449,8 +449,9 @@ export class TradingSystemManager {
 
 
     setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
-        return {data: {result: false}};
-    }
+        logger.info(`request to set discount policy to store ${req.body.storeName} `)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)    }
 
     setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
         logger.info(`request to set discount policy to store ${req.body.storeName} `)
