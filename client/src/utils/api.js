@@ -17,7 +17,7 @@ const instance = axios.create({
 
 
 async function init() {
-    instance.post(`${baseDomain}/system/newtoken`, { body: {} }).then(({ data }) => {
+    instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
         sessionToken = data;
     }).catch(e => console.log("cant fetch new token", e))
     instance.post(`${baseDomain}/system/init`, initData).then(({ data }) => {
