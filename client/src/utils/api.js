@@ -12,7 +12,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const instance = axios.create({
     httpsAgent: new https.Agent({
         rejectUnauthorized: false
-    })
+    }),
+    withCredentials: true
 });
 
 
@@ -48,11 +49,11 @@ async function logout() {
 }
 
 const getStores = async (offset = 0, limit = 4) => {
-    return axios.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`)
+    return instance.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`)
 
 }
 const getStoreProducts = async (storeName) => {
-    return axios.get(`${baseDomain}/stores/getProducts/?storeName=${storeName}`);
+    return instance.get(`${baseDomain}/stores/getProducts/?storeName=${storeName}`);
 
 }
 
