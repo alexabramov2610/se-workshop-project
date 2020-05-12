@@ -3,21 +3,19 @@ import openSocket from 'socket.io-client';
 
 const https = require('https');
 let socket;
-const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" }, token: sessionToken }
+const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" } }
 const baseDomain = "http://localhost:5000"
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const instance = axios.create({
-    httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-    }),
-    withCredentials: true
+    withCredentials: true,
+    crossDomain: true
 });
 
 
 async function init() {
     instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
-        sessionToken = data;
+
     }).catch(e => console.log("cant fetch new token", e))
     instance.post(`${baseDomain}/system/init`, initData).then(({ data }) => {
     }).catch(e => console.log("cant init system", e))
