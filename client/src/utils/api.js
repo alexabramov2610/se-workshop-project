@@ -17,7 +17,7 @@ const instance = axios.create({
 
 
 async function init() {
-    instance.post(`${baseDomain}/system/newtoken`, { body: {} }).then(({ data }) => {
+    instance.get(`${baseDomain}/system/newtoken`, {withCredentials:true}).then(({ data }) => {
         sessionToken = data;
     }).catch(e => console.log("cant fetch new token", e))
     instance.post(`${baseDomain}/system/init`, initData).then(({ data }) => {
@@ -48,7 +48,7 @@ async function logout() {
 }
 
 const getStores = async (offset = 0, limit = 4) => {
-    return axios.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`)
+    return axios.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`,{withCredentials:true})
 
 }
 const getStoreProducts = async (storeName) => {

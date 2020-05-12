@@ -10,6 +10,7 @@ export async function register(req,res) {
 }
 
 export async function login(req,res) {
+    console.log(req);
     const result = wrapHttp(req.body, ServiceFacade.loginUser);
     return res.send(result);
 }
