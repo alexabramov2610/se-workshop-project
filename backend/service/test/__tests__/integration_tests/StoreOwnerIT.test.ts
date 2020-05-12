@@ -844,8 +844,6 @@ describe("Store Owner Integration Tests", () => {
             items = items.concat({catalogNumber: 1, id: i+1});
         utils.addNewItems(storeName, items, token, true);
 
-        const startDate: Date = new Date()
-        const duration: number = 3;
         const simplePolicy1: ISimplePurchasePolicy = {
             productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
         }
