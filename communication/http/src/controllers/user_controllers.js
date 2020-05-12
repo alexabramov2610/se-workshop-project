@@ -5,37 +5,36 @@ import {wrapHttp} from "./http_request_wrapper";
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"username": "tnewusername", "password": "newuser"}, "token": "a8658714-a66b-45c7-9c40-cc9bb6f188dd"}'   http://localhost:4000/users/register
  */
 export async function register(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.registerUser);
+    const result = wrapHttp(req, ServiceFacade.registerUser);
     return res.send(result);
 }
 
 export async function login(req,res) {
-    console.log(req);
-    const result = wrapHttp(req.body, ServiceFacade.loginUser);
+    const result = wrapHttp(req, ServiceFacade.loginUser);
     return res.send(result);
 }
 
 export async function logout(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.logoutUser);
+    const result = wrapHttp(req, ServiceFacade.logoutUser);
     return res.send(result)
 }
 
 export async function saveProductToCart(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.saveProductToCart);
+    const result = wrapHttp(req, ServiceFacade.saveProductToCart);
     return res.send(result);
 }
 
 export async function removeProductFromCart(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.removeProductFromCart);
+    const result = wrapHttp(req, ServiceFacade.removeProductFromCart);
     return res.send(result);
 }
 
 export async function viewCart(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.viewCart(req.body));
+    const result = wrapHttp(req, ServiceFacade.viewCart(req.body));
     return res.send(result);
 }
 
 export async function viewRegisteredUserPurchasesHistory(req,res) {
-    const result = wrapHttp(req.body, ServiceFacade.viewRegisteredUserPurchasesHistory);
+    const result = wrapHttp(req, ServiceFacade.viewRegisteredUserPurchasesHistory);
     return res.send(result);
 }
