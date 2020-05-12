@@ -639,7 +639,7 @@ export class StoreManagement {
 
     getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
         const storeInfos: StoreInfo[] = [];
-        if (limit <= 0 || offset < 0 || offset >= this._stores.length)
+        if (limit <= 0 || offset < 0)
             return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
 
         const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
