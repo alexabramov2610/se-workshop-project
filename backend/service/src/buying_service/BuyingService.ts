@@ -2,6 +2,11 @@ import { Res, Req } from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
+    const isPolicyOkReq: Req.VerifyPurchasePolicy = {body: {}, token: req.token}
+    const isPolicyOk: Res.BoolResponse = ts.verifyStorePolicy(isPolicyOkReq)
+    if(!isPolicyOk.data.result){
+        return isPolicyOk;
+    }
     const isCartOnStock: Res.BoolResponse = ts.verifyCart({
         body: {},
         token: req.token,

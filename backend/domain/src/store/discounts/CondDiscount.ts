@@ -1,5 +1,5 @@
 import {Discount} from "./Discount";
-import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Condition} from "./conditions/Condition";
 
@@ -7,8 +7,8 @@ export class CondDiscount extends Discount {
     private _conditions: Map<Condition, Operators>;
 
 
-    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>) {
-        super(startDate, duration, percentage, productsInDiscount);
+    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>,category?: ProductCategory) {
+        super(startDate, duration, percentage, productsInDiscount, category);
         this._conditions = conditions;
     }
 
@@ -37,7 +37,7 @@ export class CondDiscount extends Discount {
 
         const res: BagItem[] = [];
         for (const bagItem of bag) {
-            if (this.isProductInDiscount(bagItem.product.catalogNumber)) {
+            if (this.isProductInDiscount(bagItem)){
                 const minAmount = this.findMinAmount(bagItem.product.catalogNumber);
                 let diffAmount = 1;
                 if(minAmount !== -1)
