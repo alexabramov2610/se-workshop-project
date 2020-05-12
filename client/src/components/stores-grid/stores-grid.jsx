@@ -3,7 +3,7 @@ import CardColumns from "react-bootstrap/CardColumns";
 import Card from "react-bootstrap/Card";
 import { AiTwotoneShop } from "react-icons/ai";
 import myImage from "../../assets/storeimg2.svg";
-
+import { history } from "../../App";
 import { OptionLink } from "../header/Header-styles";
 const stores = [
   {
@@ -59,7 +59,7 @@ export const StoresGrid = () => {
                   as="div"
                   className="hvr-underline-from-center"
                   to="/contact"
-                  onClick={() => alert("test")}
+                  onClick={() => history.push("/signupsignin")}
                 >
                   {s.name}
                 </OptionLink>

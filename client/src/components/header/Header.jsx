@@ -27,7 +27,7 @@ export class Header extends React.Component {
     }); 
 
   render() {
-    history.push("/homepage");
+    
     return (
       <React.Fragment>
         <HeaderContainer>
