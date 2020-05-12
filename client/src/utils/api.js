@@ -30,7 +30,7 @@ async function register(username, password) {
 }
 
 async function createStore(storeName, description) {
-    return instance.post(`${baseDomain}/stores/createstore`,
+    return instance.post(`${baseDomain}/stores/createStore`,
         addToken({ body: { storeName, description } }));
 }
 
@@ -51,6 +51,10 @@ const getStores = async (offset = 0, limit = 4) => {
     return axios.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`)
 
 }
+const getStoreProducts = async (storeName) => {
+    return axios.get(`${baseDomain}/stores/getProducts/?storeName=${storeName}`);
+
+}
 
 
-export { startConnection, login, init, register, logout, getStores };
+export { startConnection, login, init, register, logout, getStores, createStore, getStoreProducts };

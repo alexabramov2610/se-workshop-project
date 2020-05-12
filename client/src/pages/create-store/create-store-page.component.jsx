@@ -7,6 +7,7 @@ import {
 } from "./create-store-page.styles";
 import FormInput from "../../components/form-input/form-input.component";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
+import * as api from "../../utils/api";
 class CreateStorePage extends React.Component {
   constructor() {
     super();
@@ -24,6 +25,7 @@ class CreateStorePage extends React.Component {
       storeName: "",
       description: "",
     });
+    api.createStore(storeName, description);
   };
 
   handleChange = (event) => {
@@ -35,8 +37,14 @@ class CreateStorePage extends React.Component {
   render() {
     const { storeName, description } = this.state;
     const { isLoggedIn } = this.props;
-    return isLoggedIn ? (
-      <div />
+    return !isLoggedIn ? (
+      <CreateStorePageContainer>
+        <StoreFormContainer>
+          <CreateStoreTitle>
+            Creating A Store is for Logged in users only
+          </CreateStoreTitle>
+        </StoreFormContainer>
+      </CreateStorePageContainer>
     ) : (
       <CreateStorePageContainer>
         <StoreFormContainer>
@@ -53,10 +61,11 @@ class CreateStorePage extends React.Component {
             />
             <FormInput
               type="text"
-              name="storeDescription"
+              name="description"
               value={description}
               onChange={this.handleChange}
               label="Store Description"
+              
             />
 
             <CustomButton type="submit">Create Store!</CustomButton>

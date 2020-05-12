@@ -16,7 +16,7 @@ export class StoresGrid extends React.Component {
   }
 
   async componentDidMount() {
-    const { data } = await api.getStores();
+    const { data } = await api.getStores(0, 50);
     const { stores } = data.data;
     this.setState({ stores });
     console.log(stores);
@@ -38,7 +38,7 @@ export class StoresGrid extends React.Component {
                     as="div"
                     className="hvr-underline-from-center"
                     to="/contact"
-                    onClick={() => history.push("/signupsignin")}
+                    onClick={() => history.push(`/store/${s.storeName}`)}
                   >
                     {s.storeName}
                   </OptionLink>

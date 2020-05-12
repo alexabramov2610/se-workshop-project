@@ -11,6 +11,7 @@ import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
 import { init } from '../src/utils/api'
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
+import { StorePage } from './pages/store-page/store-page'
 import { createBrowserHistory } from 'history';
 import { history } from './utils/config'
 
@@ -44,8 +45,8 @@ class App extends React.Component {
                     <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/category" component={CategoryPage} />
                     <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
-                    <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
-                    {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
+                    <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
+                    <Route path="/store/:storename" component={StorePage} />
                     {/*<Route exact path="/contact" component={ContactPage}/>*/}
                     {/*<Route*/}
                     {/*    exact*/}
