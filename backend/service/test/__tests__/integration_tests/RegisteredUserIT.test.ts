@@ -25,8 +25,8 @@ describe("Registered User Integration Tests", () => {
     //     await utils.terminateSocket();
     // });
 
-    afterAll(async () => {
-        await utils.terminateSocket();
+    afterAll(() => {
+        utils.terminateSocket();
     });
 
     it("logout IT test", () => {

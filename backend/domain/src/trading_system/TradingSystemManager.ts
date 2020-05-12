@@ -511,8 +511,8 @@ export class TradingSystemManager {
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
     }
 
-    async terminateSocket() {
-        await this._publisher.terminateSocket();
+    terminateSocket() {
+        this._publisher.terminateSocket();
     }
 
     getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse {

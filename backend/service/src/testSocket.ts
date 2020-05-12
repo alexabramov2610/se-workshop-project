@@ -24,18 +24,22 @@ const adminName: string = "admin";
 const adminPassword: string = "admin123123";
 let adminToken: string;
 
-export const getGuestSession = (): string => {
+export const getAdminSession = (): string => {
     return adminToken = ServiceFacade.startNewSession();
 }
 
+export const NewSessionSession = (): string => {
+    return ServiceFacade.startNewSession();
+}
+
 export const systemInit = (): void => {
-    adminToken = getGuestSession();
+    adminToken = getAdminSession();
     const initReq: Req.InitReq = {  body: { firstAdminName: adminName, firstAdminPassword: adminPassword } , token: adminToken};
     ServiceFacade.systemInit(initReq);
 }
 
 export const initSessionRegisterLogin = (username: string, password: string): string => {
-    const token = getGuestSession();
+    const token = getAdminSession();
     registerUser(username, password, token, false);
     loginUser(username, password, token, false);
     return token;
@@ -79,7 +83,7 @@ export const addNewItems = (storeName: string, items: IItem[], token: string, ex
 
 
 
-
+/** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export function t1 (){
     systemInit();
 
@@ -191,53 +195,34 @@ export function t1 (){
 
 
 }
+
+/** creates new store with 1 product and 1 item, and 10 users */
 export function t2 (){
+    // prepare
     storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
     store = new Store(storeName,storeDesc);
     storeOwner = new StoreOwner(storeOwnerName);
 
-    token = initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
-    createStore(storeName, token);
-
-
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
     const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
+    const buyer3: RegisteredUser = new RegisteredUser("buyer3", "buyer2password");
+    const buyer4: RegisteredUser = new RegisteredUser("buyer4", "buyer2password");
+    const buyer5: RegisteredUser = new RegisteredUser("buyer5", "buyer2password");
+    const buyer6: RegisteredUser = new RegisteredUser("buyer6", "buyer2password");
+    const buyer7: RegisteredUser = new RegisteredUser("buyer7", "buyer2password");
+    const buyer8: RegisteredUser = new RegisteredUser("buyer8", "buyer2password");
+    const buyer9: RegisteredUser = new RegisteredUser("buyer9", "buyer2password");
+    const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
+    const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10];
 
     const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
-
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
-    const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
-    const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
-    const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
-
-    const products: Product[] = [prod1, prod2, prod3, prod4];
-    const items: IItem[] = [item1, item2, item3, item4];
-
-    addNewProducts(storeName, products, token, true);
-    addNewItems(storeName, items, token, true);
-    registerUser(buyer1.name, buyer1.password, token, true);
-    registerUser(buyer2.name, buyer2.password, token, false);
-
-
-    // buyer 1 buys
-    loginUser(buyer1.name, buyer1.password, token, false);
-    // save prod1, prod2
+    const products: Product[] = [prod1];
+    const items: IItem[] = [item1];
     let saveProductToCartReq: Req.SaveToCartRequest = {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
         token: token
     }
-    let saveProductToCartRes: Res.BoolResponse = ServiceFacade.saveProductToCart(saveProductToCartReq)
-
-    saveProductToCartReq = {
-        body: {storeName, catalogNumber: products[1].catalogNumber, amount: 1},
-        token: token
-    }
-    saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
-
-    // buy
     let purchaseReq: Req.PurchaseRequest = {
         body: {
             payment: {
@@ -251,52 +236,31 @@ export function t2 (){
             }
         }, token: token
     }
-    let purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
 
+    systemInit();
 
-    // buyer 2 buys
-    loginUser(buyer2.name, buyer2.password, token, true);
-    // save prod1, prod2
-    saveProductToCartReq = {
-        body: {storeName, catalogNumber: products[2].catalogNumber, amount: 1},
-        token: token
+    // owner
+    token = initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
+    createStore(storeName, token);
+    addNewProducts(storeName, products, token, true);
+    addNewItems(storeName, items, token, true);
+
+    console.log('generating 10 tokens...')
+    for (let i = 0; i < 10; i++) {
+        const t = NewSessionSession();
+        purchaseReq.token = t;
+        saveProductToCartReq.token = t;
+
+        registerUser(users[i].name, users[i].password, token, false);
+        loginUser(users[i].name, users[i].password, t, false);
+        console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
+
+        console.log(`purchase request ${i}:`)
+        console.log(`curl --cacert server.cert -k --header "Content-Type: application/json"  --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
     }
-    saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
-
-    saveProductToCartReq = {
-        body: {storeName, catalogNumber: products[3].catalogNumber, amount: 1},
-        token: token
-    }
-    saveProductToCartRes = ServiceFacade.saveProductToCart(saveProductToCartReq)
-
-    // buy
-    purchaseReq = {
-        body: {
-            payment: {
-                cardDetails: {
-                    holderName: "tal",
-                    number: "152",
-                    expYear: "2021",
-                    expMonth: "5",
-                    cvv: "40"
-                }, address: "batyam", city: "batya", country: "israel"
-            }
-        }, token: token
-    }
-    purchaseResponse = ServiceFacade.purchase(purchaseReq)
-
-
-    // get purchases history
-    loginUser(storeOwnerName, storeOwnerPassword, token, true);
-    const viewPurchasesHistoryReq: Req.ViewShopPurchasesHistoryRequest = { body: { storeName: storeName }, token: token };
-    const viewPurchasesHistoryRes: Res.ViewShopPurchasesHistoryResponse = ServiceFacade.viewStorePurchasesHistory(viewPurchasesHistoryReq);
-    let idsTakes: number[] = [1, 1, 1, 1, 1];
-    let prodCatalogsTaken: number[] = [1, 1, 1, 1, 1];
-
-
-
-
 }
+
+/** creates 10 stores */
 export function t3 (){
     // prepare
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");

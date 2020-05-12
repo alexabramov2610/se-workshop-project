@@ -18,8 +18,8 @@ describe("Store Manager Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
-    afterAll(async () => {
-        await utils.terminateSocket();
+    afterAll(() => {
+        utils.terminateSocket();
     });
 
 

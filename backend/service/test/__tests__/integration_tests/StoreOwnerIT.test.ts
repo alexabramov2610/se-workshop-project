@@ -49,8 +49,8 @@ describe("Store Owner Integration Tests", () => {
     //     await utils.terminateSocket();
     // });
 
-    afterAll(async () => {
-        await utils.terminateSocket();
+    afterAll(() => {
+        utils.terminateSocket();
     });
 
     it("add new products", () => {

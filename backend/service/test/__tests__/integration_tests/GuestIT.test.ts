@@ -29,13 +29,9 @@ describe("Guest Integration Tests", () => {
         expect(token).toBeDefined();
     });
 
-    afterAll(async () => {
-        await utils.terminateSocket();
+    afterAll(() => {
+        utils.terminateSocket();
     });
-
-    it('a', () => {
-        expect(true).toBe(true);
-    })
 
     it("Register IT test", () => {
         const req: Req.RegisterRequest = {body: {username, password}, token};

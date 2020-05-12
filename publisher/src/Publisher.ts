@@ -244,8 +244,8 @@ export class Publisher {
         return -1;
     }
 
-    async terminateSocket() {
-        await terminate()
+    terminateSocket() {
+        terminate()
     }
 
     removeClient(username) {

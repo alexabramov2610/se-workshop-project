@@ -72,10 +72,10 @@ function sendMessageTo(username, message) {
     return false;
 }
 
-async function terminate() {
+function terminate() {
     try {
-        await socketServer.close();
-        await httpsServer.close();
+        socketServer.close();
+        httpsServer.close();
     } catch (err) {
         console.log(err)
     }
