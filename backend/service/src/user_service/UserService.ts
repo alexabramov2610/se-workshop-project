@@ -66,3 +66,7 @@ export const viewRegisteredUserPurchasesHistory = (req: Req.ViewRUserPurchasesHi
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
     return ts.isLoggedInUserByToken(req);
 }
+
+export const verifyToken = (req: Req.Request): Res.BoolResponse => {
+    return ts.verifyToken(req);
+}

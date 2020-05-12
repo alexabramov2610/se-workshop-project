@@ -5,7 +5,6 @@ import {invalidRes, wrapHttp} from "./http_request_wrapper";
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"firstAdminName": "tal", "firstAdminPassword": "taltal"}, "token": "1"}'   http://localhost:4000/system/init
  */
 export async function systemInit(req,res) {
-    console.log('sys init')
     const result = wrapHttp(req, ServiceFacade.systemInit);
     return res.send(result)
 }
@@ -22,6 +21,11 @@ export async function isLoggedIn(req, res) {
 // get
 
 export async function startNewSession(req,res) {
+    if (req.cookies['token'] && req.cookies['token'].length > 0 &&
+        ServiceFacade.verifyToken(req.cookies['token']).data.result) {
+        return res.send(req.cookies['token'])
+    }
+
     const token = wrapHttp(req, ServiceFacade.startNewSession);
     res.cookie('token', token, {
         httpOnly: true,
