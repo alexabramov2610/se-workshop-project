@@ -1,7 +1,7 @@
 const WebSocketServer = require('ws').Server;
 const url = require('url');
 
-const port = 3000;
+const port = 8000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 

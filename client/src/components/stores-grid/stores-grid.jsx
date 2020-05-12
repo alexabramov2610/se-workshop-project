@@ -47,8 +47,8 @@ export const StoresGrid = () => {
   return (
     <div style={{ marginTop: "20px" }}>
       <CardColumns>
-        {stores.map((s) => (
-          <Card className="text-center">
+        {stores.map((s, index) => (
+          <Card className="text-center" key={index}>
             <Card.Img height="180px" src={myImage} />
             <Card.Body>
               <Card.Title>
@@ -59,7 +59,7 @@ export const StoresGrid = () => {
                   as="div"
                   className="hvr-underline-from-center"
                   to="/contact"
-                  onClick={()=> alert('test')}
+                  onClick={() => alert("test")}
                 >
                   {s.name}
                 </OptionLink>

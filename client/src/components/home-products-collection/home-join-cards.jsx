@@ -12,20 +12,16 @@ export const JoinCards = () => {
         <Card.Body>
           <Card.Title>
             <AiTwotoneShop
-              style={{ marginRight: "-6px", marginBottom: "2px" }}
+              style={{ marginRight: "6px", marginBottom: "2px" }}
             />{" "}
-            <OptionLink
+            <Link
               as="a"
               className="hvr-underline-from-center"
-              to="/contact"
+              to="/signupsignin"
+              style={{ textDecoration: "none", color: "black" }}
             >
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to="/signupsignin"
-              >
-                Shop With Us
-              </Link>
-            </OptionLink>
+              Shop With Us
+            </Link>
           </Card.Title>
           <Card.Text>
             Join our trading systems and start enjoying the best prices and
@@ -37,21 +33,16 @@ export const JoinCards = () => {
         <Card.Body>
           <Card.Title>
             <AiTwotoneShop
-              style={{ marginRight: "-6px", marginBottom: "2px" }}
+              style={{ marginRight: "6px", marginBottom: "2px" }}
             />{" "}
-            <OptionLink
-              as="div"
+            <Link
+              as="a"
               className="hvr-underline-from-center"
-              to="/contact"
+              to="/createstore"
+              style={{ textDecoration: "none", color: "black" }}
             >
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to="/category"
-              >
-                {" "}
-                Create Your Own Store
-              </Link>
-            </OptionLink>
+              Trade With Us
+            </Link>
           </Card.Title>
           <Card.Text>
             Join our trading systems to expose you buisness to millions of users

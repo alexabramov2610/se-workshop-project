@@ -2,7 +2,7 @@ import React from "react";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
 import { SignUpContainer, SignUpTitle } from "./sign-up.styles";
-
+import { register } from "../../utils/api";
 class SignUp extends React.Component {
   constructor() {
     super();
@@ -16,7 +16,7 @@ class SignUp extends React.Component {
   }
 
   handleSubmit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
     const { displayName, email, password, confirmPassword } = this.state;
 
@@ -24,17 +24,14 @@ class SignUp extends React.Component {
       alert("passwords don't match");
       return;
     }
-
-    try {
-      this.setState({
-        displayName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    console.log(this.state);
+    this.setState({
+      displayName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    register(displayName, password);
   };
 
   handleChange = (event) => {
@@ -55,15 +52,7 @@ class SignUp extends React.Component {
             name="displayName"
             value={displayName}
             onChange={this.handleChange}
-            label="Display Name"
-            required
-          />
-          <FormInput
-            type="email"
-            name="email"
-            value={email}
-            onChange={this.handleChange}
-            label="Email"
+            label="User Name"
             required
           />
           <FormInput
