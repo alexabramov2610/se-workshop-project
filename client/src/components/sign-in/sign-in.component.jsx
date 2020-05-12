@@ -2,7 +2,7 @@ import React from "react";
 import { login } from "../../utils/api";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
-
+import * as config from "../../utils/config";
 import {
   SignInContainer,
   SignInTitle,
@@ -26,9 +26,12 @@ class SignIn extends React.Component {
 
     try {
       login(userName, password).then(({ data }) => {
-        console.log("onLogin Response", data);
-        (!data.error || data.error.message === "Already at this state") &&
+        if (!data.error || data.error.message === "Already at this state") {
           this.props.onLogin();
+          config.history.push("/");
+        } else {
+          alert("invalid details");
+        }
       });
     } catch (error) {
       console.log(error);

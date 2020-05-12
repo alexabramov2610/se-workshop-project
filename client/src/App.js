@@ -10,11 +10,9 @@ import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
 import { init } from '../src/utils/api'
+import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { createBrowserHistory } from 'history';
-
-export const history = createBrowserHistory();
-
-
+import { history } from './utils/config'
 
 class App extends React.Component {
     constructor(props) {
@@ -43,10 +41,10 @@ class App extends React.Component {
             <Router history={history}>
                 <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                 <Switch>
-                    <Route exact path="/" component={HomePageContainer} />
+                    <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/category" component={CategoryPage} />
-                    <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage onLogin={this.onLogin} />} />
-                    {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
+                    <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
+                    <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                     {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
                     {/*<Route exact path="/contact" component={ContactPage}/>*/}
                     {/*<Route*/}

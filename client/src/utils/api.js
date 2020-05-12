@@ -29,6 +29,10 @@ async function register(username, password) {
         addToken({ body: { username, password } }));
 }
 
+async function createStore(storeName, description) {
+    return instance.post(`${baseDomain}/stores/createstore`,
+        addToken({ body: { storeName, description } }));
+}
 
 function startConnection(cb) {
     openSocket("ws://localhost:8000/?name=alex")
@@ -43,10 +47,10 @@ async function logout() {
     return instance.post(`${baseDomain}/users/logout`, addToken({}))
 }
 
-const getStores = async (offset = 0, limit = 5) => {
+const getStores = async (offset = 0, limit = 4) => {
     return axios.get(`${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`)
 
 }
 
 
-export { startConnection, login, init, register, logout };
+export { startConnection, login, init, register, logout, getStores };
