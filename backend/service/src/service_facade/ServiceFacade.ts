@@ -225,6 +225,9 @@ correctness-constraints
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.setPurchasePolicy));
 }
+export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.viewPurchasePolicy));
+}
 
 /*
 Additional req from FE

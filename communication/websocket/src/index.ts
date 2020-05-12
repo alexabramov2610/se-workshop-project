@@ -3,7 +3,7 @@ const url = require('url');
 import fs from "fs";
 var path = require('path');
 
-const port = 3000;
+const port = 8000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 

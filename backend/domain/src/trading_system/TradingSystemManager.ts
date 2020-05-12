@@ -8,7 +8,7 @@ import {EventCode, NotificationsType, TradingSystemState} from "se-workshop-20-i
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
-import {BagItem, IPolicy, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {BagItem, IDiscountPolicy, IPurchasePolicy, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
@@ -76,8 +76,7 @@ export class TradingSystemManager {
                 event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
             })
-        }
-        else {
+        } else {
             this._publisher.removeClient(req.body.username);
         }
         return res;
@@ -163,7 +162,7 @@ export class TradingSystemManager {
             const storeName: string = req.body.storeName;
             const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
             const event: Event.StoreOwnerEvent = {
-                username: req.body.usernameToAssign, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName: storeName,
+                username: req.body.usernameToAssign, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
                 notification: {type: NotificationsType.GREEN, message: msg}
             };
             if (this._publisher.notify(event).length !== 0)
@@ -193,7 +192,7 @@ export class TradingSystemManager {
             const storeName: string = req.body.storeName;
             const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
             const event: Event.StoreOwnerEvent = {
-                username: req.body.usernameToRemove, code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
+                username: req.body.usernameToRemove, code: EventCode.REMOVED_AS_STORE_OWNER, storeName,
                 notification: {type: NotificationsType.GREEN, message: msg}
             };
             if (this._publisher.notify(event).length !== 0)
@@ -379,7 +378,7 @@ export class TradingSystemManager {
                 const event: Event.NewPurchaseEvent = {
                     username: storeOwner.name,
                     code: EventCode.NEW_PURCHASE,
-                    storeName: storeName,
+                    storeName,
                     notification
                 };
                 this._publisher.notify(event).forEach(userToNotify => { // if didn't send
@@ -450,8 +449,9 @@ export class TradingSystemManager {
 
 
     setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
-        return {data: {result: false}};
-    }
+        logger.info(`request to set discount policy to store ${req.body.storeName} `)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)    }
 
     setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
         logger.info(`request to set discount policy to store ${req.body.storeName} `)
@@ -462,7 +462,14 @@ export class TradingSystemManager {
     viewDiscountsPolicy(req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse {
         logger.info(`request to view discount policy of store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const policy: IPolicy = this._storeManager.getStoreDiscountPolicy(user, req.body.storeName)
+        const policy: IDiscountPolicy = this._storeManager.getStoreDiscountPolicy(user, req.body.storeName)
+        return {data: {policy}}
+    }
+
+    viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse {
+        logger.info(`request to view purchase policy of store ${req.body.storeName} `)
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        const policy: IPurchasePolicy = this._storeManager.getStorePurchasePolicy(user, req.body.storeName)
         return {data: {policy}}
     }
 

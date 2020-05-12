@@ -5,10 +5,10 @@ import SignUp from "../../components/sign-up/sign-up.component";
 
 import { SignInAndSignUpContainer } from "./sign-in-and-sign-up.styles";
 
-const SignInAndSignUpPage = () => (
+const SignInAndSignUpPage = ({ onLogin }) => (
   <SignInAndSignUpContainer>
     <SignUp />
-    <SignIn />
+    <SignIn onLogin={onLogin} />
   </SignInAndSignUpContainer>
 );
 
