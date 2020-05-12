@@ -3,8 +3,6 @@ import openSocket from 'socket.io-client';
 
 const https = require('https');
 let socket;
-let sessionToken;
-const addToken = (req) => { return { body: req.body, sessionToken }; }
 const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" }, token: sessionToken }
 const baseDomain = "http://localhost:5000"
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -27,12 +25,12 @@ async function init() {
 
 async function register(username, password) {
     return instance.post(`${baseDomain}/users/register`,
-        addToken({ body: { username, password } }));
+        { body: { username, password } });
 }
 
 async function createStore(storeName, description) {
     return instance.post(`${baseDomain}/stores/createStore`,
-        addToken({ body: { storeName, description } }));
+        { body: { storeName, description } });
 }
 
 function startConnection(cb) {
@@ -41,11 +39,11 @@ function startConnection(cb) {
 
 
 async function login(username, password) {
-    return instance.post(`${baseDomain}/users/login`, addToken({ body: { username, password } }))
+    return instance.post(`${baseDomain}/users/login`, { body: { username, password } })
 }
 
 async function logout() {
-    return instance.post(`${baseDomain}/users/logout`, addToken({}))
+    return instance.post(`${baseDomain}/users/logout`, {})
 }
 
 const getStores = async (offset = 0, limit = 4) => {
