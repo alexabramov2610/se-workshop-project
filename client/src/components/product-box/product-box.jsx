@@ -3,8 +3,8 @@ import Card from "react-bootstrap/Card";
 import { AiFillStar } from "react-icons/ai";
 import { FiBox } from "react-icons/fi";
 import { history } from "../../utils/config";
+import { CustomButton } from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
-
 
 export const ProductBox = (props) => (
   <Card className="text-center grid-item">
@@ -26,5 +26,8 @@ export const ProductBox = (props) => (
         </div>
       </Card.Text>
     </Card.Body>
+    <Card.Footer>
+      <CustomButton style={{ margin: "auto" }}>Add To Cart</CustomButton>
+    </Card.Footer>
   </Card>
 );

@@ -32,12 +32,12 @@ class App extends React.Component {
     onLogout = () => {
         this.setState({ isLoggedIn: false })
     }
-    componentDidMount() {
-        init();
-
+    async componentDidMount() {
+        const initialized = await init();
+        this.setState({ initialized: true })
     }
     render() {
-        return (
+        return this.state.initialized ? (
 
             <Router history={history}>
                 <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
@@ -62,7 +62,8 @@ class App extends React.Component {
                 </Switch>
             </Router>
 
-        );
+        ) : null
+
     }
 }
 
