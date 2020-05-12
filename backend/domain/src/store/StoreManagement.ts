@@ -16,16 +16,32 @@ import {
     SearchFilters,
     SearchQuery,
     IContactUsMessage,
-    IPolicy
+    IDiscountPolicy,
+    IDiscountInPolicy,
+    IConditionOfDiscount,
+    IPurchasePolicy,
+    StoreInfo,
+    IPurchasePolicyElement,
+    ISimplePurchasePolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+import {Discount} from "./discounts/Discount";
+import {DiscountPolicy} from "./discounts/DiscountPolicy";
+import {CondDiscount} from "./discounts/CondDiscount";
+import {PurchasePolicy} from "./PurchasePolicy/PurchasePolicy";
+import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
+import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
+import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
+import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
+import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 
 const logger = loggerW(__filename)
 
 export class StoreManagement {
     private readonly _stores: Store[];
+    private _storeByStoreName: Map<string, Store>;
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
     private _externalSystems: ExternalSystemsManager;
@@ -35,12 +51,14 @@ export class StoreManagement {
         this._stores = [];
         this._storeManagerAssigners = new Map();
         this._storeOwnerAssigners = new Map();
+        this._storeByStoreName = new Map();
     }
 
     addStore(storeName: string, description: string, owner: RegisteredUser): Res.BoolResponse {
         const newStore = new Store(storeName, description);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
+        this._storeByStoreName.set(newStore.storeName, newStore);
         logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
         return {data: {result: true}}
     }
@@ -537,12 +555,40 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
-    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IPolicy): Res.AddDiscountResponse {
+    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const discountID: string = store.setDiscountPolicy(discounts.discounts);
         return {data: {result: true, discountID}}
+    }
+
+    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IDiscountPolicy {
+        const store: Store = this.findStoreByName(storeName);
+        const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
+        const children: Map<Discount, Operators> = discount.children;
+        const discountInPolicy: IDiscountInPolicy[] = [];
+        for (const [discount, operator] of children) {
+            const iDiscount: IDiscount = this.convertDiscountToIDiscount(discount);
+            discountInPolicy.push({discount: iDiscount, operator});
+        }
+        const policy: IDiscountPolicy = {discounts: discountInPolicy}
+
+        return policy;
+    }
+
+    getStorePurchasePolicy(user: RegisteredUser, storeName: string): IPurchasePolicy {
+        const store: Store = this.findStoreByName(storeName);
+        const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
+        const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
+        const purchasePolicyElements: IPurchasePolicyElement[] = [];
+        for (const [policy, operator] of children) {
+            const iPurchasePolicy: ISimplePurchasePolicy = this.convertPolicyToISimplePurchasePolicy(policy);
+            purchasePolicyElements.push({policy: iPurchasePolicy, operator});
+        }
+        const policy: IPurchasePolicy = {policy: purchasePolicyElements}
+
+        return policy;
     }
 
     removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
@@ -591,6 +637,111 @@ export class StoreManagement {
 
     }
 
+    getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
+        const storeInfos: StoreInfo[] = [];
+        if (limit <= 0 || offset < 0 || offset >= this._stores.length)
+            return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
+
+        const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
+
+        while (offset < maxIndex) {
+            storeInfos.push(this._stores[offset].viewStoreInfo().data.info);
+            offset++;
+        }
+
+        return {data: {stores: storeInfos}};
+    }
+
+    getAllProductsInStore(storeName: string): Res.GetAllProductsInStoreResponse {
+        const productInStore: ProductInStore[] = [];
+        if (!this._storeByStoreName.has(storeName))
+            return {data: {products: []}};
+
+        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        let currProd: Product = prodIterator.next().value;
+        while (currProd) {
+            const currProductInStore: ProductInStore = {
+                storeName,
+                product: {
+                    catalogNumber: currProd.catalogNumber,
+                    price: currProd.price,
+                    name: currProd.name,
+                    category: currProd.category,
+                    rating: currProd.rating
+                }
+            }
+            productInStore.push(currProductInStore);
+            currProd = prodIterator.next().value;
+        }
+
+        return {data: {products: productInStore}};
+    }
+
+    getAllCategoriesInStore(storeName: string): Res.GetAllCategoriesInStoreResponse {
+        const categoriesInStore: ProductCategory[] = [];
+        if (!this._storeByStoreName.has(storeName))
+            return {data: {categories: []}};
+
+        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        let currProd: Product = prodIterator.next().value;
+        while (currProd) {
+            categoriesInStore.push(currProd.category);
+            currProd = prodIterator.next().value;
+        }
+
+        return {data: {categories: categoriesInStore}};
+    }
+
+    setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Res.BoolResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const setPolicyOk: boolean = store.setPurchasePolicy(policy.policy);
+        return setPolicyOk ? {data: {result: true}} :
+            {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
+    }
+
+    private convertDiscountToIDiscount(discount: Discount): IDiscount {
+        const condDiscount: CondDiscount = discount as CondDiscount;
+        let conditions: IConditionOfDiscount[];
+        if (condDiscount.conditions && condDiscount.conditions.size !== 0) {
+            conditions = [];
+            for (const [condition, operator] of condDiscount.conditions) {
+                const catalogNumber: number = condition.getCatalogNumber();
+                const minPay: number = condition.getMinPay();
+                const minAmount: number = condition.getMinAmount();
+                if (!minAmount && !minPay) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber
+                        }, operator
+                    })
+                } else if (minPay) {
+                    conditions.push({
+                        condition: {
+                            minPay
+                        }, operator
+                    })
+                } else if (minAmount) {
+                    conditions.push({
+                        condition: {
+                            catalogNumber,
+                            minAmount
+                        }, operator
+                    })
+                }
+            }
+        }
+        return {
+            startDate: discount.startDate,
+            duration: discount.duration,
+            percentage: discount.percentage,
+            products: discount.productsInDiscount,
+            condition: conditions
+        }
+
+    }
+
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
         const products: Product[] = [];
         for (const productReq of productsReqs) {
@@ -608,4 +759,42 @@ export class StoreManagement {
         }
         return items;
     }
+
+    private convertPolicyToISimplePurchasePolicy(policy: PurchasePolicy): ISimplePurchasePolicy {
+        const tag: string = policy.getPolicyTag();
+        switch (tag) {
+            case "bag": {
+                const bagP: BagPolicy = policy as BagPolicy;
+                return {bagPolicy: {minAmount: bagP.minAmount, maxAmount: bagP.maxAmount}}
+                break;
+            }
+            case "product": {
+                const productP: ProductPolicy = policy as ProductPolicy;
+                return {
+                    productPolicy: {
+                        catalogNumber: productP.catalogNumber,
+                        minAmount: productP.minAmount,
+                        maxAmount: productP.maxAmount
+                    }
+                }
+                break;
+            }
+            case "system": {
+                const systemP: SystemPolicy = policy as SystemPolicy;
+                return {systemPolicy: {notForSellDays: systemP.notForSellDays}}
+                break;
+            }
+            case "user": {
+                const userP: UserPolicy = policy as UserPolicy;
+                return {userPolicy: {countries: userP.countries}}
+                break;
+            }
+            default: {
+                return undefined
+            }
+
+        }
+
+    }
+
 }

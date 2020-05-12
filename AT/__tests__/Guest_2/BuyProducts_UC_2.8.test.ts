@@ -6,7 +6,7 @@ import {
 } from "../../";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import {IDiscount, Purchase,IPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IDiscount, Purchase,IDiscountPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
 
 
@@ -85,13 +85,8 @@ describe("Guest buy items, UC: 2.8", () => {
         _testCondDiscount2={startDate: new Date(), percentage: 50, duration: 5,                 // 50% on cola if
             products:[_testCola.catalogNumber],
             condition: [{condition: {catalogNumber: _testEggs.catalogNumber ,minAmount:1},operator: Operators.OR},  //buy eggs  OR   
-            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:2},operator:Operators.AND},                 // buy 2+ banana and milk 
+            {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:1},operator:Operators.AND},                 // buy 2+ banana and milk
             {condition:{catalogNumber:_testMilk.catalogNumber,minAmount:1},operator:Operators.AND}]}
-
-
-
-        
-
 
         _serviceBridge.createStore(_testStore1);
         _serviceBridge.createStore(_testStore2);
@@ -206,7 +201,7 @@ describe("Guest buy items, UC: 2.8", () => {
     test("Non empty cart, items in stock, with simple discount(50% on milk)" ,() => { 
 
     const storeName = _testStore1.name
-    const policy:IPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
+    const policy:IDiscountPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
     const setPolicyReq: Req.SetDiscountsPolicyRequest = {
                     body: {storeName, policy},
                     token: '123'
@@ -237,7 +232,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
     test(" Buy items with XOR discount(50 on milk or 50 on cola but noth both)",()=>{
         const storeName=_testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.XOR},{discount: _testSimpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.XOR},{discount: _testSimpleDiscount2, operator: Operators.AND} ]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: "123"
@@ -257,7 +252,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
     test('Non empty cart, items in stock, with Cond discount , buy 1 get 2nd for 50%',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
 
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
@@ -283,7 +278,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
      test('Cond discount,get 50% of cola if you buy eggs or 2 bananas and milk ',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: '123'
@@ -303,16 +298,13 @@ describe("Guest buy items, UC: 2.8", () => {
 
         const expectedCharge=(2*_testCondDiscount2.percentage *_testCola.price/100) + (2*_testEggs.price);
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
-
-
-
         
     })
 
 
     test('Cond discount,get 50% of cola if you buy eggs or  banana and milk 2nd cond ',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: '123'
@@ -334,26 +326,5 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
 
     })
-
-
-        test('')
-
-    
-
-
-
-
-
-   
-
-
-
-
-
-
-
-        
-
-
 
 });

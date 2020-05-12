@@ -6,7 +6,7 @@ import {
     Cart,
     IDiscount,
     IItem,
-    IPolicy,
+    IDiscountPolicy,
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
@@ -438,7 +438,7 @@ describe("Guest Integration Tests", () => {
             products: [1],
             percentage: 50,
         }
-        const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -472,7 +472,7 @@ describe("Guest Integration Tests", () => {
             percentage: 50,
             condition: [{condition: {catalogNumber: 1, minAmount: 1}, operator: Operators.AND}]
         }
-        const policy: IPolicy = {discounts: [{discount: condDiscount, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: condDiscount, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -519,7 +519,7 @@ describe("Guest Integration Tests", () => {
                 percentage: 50,
             }
 
-            const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.XOR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+            const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.XOR},{discount: simpleDiscount2, operator: Operators.AND} ]}
             const setPolicyReq: Req.SetDiscountsPolicyRequest = {
                 body: {storeName, policy},
                 token: ownerToken
@@ -574,7 +574,7 @@ describe("Guest Integration Tests", () => {
                 }
 
 
-                const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND},{discount: simpleDiscount2, operator: Operators.AND} ]}
+                const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND},{discount: simpleDiscount2, operator: Operators.AND} ]}
                 const setPolicyReq: Req.SetDiscountsPolicyRequest = {
                     body: {storeName, policy},
                     token: ownerToken
@@ -628,7 +628,7 @@ describe("Guest Integration Tests", () => {
       }
 
 
-      const policy: IPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.OR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+      const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.OR},{discount: simpleDiscount2, operator: Operators.AND} ]}
       const setPolicyReq: Req.SetDiscountsPolicyRequest = {
           body: {storeName, policy},
           token: ownerToken
@@ -676,7 +676,7 @@ describe("Guest Integration Tests", () => {
           condition: [{condition: {minPay: 200}, operator: Operators.AND}]
       }
 
-      const policy: IPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}]}
+      const policy: IDiscountPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}]}
       const setPolicyReq: Req.SetDiscountsPolicyRequest = {
           body: {storeName, policy},
           token: ownerToken

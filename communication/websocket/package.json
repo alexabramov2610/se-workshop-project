@@ -5,15 +5,18 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "tsc",
+    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/",
     "start": "tsc && node dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^13.13.5",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
     "url": "^0.11.0",
     "url-parse": "^1.4.7",
-    "ws": "^7.2.5",
+    "ws": "^7.3.0",
     "wss": "^3.3.4"
   },
   "devDependencies": {

@@ -146,6 +146,10 @@ UC-4.2 discounts
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.setDiscountsPolicy));
 }
+
+export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.viewDiscountsPolicy));
+}
 export const addDiscount = (req: Req.AddDiscountRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addDiscount));
 }
@@ -221,8 +225,34 @@ correctness-constraints
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.setPurchasePolicy));
 }
+export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.viewPurchasePolicy));
+}
 
+/*
+Additional req from FE
+ */
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, StoreService.getStoresWithOffset);
+}
+export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
+    return runIfOpen(req, StoreService.getAllProductsInStore);
+}
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
+    return runIfOpen(req, StoreService.getAllCategoriesInStore);
+}
+export const isSystemUp = (): Res.BoolResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return { data: { result: tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
+}
 
+export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
+    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
+    return runIfOpen(req, UserService.isLoggedInUser);
+}
 
 /*
 Utils
@@ -235,7 +265,7 @@ export const startNewSession = (): string => {
 }
 const runIfOpen = (req: Req.Request, fn: any): any => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.getTradeSystemState(isOpenReq).data.state !== Enums.TradingSystemState.OPEN)
+    if (tradingSystem.getTradeSystemState().data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
     return fn.call(this, req);
 }
@@ -262,15 +292,21 @@ const runIfLoggedIn = (fn: any): any => {
     return f;
 }
 
+export {tradingSystem}
 
 
-// --------------------------------- testing socket
-import {t1, t2} from "../testSocket";
+
+
+
+/** --------------------------------- testing --------------------------------- */
+import {t1, t2, t3} from "../testSocket";
 export const test1 = () : any => {
     t1();
 }
 export const test2 = () : any => {
     t2();
 }
+export const test3 = () : any => {
+    t3();
+}
 
-export {tradingSystem}
