@@ -21,10 +21,10 @@ export async function isLoggedIn(req, res) {
 // get
 
 export async function startNewSession(req,res) {
-    if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-        ServiceFacade.verifyToken(req.cookies['token']).data.result) {
-        return res.send(req.cookies['token'])
-    }
+    // if (req.cookies['token'] && req.cookies['token'].length > 0 &&
+    //     ServiceFacade.verifyToken(req.cookies['token']).data.result) {
+    //     return res.send(req.cookies['token'])
+    // }
 
     const token = wrapHttp(req, ServiceFacade.startNewSession);
     res.cookie('token', token, {

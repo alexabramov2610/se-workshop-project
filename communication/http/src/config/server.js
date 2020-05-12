@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from 'cookie-parser';
 
 const server = express();
+server.options('*', cors()); // preflight OPTIONS;
 server.use(cookieParser());
 
 server.use(bodyParser.json());
