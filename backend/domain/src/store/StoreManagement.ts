@@ -701,6 +701,18 @@ export class StoreManagement {
             {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
     }
 
+    verifyStorePolicy(user: RegisteredUser, storeName: string, bagItems: BagItem[]): Res.BoolResponse {
+        logger.info(`request to verify purchase policy in store ${storeName}`)
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const isPolicyOk: boolean = store.verifyStorePolicy(user, bagItems);
+        return isPolicyOk ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.VERIFY_POLICY_FAILED + "in store" + storeName}
+        }
+    }
+
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;
         let conditions: IConditionOfDiscount[];
@@ -796,5 +808,4 @@ export class StoreManagement {
         }
 
     }
-
 }

@@ -1,4 +1,4 @@
-import {RegisteredUser, UserManager} from "../user/internal_api";
+import {RegisteredUser, User, UserManager} from "../user/internal_api";
 import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
@@ -319,6 +319,21 @@ export class TradingSystemManager {
         return {data: {result: true, price: finalPrice}}
     }
 
+    verifyStorePolicy(req: Req.VerifyPurchasePolicy): Res.BoolResponse {
+        logger.info(`request to verify purchase policy for user cart`)
+        const user: User = this._userManager.getUserByToken(req.token);
+
+        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        for (const [storeName, bagItems] of cart.entries()) {
+            const isPolicyOk: Res.BoolResponse = this._storeManager.verifyStorePolicy(this._userManager.getLoggedInUserByToken(req.token), storeName, bagItems)
+            if (!isPolicyOk.data.result) {
+                logger.warn(`purchase policy verification failed in store ${storeName} `)
+                return isPolicyOk;
+            }
+        }
+        return {data: {result: true}}
+    }
+
     verifyCart(req: Req.VerifyCartRequest): Res.BoolResponse {
         logger.info(`Verify that products in cart are on stock`)
         const user = this._userManager.getUserByToken(req.token);
@@ -451,7 +466,8 @@ export class TradingSystemManager {
     setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
         logger.info(`request to set discount policy to store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)    }
+        return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)
+    }
 
     setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
         logger.info(`request to set discount policy to store ${req.body.storeName} `)
@@ -543,6 +559,8 @@ export class TradingSystemManager {
 
     isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        return { data: { username: user ? user.name : "undefined" } }
+        return {data: {username: user ? user.name : "undefined"}}
     }
+
+
 }

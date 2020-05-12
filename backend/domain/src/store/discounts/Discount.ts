@@ -1,16 +1,23 @@
 import {v4 as uuid} from 'uuid';
-import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export abstract class Discount {
-    protected _productsInDiscount: number[];
+    protected _category: ProductCategory;
 
-    constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[]) {
+    constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], category?: ProductCategory) {
         this._id = uuid();
         this._percentage = percentage;
         this._duration = duration;
         this._startDate = startDate;
         this._productsInDiscount = productsInDiscount;
+        this._category = category
+    }
+
+    protected _productsInDiscount: number[];
+
+    get productsInDiscount(): number[] {
+        return this._productsInDiscount;
     }
 
     private _id: string;
@@ -47,8 +54,8 @@ export abstract class Discount {
 
     abstract calc(bag: BagItem[]): BagItem[];
 
-    isRelevant(bag: BagItem[]): boolean {
-        return this.isValid() && bag.some((bagItem) => this.isProductInDiscount(bagItem.product.catalogNumber));
+    isRelevant(bagItem: BagItem[]): boolean {
+        return this.isValid() && bagItem.some((bagItem) => this.isProductInDiscount(bagItem));
     }
 
     abstract add(discount: Discount, operator: Operators): void;
@@ -63,17 +70,12 @@ export abstract class Discount {
         return today < endDate;
     }
 
-    protected isProductInDiscount(catalogNumber: number): boolean {
-        return this._productsInDiscount.indexOf(catalogNumber) !== -1
+    protected isProductInDiscount(bagItem: BagItem): boolean {
+        return this._productsInDiscount.indexOf(bagItem.product.catalogNumber) !== -1 || this._category === bagItem.product.category
     }
 
     protected addMinutes(date, minutes): Date {
         return new Date(date.getTime() + minutes * 60000);
-    }
-
-
-    get productsInDiscount(): number[] {
-        return this._productsInDiscount;
     }
 
 
