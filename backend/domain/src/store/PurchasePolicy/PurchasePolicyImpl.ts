@@ -4,6 +4,8 @@ import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {RegisteredUser} from "../../user/users/RegisteredUser";
 
 export class PurchasePolicyImpl extends PurchasePolicy {
+    public
+
     public constructor() {
         super()
         this._children = new Map();
@@ -28,36 +30,58 @@ export class PurchasePolicyImpl extends PurchasePolicy {
     }
 
     isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean {
+
+        if (this._children.size === 1) {
+            const isSatisfied: boolean = this._children.keys().next().value.isSatisfied(bagItems, user);
+            return isSatisfied;
+        }
         let ans: boolean = false;
+        let lastOp: Operators;
+        const temp: PurchasePolicy[] = Array.from(this._children.keys());
         for (const [policy, nextOp] of this._children) {
             const isSatisfied: boolean = policy.isSatisfied(bagItems, user);
-            if (isSatisfied) {
-                if (nextOp === Operators.OR) {
-                    return true;
-                }
-                if (nextOp === Operators.XOR) {
-                    // @ts-ignore
-                    ans = ans !== true;
-                }
-                if (nextOp === Operators.AND) {
-                    // @ts-ignore
-                    ans = true;
+            if (temp.indexOf(policy) === temp.length - 1) {
+                switch (lastOp) {
+                    case Operators.OR: {
+                        return isSatisfied;
+                    }
+                        break;
+                    case Operators.AND: {
+                        return isSatisfied;
+                    }
+                        break
+                    case Operators.XOR: {
+                        return ans !== isSatisfied;
+                    }
+                        break;
                 }
             } else {
-                if (nextOp === Operators.AND) {
-                    return false;
+                switch (nextOp) {
+                    case Operators.OR: {
+                        if (isSatisfied)
+                            return true;
+                    }
+                        break;
+                    case Operators.AND: {
+                        if(!isSatisfied)
+                            return false;
+                    }
+                        break;
+                    case Operators.XOR: {
+                        ans = ans !== isSatisfied
+                    }
+                        break;
                 }
-                if (nextOp === Operators.XOR) {
-                    ans = ans !== false;
-                }
-
+                lastOp = nextOp;
             }
 
         }
-        return this._children.size === 0? true : ans;
+        return this._children.size === 0 ? true : ans;
     }
 
-    public getPolicyTag(): string {
+    getPolicyTag()
+        :
+        string {
         return "impl";
     }
 
