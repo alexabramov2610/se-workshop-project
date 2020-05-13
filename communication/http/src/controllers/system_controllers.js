@@ -28,9 +28,12 @@ export async function startNewSession(req,res) {
     if (req.cookies['token'] && req.cookies['token'].length > 0 &&
         ServiceFacade.verifyToken(req.cookies['token']).data.result) {
         token = res.send(req.cookies['token'])
+        console.log('already exists :' + token)
     }
-    else
+    else {
         token = wrapHttp(req, ServiceFacade.startNewSession);
+        console.log('new token! :' + token)
+    }
 
     res.cookie('token', token, {
         httpOnly: true,
