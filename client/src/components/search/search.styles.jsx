@@ -20,6 +20,12 @@ export const ButtonsBarContainer = styled.div`
 export const FiltersContainer = styled.div`
   margin-top: -50px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 15px;
+`;
+export const SearchInputsContainer = styled.div`
+  margin-top: -25px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 15px;
 `;
