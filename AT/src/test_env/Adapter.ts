@@ -279,6 +279,21 @@ export const Adapter: Partial<Env.Bridge> = {
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined }; 
+  },
+
+  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
+    const { data, error } = ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined }; 
+  },
+
+  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
+    const { data, error } = ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined }; 
   }
+
 
 };

@@ -87,5 +87,7 @@ export interface Bridge {
   setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
    addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
   removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
+  setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse
+  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse
 
 }

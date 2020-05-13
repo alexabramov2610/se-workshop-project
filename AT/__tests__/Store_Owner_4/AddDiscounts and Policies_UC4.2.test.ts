@@ -6,8 +6,8 @@ import {
 } from "../..";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import {IDiscount, Purchase, ISimplePurchasePolicy, IPurchasePolicy,} from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
+import {IDiscount, Purchase, ISimplePurchasePolicy, IPurchasePolicy, IDiscountPolicy,} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {Operators, ProductCategory, Rating, WeekDays} from "se-workshop-20-interfaces/dist/src/Enums"
 
 
 import { Req, Res } from "se-workshop-20-interfaces";
@@ -41,6 +41,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     let _testSimpleDiscount2: IDiscount;
     let _testCondDiscount1:IDiscount;
     let _testCondDiscount2:IDiscount;
+
+
 
     beforeEach(() => {
         _serviceBridge = _driver
@@ -86,11 +88,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
             {condition:{catalogNumber:_testBanana.catalogNumber,minAmount:1},operator:Operators.AND},                 // buy 2+ banana and milk 
             {condition:{catalogNumber:_testMilk.catalogNumber,minAmount:1},operator:Operators.AND}]}
 
-
-
         
-
-
         _serviceBridge.createStore(_testStore1);
         _serviceBridge.createStore(_testStore2);
 
@@ -105,8 +103,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         
     });
 
-    afterEach(() => {
-        utils.terminateSocket();
+    afterEach(async () => {
+        await utils.terminateSocket();
      });
 
   
@@ -114,7 +112,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     test("Non empty cart, items in stock, with simple discount(50% on milk)" ,() => { 
 
     const storeName = _testStore1.name
-    const policy:IPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
+    const policy:IDiscountPolicy = {discounts: [{discount: _testSimpleDiscount2, operator: Operators.AND}]}
     const setPolicyReq: Req.SetDiscountsPolicyRequest = {
                     body: {storeName, policy},
                     token: '123'
@@ -145,7 +143,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     test(" Buy items with XOR discount(50 on milk or 50 on cola but noth both)",()=>{
         const storeName=_testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.XOR},{discount: _testSimpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testSimpleDiscount1, operator: Operators.XOR},{discount: _testSimpleDiscount2, operator: Operators.AND} ]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: "123"
@@ -165,7 +163,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     test('Non empty cart, items in stock, with Cond discount , buy 1 get 2nd for 50%',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount1, operator: Operators.AND}]}
 
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
@@ -191,7 +189,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
      test('Cond discount,get 50% of cola if you buy eggs or 2 bananas and milk ',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: '123'
@@ -220,7 +218,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     test('Cond discount,get 50% of cola if you buy eggs or  banana and milk 2nd cond ',()=>{
         const storeName = _testStore1.name
-        const policy: IPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: _testCondDiscount2, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: '123'
@@ -251,7 +249,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
             products:[_testMilk.catalogNumber],
             condition: [{condition: {minPay : 90},operator: Operators.AND}]} 
 
-        const policy: IPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: '123'
@@ -273,25 +271,196 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     })
 
-
-
-    //buying policies
+    
 
     test('set and view buying policy ',()=>{
         const storeName=_testStore1.name
-        const simplePolicy1: ISimplePurchasePolicy = {
-            productPolicy:{catalogNumber:_testMilk.catalogNumber ,minAmount: 2, maxAmount: 4}
-        
-        }
 
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND},{policy: simplePolicy3, operator: Operators.XOR}, {policy: simplePolicy4, operator: Operators.AND}]}
+        const simplePolicy1 = {productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}}
+        const simplePolicy2 = {bagPolicy:{minAmount: 2, maxAmount:3}}
+        const simplePolicy3 = {systemPolicy:{notForSellDays:[WeekDays.FRIDAY]}}
+        const simplePolicy4 = {userPolicy:{countries: ["israel"]}}
+        
+
+        const policy: IPurchasePolicy = {policy: [
+             {policy: simplePolicy1, operator: Operators.OR},
+             {policy: simplePolicy2, operator: Operators.AND},
+             {policy: simplePolicy3, operator: Operators.XOR},
+             {policy: simplePolicy4, operator: Operators.AND}]}
+        
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: '123'
         }
 
         const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
 
+        const req : Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token:'123'};
+        const res: Res.ViewStorePurchasePolicyResponse = _serviceBridge.viewPurchasePolicy(req);
+        expect(res.data.policy).toEqual(policy);
         
     })
+
+    
+    test('buy with simple product buying policy',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 2}}
+
+
+        const policy:IPurchasePolicy = {policy:[
+            {policy: simplePolicy1, operator: Operators.OR}
+        ]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola]).makeABuy(3); 
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+
+        const res = _driver.given.store(_testStore1).products([_testCola]).makeABuy(1); 
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt).toBeDefined()
+
+
+
+    })
+
+    test('buy with simple bagitem buying policy',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1 = {bagPolicy:{minAmount: 1, maxAmount:1}}
+
+
+        const policy:IPurchasePolicy = {policy:[
+            {policy: simplePolicy1, operator: Operators.OR}
+        ]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+
+        const res = _driver.given.store(_testStore1).products([_testCola]).makeABuy(1); 
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt).toBeDefined()
+
+
+    })
+
+    // test('buy with simple systemPolicy buying policy',()=>{
+    //     const storeName=_testStore1.name
+    //     const today=new Date().getDay()   
+    //     const simplePolicy1 = {systemPolicy:{notForSellDays:[WeekDays.FRIDAY]}}    //change day
+
+    //     const policy:IPurchasePolicy = {policy:[
+    //         {policy: simplePolicy1, operator: Operators.OR}
+    //     ]}
+    //     const setPolicyReq: Req.SetPurchasePolicyRequest = {
+    //         body: {storeName, policy},
+    //         token: '123'
+    //     }
+    //     const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+    //     expect(makePolicyRes.data.result).toBeTruthy()
+
+    //     const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+    //     expect(error).toBeDefined()
+    //     expect(data.result).toBeFalsy()
+
+    // })
+
+    
+
+  
+
+
+    test('buy with Comp And buying policy',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 3}}
+        const simplePolicy2 = {bagPolicy:{minAmount: 3, maxAmount:5}}
+
+
+
+        const policy:IPurchasePolicy = {policy:[
+            {policy: simplePolicy1, operator: Operators.AND}
+        ]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        //fail item amount < bagPolicy minAmount (3)
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+        //success
+        const res = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); 
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt).toBeDefined()
+
+    })
+
+    test('buy with Comp OR buying policy',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 3}}
+        const simplePolicy2 = {bagPolicy:{minAmount: 3, maxAmount:5}}
+
+
+
+        const policy:IPurchasePolicy = {policy:[
+            {policy: simplePolicy1, operator: Operators.AND}
+        ]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        // 1<cola<3 success 
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        expect(error).toBeUndefined()
+        expect(data.result).toBeTruthy()
+       
+    })
+
+    test('buy with Comp XOR buying policy',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 3}}
+        const simplePolicy2 = {bagPolicy:{minAmount: 3, maxAmount:5}}
+
+
+
+        const policy:IPurchasePolicy = {policy:[
+            {policy: simplePolicy1, operator: Operators.AND}
+        ]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        // 1<cola<3 and 3<bag items<5 -> fail  
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(2); 
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+
+        const res = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt).toBeDefined()
+       
+    })
+    
+
 });
