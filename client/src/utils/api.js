@@ -55,6 +55,10 @@ const getStoreProducts = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getProducts/?storeName=${storeName}`);
 
 }
+const search = async (req) => {
+    return instance.post(`${baseDomain}/stores/search`, req);
+
+}
 
 
-export { startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit };
+export { startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search };
