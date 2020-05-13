@@ -473,11 +473,11 @@ export class StoreManagement {
     }
 
     search(filters: SearchFilters, query: SearchQuery): Res.SearchResponse {
-        if (query.storeName) {
+        if (query.storeName && query.storeName.length > 0) {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
                 return {data: {result: false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
-            if (!filters.storeRating || filters.storeRating === store.rating)
+            if (!filters.storeRating || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
                 return {data: {result: true, products: store.search(filters, query)}};
             else
                 return {data: {result: true, products: []}};
@@ -485,7 +485,7 @@ export class StoreManagement {
 
         let productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
-            if (typeof filters.storeRating === "undefined" || filters.storeRating === store.rating)
+            if (typeof filters.storeRating === "undefined" || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
                 productsFound = productsFound.concat(store.search(filters, query));
         }
         return {data: {result: true, products: productsFound}};
