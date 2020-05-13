@@ -153,16 +153,15 @@ export const removeDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
     return ts.setPurchasePolicy(req);
 }
+export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse => {
+    return ts.viewPurchasePolicy(req);
+}
 
 export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
     return ts.setDiscountsPolicy(req);
 }
 export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
     return ts.viewDiscountsPolicy(req);
-}
-
-export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
-    return ts.getStoresWithOffset(req);
 }
 
 const verifyPermission = (storeName: string, permission: ManagementPermission, token: string): Res.BoolResponse => {
@@ -172,4 +171,16 @@ const verifyPermission = (storeName: string, permission: ManagementPermission, t
             permission
         }, token
     })
+}
+
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+    return ts.getStoresWithOffset(req);
+}
+
+export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
+    return ts.getAllProductsInStore(req);
+}
+
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+    return ts.getAllCategoriesInStore(req);
 }

@@ -16,6 +16,7 @@ import * as utils from "../utils"
 
 
 describe("Store owner add Disconts and policies , UC: 4.2", () => {
+
     let _driver = new Driver();
     let _serviceBridge: Bridge;
     let _testStore1: Store;
@@ -68,9 +69,6 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         _testBanana1= new ItemBuilder().withId(7).withCatalogNumber(_testBanana.catalogNumber).getItem();
 
 
-
-
-
         _testStore1 = {name: "testStore1Name"};
         _testStore2 = {name: "testStore2Name"};
 
@@ -112,7 +110,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
      });
 
   
-
+//discounts
     test("Non empty cart, items in stock, with simple discount(50% on milk)" ,() => { 
 
     const storeName = _testStore1.name
@@ -276,4 +274,10 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     })
 
 
+
+    //buying policies
+
+    test('add buying policy',()=>{
+        
+    })
 });

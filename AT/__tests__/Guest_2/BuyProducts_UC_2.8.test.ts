@@ -6,7 +6,7 @@ import {
 } from "../../";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import {IDiscount, Purchase,IPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IDiscount, Purchase,IDiscountInPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
 
 

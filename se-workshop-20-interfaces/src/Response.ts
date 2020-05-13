@@ -9,7 +9,7 @@ import {
   Cart,
   IPayment,
   IContactUsMessage,
-  Error, IPolicy,
+  Error, IDiscountPolicy, IPurchasePolicy,
 } from "./CommonInterface";
 import {
   ManagementPermission,
@@ -89,10 +89,11 @@ interface AddDiscountResponse extends BoolResponse {
 }
 
 interface ViewStoreDiscountsPolicyResponse extends Response{
-  data: { policy: IPolicy;};
-
+  data: { policy: IDiscountPolicy;};
 }
-
+interface ViewStorePurchasePolicyResponse extends Response{
+  data: { policy: IPurchasePolicy;};
+}
 interface ViewRUserPurchasesHistoryRes extends Response {
   data: { result: boolean; receipts: IReceipt[] };
 }
@@ -121,7 +122,22 @@ interface GetStoresWithOffsetResponse extends Response {
   data: { stores: StoreInfo[] }
 }
 
+interface GetAllProductsInStoreResponse extends Response {
+  data: { products: ProductInStore[] }
+}
+
+interface GetAllCategoriesInStoreResponse extends Response {
+  data: { categories: ProductCategory[] }
+}
+
+interface GetLoggedInUserResponse extends Response {
+  data: { username: string }
+}
+
 export {
+  GetLoggedInUserResponse,
+  GetAllProductsInStoreResponse,
+  GetAllCategoriesInStoreResponse,
   GetStoresWithOffsetResponse,
   DeliveryResponse,
   AddDiscountResponse,
@@ -144,4 +160,5 @@ export {
   ViewRUserPurchasesHistoryRes,
   ViewCartRes,
   ViewStoreDiscountsPolicyResponse,
+  ViewStorePurchasePolicyResponse
 };
