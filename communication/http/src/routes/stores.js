@@ -17,6 +17,7 @@ router.post("/removeProductsWithQuantity", StoreController.removeProductsWithQua
 router.post("/addNewProducts", StoreController.addNewProducts);
 router.post("/removeProducts", StoreController.removeProducts);
 router.post("/setDiscountsPolicy", StoreController.setDiscountsPolicy);
+router.post("/getDiscountsPolicy", StoreController.getDiscountsPolicy);
 router.post("/addDiscount", StoreController.addDiscount);
 router.post("/removeProductDiscount", StoreController.removeProductDiscount);
 router.post("/assignStoreOwner", StoreController.assignStoreOwner);
