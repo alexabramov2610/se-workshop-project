@@ -559,7 +559,7 @@ export class TradingSystemManager {
 
     isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        return {data: {username: user ? user.name : "undefined"}}
+        return {data: {username: user ? user.name : undefined}}
     }
 
     verifyToken(req: Req.Request): Res.BoolResponse {

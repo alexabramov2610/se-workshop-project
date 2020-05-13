@@ -9,16 +9,19 @@ export async function systemInit(req,res) {
     return res.send(result)
 }
 
-export async function isLoggedIn(req, res) {
-    const result = wrapHttp(req, ServiceFacade.isLoggedInUser);
-    return res.send(result)
-}
 
 
 
 
 
 // get
+
+
+
+export async function isLoggedIn(req, res) {
+    const result = wrapHttp(req, ServiceFacade.isLoggedInUser);
+    return res.send(result)
+}
 
 export async function startNewSession(req,res) {
     let token;

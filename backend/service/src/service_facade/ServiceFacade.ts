@@ -233,16 +233,16 @@ export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res
 Additional req from FE
  */
 export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    return runIfOpen(req, StoreService.getStoresWithOffset);
+    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    // return runIfOpen(req, StoreService.getStoresWithOffset);
 }
 export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
-    return runIfOpen(req, StoreService.getAllProductsInStore);
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
+    // return runIfOpen(req, StoreService.getAllProductsInStore);
 }
 export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    return runIfOpen(req, StoreService.getAllCategoriesInStore);
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
+    // return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
 export const isSystemUp = (): Res.BoolResponse => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
@@ -252,8 +252,8 @@ export const verifyToken = (req: Req. Request): Res.BoolResponse => {
     return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    return runIfOpen(req, UserService.isLoggedInUser);
+    return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
+    // return runIfOpen(req, UserService.isLoggedInUser);
 }
 
 /*
