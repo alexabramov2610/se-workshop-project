@@ -252,8 +252,8 @@ export const verifyToken = (req: Req. Request): Res.BoolResponse => {
     return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    return runIfOpen(req, UserService.isLoggedInUser);
+    return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
+    // return runIfOpen(req, UserService.isLoggedInUser);
 }
 
 /*
