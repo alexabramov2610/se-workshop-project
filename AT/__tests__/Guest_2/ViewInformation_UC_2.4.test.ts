@@ -29,9 +29,9 @@ describe("Guest - View Information, UC: 2.4", () => {
 
     });
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
     test("View valid product", () => {
         _serviceBridge.createStore(_testStore);

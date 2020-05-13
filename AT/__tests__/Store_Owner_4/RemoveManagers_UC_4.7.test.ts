@@ -30,8 +30,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
 
   test("Remove managers - remove store manager options- store owner not logged in", () => {

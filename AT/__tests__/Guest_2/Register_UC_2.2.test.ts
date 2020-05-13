@@ -12,9 +12,9 @@ describe("Guest Registration, UC: 2.2", () => {
         _credentials = {userName: "test-username", password: "test-password"};
     });
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
     test("Valid Details", () => {
         _credentials.userName = "validUsername";

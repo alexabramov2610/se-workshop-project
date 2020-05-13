@@ -12,10 +12,9 @@ import {
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import { Req } from "se-workshop-20-interfaces"
+import {Req} from "se-workshop-20-interfaces"
 import {Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import * as utils from "../../utils"
-
 
 
 describe("Guest Search, UC: 2.5", () => {
@@ -93,9 +92,9 @@ describe("Guest Search, UC: 2.5", () => {
         }
     });
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
     test("Valid search input, no filters", () => {
         _testSearchData.body.filters = {};

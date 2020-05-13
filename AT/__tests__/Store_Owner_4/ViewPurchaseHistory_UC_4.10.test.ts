@@ -31,8 +31,8 @@ describe("Watch Purchases History, UC: 3.7", () => {
 
 
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
 
 

@@ -6,7 +6,6 @@ import {PayRequest} from "se-workshop-20-interfaces/dist/src/Request";
 import * as utils from "../../utils"
 
 
-
 describe("Guest buy items, UC: 2.8", () => {
     let _driver = new Driver();
     let _serviceBridge: Bridge;
@@ -30,10 +29,9 @@ describe("Guest buy items, UC: 2.8", () => {
     });
 
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
-
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
     test("Valid request", () => {
         const {data, error} = _serviceBridge.pay(_testPaymentInfo);

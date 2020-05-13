@@ -21,8 +21,8 @@ describe("Add Remove Edit Products, UC: 4.1", () => {
     _storeInformation = { name: "some-store" };
   });
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
 
   test("Add product - Happy Path: add product to new store", () => {

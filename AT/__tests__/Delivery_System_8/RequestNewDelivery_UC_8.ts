@@ -34,9 +34,9 @@ describe("Guest buy items, UC: 2.8", () => {
     });
 
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
     test("Valid delivery", () => {
         const {data, error} = _serviceBridge.deliver(_testDeliveryInfo);

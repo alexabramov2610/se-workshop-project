@@ -47,9 +47,9 @@ describe("Perform authorized operations, UC: 5.1", () => {
     });
 
 
-    afterEach(async () => {
-        await utils.terminateSocket();
-     });
+    afterAll(() => {
+        utils.terminateSocket();
+    });
 
 
     test("Act, no permissions", () => {

@@ -27,8 +27,8 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
     _serviceBridge.assignManager(_storeInformation, _newManagerCredentials);
   });
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
 
   test("store owner logged in valid manager", () => {

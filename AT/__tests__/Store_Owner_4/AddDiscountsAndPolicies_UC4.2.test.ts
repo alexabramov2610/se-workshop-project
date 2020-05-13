@@ -105,8 +105,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         
     });
 
-    afterEach(async () => {
-        await utils.terminateSocket();
+    afterAll(() => {
+        utils.terminateSocket();
      });
 
   

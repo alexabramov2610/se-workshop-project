@@ -27,8 +27,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge.register(_newOwnerCreds);
   });
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
   test("Add Store Owner - Happy Path: valid store ,not already assigned", () => {
     _serviceBridge.login(_driver.getLoginDefaults());

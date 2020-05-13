@@ -23,8 +23,8 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
   });
 
 
-  afterEach(async () => {
-    await utils.terminateSocket();
+  afterAll(() => {
+    utils.terminateSocket();
  });
 
   test("Give Manager Permissions - store owner logged in, new manager", () => {
