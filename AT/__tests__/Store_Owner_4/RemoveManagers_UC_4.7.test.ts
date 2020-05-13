@@ -1,5 +1,7 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials } from "../../src/test_env/types";
+import * as utils from "../../utils"
+
 
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
@@ -26,6 +28,11 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge.assignManager(_storeInformation,_newManagerCreds)
     _serviceBridge.logout();
   });
+
+
+  afterEach(async () => {
+    await utils.terminateSocket();
+ });
 
   test("Remove managers - remove store manager options- store owner not logged in", () => {
     const { data, error } = _serviceBridge.removeStoreManager({

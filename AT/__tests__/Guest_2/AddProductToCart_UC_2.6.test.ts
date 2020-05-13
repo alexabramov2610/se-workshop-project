@@ -8,7 +8,7 @@ import {
 
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import * as utils from "../utils"
+import * as utils from "../../utils"
 
 
 
@@ -56,8 +56,8 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
         _serviceBridge.logout();
     });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterEach(async () => {
+        await utils.terminateSocket();
      });
 
     test("Valid insertion, item doesn't exist in cart", () => {

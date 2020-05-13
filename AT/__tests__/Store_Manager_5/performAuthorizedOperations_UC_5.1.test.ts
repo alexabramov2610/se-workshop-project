@@ -2,6 +2,7 @@ import {Bridge, Driver, Store, Credentials, Item, PERMISSION, Discount, Product}
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 import {ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import * as utils from "../../utils"
 
 describe("Perform authorized operations, UC: 5.1", () => {
     let _driver = new Driver;
@@ -44,6 +45,12 @@ describe("Perform authorized operations, UC: 5.1", () => {
         _driver.loginWithDefaults(); // Owner is logging in again
         _serviceBridge.assignManager(_testStore, _storeManagerCredentials);
     });
+
+
+    afterEach(async () => {
+        await utils.terminateSocket();
+     });
+
 
     test("Act, no permissions", () => {
         _serviceBridge.logout() // Owner signs out

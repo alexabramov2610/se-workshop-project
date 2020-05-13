@@ -1,7 +1,7 @@
 import {Bridge, Driver, Item, Store, Product} from "../../";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
-import * as utils from "../utils"
+import * as utils from "../../utils"
 
 
 // const ITEM_NOT_FOUND = "Item not found";
@@ -29,8 +29,8 @@ describe("Guest - View Information, UC: 2.4", () => {
 
     });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterEach(async () => {
+        await utils.terminateSocket();
      });
 
     test("View valid product", () => {

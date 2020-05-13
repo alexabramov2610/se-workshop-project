@@ -1,5 +1,7 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials, User, PERMISSION } from "../../src/test_env/types";
+import * as utils from "../../utils"
+
 
 describe("Edit or Set Permissions, UC: 4.6", () => {
   let _serviceBridge: Bridge;
@@ -24,6 +26,10 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
     _driver.loginWithDefaults();
     _serviceBridge.assignManager(_storeInformation, _newManagerCredentials);
   });
+
+  afterEach(async () => {
+    await utils.terminateSocket();
+ });
 
   test("store owner logged in valid manager", () => {
     const res = _serviceBridge.grantPermissions(

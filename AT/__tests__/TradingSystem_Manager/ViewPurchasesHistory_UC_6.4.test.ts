@@ -1,6 +1,8 @@
 import { Bridge, Driver, Item, CreditCard, Product, Store } from "../..";
 import { ProductBuilder } from "../../src/test_env/mocks/builders/product-builder";
 import { Credentials } from "../../src/test_env/types";
+import * as utils from "../../utils"
+
 
 describe("Watch Purchases History, UC: 3.7", () => {
   let _serviceBridge: Bridge;
@@ -27,6 +29,12 @@ describe("Watch Purchases History, UC: 3.7", () => {
     _serviceBridge.logout();
     _serviceBridge.register(_shopoholic);
   });
+
+
+  afterEach(async () => {
+    await utils.terminateSocket();
+ });
+
 
   test("logged in, with history, without admin flag", () => {
     _serviceBridge.login(_shopoholic);

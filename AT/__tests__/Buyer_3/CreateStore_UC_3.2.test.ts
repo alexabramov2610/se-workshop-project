@@ -1,4 +1,6 @@
 import { Bridge, Driver, Store } from "../..";
+import * as utils from "../../utils"
+
 
 describe("Create Store Buyer, UC: 3.2", () => {
   let _serviceBridge: Bridge;
@@ -14,6 +16,11 @@ describe("Create Store Buyer, UC: 3.2", () => {
     _serviceBridge = _driver.getBridge();
     _storeInformation = { name: "mock-name-each" };
   });
+
+
+  afterEach(async () => {
+    await utils.terminateSocket();
+ });
 
   test("Create Store - Happy Path: valid store information - logged in user", () => {
     _storeInformation = { name: "some-store" };

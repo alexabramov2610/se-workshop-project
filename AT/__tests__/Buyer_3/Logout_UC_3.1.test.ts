@@ -1,4 +1,5 @@
 import { Bridge, Driver, Credentials } from "../..";
+import * as utils from "../../utils"
 
 describe("Guest Buyer, UC: 3.1", () => {
   let _serviceBridge: Bridge;
@@ -12,6 +13,11 @@ describe("Guest Buyer, UC: 3.1", () => {
       .registerWithDefaults();
     _serviceBridge = _driver.getBridge();
   });
+
+
+  afterEach(async () => {
+    await utils.terminateSocket();
+ });
 
   test("Logout - Happy Path: after user was logged in ", () => {
     _driver.loginWithDefaults();

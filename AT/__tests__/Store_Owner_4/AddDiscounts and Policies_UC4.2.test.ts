@@ -470,11 +470,11 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
         // (1<cola<3) T  XOR  T (3<bag items<5) -> expect to fail and get error 
         const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); //4 items, 2 cola 2 milk
-        expect(error).toBeDefined()
+        expect(error.message).toBeDefined()
         expect(data.result).toBeFalsy()
 
         // 1<cola<3 and bagitems>5 -> success 
-        const res = _driver.given.store(_testStore1).products([_testMilk,_testEggs]).makeABuy(1); //cart contain 6 items
+        const res = _driver.given.store(_testStore1).products([_testBanana,_testEggs]).makeABuy(1); //cart contain 6 items
         expect(res.data.result).toBeTruthy()
         expect(res.data.receipt).toBeDefined()
        

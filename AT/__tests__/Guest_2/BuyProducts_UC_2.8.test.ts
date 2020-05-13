@@ -11,7 +11,7 @@ import {Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist
 
 
 import { Req } from "se-workshop-20-interfaces";
-import * as utils from "../utils"
+import * as utils from "../../utils"
 
 
 
@@ -88,8 +88,8 @@ describe("Guest buy items, UC: 2.8", () => {
         
     });
 
-    afterEach(() => {
-        utils.terminateSocket();
+    afterEach(async () => {
+        await utils.terminateSocket();
      });
 
     test("Non empty cart, items in stock, no discount",() => {
