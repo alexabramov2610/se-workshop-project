@@ -562,7 +562,4 @@ export class TradingSystemManager {
         return {data: {username: user ? user.name : undefined}}
     }
 
-    verifyToken(req: Req.Request): Res.BoolResponse {
-        return this._userManager.verifyToken(req.token);
-    }
 }

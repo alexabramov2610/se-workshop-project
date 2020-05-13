@@ -26,8 +26,8 @@ export async function isLoggedIn(req, res) {
 export async function startNewSession(req,res) {
     let token;
     if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-        ServiceFacade.verifyToken(req.cookies['token']).data.result) {
-        token = res.send(req.cookies['token'])
+        ServiceFacade.verifyToken({ token: req.cookies['token'] }).data.result) {
+        token = req.cookies['token']
     }
     else
         token = wrapHttp(req, ServiceFacade.startNewSession);
