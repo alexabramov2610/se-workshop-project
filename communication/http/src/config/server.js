@@ -4,10 +4,9 @@ import cors from "cors";
 import cookieParser from 'cookie-parser';
 
 const server = express();
-server.options('*', cors()); // preflight OPTIONS;
 server.use(cookieParser());
 
 server.use(bodyParser.json());
-server.use(cors());
+server.use(cors({origin: true, credentials: true}));
 
 export default server;
