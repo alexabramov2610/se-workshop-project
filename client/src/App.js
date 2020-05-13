@@ -10,11 +10,13 @@ import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
 import { init } from '../src/utils/api'
+import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { StorePage } from './pages/store-page/store-page'
+import { SearchPage } from './pages/search-page/serch-page'
 import { createBrowserHistory } from 'history';
 import { history } from './utils/config'
-
+import * as config from './utils/config'
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -23,22 +25,23 @@ class App extends React.Component {
         }
         this.onLogin = this.onLogin.bind(this);
     }
-
-    onLogin = () => {
+    onLogin = (username) => {
         this.setState({ isLoggedIn: true })
+        config.setLoggedInUser(username)
 
     }
 
     onLogout = () => {
         this.setState({ isLoggedIn: false })
+        config.setLoggedInUser(undefined);
     }
+
     async componentDidMount() {
         const initialized = await init();
         this.setState({ initialized: true })
     }
     render() {
         return this.state.initialized ? (
-
             <Router history={history}>
                 <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                 <Switch>
@@ -47,18 +50,8 @@ class App extends React.Component {
                     <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                     <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/store/:storename" component={StorePage} />
-                    {/*<Route exact path="/contact" component={ContactPage}/>*/}
-                    {/*<Route*/}
-                    {/*    exact*/}
-                    {/*    path="/signin"*/}
-                    {/*    render={() =>*/}
-                    {/*        this.props.currentUser ? (*/}
-                    {/*            <Redirect to="/"/>*/}
-                    {/*        ) : (*/}
-                    {/*            <SignInAndSignUpPage/>*/}
-                    {/*        )*/}
-                    {/*    }*/}
-                    {/*/>*/}
+                    <Route exact path="/search" component={SearchPage} />
+                    <Route exact path="/admininit" component={AdminInit} />
                 </Switch>
             </Router>
 

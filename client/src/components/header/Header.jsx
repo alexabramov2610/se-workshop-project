@@ -9,9 +9,13 @@ import {
   LogoContainer,
   OptionsContainer,
   OptionLink,
+  SearchContainer,
+  LogoSearchContainer,
 } from "./Header-styles";
+import { Search } from "../search/search";
 import BellIcon from "../bell-icon/bell-icon.component";
 import { Link } from "react-router-dom";
+
 const underlineAnimation = "hvr-underline-from-center";
 
 export class Header extends React.Component {
@@ -24,10 +28,9 @@ export class Header extends React.Component {
       console.log("Log Out Recieved: ", data);
       (!data.error || data.error.message === "Already at this state") &&
         this.props.onLogout();
-    }); 
+    });
 
   render() {
-    
     return (
       <React.Fragment>
         <HeaderContainer>
@@ -35,22 +38,33 @@ export class Header extends React.Component {
             <Logo className="logo hvr-bounce-in" />
           </LogoContainer>
           <OptionsContainer>
-            <OptionLink as="div" className={underlineAnimation} to="/shop">
-              HOME PAGE
+            <OptionLink as="div" className={underlineAnimation}>
+              <Link
+                style={{ textDecoration: "none", color: "black" }}
+                to="/search"
+              >
+                Search
+              </Link>
             </OptionLink>
-            <OptionLink as="div" className={underlineAnimation} to="/contact">
-              CONTACT
+
+            <OptionLink as="div" className={underlineAnimation}>
+              <Link style={{ textDecoration: "none", color: "black" }} to="/">
+                HOME PAGE
+              </Link>
             </OptionLink>
+
             {this.props.isLoggedIn ? (
               <OptionLink
                 as="div"
                 className={underlineAnimation}
                 onClick={() => this.onLogout()}
               >
-                SIGN OUT
+                <Link style={{ textDecoration: "none", color: "black" }} to="/">
+                  SIGN OUT
+                </Link>
               </OptionLink>
             ) : (
-              <OptionLink as="div" className={underlineAnimation} to="/signin">
+              <OptionLink as="div" className={underlineAnimation}>
                 <Link
                   style={{ textDecoration: "none", color: "black" }}
                   to="/signupsignin"
