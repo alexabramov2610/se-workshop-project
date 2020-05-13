@@ -249,7 +249,7 @@ export const isSystemUp = (): Res.BoolResponse => {
     return { data: { result: tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
 }
 export const verifyToken = (req: Req. Request): Res.BoolResponse => {
-    return runIfOpen(req, runIfHaveToken(UserService.verifyToken));
+    return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
