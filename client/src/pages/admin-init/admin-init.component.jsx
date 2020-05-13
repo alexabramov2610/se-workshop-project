@@ -42,14 +42,13 @@ class AdminInit extends React.Component {
       <CreateStorePageContainer>
         <StoreFormContainer>
           <CreateStoreTitle>Set Up System Admin</CreateStoreTitle>
-          <span>Create New Store And Start Trading</span>
           <form className="sign-up-form" onSubmit={this.handleSubmit}>
             <FormInput
               type="text"
               name="firstAdminName"
               value={firstAdminName}
               onChange={this.handleChange}
-              label="Store Name"
+              label="Admin User Name"
               required
             />
             <FormInput
@@ -57,7 +56,7 @@ class AdminInit extends React.Component {
               name="firstAdminPassword"
               value={firstAdminPassword}
               onChange={this.handleChange}
-              label="Store Description"
+              label="Admin Password"
               required
             />
 
