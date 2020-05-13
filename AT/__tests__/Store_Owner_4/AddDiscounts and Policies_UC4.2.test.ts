@@ -468,8 +468,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
         expect(makePolicyRes.data.result).toBeTruthy()
 
-        // 1<cola<3 and 3<bag items<5 -> fail  
-        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); //4 items, 2 cola
+        // (1<cola<3) T  XOR  T (3<bag items<5) -> expect to fail and get error 
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); //4 items, 2 cola 2 milk
         expect(error).toBeDefined()
         expect(data.result).toBeFalsy()
 
