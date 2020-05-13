@@ -9,6 +9,7 @@ import {Divider, Spin} from "antd";
 import {DiscountPageCtx} from "./discount-page-ctx";
 import axiosClient from "../../utils/axios-client";
 import {success} from "../../components/modal/modal";
+import { getStoreCategories, getStoreProducts } from "../../utils";
 
 const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
 const titles = ["Choose Products", "Please choose your discount configuration", "Review Discounts"];
@@ -33,8 +34,8 @@ const DiscountPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const productsRes = await axiosClient.get(productsUrl);
-            const categoriesRes = await axiosClient.get(categoriesUrl);
+            const productsRes = await getStoreProducts("store9");
+            const categoriesRes = await getStoreCategories("store9");
             console.log(productsRes);
             console.log(categoriesRes);
             const store = productsRes.data.data.products[0].storeName;
