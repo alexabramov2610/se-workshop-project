@@ -18,7 +18,6 @@ export const BellIconContainer = styled(NotificationsBellIconSvg)`
 
 export const NotificationCountContainer = styled.span`
   position: absolute;
-  padding-bottom: 3px;
   font-size: 10px;
   font-weight: bold;
   bottom: 12px;
