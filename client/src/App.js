@@ -14,6 +14,7 @@ import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { StorePage } from './pages/store-page/store-page'
 import { SearchPage } from './pages/search-page/serch-page'
+import { PersonalInfo } from './pages/personal-info-page/personal-info'
 import { createBrowserHistory } from 'history';
 import { history } from './utils/config'
 import * as config from './utils/config'
@@ -26,8 +27,9 @@ class App extends React.Component {
         this.onLogin = this.onLogin.bind(this);
     }
     onLogin = (username) => {
-        this.setState({ isLoggedIn: true })
-        config.setLoggedInUser(username)
+        console.log(username)
+        this.setState({ isLoggedIn: true }, () => config.setLoggedInUser(username))
+
 
     }
 
@@ -52,6 +54,8 @@ class App extends React.Component {
                     <Route path="/store/:storename" component={StorePage} />
                     <Route exact path="/search" component={SearchPage} />
                     <Route exact path="/admininit" component={AdminInit} />
+                    <Route exact path="/personalinfo" component={PersonalInfo} />
+
                 </Switch>
             </Router>
 

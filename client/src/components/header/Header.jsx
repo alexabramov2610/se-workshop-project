@@ -15,7 +15,7 @@ import {
 import { Search } from "../search/search";
 import BellIcon from "../bell-icon/bell-icon.component";
 import { Link } from "react-router-dom";
-
+import * as config from "../../utils/config";
 const underlineAnimation = "hvr-underline-from-center";
 
 export class Header extends React.Component {
@@ -54,15 +54,29 @@ export class Header extends React.Component {
             </OptionLink>
 
             {this.props.isLoggedIn ? (
-              <OptionLink
-                as="div"
-                className={underlineAnimation}
-                onClick={() => this.onLogout()}
-              >
-                <Link style={{ textDecoration: "none", color: "black" }} to="/">
-                  SIGN OUT
-                </Link>
-              </OptionLink>
+              <div>
+                <OptionLink
+                  as="div"
+                  className={underlineAnimation}
+                  onClick={() => this.onLogout()}
+                >
+                  <Link
+                    style={{ textDecoration: "none", color: "black" }}
+                    to="/"
+                  >
+                    SIGN OUT {config.getLoggedInUser()}
+                  </Link>
+                </OptionLink>
+
+                <OptionLink as="div" className={underlineAnimation}>
+                  <Link
+                    style={{ textDecoration: "none", color: "black" }}
+                    to={`/personalinfo`}
+                  >
+                    Personal Info
+                  </Link>
+                </OptionLink>
+              </div>
             ) : (
               <OptionLink as="div" className={underlineAnimation}>
                 <Link

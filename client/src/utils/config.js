@@ -8,8 +8,8 @@ export const setLoggedInUser = (username) => {
     loggedInUser = username;
 }
 
-export const getLoggedInUser = (username) => {
-    loggedInUser = username;
+export const getLoggedInUser = () => {
+    return loggedInUser;
 }
 
 
