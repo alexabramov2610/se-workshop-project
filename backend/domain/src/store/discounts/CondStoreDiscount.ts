@@ -1,12 +1,12 @@
 import {Discount} from "./Discount";
-import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 
 export class CondStoreDiscount extends Discount {
     private minPay: number;
 
-    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], minPay: number) {
-        super(startDate, duration, percentage, productsInDiscount);
+    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], minPay: number,category?: ProductCategory) {
+        super(startDate, duration, percentage, productsInDiscount, category);
         this.minPay = minPay;
     }
 

@@ -3,7 +3,7 @@ const url = require('url');
 import fs from "fs";
 var path = require('path');
 
-const port = 3000;
+const port = 8000;
 const LOGGED_IN_CLIENTS = new Map();
 let onCloseEvent;
 
@@ -72,10 +72,10 @@ function sendMessageTo(username, message) {
     return false;
 }
 
-async function terminate() {
+function terminate() {
     try {
-        await socketServer.close();
-        await httpsServer.close();
+        socketServer.close();
+        httpsServer.close();
     } catch (err) {
         console.log(err)
     }

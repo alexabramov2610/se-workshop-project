@@ -5,31 +5,34 @@ import { AiTwotoneShop } from "react-icons/ai";
 import { OptionLink } from "../header/Header-styles";
 import { Link } from "react-router-dom";
 
-export const JoinCards = () => {
+export const JoinCards = ({ isLoggedIn }) => {
   return (
     <CardGroup>
       <Card className="text-center">
         <Card.Body>
           <Card.Title>
-            <AiTwotoneShop
-              style={{ marginRight: "-6px", marginBottom: "2px" }}
-            />{" "}
-            <OptionLink
-              as="a"
-              className="hvr-underline-from-center"
-              to="/contact"
-            >
+            {!isLoggedIn && (
+              <AiTwotoneShop
+                style={{ marginRight: "6px", marginBottom: "2px" }}
+              />
+            )}
+            {isLoggedIn ? (
+              <div style={{ paddingTop: 17 }}>Welcome Back!</div>
+            ) : (
               <Link
-                style={{ textDecoration: "none", color: "black" }}
+                as="a"
+                className="hvr-underline-from-center"
                 to="/signupsignin"
+                style={{ textDecoration: "none", color: "black" }}
               >
                 Shop With Us
               </Link>
-            </OptionLink>
+            )}
           </Card.Title>
           <Card.Text>
-            Join our trading systems and start enjoying the best prices and
-            product world wide
+            {isLoggedIn
+              ? " "
+              : " Join our trading systems and start enjoying the best prices and product world wide"}
           </Card.Text>
         </Card.Body>
       </Card>
@@ -37,21 +40,16 @@ export const JoinCards = () => {
         <Card.Body>
           <Card.Title>
             <AiTwotoneShop
-              style={{ marginRight: "-6px", marginBottom: "2px" }}
+              style={{ marginRight: "6px", marginBottom: "2px" }}
             />{" "}
-            <OptionLink
-              as="div"
+            <Link
+              as="a"
               className="hvr-underline-from-center"
-              to="/contact"
+              to="/createstore"
+              style={{ textDecoration: "none", color: "black" }}
             >
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to="/category"
-              >
-                {" "}
-                Create Your Own Store
-              </Link>
-            </OptionLink>
+              Trade With Us
+            </Link>
           </Card.Title>
           <Card.Text>
             Join our trading systems to expose you buisness to millions of users

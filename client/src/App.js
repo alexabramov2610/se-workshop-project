@@ -4,23 +4,49 @@ import {
     Switch,
     Route,
 } from "react-router-dom";
+import { Router } from 'react-router';
 import HomePageContainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
-
+import { init } from '../src/utils/api'
+import { CreateStorePage } from './pages/create-store/create-store-page.component'
+import { StorePage } from './pages/store-page/store-page'
+import { createBrowserHistory } from 'history';
+import { history } from './utils/config'
 
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoggedIn: false
+        }
+        this.onLogin = this.onLogin.bind(this);
+    }
+
+    onLogin = () => {
+        this.setState({ isLoggedIn: true })
+
+    }
+
+    onLogout = () => {
+        this.setState({ isLoggedIn: false })
+    }
+    async componentDidMount() {
+        const initialized = await init();
+        this.setState({ initialized: true })
+    }
     render() {
-        return (
-            <div>
-                <Header />
+        return this.state.initialized ? (
+
+            <Router history={history}>
+                <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                 <Switch>
-                    <Route exact path="/" component={HomePageContainer} />
+                    <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/category" component={CategoryPage} />
-                    <Route path="/signupsignin" component={SignInAndSignUpPage} />
-                    {/*<Route exact path="/checkout" component={CheckoutPage}/>*/}
-                    {/*<Route exact path="/ordersummery" component={OrderSummery}/>*/}
+                    <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
+                    <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
+                    <Route path="/store/:storename" component={StorePage} />
                     {/*<Route exact path="/contact" component={ContactPage}/>*/}
                     {/*<Route*/}
                     {/*    exact*/}
@@ -34,8 +60,10 @@ class App extends React.Component {
                     {/*    }*/}
                     {/*/>*/}
                 </Switch>
-            </div>
-        );
+            </Router>
+
+        ) : null
+
     }
 }
 

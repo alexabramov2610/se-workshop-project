@@ -109,6 +109,7 @@ interface AddDiscountRequest extends Request {
 interface ViewStoreDiscountsPolicyRequest extends Request {
     body: { storeName: string }
 }
+
 interface ViewStorePurchasePolicyRequest extends Request {
     body: { storeName: string }
 }
@@ -212,6 +213,10 @@ interface VerifyNewCredentials extends Request {
 
 }
 
+interface VerifyPurchasePolicy extends Request {
+    body: {}
+}
+
 interface SetDiscountsPolicyRequest extends Request {
     body: { storeName: string, policy: IDiscountPolicy }
 }
@@ -290,5 +295,6 @@ export {
     ViewManagerPermissionRequest,
     VerifyProducts,
     ViewStoreDiscountsPolicyRequest,
-    ViewStorePurchasePolicyRequest
+    ViewStorePurchasePolicyRequest,
+    VerifyPurchasePolicy
 };

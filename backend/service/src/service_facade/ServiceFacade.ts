@@ -248,7 +248,9 @@ export const isSystemUp = (): Res.BoolResponse => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
     return { data: { result: tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
 }
-
+export const verifyToken = (req: Req. Request): Res.BoolResponse => {
+    return runIfOpen(req, runIfHaveToken(UserService.verifyToken));
+}
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
     return runIfOpen(req, UserService.isLoggedInUser);

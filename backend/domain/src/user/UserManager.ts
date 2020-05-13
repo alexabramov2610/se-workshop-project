@@ -217,6 +217,10 @@ export class UserManager {
         return {data: {result: true}}
     }
 
+    verifyToken(token: string): Res.BoolResponse {
+        return { data: { result: this.guests.has(token) || this.loggedInUsers.has(token) } };
+    }
+
     private getAdminByToken(token: string): Admin {
         const user: RegisteredUser = this.getLoggedInUserByToken(token);
         return !user ? user : this.admins.find((a) => user.name === a.name)

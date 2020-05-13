@@ -72,6 +72,7 @@ export interface IDiscount {
     startDate: Date;
     duration: number;
     products: number[];
+    category?: ProductCategory;
     percentage: number;
     condition?: IConditionOfDiscount[];
     coupon?: string

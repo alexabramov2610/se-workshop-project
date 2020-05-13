@@ -1,8 +1,8 @@
 import React from "react";
-
+import { login } from "../../utils/api";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
-
+import * as config from "../../utils/config";
 import {
   SignInContainer,
   SignInTitle,
@@ -14,7 +14,7 @@ class SignIn extends React.Component {
     super(props);
 
     this.state = {
-      email: "",
+      userName: "",
       password: "",
     };
   }
@@ -22,10 +22,17 @@ class SignIn extends React.Component {
   handleSubmit = async (event) => {
     event.preventDefault();
 
-    const { email, password } = this.state;
+    const { userName, password } = this.state;
 
     try {
-      this.setState({ email: "", password: "" });
+      login(userName, password).then(({ data }) => {
+        if (!data.error || data.error.message === "Already at this state") {
+          this.props.onLogin();
+          config.history.push("/");
+        } else {
+          alert("invalid details");
+        }
+      });
     } catch (error) {
       console.log(error);
     }
@@ -38,18 +45,19 @@ class SignIn extends React.Component {
   };
 
   render() {
+    console.log(this.props.onLogin);
     return (
       <SignInContainer>
         <SignInTitle>Already have an account?</SignInTitle>
-        <span>Sign in with your email and password</span>
+        <span>Sign in with your user name and password</span>
 
         <form onSubmit={this.handleSubmit}>
           <FormInput
-            name="email"
-            type="email"
+            name="userName"
+            type="text"
             handleChange={this.handleChange}
-            value={this.state.email}
-            label="Email"
+            value={this.state.userName}
+            label="User Name"
             required
           />
           <FormInput

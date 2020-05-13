@@ -6,11 +6,11 @@ import {
 } from "../..";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import {IDiscount, Purchase,IPolicy} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IDiscount, Purchase, ISimplePurchasePolicy, IPurchasePolicy,} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums"
 
 
-import { Req } from "se-workshop-20-interfaces";
+import { Req, Res } from "se-workshop-20-interfaces";
 import * as utils from "../utils"
 
 
@@ -277,7 +277,21 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     //buying policies
 
-    test('add buying policy',()=>{
+    test('set and view buying policy ',()=>{
+        const storeName=_testStore1.name
+        const simplePolicy1: ISimplePurchasePolicy = {
+            productPolicy:{catalogNumber:_testMilk.catalogNumber ,minAmount: 2, maxAmount: 4}
+        
+        }
+
+        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND},{policy: simplePolicy3, operator: Operators.XOR}, {policy: simplePolicy4, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+
+        const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
+
         
     })
 });

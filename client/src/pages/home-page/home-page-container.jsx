@@ -13,7 +13,7 @@ export default class HomePageContainer extends React.Component {
   render() {
     return this.state.data ? (
       <HomePageCtx.Provider value={this.state.data.exampleData}>
-        <HomePage />
+        <HomePage isLoggedIn={this.props.isLoggedIn} />
       </HomePageCtx.Provider>
     ) : null;
   }

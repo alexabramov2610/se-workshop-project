@@ -639,7 +639,7 @@ export class StoreManagement {
 
     getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
         const storeInfos: StoreInfo[] = [];
-        if (limit <= 0 || offset < 0 || offset >= this._stores.length)
+        if (limit <= 0 || offset < 0)
             return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
 
         const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
@@ -699,6 +699,18 @@ export class StoreManagement {
         const setPolicyOk: boolean = store.setPurchasePolicy(policy.policy);
         return setPolicyOk ? {data: {result: true}} :
             {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
+    }
+
+    verifyStorePolicy(user: RegisteredUser, storeName: string, bagItems: BagItem[]): Res.BoolResponse {
+        logger.info(`request to verify purchase policy in store ${storeName}`)
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const isPolicyOk: boolean = store.verifyStorePolicy(user, bagItems);
+        return isPolicyOk ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.VERIFY_POLICY_FAILED + "in store" + storeName}
+        }
     }
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
@@ -796,5 +808,4 @@ export class StoreManagement {
         }
 
     }
-
 }

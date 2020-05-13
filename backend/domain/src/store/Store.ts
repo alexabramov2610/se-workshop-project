@@ -580,9 +580,9 @@ export class Store {
                 const nextCondition: Condition = this.parseICondition(iCondition.condition);
                 conditions.set(nextCondition, iCondition.operator);
             }
-            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions)
+            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions,iDiscount.category)
         }
-        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products)
+        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products,iDiscount.category)
     }
 
     private parseICondition(ifCondition: ICondition): Condition {
@@ -607,5 +607,9 @@ export class Store {
             purchasePolicy = new SystemPolicy(iPolicy.systemPolicy.notForSellDays);
         }
         return purchasePolicy;
+    }
+
+    verifyStorePolicy(user: RegisteredUser, bagItems: BagItem[]) :boolean{
+        return this.purchasePolicy.isSatisfied(bagItems,user);
     }
 }
