@@ -832,5 +832,48 @@ describe("Guest Integration Tests", () => {
         expect(purchaseResponse.data.result).toBeTruthy();
         expect(purchaseResponse.data.receipt.payment.totalCharged).toEqual(200); // 20*2*(50%) + 100*2*10% - one item with discount
     });
+
+    it("Buy items with respect to xor store policy", () => {
+        const catalogNumber: number = 1;
+        const {ownerToken, products} = utils.makeStoreWithProduct(catalogNumber, 5, ownerUsername, ownerPassword, storeName, undefined);
+        const products2: Product[] = [new Product("bisli", catalogNumber + 1, 100, ProductCategory.GENERAL)]
+        utils.addNewProducts(storeName, products2, ownerToken, true);
+        let items: IItem[] = [];
+        for (let i = 0; i < 5; i++)
+            items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+        utils.addNewItems(storeName, items, ownerToken, true);
+
+        const simplePolicy1: ISimplePurchasePolicy = {
+            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+        }
+        const simplePolicy2: ISimplePurchasePolicy = {
+            bagPolicy:{minAmount: 3, maxAmount:5}
+        }
+
+
+        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.XOR}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: ownerToken
+        }
+        ServiceFacade.setPurchasePolicy(setPolicyReq)
+        // add two products to cart
+        let req: Req.SaveToCartRequest = {
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+            token: token
+        }
+        let res: Res.BoolResponse = ServiceFacade.saveProductToCart(req)
+        expect(res.data.result).toBeTruthy();
+        req = {
+            body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 1},
+            token: token
+        }
+        res = ServiceFacade.saveProductToCart(req)
+        expect(res.data.result).toBeTruthy();
+
+        const purchaseReq: Req.PurchaseRequest = utils.getPurchaseReq(token);
+        const purchaseResponse: Res.PurchaseResponse = ServiceFacade.purchase(purchaseReq)
+        expect(purchaseResponse.data.result).toBeFalsy();
+    });
 });
 
