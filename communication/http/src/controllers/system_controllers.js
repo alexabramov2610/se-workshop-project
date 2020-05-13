@@ -32,7 +32,7 @@ export async function startNewSession(req,res) {
     res.cookie('token', token, {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7, // 1 week
-        secure: true
+        // secure: true
     });
     return res.send(token)
 }

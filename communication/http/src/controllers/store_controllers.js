@@ -68,6 +68,10 @@ export async function setDiscountsPolicy(req,res) {
     const result = wrapHttp(req, ServiceFacade.setDiscountsPolicy);
     return res.send(result)
 }
+export async function getDiscountsPolicy(req,res) {
+    const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
+    return res.send(result)
+}
 
 export async function addDiscount(req,res) {
     const result = wrapHttp(req, ServiceFacade.addDiscount);
