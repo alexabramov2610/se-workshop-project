@@ -11,7 +11,7 @@ import {Operators, ProductCategory, Rating, WeekDays} from "se-workshop-20-inter
 
 
 import { Req, Res } from "se-workshop-20-interfaces";
-import * as utils from "../utils"
+import * as utils from "../../utils"
 
 
 
@@ -98,7 +98,9 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         _serviceBridge.addItemsToStore(_testStore1, [_testMilk1, _testMilk2,_testCola1,_testCola2,_testCola3,_testEggs1,_testBanana1]);
         _serviceBridge.addItemsToStore(_testStore2, [_testMilk2, _testEggs1]);
 
-        _serviceBridge.logout();
+        
+
+      //  _serviceBridge.logout();
 
         
     });
@@ -272,8 +274,10 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     })
 
     
+//policies
 
     test('set and view buying policy ',()=>{
+
         const storeName=_testStore1.name
 
         const simplePolicy1 = {productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}}
@@ -322,17 +326,18 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         expect(error).toBeDefined()
         expect(data.result).toBeFalsy()
 
-        const res = _driver.given.store(_testStore1).products([_testCola]).makeABuy(1); 
-        expect(res.data.result).toBeTruthy()
-        expect(res.data.receipt).toBeDefined()
+        const req:Req.RemoveFromCartRequest={body:{storeName,catalogNumber:_testCola.catalogNumber,amount:3},token:'123'}
+         _serviceBridge.removeProductFromCart(req)
 
-
+         const res = _driver.given.store(_testStore1).products([_testCola]).makeABuy(1); 
+         expect(res.data.result).toBeTruthy()
+         expect(res.data.receipt).toBeDefined()
 
     })
 
     test('buy with simple bagitem buying policy',()=>{
         const storeName=_testStore1.name
-        const simplePolicy1 = {bagPolicy:{minAmount: 1, maxAmount:1}}
+        const simplePolicy1 = {bagPolicy:{minAmount: 2, maxAmount:2}}
 
 
         const policy:IPurchasePolicy = {policy:[
@@ -345,9 +350,15 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
         expect(makePolicyRes.data.result).toBeTruthy()
 
-        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana,_testEggs]).makeABuy(1); 
         expect(error).toBeDefined()
         expect(data.result).toBeFalsy()
+
+        const req:Req.RemoveFromCartRequest={body:{storeName,catalogNumber:_testCola.catalogNumber,amount:1},token:'123'}
+         _serviceBridge.removeProductFromCart(req);
+
+         const req2:Req.RemoveFromCartRequest={body:{storeName,catalogNumber:_testBanana.catalogNumber,amount:1},token:'123'}
+         _serviceBridge.removeProductFromCart(req2)
 
         const res = _driver.given.store(_testStore1).products([_testCola]).makeABuy(1); 
         expect(res.data.result).toBeTruthy()
@@ -390,7 +401,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
 
         const policy:IPurchasePolicy = {policy:[
-            {policy: simplePolicy1, operator: Operators.AND}
+            {policy: simplePolicy1, operator: Operators.AND},
+            {policy: simplePolicy2, operator: Operators.AND}
         ]}
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
@@ -404,7 +416,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         expect(error).toBeDefined()
         expect(data.result).toBeFalsy()
         //success
-        const res = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); 
+        const res = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(1); //now cart contains 4 items
         expect(res.data.result).toBeTruthy()
         expect(res.data.receipt).toBeDefined()
 
@@ -418,7 +430,10 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
 
         const policy:IPurchasePolicy = {policy:[
-            {policy: simplePolicy1, operator: Operators.AND}
+            {policy: simplePolicy1, operator: Operators.OR},
+            {policy: simplePolicy2, operator: Operators.OR},
+
+
         ]}
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
@@ -434,6 +449,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
        
     })
 
+    //bug????????????????
     test('buy with Comp XOR buying policy',()=>{
         const storeName=_testStore1.name
         const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 3}}
@@ -442,7 +458,8 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
 
         const policy:IPurchasePolicy = {policy:[
-            {policy: simplePolicy1, operator: Operators.AND}
+            {policy: simplePolicy1, operator: Operators.XOR},
+            {policy: simplePolicy2, operator: Operators.AND}
         ]}
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
@@ -452,11 +469,12 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         expect(makePolicyRes.data.result).toBeTruthy()
 
         // 1<cola<3 and 3<bag items<5 -> fail  
-        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(2); 
+        const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testMilk]).makeABuy(2); //4 items, 2 cola
         expect(error).toBeDefined()
         expect(data.result).toBeFalsy()
 
-        const res = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
+        // 1<cola<3 and bagitems>5 -> success 
+        const res = _driver.given.store(_testStore1).products([_testMilk,_testEggs]).makeABuy(1); //cart contain 6 items
         expect(res.data.result).toBeTruthy()
         expect(res.data.receipt).toBeDefined()
        

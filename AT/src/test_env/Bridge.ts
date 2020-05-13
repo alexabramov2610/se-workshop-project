@@ -39,6 +39,7 @@ export interface Bridge {
     quantity: number
   ): DummyTypes.IResponse;
   watchCart(): Res.ViewCartRes;
+  
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   setDiscountToItem(
     store: Store,
@@ -78,6 +79,7 @@ export interface Bridge {
   ): Res.ViewRUserPurchasesHistoryRes;
   purchase(req: Partial<Req.PurchaseRequest>): Res.PurchaseResponse;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Res.BoolResponse;
+  removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
   viewManagerPermissions(
     req: Partial<Req.ViewManagerPermissionRequest>
   ): Res.ViewManagerPermissionResponse;

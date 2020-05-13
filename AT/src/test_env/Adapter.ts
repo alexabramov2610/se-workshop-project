@@ -217,6 +217,11 @@ export const Adapter: Partial<Env.Bridge> = {
   purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
     return ServiceFacade.purchase(wrapWithToken(req.body));
   },
+  removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse{
+    return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
+
+  },
+
 
   watchCart(): Res.ViewCartRes {
     const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
@@ -224,6 +229,8 @@ export const Adapter: Partial<Env.Bridge> = {
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
+
+
 
   saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
     return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
