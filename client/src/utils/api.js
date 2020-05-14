@@ -24,7 +24,6 @@ async function adminInit(firstAdminName, firstAdminPassword) {
 }
 
 
-
 async function register(username, password) {
     return instance.post(`${baseDomain}/users/register`,
         { body: { username, password } });
@@ -64,4 +63,12 @@ const getStoreCategories = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getCategories/?storeName=${storeName}`);
 }
 
-export { startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+const getDiscountPolicy = async (storeName) => {
+    return instance.get(`${baseDomain}/stores/getDiscountPolicy/?storeName=${storeName}`);
+}
+
+const setDiscountPolicy = async (req) => {
+    return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
+}
+
+export { getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

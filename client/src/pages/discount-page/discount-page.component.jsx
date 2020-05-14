@@ -7,15 +7,12 @@ import DiscountSettings from "../../components/discount-settings/discount-settin
 import 'semantic-ui-css/semantic.min.css';
 import {Divider, Spin} from "antd";
 import {DiscountPageCtx} from "./discount-page-ctx";
-import axiosClient from "../../utils/axios-client";
-import {success} from "../../components/modal/modal";
-import { getStoreCategories, getStoreProducts } from "../../utils";
+// import {success} from "../../components/modal/modal";
+// import { getStoreCategories, getStoreProducts, getDiscountPolicy } from "../../utils";
+import axios from 'axios';
 
 const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
 const titles = ["Choose Products", "Please choose your discount configuration", "Review Discounts"];
-const productsUrl = '/stores/getProducts?storeName=store9';
-const categoriesUrl = '/stores/getCategories?storeName=store9';
-const policyUrl = '/stores/getDiscountPolicy';
 
 const steps = [<DiscountsSummery/>, <SubjectProducts/>, <DiscountSettings/>];
 
@@ -32,12 +29,14 @@ const DiscountPage = () => {
     const [isFetching, setFetching] = useState(false);
     const [policy, setPolicy] = useState(false);
 
+    const client = axios.create({
+       headers: {"Access-Control-Allow-Credentials":  "*"}
+    });
+
     useEffect(() => {
         const fetchData = async () => {
-            const productsRes = await getStoreProducts("store9");
-            const categoriesRes = await getStoreCategories("store9");
-            console.log(productsRes);
-            console.log(categoriesRes);
+            const productsRes = await client.get("http://localhost:4000/products");
+            const categoriesRes = await client.get("http://localhost:4000/stores/getCategories");
             const store = productsRes.data.data.products[0].storeName;
             setStoreName(store);
 
@@ -52,23 +51,24 @@ const DiscountPage = () => {
         fetchData();
     }, []);
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const policyRes = await axiosClient.post(policyUrl);
-    //         setPolicy(policyRes.data.data.policy);
-    //     };
-    //
-    //     fetchData();
-    //
-    // }, [isFetching]);
+    useEffect(() => {
+        const fetchData = async () => {
+            const policyRes = await client.get("http://localhost:4000/stores/getPolicy");
+            console.log(policyRes);
+            setPolicy(policyRes.data.data.policy);
+        };
+
+        fetchData();
+
+    }, []);
 
     const submitDiscounts = () => {
-        axiosClient.post("/stores/setDiscountsPolicy", {
-            body: {
-                policy: discounts,
-                storeName: "store-10"
-            },
-        }).then(r => success("Your policy has been updated"));
+        // axiosClient.post("/stores/setDiscountsPolicy", {
+        //     body: {
+        //         policy: discounts,
+        //         storeName: "store-10"
+        //     },
+        // }).then(r => success("Your policy has been updated"));
     }
 
     const resetDiscount = () => {
@@ -92,6 +92,7 @@ const DiscountPage = () => {
     }
 
     let providerState = {
+        policy: policy,
         products: products,
         storeName: storeName,
         categories: categories,

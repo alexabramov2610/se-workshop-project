@@ -7,6 +7,7 @@ const operatorStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-
 const TableHeader = () => {
     return (
         <HeaderContainer>
+            <span style={conditionStyle}>preform actions</span>
             <span style={conditionStyle}>Products</span>
             <span style={conditionStyle}>Discount</span>
             <span style={conditionStyle}>Start Date</span>

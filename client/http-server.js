@@ -1,3 +1,4 @@
+
 const cors = require("cors");
 
 const express = require('express')
@@ -41,9 +42,53 @@ const mockProducts = {
     }
 }
 
+let mockPolicy = {
+    data: {
+        policy: {
+            discounts:
+                [
+                    {
+                        discount: {
+                            startDate: new Date(),
+                            duration: 12,
+                            products: [123, 789],
+                            percentage: 23,
+                            condition: [{
+                                condition: {
+                                    catalogNumber: 123,
+                                    minAmount: 35,
+                                },
+                                operator: "XOR"
+                            }],
+                        },
+                        operator: "AND"
+                    },
+                    {
+                        discount: {
+                            startDate: new Date(),
+                            duration: 24,
+                            products: [456, 789],
+                            percentage: 89,
+                            condition: [{
+                                condition: {
+                                    catalogNumber: 456,
+                                    minAmount: 112,
+                                },
+                                operator: "AND"
+                            }],
+                        },
+                        operator: "OR"
+                    },
+                ]
+        }
+    }
+}
+
 
 app.get('/getStores', (req, res) => res.send({add: "ad"}))
 app.get('/products', (req, res) => res.send(mockProducts))
 app.get('/stores/getCategories', (req, res) => res.send(mockCategories))
+app.get('/stores/getPolicy', (req, res) => res.send(mockPolicy))
+app.post('/stores/getPolicy', (res) => mockPolicy.data.policy.discounts.push(res.body));
 
 app.listen(port, () => console.log(`express server is running`))

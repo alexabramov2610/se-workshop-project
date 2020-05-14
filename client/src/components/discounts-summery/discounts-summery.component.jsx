@@ -47,7 +47,7 @@ function DiscountsSummery() {
                         <Droppable droppableId="list">
                             {provided => (
                                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                                    <Rows discounts={props.discounts}/>
+                                    <Rows discounts={props.policy.discounts}/>
                                     {provided.placeholder}
                                 </div>
                             )}
