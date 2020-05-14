@@ -9,6 +9,8 @@ import HomePageContainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
+import DiscountPage from "./pages/discount-page/discount-page.component";
+
 import { init } from '../src/utils/api'
 import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
@@ -18,6 +20,7 @@ import { PersonalInfo } from './pages/personal-info-page/personal-info'
 import { createBrowserHistory } from 'history';
 import { history } from './utils/config'
 import * as config from './utils/config'
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -49,6 +52,7 @@ class App extends React.Component {
                 <Switch>
                     <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/category" component={CategoryPage} />
+                    <Route path={"/set-discount"} component={DiscountPage} />}
                     <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                     <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/store/:storename" component={StorePage} />

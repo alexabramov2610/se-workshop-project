@@ -5,7 +5,7 @@ export const NotificationContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  height: 40px;
+  height: 60px;
   margin-bottom: 15px;
 `;
 

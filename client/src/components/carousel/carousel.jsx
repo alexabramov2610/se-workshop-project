@@ -5,7 +5,7 @@ import { FaRegBell, FaGifts } from "react-icons/fa";
 import { GiWorld } from "react-icons/gi";
 export const CarouselUI = () => {
   return (
-    <Carousel>
+    <Carousel style={{ marginBottom: "20px"}}>
       <Carousel.Item>
         <CarouselItem>
           <h1>Real Time Alerts </h1>
