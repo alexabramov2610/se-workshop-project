@@ -30,7 +30,7 @@ const DiscountPage = () => {
     const [policy, setPolicy] = useState(false);
 
     const client = axios.create({
-       headers: {"Access-Control-Allow-Credentials":  "*"}
+        headers: {"Access-Control-Allow-Credentials": "*"}
     });
 
     useEffect(() => {
@@ -55,7 +55,10 @@ const DiscountPage = () => {
         const fetchData = async () => {
             const policyRes = await client.get("http://localhost:4000/stores/getPolicy");
             console.log(policyRes);
-            setPolicy(policyRes.data.data.policy);
+            const fetchedDiscounts = policyRes.data.data.policy.discounts.map((d, index) => {
+                return {key: index, ...d};
+            })
+            setPolicy(fetchedDiscounts);
         };
 
         fetchData();
@@ -72,8 +75,8 @@ const DiscountPage = () => {
     }
 
     const resetDiscount = () => {
-        setCurrDiscount({condition: [], products: []});
-        setCurrCondition({});
+        setCurrDiscount({condition: [], products: [], percentage: 0});
+        setCurrCondition({condition: {}});
     }
 
     const setCategory = (category) => {
