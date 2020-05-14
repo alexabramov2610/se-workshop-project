@@ -654,14 +654,16 @@ export class StoreManagement {
 
     getAllProductsInStore(storeName: string): Res.GetAllProductsInStoreResponse {
         const productInStore: ProductInStore[] = [];
-        if (!this._storeByStoreName.has(storeName))
+        const store: Store = this._storeByStoreName.get(storeName);
+        if (!store)
             return {data: {products: []}};
 
-        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        const prodIterator = store.products.keys();
         let currProd: Product = prodIterator.next().value;
         while (currProd) {
             const currProductInStore: ProductInStore = {
                 storeName,
+                storeRating: store.rating,
                 product: {
                     catalogNumber: currProd.catalogNumber,
                     price: currProd.price,
@@ -677,7 +679,7 @@ export class StoreManagement {
         return {data: {products: productInStore}};
     }
 
-    getAllCategoriesInStore(storeName: string): Res.GetAllCategoriesInStoreResponse {
+    getAllCategoriesInStore(storeName: string): Res.GetCategoriesResponse {
         const categoriesInStore: ProductCategory[] = [];
         if (!this._storeByStoreName.has(storeName))
             return {data: {categories: []}};
@@ -808,4 +810,5 @@ export class StoreManagement {
         }
 
     }
+
 }

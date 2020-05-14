@@ -30,7 +30,7 @@ describe("Store Management Unit Tests", () => {
         token: "1"
     };
     cart.set("storeName", [{
-        product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
+        product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20, rating: Rating.MEDIUM},
         amount: 2
     }])
 
@@ -334,6 +334,7 @@ describe("Store Management Unit Tests", () => {
         const productsReq: ProductReq[] = [];
         for (const prod of products) {
             const prodReq: ProductReq = {
+                rating: Rating.MEDIUM,
                 catalogNumber: prod.catalogNumber,
                 name: prod.name,
                 price: prod.price,
@@ -1327,7 +1328,7 @@ describe("Store Management Unit Tests", () => {
     function generateProducts(numOfItems: number): ProductReq[] {
         const products: ProductReq[] = [];
         for (let i = 0; i < numOfItems; i++)
-            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.ELECTRONICS});
+            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.ELECTRONICS, rating: Rating.MEDIUM,});
 
         return products;
     }

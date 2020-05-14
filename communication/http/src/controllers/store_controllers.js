@@ -166,3 +166,8 @@ export async function getAllCategoriesInStore(req, res) {
         return res.send(invalidRes);
     }
 }
+
+export async function getAllCategories(req, res) {
+    const result = wrapHttp(req, ServiceFacade.getAllCategories);
+    return res.send(result);
+}

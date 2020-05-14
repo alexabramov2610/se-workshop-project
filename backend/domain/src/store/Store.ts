@@ -346,9 +346,10 @@ export class Store {
                     name: product.name,
                     price: product.price,
                     category: product.category,
-                    catalogNumber: product.catalogNumber
+                    catalogNumber: product.catalogNumber,
+                    rating: product.rating
                 };
-                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName};
+                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName, storeRating: this.rating};
                 products.push(matchingProdInStore);
             }
         }
