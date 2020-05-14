@@ -23,7 +23,6 @@ async function adminInit(firstAdminName, firstAdminPassword) {
     }).catch(e => console.log("cant init system", e))
 }
 
-
 async function register(username, password) {
     return instance.post(`${baseDomain}/users/register`,
         { body: { username, password } });
@@ -56,7 +55,6 @@ const getStoreProducts = async (storeName) => {
 }
 const search = async (req) => {
     return instance.post(`${baseDomain}/stores/search`, req);
-
 }
 
 const getStoreCategories = async (storeName) => {
@@ -71,4 +69,22 @@ const setDiscountPolicy = async (req) => {
     return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
 }
 
-export { getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+const getStoreInfo = async (storeName) => {
+    return instance.post(`${baseDomain}/stores/viewStoreInfo/?storeName=${storeName}`);
+}
+
+export {
+    getStoreInfo,
+    getDiscountPolicy,
+    startConnection,
+    login,
+    init,
+    register,
+    logout,
+    getStores,
+    createStore,
+    getStoreProducts,
+    adminInit,
+    search,
+    getStoreCategories
+};

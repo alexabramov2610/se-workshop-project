@@ -20,6 +20,7 @@ import { PersonalInfo } from './pages/personal-info-page/personal-info'
 import { createBrowserHistory } from 'history';
 import { history } from './utils/config'
 import * as config from './utils/config'
+import StorePageContainer from "./pages/store-page/store-page-container";
 
 class App extends React.Component {
     constructor(props) {
@@ -32,8 +33,6 @@ class App extends React.Component {
     onLogin = (username) => {
         console.log(username)
         this.setState({ isLoggedIn: true }, () => config.setLoggedInUser(username))
-
-
     }
 
     onLogout = () => {
@@ -55,14 +54,13 @@ class App extends React.Component {
                     <Route path={"/set-discount"} component={DiscountPage} />}
                     <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                     <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
-                    <Route path="/store/:storename" component={StorePage} />
+                    <Route path="/store/:storename" component={() => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                     <Route exact path="/search" component={SearchPage} />
                     <Route exact path="/admininit" component={AdminInit} />
                     <Route exact path="/personalinfo" component={PersonalInfo} />
 
                 </Switch>
             </Router>
-
         ) : null
 
     }
