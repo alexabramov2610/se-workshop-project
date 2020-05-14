@@ -13,6 +13,9 @@ describe("External System Unit Tests", () => {
         connect() {
             return true;
         }
+        deliver() {
+            return true;
+        }
     }
 
     class RealSystemMockFailure {
@@ -23,6 +26,15 @@ describe("External System Unit Tests", () => {
 
     class RealSystemMockException {
         connect() {
+            throw new Error("Connection timeout");
+        }
+    }
+
+    class RealSystemMockDeliveryException {
+        connect() {
+            return true;
+        }
+        deliver() {
             throw new Error("Connection timeout");
         }
     }
@@ -56,6 +68,58 @@ describe("External System Unit Tests", () => {
         deliverySystem.setDeliverySys(mockDelSystem);
         const res: Res.BoolResponse = deliverySystem.connect();
         expect(res.data.result).toBeFalsy();
+    });
+
+
+    test("DeliverySystem deliver - success", () => {
+        const country: string = "israel";
+        const city: string = "beer-sheva";
+        const address: string = "ben-gurion 10";
+        const deliverySystem: DeliverySystem = new DeliverySystem();
+        const mockDelSystem: RealSystemMockSuccess = new RealSystemMockSuccess();
+        deliverySystem.setDeliverySys(mockDelSystem);
+        const res: boolean = deliverySystem.deliver(country, city, address);
+        expect(res).toBe(true);
+    });
+
+    test("DeliverySystem deliver - failure - can't connect", () => {
+        const country: string = "israel";
+        const city: string = "beer-sheva";
+        const address: string = "ben-gurion 10";
+        const deliverySystem: DeliverySystem = new DeliverySystem();
+        const mockDelSystem: RealSystemMockFailure = new RealSystemMockFailure();
+        deliverySystem.setDeliverySys(mockDelSystem);
+        const res: boolean = deliverySystem.deliver(country, city, address);
+        expect(res).toBe(false);
+    });
+
+    test("DeliverySystem deliver - failure - external sys exception", () => {
+        const country: string = "israel";
+        const city: string = "beer-sheva";
+        const address: string = "ben-gurion 10";
+        const deliverySystem: DeliverySystem = new DeliverySystem();
+        const mockDelSystem: RealSystemMockDeliveryException = new RealSystemMockDeliveryException();
+        deliverySystem.setDeliverySys(mockDelSystem);
+        const res: boolean = deliverySystem.deliver(country, city, address);
+        expect(res).toBe(false);
+    });
+
+    test("DeliverySystem deliver - success - without external system", () => {
+        const country: string = "israel";
+        const city: string = "beer-sheva";
+        const address: string = "ben-gurion 10";
+        const deliverySystem: DeliverySystem = new DeliverySystem();
+        const res: boolean = deliverySystem.deliver(country, city, address);
+        expect(res).toBe(true);
+    });
+
+    test("DeliverySystem deliver - failure - without external system - invalid delivery details", () => {
+        const country: string = "";
+        const city: string = "beer-sheva";
+        const address: string = "ben-gurion 10";
+        const deliverySystem: DeliverySystem = new DeliverySystem();
+        const res: boolean = deliverySystem.deliver(country, city, address);
+        expect(res).toBe(false);
     });
 
 
@@ -115,7 +179,8 @@ describe("External System Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
-    test("PaymentSystem connection - pay - success", () => {
+
+    test("PaymentSystem pay - success", () => {
         const amount: number = 500;
         const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
@@ -125,7 +190,7 @@ describe("External System Unit Tests", () => {
         expect(res).toBeTruthy();
     });
 
-    test("PaymentSystem connection - pay - Exception", () => {
+    test("PaymentSystem pay - Exception", () => {
         const amount: number = 500;
         const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
@@ -135,7 +200,7 @@ describe("External System Unit Tests", () => {
         expect(res).toBeFalsy();
     });
 
-    test("PaymentSystem connection - pay - failure - can't connect", () => {
+    test("PaymentSystem pay - failure - can't connect", () => {
         const amount: number = 500;
         const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
@@ -145,7 +210,7 @@ describe("External System Unit Tests", () => {
         expect(res).toBeFalsy();
     });
 
-    test("PaymentSystem connection - pay - can't connect", () => {
+    test("PaymentSystem pay - can't connect", () => {
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: RealSystemMockException = new RealSystemMockException();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -153,17 +218,40 @@ describe("External System Unit Tests", () => {
         expect(res.data.result).toBeFalsy();
     });
 
+    test("PaymentSystem pay - success - without external", () => {
+        const amount: number = 500;
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const paymentSystem: PaymentSystem = new PaymentSystem();
+        const res: boolean = paymentSystem.pay(amount, creditCard);
+        expect(res).toBeTruthy();
+    });
+
+    test("PaymentSystem pay - failure - without external - invalid credit card", () => {
+        const amount: number = 500;
+        const creditCard: CreditCard = { cvv: "", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const paymentSystem: PaymentSystem = new PaymentSystem();
+        const res: boolean = paymentSystem.pay(amount, creditCard);
+        expect(res).toBe(false);
+    });
+
+    test("PaymentSystem pay - failure - without external - invalid balance", () => {
+        const amount: number = 3000;
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const paymentSystem: PaymentSystem = new PaymentSystem();
+        const res: boolean = paymentSystem.pay(amount, creditCard);
+        expect(res).toBe(false);
+    });
 
     test("SecuritySystem", () => {
         const securitySystem: SecuritySystem = new SecuritySystem();
         const pw: string = "what-a-long-pw!";
         const encPw: string = securitySystem.encryptPassword(pw);
 
+        expect(securitySystem.connect().data.result).toBe(true);
         expect(encPw).toBeDefined();
-
         expect(securitySystem.comparePassword(pw, encPw)).toBeTruthy();
-
     });
+
 
 
 
