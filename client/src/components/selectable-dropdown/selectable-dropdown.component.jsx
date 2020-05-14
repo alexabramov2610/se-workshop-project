@@ -6,13 +6,13 @@ import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
 
 const conditionStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-end", width: "14.2%"};
 
-const SelectableDropdownComponent = ({inputs, discountKey}) => {
+const SelectableDropdownComponent = ({inputs, discountKey, initialValue}) => {
 
-    const [operator, setOperator] = useState(inputs[0]);
+    const [operator, setOperator] = useState(initialValue);
 
-    const handleClick = (e, props) => {
+    const handleSelect = (e, props) => {
         setOperator(e.key);
-        props.setDiscounts(prevDiscounts => {
+        props.setPolicyDiscounts(prevDiscounts => {
             return [...prevDiscounts.map(d => {
                 return d.key === discountKey ? {...d, operator: e.key} : d
             })];
@@ -24,7 +24,7 @@ const SelectableDropdownComponent = ({inputs, discountKey}) => {
             {
                 props => {
                     const menu = (
-                        <Menu onClick={e => handleClick(e, props)}>
+                        <Menu onClick={e => handleSelect(e, props)}>
                             {inputs.map(i => <Menu.Item key={i}>{i}</Menu.Item>)}
                         </Menu>
                     );

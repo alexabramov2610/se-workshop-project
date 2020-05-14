@@ -6,6 +6,7 @@ import moment from "moment";
 import PresentableDropdown from "../../presentable-dropdown/presentable-dropdown.component";
 import {Button, Popconfirm, Space} from "antd";
 import {parseConditions, parseProducts} from "../row-parser";
+import {DiscountPageCtx} from "../../../pages/discount-page/discount-page-ctx";
 
 const Row = styled.div`
   width: 100%;
@@ -28,31 +29,42 @@ function TableRow({index, discount}) {
     const conditions = reducedConditions.length === 0 ? [emptyField] : reducedConditions;
     const coupon = currDiscount.coupon ? currDiscount.coupon : emptyField;
 
+    const handleRemove = (props) => {
+        props.setPolicyDiscounts(prevDiscounts => {
+            return prevDiscounts.filter(d => d.key !== discount.key);
+        });
+    };
+
     return (
         <Draggable draggableId={discount.key} index={index}>
             {provided => (
-                <Row
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                >
+                <DiscountPageCtx.Consumer>
+                    {
+                        props => <Row
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                        >
                     <span style={basicStyle}>
                         <Space>
-                            <Popconfirm title="Are you sure delete this discount from the policy?"><a
-                                href="#">delete</a></Popconfirm>
+                            <Popconfirm title="Are you sure delete this discount from the policy?"
+                                        onConfirm={() => handleRemove(props)}><a href="#">delete</a></Popconfirm>
                             <Button type="link">edit</Button>
                         </Space>
                     </span>
-                    <span style={basicStyle}>{products}</span>
-                    <span style={basicStyle}>{currDiscount.percentage}%</span>
-                    <span style={basicStyle}>{moment(currDiscount.startDate).format('DD-MMM-YYYY')}</span>
-                    <span style={basicStyle}>{currDiscount.duration} days</span>
-                    <span style={basicStyle}>
+                            <span style={basicStyle}>{products}</span>
+                            <span style={basicStyle}>{currDiscount.percentage}%</span>
+                            <span style={basicStyle}>{moment(currDiscount.startDate).format('DD-MMM-YYYY')}</span>
+                            <span style={basicStyle}>{currDiscount.duration} days</span>
+                            <span style={basicStyle}>
                         <PresentableDropdown inputs={conditions}/>
                     </span>
-                    <span style={basicStyle}>{coupon}</span>
-                    <SelectableDropdownComponent discountKey={discount.key} inputs={["AND", "OR", "XOR"]}/>
-                </Row>
+                            <span style={basicStyle}>{coupon}</span>
+                            <SelectableDropdownComponent discountKey={discount.key} inputs={["AND", "OR", "XOR"]}
+                                                         initialValue={discount.operator}/>
+                        </Row>
+                    }
+                </DiscountPageCtx.Consumer>
             )}
         </Draggable>
     );
