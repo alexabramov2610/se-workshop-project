@@ -48,6 +48,7 @@ let mockPolicy = {
             discounts:
                 [
                     {
+                        // key: "0",
                         discount: {
                             startDate: new Date(),
                             duration: 12,
@@ -64,6 +65,7 @@ let mockPolicy = {
                         operator: "AND"
                     },
                     {
+                        // key: "1",
                         discount: {
                             startDate: new Date(),
                             duration: 24,

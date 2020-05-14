@@ -29,13 +29,13 @@ function DiscountsSummery() {
             return;
         }
 
-        const discounts = reorder(
-            props.discounts,
+        const policy = reorder(
+            props.policyDiscounts,
             result.source.index,
             result.destination.index
         );
 
-        props.setDiscounts(discounts);
+        props.setPolicyDiscounts(policy);
     }
 
     return (
@@ -47,7 +47,7 @@ function DiscountsSummery() {
                         <Droppable droppableId="list">
                             {provided => (
                                 <div ref={provided.innerRef} {...provided.droppableProps}>
-                                    <Rows discounts={props.policy.discounts}/>
+                                    <Rows discounts={props.policyDiscounts}/>
                                     {provided.placeholder}
                                 </div>
                             )}

@@ -27,7 +27,7 @@ const DiscountPage = () => {
     const [categories, setCategories] = useState(undefined);
     const [discountSubject, setDiscountSubject] = useState("products");
     const [isFetching, setFetching] = useState(false);
-    const [policy, setPolicy] = useState(false);
+    const [policyDiscounts, setPolicyDiscounts] = useState([]);
 
     const client = axios.create({
         headers: {"Access-Control-Allow-Credentials": "*"}
@@ -54,11 +54,10 @@ const DiscountPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const policyRes = await client.get("http://localhost:4000/stores/getPolicy");
-            console.log(policyRes);
             const fetchedDiscounts = policyRes.data.data.policy.discounts.map((d, index) => {
-                return {key: index, ...d};
-            })
-            setPolicy(fetchedDiscounts);
+                return {key: index + "", ...d};
+            });
+            setPolicyDiscounts(fetchedDiscounts);
         };
 
         fetchData();
@@ -95,7 +94,8 @@ const DiscountPage = () => {
     }
 
     let providerState = {
-        policy: policy,
+        setPolicyDiscounts: setPolicyDiscounts,
+        policyDiscounts: policyDiscounts,
         products: products,
         storeName: storeName,
         categories: categories,
@@ -120,7 +120,7 @@ const DiscountPage = () => {
                 <DiscountPageContainer>
                     <Divider style={{fontSize: "20px"}} orientation={"left"}>{titles[step]}</Divider>
                     <DiscountPageBody>
-                        {policy && products && products
+                        {policyDiscounts && products && products
                             ? steps[step]
                             : <div style={spinnerStyle}>
                                 <Spin tip="Loading..."/>

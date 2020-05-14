@@ -5,6 +5,7 @@ import SelectableDropdownComponent from "../../selectable-dropdown/selectable-dr
 import moment from "moment";
 import PresentableDropdown from "../../presentable-dropdown/presentable-dropdown.component";
 import {Button, Popconfirm, Space} from "antd";
+import {parseConditions, parseProducts} from "../row-parser";
 
 const Row = styled.div`
   width: 100%;
@@ -20,25 +21,15 @@ const emptyField = "--------"
 
 function TableRow({index, discount}) {
     const currDiscount = discount.discount;
-    console.log(currDiscount);
-    const coupon = currDiscount.coupon ? currDiscount.coupon : emptyField;
-    const productsStrings = currDiscount.products.map(catalogNumber => catalogNumber + "");
-    const productsWithComma = productsStrings.join(", ");
-    const products = productsWithComma.length === 0 ? emptyField : productsWithComma;
+    const parsedProducts = parseProducts(currDiscount.products);
+    const reducedConditions = parseConditions(currDiscount.condition);
 
-    const reducedConditions = currDiscount.condition.reduce((acc, curr) => {
-        const currDesc = curr.condition && curr.condition.minPay
-            ? `store minimum subtotal: ${curr.condition.minPay} `
-            : curr.condition && curr.condition.minAmount
-                ? `minimum amount: ${curr.condition.minAmount} for product: ${curr.condition.catalogNumber} `
-                : `on discount: ${curr.condition.catalogNumber} `;
-
-        return [...acc, currDesc + curr.operator];
-    }, []);
+    const products = parsedProducts.length === 0 ? emptyField : parsedProducts;
     const conditions = reducedConditions.length === 0 ? [emptyField] : reducedConditions;
+    const coupon = currDiscount.coupon ? currDiscount.coupon : emptyField;
 
     return (
-        <Draggable draggableId={discount.key + ""} index={index}>
+        <Draggable draggableId={discount.key} index={index}>
             {provided => (
                 <Row
                     ref={provided.innerRef}
@@ -60,7 +51,7 @@ function TableRow({index, discount}) {
                         <PresentableDropdown inputs={conditions}/>
                     </span>
                     <span style={basicStyle}>{coupon}</span>
-                    <SelectableDropdownComponent discountKey={currDiscount.key} inputs={["AND", "OR", "XOR"]}/>
+                    <SelectableDropdownComponent discountKey={discount.key} inputs={["AND", "OR", "XOR"]}/>
                 </Row>
             )}
         </Draggable>
