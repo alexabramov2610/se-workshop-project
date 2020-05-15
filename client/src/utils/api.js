@@ -12,9 +12,10 @@ const instance = axios.create({
 });
 
 
-async function init() {
-    instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
-    }).catch(e => console.log("cant fetch new token", e))
+async function init(cb) {
+    return Promise.all([
+        instance.get(`${baseDomain}/system/newtoken`), instance.get(`${baseDomain}/system/status`)]).then(values => cb({ token: values[0].data, status: values[1].data }))
+
 }
 
 

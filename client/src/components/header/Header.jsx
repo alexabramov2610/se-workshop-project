@@ -64,7 +64,7 @@ export class Header extends React.Component {
                     style={{ textDecoration: "none", color: "black" }}
                     to="/"
                   >
-                    SIGN OUT {config.getLoggedInUser()}
+                    SIGN OUT
                   </Link>
                 </OptionLink>
 

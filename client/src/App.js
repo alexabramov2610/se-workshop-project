@@ -28,7 +28,9 @@ class App extends React.Component {
             isLoggedIn: false
         }
         this.onLogin = this.onLogin.bind(this);
+        this.handleInit = this.handleInit.bind(this);
     }
+
     onLogin = (username) => {
         console.log(username)
         this.setState({ isLoggedIn: true }, () => config.setLoggedInUser(username))
@@ -41,8 +43,13 @@ class App extends React.Component {
         config.setLoggedInUser(undefined);
     }
 
+    handleInit({ token, status }) {
+        status && status.data && status.data.username && status.data.username.length > 0 && this.onLogin(status.data.username)
+    }
+
     async componentDidMount() {
-        const initialized = await init();
+        const initialized = await init(this.handleInit);
+
         this.setState({ initialized: true })
     }
     render() {
