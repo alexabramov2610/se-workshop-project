@@ -18,6 +18,7 @@ import { StorePage } from './pages/store-page/store-page'
 import { SearchPage } from './pages/search-page/serch-page'
 import { PersonalInfo } from './pages/personal-info-page/personal-info'
 import { createBrowserHistory } from 'history';
+import { CartCtx } from './contexts/cart-context'
 import { history } from './utils/config'
 import * as config from './utils/config'
 
@@ -26,7 +27,8 @@ class App extends React.Component {
         super(props);
         this.state = {
             isLoggedIn: false,
-            systemIsClose: false
+            systemIsClose: false,
+            cartItems: []
         }
         this.onLogin = this.onLogin.bind(this);
         this.handleInit = this.handleInit.bind(this);
@@ -38,7 +40,14 @@ class App extends React.Component {
 
 
     }
+    addToCart = async (p) => {
+        await this.setState(prevState => {
+            return {
+                cartItems: prevState.cartItems.concat([p])
+            }
+        });
 
+    }
     onLogout = () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
@@ -56,19 +65,21 @@ class App extends React.Component {
     }
     render() {
         return (!this.state.systemIsClose) ? (
-            <Router history={history}>
-                <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
-                <Switch>
-                    <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
-                    <Route path="/category" component={CategoryPage} />
-                    <Route path={"/set-discount"} component={DiscountPage} />}
-                    <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
-                    <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
-                    <Route path="/store/:storename" component={StorePage} />
-                    <Route exact path="/search" component={SearchPage} />
-                    <Route exact path="/personalinfo" component={PersonalInfo} />
-                </Switch>
-            </Router>
+            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItems: this.state.cartItems }} >
+                <Router history={history}>
+                    <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
+                    <Switch>
+                        <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
+                        <Route path="/category" component={CategoryPage} />
+                        <Route path={"/set-discount"} component={DiscountPage} />}
+                        <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
+                        <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
+                        <Route path="/store/:storename" component={StorePage} />
+                        <Route exact path="/search" component={SearchPage} />
+                        <Route exact path="/personalinfo" component={PersonalInfo} />
+                    </Switch>
+                </Router>
+            </CartCtx.Provider>
 
         ) : <AdminInit history={history} />
 

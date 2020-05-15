@@ -3,13 +3,9 @@ import { JoinCards } from "../../components/home-products-collection/home-join-c
 import { CarouselUI } from "../../components/carousel/carousel";
 import { ProductsGrid } from "../../components/products-grid/products-grid";
 
- class StorePage extends React.Component {
+class StorePage extends React.Component {
   render() {
-    return (
-      <div>
-        <ProductsGrid storename={this.props.match.params.storename} />
-      </div>
-    );
+    return <ProductsGrid storename={this.props.match.params.storename} />;
   }
 }
 

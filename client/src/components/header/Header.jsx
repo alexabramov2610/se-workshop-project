@@ -90,7 +90,7 @@ export class Header extends React.Component {
                   to={`/personalinfo`}
                   className="hvr-underline-from-center"
                 >
-                  Personal Info
+                  PERSONAL INFO
                 </Link>
               </div>
             ) : (

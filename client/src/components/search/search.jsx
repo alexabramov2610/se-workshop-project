@@ -65,7 +65,9 @@ class Search extends React.Component {
       },
     };
     const { data } = await api.search(req);
-    const products = data.data.products.map((e) => e.product);
+    const products = data.data.products.map((e) => {
+      return { ...e.product, store: e.storeName };
+    });
     this.setState({ products }, () => console.log("abs s", this.state));
   };
   handleChange = (event) => {
@@ -200,6 +202,7 @@ class Search extends React.Component {
                 price={p.price}
                 key={index}
                 rating={p.rating}
+                store={p.store}
               />
             ))}{" "}
         </ProductGridContainer>
