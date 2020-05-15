@@ -13,12 +13,12 @@ const StorePageContainer = ({isLoggedIn}) => {
 
     useEffect(async () => {
         const storeInfo = await getStoreInfo("store9");
-        console.log(storeInfo);
+        setStoreData(storeInfo.data.data.info);
     }, []);
 
     return storeData
         ? <StorePageCtx.Provider value={storeData}>
-            <StorePage isLoggedIn={isLoggedIn}/>
+            <StorePage isLoggedIn={isLoggedIn} />
         </StorePageCtx.Provider>
 
         : <div style={spinnerStyle}>

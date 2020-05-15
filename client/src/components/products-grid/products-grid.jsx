@@ -6,6 +6,7 @@ import {history} from "../../utils/config";
 import {ProductBox} from "../product-box/product-box";
 import * as api from "../../utils/api";
 import {ProductGridContainer} from "./products-grid-container.styles.jsx";
+import {StorePageCtx} from "../../pages/store-page/store-page-ctx";
 
 const stores = [];
 
@@ -17,7 +18,7 @@ export class ProductsGrid extends React.Component {
     }
 
     async componentDidMount() {
-        const {data} = await api.getStoreProducts(this.props.storename);
+        const {data} = await api.getStoreProducts(this.props.storeName);
         const products = data.data.products.map((e) => e.product);
         this.setState({products});
         console.log(products);
@@ -34,7 +35,7 @@ export class ProductsGrid extends React.Component {
                         key={index}
                         rating={p.rating}
                     />
-                ))}{" "}
+                ))}
             </ProductGridContainer>
         );
     }

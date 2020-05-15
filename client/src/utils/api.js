@@ -3,7 +3,7 @@ import openSocket from 'socket.io-client';
 
 const https = require('https');
 let socket;
-const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" } }
+const initData = {body: {firstAdminName: "admin1", firstAdminPassword: "admin123"}}
 const baseDomain = "http://localhost:5000"
 
 const instance = axios.create({
@@ -13,24 +13,24 @@ const instance = axios.create({
 
 
 async function init() {
-    instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
+    instance.get(`${baseDomain}/system/newtoken`).then(({data}) => {
     }).catch(e => console.log("cant fetch new token", e))
 }
 
 
 async function adminInit(firstAdminName, firstAdminPassword) {
-    instance.post(`${baseDomain}/system/init`, { body: { firstAdminName, firstAdminPassword } }).then(({ data }) => {
+    instance.post(`${baseDomain}/system/init`, {body: {firstAdminName, firstAdminPassword}}).then(({data}) => {
     }).catch(e => console.log("cant init system", e))
 }
 
 async function register(username, password) {
     return instance.post(`${baseDomain}/users/register`,
-        { body: { username, password } });
+        {body: {username, password}});
 }
 
 async function createStore(storeName, description) {
     return instance.post(`${baseDomain}/stores/createStore`,
-        { body: { storeName, description } });
+        {body: {storeName, description}});
 }
 
 function startConnection(cb) {
@@ -38,7 +38,7 @@ function startConnection(cb) {
 }
 
 async function login(username, password) {
-    return instance.post(`${baseDomain}/users/login`, { body: { username, password } })
+    return instance.post(`${baseDomain}/users/login`, {body: {username, password}})
 }
 
 async function logout() {
@@ -70,7 +70,7 @@ const setDiscountPolicy = async (req) => {
 }
 
 const getStoreInfo = async (storeName) => {
-    return instance.post(`${baseDomain}/stores/viewStoreInfo/?storeName=${storeName}`);
+    return instance.post(`${baseDomain}/stores/viewStoreInfo`, {body: {storeName}});
 }
 
 export {

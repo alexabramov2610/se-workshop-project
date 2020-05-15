@@ -58,7 +58,6 @@ class App extends React.Component {
                     <Route exact path="/search" component={SearchPage} />
                     <Route exact path="/admininit" component={AdminInit} />
                     <Route exact path="/personalinfo" component={PersonalInfo} />
-
                 </Switch>
             </Router>
         ) : null
