@@ -25,7 +25,8 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoggedIn: false
+            isLoggedIn: false,
+            systemIsClose: false
         }
         this.onLogin = this.onLogin.bind(this);
         this.handleInit = this.handleInit.bind(this);
@@ -33,27 +34,28 @@ class App extends React.Component {
 
     onLogin = (username) => {
         console.log(username)
-        this.setState({ isLoggedIn: true }, () => config.setLoggedInUser(username))
+        this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
 
 
     }
 
     onLogout = () => {
-        this.setState({ isLoggedIn: false })
+        this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
     }
 
-    handleInit({ token, status }) {
-        status && status.data && status.data.username && status.data.username.length > 0 && this.onLogin(status.data.username)
+    handleInit({ token, status, isSystemUp }) {
+        console.log(isSystemUp)
+        if (!isSystemUp) this.setState({ systemIsClose: true })
+        else if (status && status.data && status.data.username && status.data.username.length > 0) this.onLogin(status.data.username)
+        else this.setState({ systemIsClose: false })
     }
 
     async componentDidMount() {
-        const initialized = await init(this.handleInit);
-
-        this.setState({ initialized: true })
+        init(this.handleInit);
     }
     render() {
-        return this.state.initialized ? (
+        return (!this.state.systemIsClose) ? (
             <Router history={history}>
                 <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                 <Switch>
@@ -64,13 +66,11 @@ class App extends React.Component {
                     <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
                     <Route path="/store/:storename" component={StorePage} />
                     <Route exact path="/search" component={SearchPage} />
-                    <Route exact path="/admininit" component={AdminInit} />
                     <Route exact path="/personalinfo" component={PersonalInfo} />
-
                 </Switch>
             </Router>
 
-        ) : null
+        ) : <AdminInit history={history} />
 
     }
 }

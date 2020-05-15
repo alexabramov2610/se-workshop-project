@@ -14,7 +14,7 @@ const instance = axios.create({
 
 async function init(cb) {
     return Promise.all([
-        instance.get(`${baseDomain}/system/newtoken`), instance.get(`${baseDomain}/system/status`)]).then(values => cb({ token: values[0].data, status: values[1].data }))
+        instance.get(`${baseDomain}/system/newtoken`), instance.get(`${baseDomain}/system/status`), instance.get(`${baseDomain}/system/healthcheck`)]).then(values => cb({ token: values[0].data, status: values[1].data, isSystemUp: values[2].data.data.result }))
 
 }
 
