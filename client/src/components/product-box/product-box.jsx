@@ -8,7 +8,7 @@ import { CustomButton } from "../../components/custom-button/custom-button.compo
 import * as api from "../../utils/api";
 import { CartCtx } from "../../contexts/cart-context";
 import { ProductDetails } from "./products-box.styles";
-export const ProductBox = ({ name, price, rating, store }) => (
+export const ProductBox = ({ name, price, rating, store, cn }) => (
   <Card className="text-center grid-item">
     <Card.Body>
       <Card.Title>
@@ -21,7 +21,7 @@ export const ProductBox = ({ name, price, rating, store }) => (
           Store: <Link to={`/store/${store}`}>{store}</Link>
         </div>
         <div>
-          Rating:{" "}
+          Rating :{" "}
           {[1, 2, 3, 4, 5].map(
             (e, index) =>
               index < rating && (
@@ -36,7 +36,15 @@ export const ProductBox = ({ name, price, rating, store }) => (
         {(value) => (
           <CustomButton
             style={{ margin: "auto" }}
-            onClick={(ev) => value.addToCart("s")}
+            onClick={(ev) =>
+              value.addToCart({
+                body: {
+                  storeName: store,
+                  catalogNumber: cn,
+                  amount: 1,
+                },
+              })
+            }
           >
             Add To Cart
           </CustomButton>

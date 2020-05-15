@@ -11,7 +11,7 @@ import { Header } from './components/header'
 import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
 import DiscountPage from "./pages/discount-page/discount-page.component";
 
-import { init } from '../src/utils/api'
+import * as api from '../src/utils/api'
 import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { StorePage } from './pages/store-page/store-page'
@@ -28,7 +28,7 @@ class App extends React.Component {
         this.state = {
             isLoggedIn: false,
             systemIsClose: false,
-            cartItems: []
+            cartItemsCounter: 0
         }
         this.onLogin = this.onLogin.bind(this);
         this.handleInit = this.handleInit.bind(this);
@@ -40,14 +40,32 @@ class App extends React.Component {
 
 
     }
-    addToCart = async (p) => {
-        await this.setState(prevState => {
-            return {
-                cartItems: prevState.cartItems.concat([p])
-            }
-        });
-
+    addToCart = async (req) => {
+        const { data } = await api.addToCart(req);
+        const isAdded = data.data.result;
+        if (isAdded) {
+            const data = await api.viewCart()
+            console.log('cart requests returns:', data, 'req is: {body:{}}')
+            await this.setState(prevState => {
+                return {
+                    cartItemsCounter: prevState.cartItemsCounter + 1
+                }
+            });
+        }
     }
+    // data: {
+    //     result: boolean;
+    //     cart?: {
+    //         products: {
+    //             storeName: string;
+    //             bagItems: {
+    //     product: IProduct;
+    //     amount: number;
+    //     finalPrice?: number;
+    // }[];
+    //         }
+    //     }
+    // };
     onLogout = () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
@@ -61,11 +79,11 @@ class App extends React.Component {
     }
 
     async componentDidMount() {
-        init(this.handleInit);
+        api.init(this.handleInit);
     }
     render() {
         return (!this.state.systemIsClose) ? (
-            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItems: this.state.cartItems }} >
+            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter }} >
                 <Router history={history}>
                     <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                     <Switch>

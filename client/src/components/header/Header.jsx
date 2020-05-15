@@ -16,6 +16,7 @@ import { Search } from "../search/search";
 import BellIcon from "../bell-icon/bell-icon.component";
 import { Link } from "react-router-dom";
 import * as config from "../../utils/config";
+import { CartCtx } from "../../contexts/cart-context";
 const underlineAnimation = "hvr-underline-from-center";
 
 export class Header extends React.Component {
@@ -108,7 +109,9 @@ export class Header extends React.Component {
               </Link>
             )}
             <BellIcon isLoggedIn={this.props.isLoggedIn} />
-            <CartIcon />
+            <CartCtx.Consumer>
+              {(value) => <CartIcon itemCount={value.cartItemsCounter} />}
+            </CartCtx.Consumer>
           </OptionsContainer>
         </HeaderContainer>
       </React.Fragment>

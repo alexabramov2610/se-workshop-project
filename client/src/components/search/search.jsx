@@ -203,6 +203,7 @@ class Search extends React.Component {
                 key={index}
                 rating={p.rating}
                 store={p.store}
+                cn={p.catalogNumber}
               />
             ))}{" "}
         </ProductGridContainer>

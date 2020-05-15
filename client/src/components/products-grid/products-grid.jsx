@@ -40,6 +40,7 @@ export class ProductsGrid extends React.Component {
                 key={index}
                 rating={p.rating}
                 store={this.props.storename}
+                cn={p.catalogNumber}
               />
             ))}{" "}
         </ProductGridContainer>
