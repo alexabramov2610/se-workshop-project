@@ -5,9 +5,10 @@ import {
     ProductCatalogNumber,
     ProductInStore,
     ProductWithQuantity,
-    SearchFilters, SearchQuery
+    SearchFilters,
+    SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Req, Res} from 'se-workshop-20-interfaces'
+import {Res} from 'se-workshop-20-interfaces'
 import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 describe("Store Management Unit Tests", () => {
@@ -553,7 +554,7 @@ describe("Store Management Unit Tests", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
         const items: Item[] = generateValidItems(10, 0, 1, 0);
-        const product: ProductReq = {catalogNumber: 1, category: ProductCategory.ELECTRONICS, name: "name", price: 5}
+        const product: ProductReq = {catalogNumber: 1, category: ProductCategory.ELECTRONICS, name: "name", price: 5, rating: Rating.MEDIUM}
         let res: Item[] = store.getItemsFromStock(product, 3);
         expect(res).toHaveLength(0);
         store.addItems(items);
@@ -589,8 +590,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(expectedRes.length);
@@ -620,9 +622,10 @@ describe("Store Management Unit Tests", () => {
             product: {
                 catalogNumber: products[0].catalogNumber,
                 category: products[0].category,
+                rating: Rating.MEDIUM,
                 name: products[0].name,
                 price: products[0].price
-            }, storeName: store.storeName
+            }, storeName: store.storeName, storeRating: Rating.MEDIUM
         }];
 
         expect(productsInStore).toHaveLength(expectedRes.length);
@@ -655,8 +658,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM,
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(5);
@@ -703,8 +707,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM,
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(5);

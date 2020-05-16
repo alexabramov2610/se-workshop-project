@@ -13,7 +13,7 @@ import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
-import {Req, Res} from 'se-workshop-20-interfaces'
+import {Res} from 'se-workshop-20-interfaces'
 
 const storeReq = {storeName: "mock-store", description: "storeDescription"}
 let store: Store = new Store("name", "storeDesc");
@@ -555,26 +555,6 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(true);
     });
 
-    test("removeManagerPermissions - Failure: invalid permission", () => {
-        const isSuccessVerify: boolean = true;
-        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
-        const storeManager: StoreManager = new StoreManager("storeManager-mock");
-        const permissionToRemove: ManagementPermission = -2;
-        const permissions: ManagementPermission[] = [permissionToRemove];
-
-        mockVerifyStoreOperation(isSuccessVerify);
-        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
-        jest.spyOn(store, "getStoreOwner").mockReturnValue(storeOwner);
-        jest.spyOn(store, "getStoreManager").mockReturnValue(storeManager);
-        jest.spyOn(storeOwner, "isAssignerOfManager").mockReturnValue(true);
-
-
-        const actualRes: Res.BoolResponse = storeManagement.removeManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
-        expect(actualRes.data.result).toBe(false);
-        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
-        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
-    });
-
 
     test("addManagerPermissions - Success", () => {
         const isSuccessVerify: boolean = true;
@@ -676,32 +656,12 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
     });
 
-    test("addManagerPermissions - Failure: invalid permission", () => {
-        const isSuccessVerify: boolean = true;
-        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
-        const storeManager: StoreManager = new StoreManager("storeManager-mock");
-        const permissionToRemove: ManagementPermission = -2;
-        const permissions: ManagementPermission[] = [permissionToRemove];
-
-        mockVerifyStoreOperation(isSuccessVerify);
-        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
-        jest.spyOn(store, "getStoreOwner").mockReturnValue(storeOwner);
-        jest.spyOn(store, "getStoreManager").mockReturnValue(storeManager);
-        jest.spyOn(storeOwner, "isAssignerOfManager").mockReturnValue(true);
-
-
-        const actualRes: Res.BoolResponse = storeManagement.addManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
-        expect(actualRes.data.result).toBe(false);
-        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
-        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
-    });
-
 
     test("changeProductName - Success", () => {
         const isSuccessVerify: boolean = true;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const product: Product = new Product('name', catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
         const newName: string = "newProductName";
@@ -722,7 +682,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = false;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
@@ -742,7 +702,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = true;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
@@ -763,7 +723,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = true;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const prodName: string = "mockname";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
@@ -785,7 +745,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = false;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
@@ -805,7 +765,7 @@ describe("Store Management Unit Tests", () => {
         const isSuccessVerify: boolean = true;
         const prodPrice: number = 5;
         const catalogNumber: number = 5;
-        const category: number = 5;
+        const category: ProductCategory = ProductCategory.HOBBIES;
         const prodName: string = "mock-name";
         const product: Product = new Product(prodName, catalogNumber, prodPrice, category);
         const user: StoreOwner = new StoreOwner("storeOwner-mock");
@@ -886,6 +846,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const prodReq: ProductReq[] = [{
             name: 'mock-prod',
+            rating: Rating.MEDIUM,
             category: ProductCategory.ELECTRONICS,
             catalogNumber: 1,
             price: 1
@@ -983,11 +944,12 @@ describe("Store Management Unit Tests", () => {
 
         const productsInStore: ProductInStore[] = [{
             product: {
+                rating: Rating.MEDIUM,
                 catalogNumber: 1,
                 category: ProductCategory.GENERAL,
                 name: "mock",
                 price: 11
-            }, storeName: store.storeName
+            }, storeName: store.storeName, storeRating: Rating.MEDIUM
         }];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);

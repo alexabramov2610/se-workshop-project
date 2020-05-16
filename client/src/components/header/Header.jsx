@@ -9,9 +9,14 @@ import {
   LogoContainer,
   OptionsContainer,
   OptionLink,
+  SearchContainer,
+  LogoSearchContainer,
 } from "./Header-styles";
+import { Search } from "../search/search";
 import BellIcon from "../bell-icon/bell-icon.component";
 import { Link } from "react-router-dom";
+import * as config from "../../utils/config";
+import { CartCtx } from "../../contexts/cart-context";
 const underlineAnimation = "hvr-underline-from-center";
 
 export class Header extends React.Component {
@@ -24,10 +29,9 @@ export class Header extends React.Component {
       console.log("Log Out Recieved: ", data);
       (!data.error || data.error.message === "Already at this state") &&
         this.props.onLogout();
-    }); 
+    });
 
   render() {
-    
     return (
       <React.Fragment>
         <HeaderContainer>
@@ -35,32 +39,79 @@ export class Header extends React.Component {
             <Logo className="logo hvr-bounce-in" />
           </LogoContainer>
           <OptionsContainer>
-            <OptionLink as="div" className={underlineAnimation} to="/shop">
+            <Link
+              style={{
+                marginLeft: "8px",
+                marginRight: "8px",
+                textDecoration: "none",
+                color: "black",
+              }}
+              to="/search"
+              className="hvr-underline-from-center"
+            >
+              Search
+            </Link>
+
+            <Link
+              style={{
+                marginLeft: "8px",
+                marginRight: "8px",
+                textDecoration: "none",
+                color: "black",
+              }}
+              className="hvr-underline-from-center"
+              to="/"
+            >
               HOME PAGE
-            </OptionLink>
-            <OptionLink as="div" className={underlineAnimation} to="/contact">
-              CONTACT
-            </OptionLink>
+            </Link>
+
             {this.props.isLoggedIn ? (
-              <OptionLink
-                as="div"
-                className={underlineAnimation}
-                onClick={() => this.onLogout()}
-              >
-                SIGN OUT
-              </OptionLink>
-            ) : (
-              <OptionLink as="div" className={underlineAnimation} to="/signin">
+              <div>
                 <Link
-                  style={{ textDecoration: "none", color: "black" }}
-                  to="/signupsignin"
+                  style={{
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    textDecoration: "none",
+                    color: "black",
+                  }}
+                  className="hvr-underline-from-center"
+                  onClick={() => this.onLogout()}
+                  to="/"
                 >
-                  SIGN IN
+                  SIGN OUT
                 </Link>
-              </OptionLink>
+
+                <Link
+                  style={{
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    textDecoration: "none",
+                    color: "black",
+                  }}
+                  to={`/personalinfo`}
+                  className="hvr-underline-from-center"
+                >
+                  PERSONAL INFO
+                </Link>
+              </div>
+            ) : (
+              <Link
+                style={{
+                  marginLeft: "8px",
+                  marginRight: "8px",
+                  textDecoration: "none",
+                  color: "black",
+                }}
+                to="/signupsignin"
+                className="hvr-underline-from-center"
+              >
+                SIGN IN
+              </Link>
             )}
             <BellIcon isLoggedIn={this.props.isLoggedIn} />
-            <CartIcon />
+            <CartCtx.Consumer>
+              {(value) => <CartIcon itemCount={value.cartItemsCounter} />}
+            </CartCtx.Consumer>
           </OptionsContainer>
         </HeaderContainer>
       </React.Fragment>

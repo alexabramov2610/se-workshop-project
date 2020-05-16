@@ -68,5 +68,5 @@ export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse =>
 }
 
 export const verifyToken = (req: Req.Request): Res.BoolResponse => {
-    return ts.verifyToken(req);
+    return ts.verifyTokenExists(req);
 }

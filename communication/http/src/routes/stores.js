@@ -17,6 +17,7 @@ router.post("/removeProductsWithQuantity", StoreController.removeProductsWithQua
 router.post("/addNewProducts", StoreController.addNewProducts);
 router.post("/removeProducts", StoreController.removeProducts);
 router.post("/setDiscountsPolicy", StoreController.setDiscountsPolicy);
+router.post("/getDiscountsPolicy", StoreController.getDiscountsPolicy);
 router.post("/addDiscount", StoreController.addDiscount);
 router.post("/removeProductDiscount", StoreController.removeProductDiscount);
 router.post("/assignStoreOwner", StoreController.assignStoreOwner);
@@ -35,5 +36,6 @@ router.get("/", (req, res) => res.send('Hello World! -> /'));
 router.get("/getStores/", StoreController.getStoresWithLimit);      // usage: stores/getStores/?offset=2&limit=3
 router.get("/getProducts/", StoreController.getAllProductsInStore);      // usage: stores/getProducts/?storeName=shufersal
 router.get("/getCategories/", StoreController.getAllCategoriesInStore);      // usage: stores/getCategories/?storeName=shufersal
+router.get("/getAllCategories/", StoreController.getAllCategories);      // usage: stores/getAllCategories
 
 export default router;

@@ -54,8 +54,8 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("add new products", () => {
-        let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+        let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: ProductCategory.ELECTRONICS};
+        let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: ProductCategory.HOBBIES};
         let products: ProductReq[] = [product1, product2];
 
         // all products are valid
@@ -65,8 +65,8 @@ describe("Store Owner Integration Tests", () => {
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(0);
 
-        product1 = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        product2 = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+        product1 = {name: 'mock1', catalogNumber: 5, price: 123, category: ProductCategory.ELECTRONICS};
+        product2 = {name: 'mock2', catalogNumber: 15, price: 1123, category: ProductCategory.HOBBIES};
         products = [product1, product2];
 
         // all products are invalid
@@ -77,8 +77,8 @@ describe("Store Owner Integration Tests", () => {
         expect(productAdditionRes.data.productsNotAdded).toBeDefined();
         expect(productAdditionRes.data.productsNotAdded.length).toBe(products.length);
 
-        product1 = {name: 'mock1', catalogNumber: -5, price: 123, category: 1};
-        product2 = {name: 'mock2', catalogNumber: 12, price: 1123, category: 2};
+        product1 = {name: 'mock1', catalogNumber: -5, price: 123, category: ProductCategory.ELECTRONICS};
+        product2 = {name: 'mock2', catalogNumber: 12, price: 1123, category: ProductCategory.HOBBIES};
         products = [product1, product2];
 
         // one product is valid
@@ -103,8 +103,8 @@ describe("Store Owner Integration Tests", () => {
         expect(itemsAdditionRes.data.itemsNotAdded.length).toBe(items.length);
 
         // prepare products to add items
-        const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+        const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: ProductCategory.ELECTRONICS};
+        const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: ProductCategory.HOBBIES};
         const products: ProductReq[] = [product1, product2];
 
         // all products are valid
@@ -269,8 +269,8 @@ describe("Store Owner Integration Tests", () => {
         expect(removeItemsRes.data.itemsNotRemoved.length).toBe(items.length);
 
         // prepare products to add items
-        const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+        const product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: ProductCategory.ELECTRONICS};
+        const product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: ProductCategory.HOBBIES};
         const products: ProductReq[] = [product1, product2];
 
         // all products are valid
@@ -336,8 +336,8 @@ describe("Store Owner Integration Tests", () => {
     });
 
     it("remove products", () => {
-        let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: 1};
-        let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: 2};
+        let product1: ProductReq = {name: 'mock1', catalogNumber: 5, price: 123, category: ProductCategory.ELECTRONICS};
+        let product2: ProductReq = {name: 'mock2', catalogNumber: 15, price: 1123, category: ProductCategory.HOBBIES};
         let products: ProductReq[] = [product1, product2];
 
         // products don't exist
@@ -383,17 +383,16 @@ describe("Store Owner Integration Tests", () => {
 
         product1 = {name: name1, catalogNumber: catalog1, price: price1, category: category1};
         product2 = {name: name2, catalogNumber: catalog2, price: price2, category: category2};
-        const product3: ProductReq = {name: 'mock3', catalogNumber: -15, price: 1123, category: 2};
-        const product4: ProductReq = {name: 'mock4', catalogNumber: 15, price: -1123, category: 2};
-        const product5: ProductReq = {name: 'mock5', catalogNumber: 15, price: 1123, category: -2};
+        const product3: ProductReq = {name: 'mock3', catalogNumber: -15, price: 1123, category: ProductCategory.HOBBIES};
+        const product4: ProductReq = {name: 'mock4', catalogNumber: 15, price: -1123, category: ProductCategory.HOBBIES};
 
-        products = [product1, product2, product3, product4, product5];
+        products = [product1, product2, product3, product4];
         removeProductsReq = {body: {storeName, products}, token};
         removeProductsRes = ServiceFacade.removeProducts(removeProductsReq);
 
         expect(removeProductsRes.data.result).toBe(true);
         expect(removeProductsRes.data.productsNotRemoved).toBeDefined();
-        expect(removeProductsRes.data.productsNotRemoved.length).toBe(3);
+        expect(removeProductsRes.data.productsNotRemoved.length).toBe(2);
 
         // add 2 valid products
         products = [product1, product2];

@@ -68,6 +68,10 @@ export async function setDiscountsPolicy(req,res) {
     const result = wrapHttp(req, ServiceFacade.setDiscountsPolicy);
     return res.send(result)
 }
+export async function getDiscountsPolicy(req,res) {
+    const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
+    return res.send(result)
+}
 
 export async function addDiscount(req,res) {
     const result = wrapHttp(req, ServiceFacade.addDiscount);
@@ -161,4 +165,9 @@ export async function getAllCategoriesInStore(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
+}
+
+export async function getAllCategories(req, res) {
+    const result = wrapHttp(req, ServiceFacade.getAllCategories);
+    return res.send(result);
 }

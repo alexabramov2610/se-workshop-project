@@ -184,4 +184,5 @@ export interface StoreInfo {
 export interface ProductInStore {
     product: IProduct;
     storeName: string;
+    storeRating: Rating
 }

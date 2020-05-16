@@ -346,9 +346,10 @@ export class Store {
                     name: product.name,
                     price: product.price,
                     category: product.category,
-                    catalogNumber: product.catalogNumber
+                    catalogNumber: product.catalogNumber,
+                    rating: product.rating
                 };
-                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName};
+                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName, storeRating: this.rating};
                 products.push(matchingProdInStore);
             }
         }
@@ -562,14 +563,20 @@ export class Store {
     }
 
     private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
-        if (typeof query.productName !== "undefined" && query.productName !== product.name)
+        if (typeof query.productName !== "undefined" && query.productName.length > 0 && query.productName !== product.name)
             return false;
-        if (typeof filters.priceRange !== "undefined" && (product.price < filters.priceRange.min || filters.priceRange.max < product.price))
+
+        if (typeof filters.priceRange !== "undefined" && (
+            ((<unknown>filters.priceRange.min) !== "" && product.price < filters.priceRange.min) ||
+            ((<unknown>filters.priceRange.max) !== "" && filters.priceRange.max < product.price)))
             return false;
-        if (typeof filters.productCategory !== "undefined" && filters.productCategory !== product.category)
+
+        if (typeof filters.productCategory !== "undefined" && (<unknown>filters.productCategory) !== "" && filters.productCategory !== product.category)
             return false;
-        if (typeof filters.productRating !== "undefined" && filters.productRating !== product.rating)
+
+        if (typeof filters.productRating !== "undefined" && (<unknown>filters.productRating) !== "" && filters.productRating !== product.rating)
             return false;
+
         return true;
     }
 
