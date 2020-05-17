@@ -13,8 +13,7 @@ class AdminInit extends React.Component {
   constructor() {
     super();
     this.state = {
-      firstAdminName: "",
-      firstAdminPassword: "",
+      afterInit: false,
     };
   }
 
@@ -26,8 +25,8 @@ class AdminInit extends React.Component {
       firstAdminPassword: "",
       firstAdminName: "",
     });
-    api.adminInit(firstAdminName, firstAdminPassword);
-    window.location.reload();
+    await api.adminInit(firstAdminName, firstAdminPassword);
+    this.setState({ afterInit: true }, () => window.location.reload());
   };
 
   handleChange = (event) => {
@@ -39,6 +38,7 @@ class AdminInit extends React.Component {
   render() {
     const { firstAdminName, firstAdminPassword } = this.state;
     const { isLoggedIn } = this.props;
+    this.state.afterInit && window.location.reload();
     return (
       <CreateStorePageContainer>
         <StoreFormContainer>
