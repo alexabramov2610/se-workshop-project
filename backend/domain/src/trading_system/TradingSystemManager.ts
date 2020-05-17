@@ -454,7 +454,7 @@ export class TradingSystemManager {
 
     // methods that are available for admin also
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
-        logger.info(`retrieving purchases history REQ:${JSON.stringify(req)}`)
+        logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const userToView: RegisteredUser = (req.body && req.body.userName) ? this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
