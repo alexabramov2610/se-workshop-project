@@ -30,10 +30,6 @@ export async function removeProductFromCart(req,res) {
 }
 
 
-export async function viewRegisteredUserPurchasesHistory(req,res) {
-    const result = wrapHttp(req, ServiceFacade.viewRegisteredUserPurchasesHistory);
-    return res.send(result);
-}
 
 
 
@@ -47,5 +43,10 @@ export async function viewCart(req,res) {
 
 export async function personalDetails(req,res) {
     const result = wrapHttp(req, ServiceFacade.getPersonalDetails);
+    return res.send(result);
+}
+
+export async function viewRegisteredUserPurchasesHistory(req,res) {
+    const result = wrapHttp(req, ServiceFacade.viewRegisteredUserPurchasesHistory);
     return res.send(result);
 }

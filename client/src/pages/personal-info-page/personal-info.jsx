@@ -15,8 +15,8 @@ class PersonalInfo extends React.Component {
 
     async initPage() {
         const { data } = await api.getPersonalInfo();
-        const { username, cart, managedStores, ownedStores } = data.data;
-        this.setState({ username, cart, managedStores, ownedStores });
+        const { username, cart, managedStores, ownedStores, purchasesHistory } = data.data;
+        this.setState({ username, cart, managedStores, ownedStores, purchasesHistory });
     }
 
 
@@ -24,10 +24,11 @@ class PersonalInfo extends React.Component {
     return (
         <div>
           <SignInTitle>Personal Info</SignInTitle>
-            <div style={{ minWidth: "155px" }}>Username: {this.state.username}</div>
-            <div style={{ minWidth: "155px" }}>Cart: {JSON.stringify(this.state.cart)}</div>
-            <div style={{ minWidth: "155px" }}>Managed Stores: {JSON.stringify(this.state.managedStores)}</div>
-            <div style={{ minWidth: "155px" }}>Owned Stores: : {JSON.stringify(this.state.ownedStores)}</div>
+            <div>Username: {this.state.username}</div>
+            <div>Cart: {JSON.stringify(this.state.cart)}</div>
+            <div>Purchases History: {JSON.stringify(this.state.purchasesHistory)}</div>
+            <div>Managed Stores: {JSON.stringify(this.state.managedStores)}</div>
+            <div>Owned Stores: : {JSON.stringify(this.state.ownedStores)}</div>
         </div>
     );
   }

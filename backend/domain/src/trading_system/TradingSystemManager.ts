@@ -17,7 +17,7 @@ import {
     BagItem,
     Cart,
     IDiscountPolicy,
-    IPurchasePolicy,
+    IPurchasePolicy, IReceipt,
     Purchase, StoreInfo
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
@@ -454,12 +454,12 @@ export class TradingSystemManager {
 
     // methods that are available for admin also
     viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
-        logger.info(`retrieving purchases history`)
+        logger.info(`retrieving purchases history REQ:${JSON.stringify(req)}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const userToView: RegisteredUser = req.body.userName ? this._userManager.getUserByName(req.body.userName) : user;
+        const userToView: RegisteredUser = (req.body && req.body.userName) ? this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isAdminReq: boolean = req.body.userName && user.role === UserRole.ADMIN;
+        const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
         if (userToView.name !== user.name && !isAdminReq)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
@@ -592,17 +592,18 @@ export class TradingSystemManager {
     }
 
     getPersonalDetails(req: Req.Request):  Res.GetPersonalDetailsResponse {
+        logger.info(`getting personal details`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (!user)
-            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: []}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: [], purchasesHistory: undefined}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const viewCartRes: Res.ViewCartRes = this.viewCart(req);
         if (!viewCartRes.data.result)
-            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: []}, error: viewCartRes.error};
+            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: [], purchasesHistory: undefined}, error: viewCartRes.error};
 
         const managedStores: StoreInfo[] = this._storeManager.getStoresInfoOfManagedBy(user.name);
         const ownedStores: StoreInfo[] = this._storeManager.getStoresInfoOfOwnedBy(user.name);
-
-        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores: managedStores, ownedStores: ownedStores } };
+        const purchasesHistory: IReceipt[] = this.viewRegisteredUserPurchasesHistory(req).data.receipts;
+        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores: managedStores, ownedStores: ownedStores, purchasesHistory: purchasesHistory } };
 
     }
 }

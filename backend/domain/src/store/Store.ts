@@ -373,7 +373,7 @@ export class Store {
                 return true;
             }
         }
-        logger.warn(`user: ${JSON.stringify(userName)} is not an owner of store ${this.storeName}`)
+        logger.debug(`user: ${JSON.stringify(userName)} is not an owner of store ${this.storeName}`)
         return false;
     }
 
@@ -385,7 +385,7 @@ export class Store {
                 return true;
             }
         }
-        logger.warn(`user: ${userName} is not a manager of store ${this.storeName}`)
+        logger.debug(`user: ${userName} is not a manager of store ${this.storeName}`)
         return false;
     }
 
