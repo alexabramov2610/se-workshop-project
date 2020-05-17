@@ -1,6 +1,7 @@
 import {Store, StoreManagement} from "../../../../src/store/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
+    BagItem,
     IItem as ItemReq,
     IProduct as ProductReq,
     ProductCatalogNumber,
@@ -1017,6 +1018,30 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.products).toMatchObject(productsInStore);
     });
 
+
+    test("verifyStoreBag - success", () => {
+        //TODO
+
+        // const price1: number = 50;
+        // const price2: number = 1352;
+        // const price3: number = 210;
+        //
+        // const bagItem1: BagItem = { amount: price1, finalPrice: price1,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price1}
+        // };
+        // const bagItem2: BagItem = { amount: price2, finalPrice: price2,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price2}
+        // };
+        // const bagItem3: BagItem = { amount: price3, finalPrice: price3,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price3}
+        // };
+        //
+        // const bagItems: BagItem[] = [bagItem1, bagItem2, bagItem3];
+        // jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(mockValidationRes);
+        //
+        // storeManagement.verifyStoreBag(storeName, bagItems);
+        // expect(store.getBagPrice(bagItems)).toBe(finalPrice);
+    });
 
     function mockVerifyStoreOperation(isSuccess: boolean) {
         const mockValidationRes: Res.BoolResponse = isSuccess ? {data: {result: isSuccess}} : {
