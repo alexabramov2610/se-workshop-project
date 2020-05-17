@@ -12,9 +12,10 @@ const instance = axios.create({
 });
 
 
-async function init() {
-    instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
-    }).catch(e => console.log("cant fetch new token", e))
+async function init(cb) {
+    return Promise.all([
+        instance.get(`${baseDomain}/system/newtoken`), instance.get(`${baseDomain}/system/status`), instance.get(`${baseDomain}/system/healthcheck`)]).then(values => cb({ token: values[0].data, status: values[1].data, isSystemUp: values[2].data.data.result }))
+
 }
 
 
@@ -63,6 +64,12 @@ const getStoreCategories = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getCategories/?storeName=${storeName}`);
 }
 
+const addToCart = async (req) => {
+    return instance.post(`${baseDomain}/users/saveProduct/`, req);
+}
+const viewCart = async () => {
+    return instance.post(`${baseDomain}/users/viewCart/`, {  });
+}
 const getDiscountPolicy = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getDiscountPolicy/?storeName=${storeName}`);
 }
@@ -71,4 +78,4 @@ const setDiscountPolicy = async (req) => {
     return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
 }
 
-export { getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export { viewCart, addToCart, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

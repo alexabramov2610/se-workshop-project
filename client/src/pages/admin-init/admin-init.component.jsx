@@ -27,6 +27,7 @@ class AdminInit extends React.Component {
       firstAdminName: "",
     });
     api.adminInit(firstAdminName, firstAdminPassword);
+    window.location.reload();
   };
 
   handleChange = (event) => {

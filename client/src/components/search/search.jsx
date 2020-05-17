@@ -30,8 +30,8 @@ class Search extends React.Component {
     this.state = {
       productName: "",
       storeName: "",
-      productRating: "Product Rating",
-      storeRating: "Store Rating",
+      productRating: "",
+      storeRating: "",
       min: "",
       max: "",
     };
@@ -57,14 +57,17 @@ class Search extends React.Component {
         filters: {
           priceRange: { min, max },
           productRating:
-            productRating !== "Product Rating" ? productRating : "",
-          storeRating: storeRating !== "Store Rating" ? productRating : "",
+            productRating !== "" ? Number.parseInt(productRating) - 1 : "",
+          storeRating:
+            storeRating !== "" ? Number.parseInt(storeRating) - 1 : "",
           productCategory,
         },
       },
     };
     const { data } = await api.search(req);
-    const products = data.data.products.map((e) => e.product);
+    const products = data.data.products.map((e) => {
+      return { ...e.product, store: e.storeName };
+    });
     this.setState({ products }, () => console.log("abs s", this.state));
   };
   handleChange = (event) => {
@@ -76,10 +79,11 @@ class Search extends React.Component {
   }
   clearFilters() {
     this.setState({
-      saerchQuery: "",
+      storeName: "",
+      productName: "",
       priceRange: "",
-      productRating: "Product Rating",
-      storeRating: "Store Rating",
+      productRating: "",
+      storeRating: "",
       productCategory: undefined,
       min: "",
       max: "",
@@ -110,46 +114,67 @@ class Search extends React.Component {
               />
             </SearchInputsContainer>
             <FiltersContainer>
-              <FilterDropDown
-                name={this.state.storeRating}
-                attrName="storeRating"
-                array={[1, 2, 3, 4, 5]}
-                handler={this.updateRating}
-              />
-              <FilterDropDown
-                name={this.state.productRating}
-                attrName="productRating"
-                array={[1, 2, 3, 4, 5]}
-                handler={this.updateRating}
-              />
-              <FilterDropDown
-                name={
-                  this.state.productCategory
-                    ? Object.keys(Category)[this.state.productCategory]
-                    : "Category"
-                }
-                attrName="productCategory"
-                array={Object.keys(Category)}
-                handler={this.updateRating}
-                isCategory={true}
-              />
-              <InputGroup className="mb-3" style={{ marginTop: "14px" }}>
+              <div style={{ minWidth: "155px" }}>
+                <FilterDropDown
+                  name={this.state.storeRating}
+                  attrName="storeRating"
+                  array={[1, 2, 3, 4, 5]}
+                  handler={this.updateRating}
+                  prefix="Store Rating:"
+                />
+              </div>
+              <div style={{ minWidth: "155px" }}>
+                <FilterDropDown
+                  name={this.state.productRating}
+                  attrName="productRating"
+                  array={[1, 2, 3, 4, 5]}
+                  handler={this.updateRating}
+                  prefix="Product Rating:"
+                />
+              </div>
+              <div
+                style={{
+                  minWidth: "155px",
+                }}
+              >
+                <FilterDropDown
+                  name={
+                    this.state.productCategory
+                      ? Object.keys(Category)[this.state.productCategory]
+                      : ""
+                  }
+                  attrName="productCategory"
+                  array={Object.keys(Category)}
+                  handler={this.updateRating}
+                  isCategory={true}
+                  prefix="Category:"
+                />
+              </div>
+              <InputGroup className="mb-3" style={{}}>
                 <InputGroup.Prepend>
                   <InputGroup.Text
-                    style={{ backgroundColor: "white", border: "none" }}
+                    style={{
+                      backgroundColor: "white",
+                      border: "none",
+                      marginBottom: "",
+                      marginLeft: "-10px",
+                    }}
                   >
                     {" "}
                     Min / Max Price
                   </InputGroup.Text>
                 </InputGroup.Prepend>
+
                 <FormControl
                   name="min"
+                  style={{ marginTop: "10px" }}
                   type="number"
                   onChange={this.handleChange}
                   value={this.state.min}
                 />
                 <FormControl
                   name="max"
+                  style={{ marginTop: "10px" }}
                   type="number"
                   onChange={this.handleChange}
                   value={this.state.max}
@@ -177,6 +202,8 @@ class Search extends React.Component {
                 price={p.price}
                 key={index}
                 rating={p.rating}
+                store={p.store}
+                cn={p.catalogNumber}
               />
             ))}{" "}
         </ProductGridContainer>
@@ -191,9 +218,11 @@ const FilterDropDown = ({
   array,
   handler,
   isCategory = false,
+  prefix,
 }) => {
   return (
     <Dropdown style={{ marginTop: "15px", marginBottom: "20px" }}>
+      {prefix}
       <Dropdown.Toggle variant="" id="dropdown-basic">
         {name}
       </Dropdown.Toggle>
@@ -206,7 +235,7 @@ const FilterDropDown = ({
                 attrName,
                 isCategory
                   ? Category[e.target.innerText]
-                  : Number.parseInt(e.target.innerText) - 1
+                  : Number.parseInt(e.target.innerText)
               )
             }
           >
