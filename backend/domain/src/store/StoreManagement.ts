@@ -546,6 +546,24 @@ export class StoreManagement {
         return {data: {result: true, permissions}}
     }
 
+    getManagerPermissions(username: string, storeName: string): Res.ViewManagerPermissionResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const storeOwner: StoreOwner = store.getStoreOwner(username);
+        if (storeOwner)
+            return { data: { result: true, permissions: this.getAllPermissions() } };
+        const storeManager: StoreManager = store.getStoreManager(username);
+        if (!storeManager)
+            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
+        return { data: {result: true, permissions: storeManager.getPermissions()}}
+
+    }
+
+    getAllPermissions(): ManagementPermission[] {
+        return Object.keys(ManagementPermission).map((key:any) => ManagementPermission[key]);
+    }
+
 
     addDiscount(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
         const store: Store = this.findStoreByName(storeName);

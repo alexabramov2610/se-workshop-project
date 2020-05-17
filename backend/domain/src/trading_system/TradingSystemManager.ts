@@ -438,6 +438,13 @@ export class TradingSystemManager {
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
+    getManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+        logger.info(`viewing manager permissions`);
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return { data: { result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+        return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
+    }
 
     addDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
         logger.info(`adding discount to store ${req.body.storeName}`)

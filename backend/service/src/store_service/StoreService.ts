@@ -125,6 +125,10 @@ export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): R
     return ts.viewManagerPermissions(req);
 }
 
+export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+    return ts.getManagerPermissions(req);
+}
+
 export const search = (req: Req.SearchRequest): Res.SearchResponse => {
     return ts.search(req);
 }

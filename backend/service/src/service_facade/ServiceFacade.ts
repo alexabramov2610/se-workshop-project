@@ -187,6 +187,9 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.viewManagerPermissions));
 }
+export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.getManagerPermissions));
+}
 
 /*
 UC-4.7
