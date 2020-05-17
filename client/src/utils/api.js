@@ -70,7 +70,7 @@ const addToCart = async (req) => {
     return instance.post(`${baseDomain}/users/saveProduct/`, req);
 }
 const viewCart = async () => {
-    return instance.post(`${baseDomain}/users/viewCart/`, {  });
+    return instance.get(`${baseDomain}/users/viewCart/`);
 }
 const getDiscountPolicy = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getDiscountPolicy/?storeName=${storeName}`);
