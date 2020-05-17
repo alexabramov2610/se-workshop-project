@@ -17,8 +17,6 @@ class PersonalInfo extends React.Component {
         const { data } = await api.getPersonalInfo();
         const { username, cart, managedStores, ownedStores } = data.data;
         this.setState({ username, cart, managedStores, ownedStores });
-        console.log(this.state.username);
-        console.log("hey");
     }
 
 
