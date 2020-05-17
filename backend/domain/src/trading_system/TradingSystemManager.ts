@@ -505,7 +505,12 @@ export class TradingSystemManager {
 
     verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
         logger.info(`verifying credentials`)
-        return this._userManager.verifyNewCredentials(req);
+        const res: Res.BoolResponse = this._userManager.verifyNewCredentials(req);
+        if (res.data.result)
+            logger.info(`verified credentials successfully`);
+        else
+            logger.warn(`failed verifying credentials`);
+        return res;
     }
 
     verifyUserLoggedIn(req: Req.Request): Res.BoolResponse {

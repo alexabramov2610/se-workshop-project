@@ -29,12 +29,18 @@ export async function removeProductFromCart(req,res) {
     return res.send(result);
 }
 
-export async function viewCart(req,res) {
-    const result = wrapHttp(req, ServiceFacade.viewCart(req.body));
-    return res.send(result);
-}
 
 export async function viewRegisteredUserPurchasesHistory(req,res) {
     const result = wrapHttp(req, ServiceFacade.viewRegisteredUserPurchasesHistory);
+    return res.send(result);
+}
+
+
+
+
+// get
+
+export async function viewCart(req,res) {
+    const result = wrapHttp(req, ServiceFacade.viewCart);
     return res.send(result);
 }
