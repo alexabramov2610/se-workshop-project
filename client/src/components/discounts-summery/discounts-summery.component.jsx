@@ -3,6 +3,7 @@ import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import TableRow from "./table-row/table-row.components";
 import TableHeader from "./table-header/table-header.component";
 import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
+import {Empty} from "antd";
 
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -29,13 +30,13 @@ function DiscountsSummery() {
             return;
         }
 
-        const discounts = reorder(
-            props.discounts,
+        const policy = reorder(
+            props.policyDiscounts,
             result.source.index,
             result.destination.index
         );
 
-        props.setDiscounts(discounts);
+        props.setPolicyDiscounts(policy);
     }
 
     return (
@@ -46,10 +47,12 @@ function DiscountsSummery() {
                         <TableHeader/>
                         <Droppable droppableId="list">
                             {provided => (
-                                <div ref={provided.innerRef} {...provided.droppableProps}>
-                                    <Rows discounts={props.policy.discounts}/>
-                                    {provided.placeholder}
-                                </div>
+                                props.policyDiscounts.length === 0
+                                    ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+                                    : <div ref={provided.innerRef} {...provided.droppableProps}>
+                                        <Rows discounts={props.policyDiscounts}/>
+                                        {provided.placeholder}
+                                    </div>
                             )}
                         </Droppable>
                     </DragDropContext>

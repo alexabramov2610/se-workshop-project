@@ -8,6 +8,7 @@ const TableHeader = () => {
     return (
         <HeaderContainer>
             <span style={conditionStyle}>preform actions</span>
+            <span style={conditionStyle}>Subject</span>
             <span style={conditionStyle}>Products</span>
             <span style={conditionStyle}>Discount</span>
             <span style={conditionStyle}>Start Date</span>

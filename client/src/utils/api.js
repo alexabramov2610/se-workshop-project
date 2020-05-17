@@ -88,4 +88,4 @@ const viewPersonalPurchasesHistory = async (req) => {
     return instance.get(`${baseDomain}/users/viewRegisteredUserPurchasesHistory/`, req);
 }
 
-export { viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export { viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

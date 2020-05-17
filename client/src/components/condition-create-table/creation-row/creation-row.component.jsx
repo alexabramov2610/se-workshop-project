@@ -3,11 +3,10 @@ import {Table} from "semantic-ui-react";
 import SearchSelect from "../../search-select/search-select.component";
 import {Button, InputNumber, Radio, Space} from "antd";
 import {DiscountPageCtx} from "../../../pages/discount-page/discount-page-ctx";
-import {verifyConditionSetting} from "../../../utils/settings-verifier";
+import {verifyConditionSetting} from "../../../pages/discount-page/settings-verifier";
+import * as utils from "../../../pages/discount-page/discount-page-utils";
+import {isEditedDiscount, isEditMode} from "../../../pages/discount-page/discount-page-utils";
 
-const basicOperators = ["AND", "OR", "XOR"].map(operator => {
-    return {value: operator}
-});
 
 const CreationRow = () => {
 
@@ -29,11 +28,24 @@ const CreationRow = () => {
 
     const handleAddition = (props) => {
         if (!verifyConditionSetting(props)) return;
-
-        props.setDiscount({
-            ...props.discount,
-            condition: [...props.discount.condition, {key: props.discount.condition.length, ...props.condition}],
-        })
+        isEditMode(props.mode)
+            ? props.setPolicyDiscounts(prevPolicyDiscounts => {
+                return prevPolicyDiscounts.map(pd => {
+                    return isEditedDiscount(pd.key, props.mode)
+                        ? {
+                            ...pd,
+                            discount: {
+                                ...pd.discount,
+                                condition: [...pd.discount.condition, {key: pd.discount.condition + 1, ...props.condition}]
+                            }
+                        }
+                        : pd
+                });
+            })
+            : props.setDiscount({
+                ...props.discount,
+                condition: [...props.discount.condition, {key: props.discount.condition.length, ...props.condition}],
+            })
         props.setCondition({condition: {}});
     }
 
@@ -50,28 +62,20 @@ const CreationRow = () => {
         props.setCondition(prevCond => {
             return {
                 ...prevCond,
-                condition: {...prevCond.condition, catalogNumber: extractCatalogNumber(e)}
+                condition: {...prevCond.condition, catalogNumber: utils.extractCatalogNumber(e)}
             }
         });
-    }
-
-    const extractCatalogNumber = (e) => {
-        const commaIdx = e.indexOf(',');
-        const catalogNumber = e.substring(commaIdx + 1);
-        return parseInt(catalogNumber);
     }
 
     return (
         <DiscountPageCtx.Consumer>
             {
                 (props) => {
-                    const presentProducts = props.products.map(p => {
-                        return {value: `${p.name}, ${p.catalogNumber}`};
-                    });
+                    const presentProducts = utils.getPresentedProducts(props);
                     return <React.Fragment>
                         <Table.Row>
                             <Table.Cell style={{width: "33.3%"}}>
-                                <SearchSelect onChangeCallback={(e) => handleProductSelection(e, props)}
+                                <SearchSelect onChangeCallback={handleProductSelection}
                                               placeholder={"product"} bordered={false} options={presentProducts}/>
                             </Table.Cell>
                             <Table.Cell style={{width: "33.3%"}}>
@@ -91,13 +95,14 @@ const CreationRow = () => {
                             </Table.Cell>
                             <Table.Cell style={{width: "33.3%"}}>
                                 <SearchSelect placeholder={"operator"}
-                                              bordered={false} options={basicOperators}
+                                              bordered={false} options={utils.basicOperators}
                                               onChangeCallback={(e) => handleOperatorChange(e, props)}
                                 />
                             </Table.Cell>
                         </Table.Row>
-                        <Button size={"small"} type="primary" onClick={() => handleAddition(props)}>Add
-                            Condition</Button>
+                        <Button size={"small"} type="primary" onClick={() => handleAddition(props)}>
+                            Add Condition
+                        </Button>
                     </React.Fragment>
                 }
             }
