@@ -259,6 +259,10 @@ export const getAllCategories = (req: Req.Request): Res.GetCategoriesResponse =>
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
 }
 
+export const getPersonalDetails = (req: Req.Request): Res.GetPersonalDetailsResponse => {
+    return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
+}
+
 /*
 Utils
  */

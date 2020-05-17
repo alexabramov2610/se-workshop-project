@@ -138,7 +138,12 @@ interface GetAllCategoriesResponse extends Response {
   data: { categories: string[] }
 }
 
+interface GetPersonalDetailsResponse extends Response {
+  data: {result: boolean, username: string, cart: Cart, managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+}
+
 export {
+  GetPersonalDetailsResponse,
   GetAllCategoriesResponse,
   GetCategoriesResponse,
   GetLoggedInUserResponse,

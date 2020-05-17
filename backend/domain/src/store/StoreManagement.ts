@@ -715,6 +715,27 @@ export class StoreManagement {
         }
     }
 
+    getStoresInfoOfManagedBy(username: string): StoreInfo[] {
+        let stores: StoreInfo[] = [];
+        this._stores.forEach(store => {
+            if (store.verifyIsStoreManager(username))
+                stores.push(store.viewStoreInfo().data.info);
+            }
+        )
+        return stores;
+    }
+
+    getStoresInfoOfOwnedBy(username: string): StoreInfo[] {
+        let stores: StoreInfo[] = [];
+        this._stores.forEach(store => {
+                if (store.verifyIsStoreOwner(username))
+                    stores.push(store.viewStoreInfo().data.info);
+            }
+        )
+        return stores;
+    }
+
+
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;
         let conditions: IConditionOfDiscount[];
@@ -810,5 +831,6 @@ export class StoreManagement {
         }
 
     }
+
 
 }

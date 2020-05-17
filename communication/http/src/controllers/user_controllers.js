@@ -44,3 +44,8 @@ export async function viewCart(req,res) {
     const result = wrapHttp(req, ServiceFacade.viewCart);
     return res.send(result);
 }
+
+export async function personalDetails(req,res) {
+    const result = wrapHttp(req, ServiceFacade.getPersonalDetails);
+    return res.send(result);
+}

@@ -80,4 +80,8 @@ const setDiscountPolicy = async (req) => {
     return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
 }
 
-export { viewCart, addToCart, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+const getPersonalInfo = async (req) => {
+    return instance.get(`${baseDomain}/users/personalDetails/`, req);
+}
+
+export { getPersonalInfo, viewCart, addToCart, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

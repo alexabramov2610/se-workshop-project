@@ -13,7 +13,13 @@ import {
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
-import {BagItem, IDiscountPolicy, IPurchasePolicy, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    BagItem,
+    Cart,
+    IDiscountPolicy,
+    IPurchasePolicy,
+    Purchase, StoreInfo
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
@@ -585,4 +591,18 @@ export class TradingSystemManager {
         return {data: {username: user ? user.name : undefined}}
     }
 
+    getPersonalDetails(req: Req.Request):  Res.GetPersonalDetailsResponse {
+        const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        if (!user)
+            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: []}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        const viewCartRes: Res.ViewCartRes = this.viewCart(req);
+        if (!viewCartRes.data.result)
+            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: []}, error: viewCartRes.error};
+
+        const managedStores: StoreInfo[] = this._storeManager.getStoresInfoOfManagedBy(user.name);
+        const ownedStores: StoreInfo[] = this._storeManager.getStoresInfoOfOwnedBy(user.name);
+
+        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores: managedStores, ownedStores: ownedStores } };
+
+    }
 }

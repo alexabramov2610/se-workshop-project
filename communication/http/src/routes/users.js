@@ -12,6 +12,7 @@ router.post("/viewRegisteredUserPurchasesHistory", UserController.viewRegistered
 
 
 router.get("/viewCart", UserController.viewCart);
+router.get("/personalDetails", UserController.personalDetails);
 
 
 export default router;
