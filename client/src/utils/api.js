@@ -80,4 +80,4 @@ const setDiscountPolicy = async (req) => {
     return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
 }
 
-export { viewCart, addToCart, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export { viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

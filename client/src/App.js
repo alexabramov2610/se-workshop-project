@@ -12,6 +12,7 @@ import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sig
 import DiscountPage from "./pages/discount-page/discount-page.component";
 
 import * as api from '../src/utils/api'
+import { init } from '../src/utils/api'
 import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { StorePage } from './pages/store-page/store-page'
@@ -21,6 +22,7 @@ import { createBrowserHistory } from 'history';
 import { CartCtx } from './contexts/cart-context'
 import { history } from './utils/config'
 import * as config from './utils/config'
+import DiscountPageContainer from "./pages/discount-page/discount-page-container";
 
 class App extends React.Component {
     constructor(props) {
@@ -81,6 +83,7 @@ class App extends React.Component {
     async componentDidMount() {
         api.init(this.handleInit);
     }
+
     render() {
         return (!this.state.systemIsClose) ? (
             <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter }} >

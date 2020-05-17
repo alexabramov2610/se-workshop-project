@@ -1,10 +1,15 @@
 import React from 'react'
 import {Draggable} from "react-beautiful-dnd";
 import styled from "styled-components";
-import SelectableDropdownComponent from "../../selectable-dropdown/selectable-dropdown.component";
+import SelectableDropdownComponent from "../selectable-dropdown/selectable-dropdown.component";
 import moment from "moment";
 import PresentableDropdown from "../../presentable-dropdown/presentable-dropdown.component";
 import {Button, Popconfirm, Space} from "antd";
+import * as rowParser from "../row-parser";
+import {DiscountPageCtx} from "../../../pages/discount-page/discount-page-ctx";
+import {config} from '../../../pages/discount-page/discount-page-config';
+import * as utils from "../../../pages/discount-page/discount-page-utils";
+
 
 const Row = styled.div`
   width: 100%;
@@ -14,54 +19,61 @@ const Row = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-
 const basicStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-start", width: "14.2%"};
-const emptyField = "--------"
 
 function TableRow({index, discount}) {
     const currDiscount = discount.discount;
-    console.log(currDiscount);
-    const coupon = currDiscount.coupon ? currDiscount.coupon : emptyField;
-    const productsStrings = currDiscount.products.map(catalogNumber => catalogNumber + "");
-    const productsWithComma = productsStrings.join(", ");
-    const products = productsWithComma.length === 0 ? emptyField : productsWithComma;
+    const parsedProducts = rowParser.parseProducts(currDiscount.products);
+    const reducedConditions = rowParser.parseConditions(currDiscount.condition);
+    const parsedSubject = rowParser.parsedSubject(currDiscount);
 
-    const reducedConditions = currDiscount.condition.reduce((acc, curr) => {
-        const currDesc = curr.condition && curr.condition.minPay
-            ? `store minimum subtotal: ${curr.condition.minPay} `
-            : curr.condition && curr.condition.minAmount
-                ? `minimum amount: ${curr.condition.minAmount} for product: ${curr.condition.catalogNumber} `
-                : `on discount: ${curr.condition.catalogNumber} `;
+    const products = parsedProducts.length === 0 ? utils.emptyField : parsedProducts;
+    const conditions = reducedConditions.length === 0 ? [utils.emptyField] : reducedConditions;
+    const coupon = currDiscount.coupon ? currDiscount.coupon : utils.emptyField;
 
-        return [...acc, currDesc + curr.operator];
-    }, []);
-    const conditions = reducedConditions.length === 0 ? [emptyField] : reducedConditions;
+    const handleRemove = (props) => {
+        props.setPolicyDiscounts(prevDiscounts => {
+            return prevDiscounts.filter(d => d.key !== discount.key);
+        });
+    };
+
+    const handleEditMode = ({moveToScreen, setMode}) => {
+        setMode({mode: config.modes.EDIT, editedDiscount: discount.key});
+        moveToScreen(config.steps.EDIT_ADD);
+    };
 
     return (
-        <Draggable draggableId={discount.key + ""} index={index}>
+        <Draggable draggableId={discount.key} index={index}>
             {provided => (
-                <Row
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                >
-                    <span style={basicStyle}>
-                        <Space>
-                            <Popconfirm title="Are you sure delete this discount from the policy?"><a
-                                href="#">delete</a></Popconfirm>
-                            <Button type="link">edit</Button>
-                        </Space>
-                    </span>
-                    <span style={basicStyle}>{products}</span>
-                    <span style={basicStyle}>{currDiscount.percentage}%</span>
-                    <span style={basicStyle}>{moment(currDiscount.startDate).format('DD-MMM-YYYY')}</span>
-                    <span style={basicStyle}>{currDiscount.duration} days</span>
-                    <span style={basicStyle}>
-                        <PresentableDropdown inputs={conditions}/>
-                    </span>
-                    <span style={basicStyle}>{coupon}</span>
-                    <SelectableDropdownComponent discountKey={currDiscount.key} inputs={["AND", "OR", "XOR"]}/>
-                </Row>
+                <DiscountPageCtx.Consumer>
+                    {
+                        props =>
+                            <Row
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                            >
+                                <span style={basicStyle}>
+                                    <Space>
+                                        <Popconfirm title="Are you sure delete this discount from the policy?"
+                                                    onConfirm={() => handleRemove(props)}><a
+                                            href="#">delete</a></Popconfirm>
+                                        <Button type="link" onClick={() => handleEditMode(props)}>edit</Button>
+                                    </Space>
+                                </span>
+                                <span style={basicStyle}>{parsedSubject}</span>
+                                <span style={basicStyle}>{products}</span>
+                                <span style={basicStyle}>{currDiscount.percentage}%</span>
+                                <span style={basicStyle}>{moment(currDiscount.startDate).format('DD-MMM-YYYY')}</span>
+                                <span style={basicStyle}>{currDiscount.duration} days</span>
+                                <span style={basicStyle}>
+                                    <PresentableDropdown inputs={conditions}/>
+                                </span>
+                                <span style={basicStyle}>{coupon}</span>
+                                <SelectableDropdownComponent inputs={["AND", "OR", "XOR"]} initialValue={discount.operator}/>
+                            </Row>
+                    }
+                </DiscountPageCtx.Consumer>
             )}
         </Draggable>
     );
