@@ -4,7 +4,12 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {EventCode, NotificationsType, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {
+    EventCode,
+    NotificationsType,
+    ProductCategory,
+    TradingSystemState
+} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
@@ -500,7 +505,12 @@ export class TradingSystemManager {
 
     verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
         logger.info(`verifying credentials`)
-        return this._userManager.verifyNewCredentials(req);
+        const res: Res.BoolResponse = this._userManager.verifyNewCredentials(req);
+        if (res.data.result)
+            logger.info(`verified credentials successfully`);
+        else
+            logger.warn(`failed verifying credentials`);
+        return res;
     }
 
     verifyUserLoggedIn(req: Req.Request): Res.BoolResponse {
@@ -559,10 +569,14 @@ export class TradingSystemManager {
         return this._storeManager.getAllProductsInStore(storeName);
     }
 
-    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse {
+    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse {
         logger.info(`getting all categories in store ${req.body.storeName}`);
         const storeName: string = req.body.storeName;
         return this._storeManager.getAllCategoriesInStore(storeName);
+    }
+
+    getAllCategories(): Res.GetAllCategoriesResponse {
+        return { data: { categories: Object.keys(ProductCategory) } }
     }
 
     isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {

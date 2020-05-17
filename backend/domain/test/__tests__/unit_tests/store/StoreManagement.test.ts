@@ -1,6 +1,7 @@
 import {Store, StoreManagement} from "../../../../src/store/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
+    BagItem,
     IItem as ItemReq,
     IProduct as ProductReq,
     ProductCatalogNumber,
@@ -13,7 +14,7 @@ import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Product} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
-import {Req, Res} from 'se-workshop-20-interfaces'
+import {Res} from 'se-workshop-20-interfaces'
 
 const storeReq = {storeName: "mock-store", description: "storeDescription"}
 let store: Store = new Store("name", "storeDesc");
@@ -846,6 +847,7 @@ describe("Store Management Unit Tests", () => {
         mockVerifyStoreOperation(isSuccessVerify);
         const prodReq: ProductReq[] = [{
             name: 'mock-prod',
+            rating: Rating.MEDIUM,
             category: ProductCategory.ELECTRONICS,
             catalogNumber: 1,
             price: 1
@@ -943,11 +945,12 @@ describe("Store Management Unit Tests", () => {
 
         const productsInStore: ProductInStore[] = [{
             product: {
+                rating: Rating.MEDIUM,
                 catalogNumber: 1,
                 category: ProductCategory.GENERAL,
                 name: "mock",
                 price: 11
-            }, storeName: store.storeName
+            }, storeName: store.storeName, storeRating: Rating.MEDIUM
         }];
         jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
         jest.spyOn(store, 'search').mockReturnValueOnce(productsInStore);
@@ -1015,6 +1018,30 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.products).toMatchObject(productsInStore);
     });
 
+
+    test("verifyStoreBag - success", () => {
+        //TODO
+
+        // const price1: number = 50;
+        // const price2: number = 1352;
+        // const price3: number = 210;
+        //
+        // const bagItem1: BagItem = { amount: price1, finalPrice: price1,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price1}
+        // };
+        // const bagItem2: BagItem = { amount: price2, finalPrice: price2,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price2}
+        // };
+        // const bagItem3: BagItem = { amount: price3, finalPrice: price3,
+        //     product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price3}
+        // };
+        //
+        // const bagItems: BagItem[] = [bagItem1, bagItem2, bagItem3];
+        // jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(mockValidationRes);
+        //
+        // storeManagement.verifyStoreBag(storeName, bagItems);
+        // expect(store.getBagPrice(bagItems)).toBe(finalPrice);
+    });
 
     function mockVerifyStoreOperation(isSuccess: boolean) {
         const mockValidationRes: Res.BoolResponse = isSuccess ? {data: {result: isSuccess}} : {

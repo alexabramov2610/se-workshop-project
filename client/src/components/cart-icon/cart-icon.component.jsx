@@ -7,10 +7,9 @@ import {
 } from "./cart-icon.styles";
 import CartDropdown from "../cart-dropdown/cart-dropdown.component";
 
-const CartIcon = () => {
+const CartIcon = ({ itemCount }) => {
   const [animate, setAnimate] = useState(false);
   const [dropdown, toggleDropDown] = useState(false);
-  const [products, setProducts] = useState([]);
   const isMounting = useRef(true);
 
   useEffect(() => {
@@ -19,8 +18,7 @@ const CartIcon = () => {
     } else {
       setAnimate(true);
     }
-  }, [products]);
-
+  }, [itemCount]);
   const className = `animated hvr-underline-from-center ${
     animate ? "spin" : ""
   }`;
@@ -33,7 +31,7 @@ const CartIcon = () => {
           }}
         >
           <ShoppingIcon />
-          <ItemCountContainer>{products.length}</ItemCountContainer>
+          <ItemCountContainer>{itemCount}</ItemCountContainer>
         </CartContainer>
       </div>
       <CartDropdown isVisible={dropdown} />

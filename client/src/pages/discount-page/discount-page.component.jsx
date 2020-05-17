@@ -3,17 +3,18 @@ import {DiscountPageBody, DiscountPageContainer, DiscountWrapper} from "./discou
 import Stages from "../../components/stages/stages.component";
 import 'semantic-ui-css/semantic.min.css';
 import {Divider} from "antd";
+import {config} from './discount-page-config';
 
-const DiscountPage = ({steps, currStep, titles}) => {
+const DiscountPage = ({screen}) => {
 
     return (
         <DiscountWrapper>
             <DiscountPageContainer>
-                <Divider style={{fontSize: "20px"}} orientation={"left"}>{titles[currStep]}</Divider>
+                <Divider style={{fontSize: "20px"}} orientation={"left"}>{config.titles[screen]}</Divider>
                 <DiscountPageBody>
-                    {steps[currStep]}
+                    {config.screens[screen]}
                 </DiscountPageBody>
-                <Stages step={currStep}/>
+                <Stages stage={screen}/>
             </DiscountPageContainer>
         </DiscountWrapper>
     );

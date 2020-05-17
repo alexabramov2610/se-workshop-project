@@ -3,31 +3,53 @@ import Card from "react-bootstrap/Card";
 import { AiFillStar } from "react-icons/ai";
 import { FiBox } from "react-icons/fi";
 import { history } from "../../utils/config";
+import { Link } from "react-router-dom";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
-
-export const ProductBox = (props) => (
+import { CartCtx } from "../../contexts/cart-context";
+import { ProductDetails } from "./products-box.styles";
+export const ProductBox = ({ name, price, rating, store, cn }) => (
   <Card className="text-center grid-item">
     <Card.Body>
       <Card.Title>
         <FiBox style={{ marginRight: "4px", marginBottom: "2px" }} />
-        {props.name}
+        {name}
       </Card.Title>
-      <Card.Text>
-        <div>Price: {props.price}</div>
+      <ProductDetails>
+        <div>Price: {price}</div>
         <div>
-          Rating:{" "}
+          Store: <Link to={`/store/${store}`}>{store}</Link>
+        </div>
+        <div>
+          Rating :{" "}
           {[1, 2, 3, 4, 5].map(
             (e, index) =>
-              index < props.rating && (
-                <AiFillStar style={{ marginBottom: "2px" }} />
+              index < rating && (
+                <AiFillStar key={index} style={{ marginBottom: "2px" }} />
               )
           )}
         </div>
-      </Card.Text>
+      </ProductDetails>
     </Card.Body>
     <Card.Footer>
-      <CustomButton style={{ margin: "auto" }}>Add To Cart</CustomButton>
+      <CartCtx.Consumer>
+        {(value) => (
+          <CustomButton
+            style={{ margin: "auto" }}
+            onClick={(ev) =>
+              value.addToCart({
+                body: {
+                  storeName: store,
+                  catalogNumber: cn,
+                  amount: 1,
+                },
+              })
+            }
+          >
+            Add To Cart
+          </CustomButton>
+        )}
+      </CartCtx.Consumer>
     </Card.Footer>
   </Card>
 );

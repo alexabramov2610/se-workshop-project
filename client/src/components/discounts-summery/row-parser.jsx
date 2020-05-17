@@ -13,6 +13,12 @@ export const parseConditions = (conditions) => {
 export const parseProducts = (products) => {
     const productsStrings = products.map(catalogNumber => catalogNumber + "");
     return productsStrings.join(", ");
-
 }
 
+export const parsedSubject = (discount) => {
+    const {products, category} = discount;
+    if (products.length === 0 && !category) {
+        return "store";
+    }
+    return !category ? "products" : "category";
+}

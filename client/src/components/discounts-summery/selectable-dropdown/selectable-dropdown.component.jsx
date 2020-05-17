@@ -2,11 +2,11 @@ import React, {useState} from 'react';
 import 'antd/dist/antd.css';
 import {Menu, Dropdown} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
-import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
+import {DiscountPageCtx} from "../../../pages/discount-page/discount-page-ctx";
 
 const conditionStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-end", width: "14.2%"};
 
-const SelectableDropdownComponent = ({inputs, discountKey, initialValue}) => {
+const SelectableDropdownComponent = ({inputs, discountKey, initialValue, customHandleSelect}) => {
 
     const [operator, setOperator] = useState(initialValue);
 

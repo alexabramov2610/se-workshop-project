@@ -36,5 +36,6 @@ router.get("/", (req, res) => res.send('Hello World! -> /'));
 router.get("/getStores/", StoreController.getStoresWithLimit);      // usage: stores/getStores/?offset=2&limit=3
 router.get("/getProducts/", StoreController.getAllProductsInStore);      // usage: stores/getProducts/?storeName=shufersal
 router.get("/getCategories/", StoreController.getAllCategoriesInStore);      // usage: stores/getCategories/?storeName=shufersal
+router.get("/getAllCategories/", StoreController.getAllCategories);      // usage: stores/getAllCategories
 
 export default router;

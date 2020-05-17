@@ -16,6 +16,7 @@ import { Search } from "../search/search";
 import BellIcon from "../bell-icon/bell-icon.component";
 import { Link } from "react-router-dom";
 import * as config from "../../utils/config";
+import { CartCtx } from "../../contexts/cart-context";
 const underlineAnimation = "hvr-underline-from-center";
 
 export class Header extends React.Component {
@@ -38,57 +39,79 @@ export class Header extends React.Component {
             <Logo className="logo hvr-bounce-in" />
           </LogoContainer>
           <OptionsContainer>
-            <OptionLink as="div" className={underlineAnimation}>
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to="/search"
-              >
-                Search
-              </Link>
-            </OptionLink>
+            <Link
+              style={{
+                marginLeft: "8px",
+                marginRight: "8px",
+                textDecoration: "none",
+                color: "black",
+              }}
+              to="/search"
+              className="hvr-underline-from-center"
+            >
+              Search
+            </Link>
 
-            <OptionLink as="div" className={underlineAnimation}>
-              <Link style={{ textDecoration: "none", color: "black" }} to="/">
-                HOME PAGE
-              </Link>
-            </OptionLink>
+            <Link
+              style={{
+                marginLeft: "8px",
+                marginRight: "8px",
+                textDecoration: "none",
+                color: "black",
+              }}
+              className="hvr-underline-from-center"
+              to="/"
+            >
+              HOME PAGE
+            </Link>
 
             {this.props.isLoggedIn ? (
               <div>
-                <OptionLink
-                  as="div"
-                  className={underlineAnimation}
+                <Link
+                  style={{
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    textDecoration: "none",
+                    color: "black",
+                  }}
+                  className="hvr-underline-from-center"
                   onClick={() => this.onLogout()}
+                  to="/"
                 >
-                  <Link
-                    style={{ textDecoration: "none", color: "black" }}
-                    to="/"
-                  >
-                    SIGN OUT {config.getLoggedInUser()}
-                  </Link>
-                </OptionLink>
+                  SIGN OUT
+                </Link>
 
-                <OptionLink as="div" className={underlineAnimation}>
-                  <Link
-                    style={{ textDecoration: "none", color: "black" }}
-                    to={`/personalinfo`}
-                  >
-                    Personal Info
-                  </Link>
-                </OptionLink>
+                <Link
+                  style={{
+                    marginLeft: "8px",
+                    marginRight: "8px",
+                    textDecoration: "none",
+                    color: "black",
+                  }}
+                  to={`/personalinfo`}
+                  className="hvr-underline-from-center"
+                >
+                  PERSONAL INFO
+                </Link>
               </div>
             ) : (
-              <OptionLink as="div" className={underlineAnimation}>
-                <Link
-                  style={{ textDecoration: "none", color: "black" }}
-                  to="/signupsignin"
-                >
-                  SIGN IN
-                </Link>
-              </OptionLink>
+              <Link
+                style={{
+                  marginLeft: "8px",
+                  marginRight: "8px",
+                  textDecoration: "none",
+                  color: "black",
+                }}
+                to="/signupsignin"
+                className="hvr-underline-from-center"
+              >
+                SIGN IN
+              </Link>
             )}
             <BellIcon isLoggedIn={this.props.isLoggedIn} />
-            <CartIcon />
+            <CartCtx.Consumer>
+              {(value) => <CartIcon itemCount={value.cartItemsCounter} />}
+            </CartCtx.Consumer>
           </OptionsContainer>
         </HeaderContainer>
       </React.Fragment>

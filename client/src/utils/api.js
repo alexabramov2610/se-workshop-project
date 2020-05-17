@@ -4,17 +4,20 @@ import openSocket from 'socket.io-client';
 const https = require('https');
 let socket;
 const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" } }
-const baseDomain = "http://localhost:5000"
+const baseDomain = "https://localhost:4000"
 
 const instance = axios.create({
+    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     withCredentials: true,
-    crossDomain: true
+    crossDomain: true,
+    // https: true
 });
 
 
-async function init() {
-    instance.get(`${baseDomain}/system/newtoken`).then(({ data }) => {
-    }).catch(e => console.log("cant fetch new token", e))
+async function init(cb) {
+    return Promise.all([
+        instance.get(`${baseDomain}/system/newtoken`), instance.get(`${baseDomain}/system/status`), instance.get(`${baseDomain}/system/healthcheck`)]).then(values => cb({ token: values[0].data, status: values[1].data, isSystemUp: values[2].data.data.result }))
+
 }
 
 
@@ -63,6 +66,12 @@ const getStoreCategories = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getCategories/?storeName=${storeName}`);
 }
 
+const addToCart = async (req) => {
+    return instance.post(`${baseDomain}/users/saveProduct/`, req);
+}
+const viewCart = async () => {
+    return instance.get(`${baseDomain}/users/viewCart/`);
+}
 const getDiscountPolicy = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getDiscountPolicy/?storeName=${storeName}`);
 }
@@ -71,4 +80,4 @@ const setDiscountPolicy = async (req) => {
     return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
 }
 
-export { getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export { viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

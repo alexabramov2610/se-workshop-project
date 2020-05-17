@@ -16,10 +16,15 @@ export class StoresGrid extends React.Component {
   }
 
   async componentDidMount() {
+    this.initPage();
+  }
+  componentDidUpdate(prevProps) {
+    this.props !== prevProps && this.initPage();
+  }
+  async initPage() {
     const { data } = await api.getStores(0, 50);
     const { stores } = data.data;
     this.setState({ stores });
-    console.log(stores);
   }
 
   render() {

@@ -1,4 +1,3 @@
-
 const cors = require("cors");
 
 const express = require('express')
@@ -50,16 +49,24 @@ let mockPolicy = {
                     {
                         // key: "0",
                         discount: {
+                            category: "Electronics",
                             startDate: new Date(),
                             duration: 12,
                             products: [123, 789],
                             percentage: 23,
+                            coupon: "avishai coupon code",
                             condition: [{
                                 condition: {
                                     catalogNumber: 123,
                                     minAmount: 35,
                                 },
                                 operator: "XOR"
+                            }, {
+                                condition: {
+                                    catalogNumber: 456,
+                                    minAmount: 24,
+                                },
+                                operator: "AND"
                             }],
                         },
                         operator: "AND"
@@ -74,12 +81,27 @@ let mockPolicy = {
                             condition: [{
                                 condition: {
                                     catalogNumber: 456,
-                                    minAmount: 112,
                                 },
                                 operator: "AND"
                             }],
                         },
                         operator: "OR"
+                    },
+                    {
+                        // key: "2",
+                        discount: {
+                            startDate: new Date(),
+                            duration: 19,
+                            products: [],
+                            percentage: 12,
+                            condition: [{
+                                condition: {
+                                    minPay: 25
+                                },
+                                operator: "AND"
+                            }],
+                        },
+                        operator: "XOR"
                     },
                 ]
         }

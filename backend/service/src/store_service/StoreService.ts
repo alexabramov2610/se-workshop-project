@@ -181,6 +181,10 @@ export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Re
     return ts.getAllProductsInStore(req);
 }
 
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse => {
     return ts.getAllCategoriesInStore(req);
+}
+
+export const getAllCategories = (req: Req.Request): Res.GetAllCategoriesResponse => {
+    return ts.getAllCategories();
 }

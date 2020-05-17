@@ -4,7 +4,7 @@ import fs from "fs"
 import https from "https"
 
 const PORT = process.env.PORT || 4000;
-const httpPort = 5000
+// const httpPort = 5000
 // set up http server
 routes(server);
 
@@ -16,6 +16,6 @@ https.createServer({
     .listen(PORT, function () {
         console.log(`https app running on port ${PORT}`)
     });
-server.listen(httpPort, () => {
-    console.log(`http app running on port ${httpPort}`);
-});
+// server.listen(httpPort, () => {
+//     console.log(`http app running on port ${httpPort}`);
+// });

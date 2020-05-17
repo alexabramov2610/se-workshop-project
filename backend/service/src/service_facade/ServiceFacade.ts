@@ -240,7 +240,7 @@ export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Re
     return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
     // return runIfOpen(req, StoreService.getAllProductsInStore);
 }
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
     // return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
@@ -254,6 +254,9 @@ export const verifyToken = (req: Req. Request): Res.BoolResponse => {
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
     return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
     // return runIfOpen(req, UserService.isLoggedInUser);
+}
+export const getAllCategories = (req: Req.Request): Res.GetCategoriesResponse => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
 }
 
 /*
@@ -301,7 +304,7 @@ export {tradingSystem}
 
 
 /** --------------------------------- testing --------------------------------- */
-import {t1, t2, t3} from "../testSocket";
+import {t1, t2, t3, t4} from "../testSocket";
 export const test1 = () : any => {
     t1();
 }
@@ -310,5 +313,8 @@ export const test2 = () : any => {
 }
 export const test3 = () : any => {
     t3();
+}
+export const test4 = () : any => {
+    t4();
 }
 

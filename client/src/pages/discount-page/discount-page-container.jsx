@@ -1,37 +1,31 @@
 import React, {useEffect, useState} from "react";
 import {DiscountPageCtx} from "./discount-page-ctx";
-import axios from "axios";
 import DiscountPage from "./discount-page.component";
 import {Spin} from "antd";
-import DiscountsSummery from "../../components/discounts-summery/discounts-summery.component";
-import SubjectProducts from "../../components/subject-products/subject-products.component";
-import DiscountSettings from "../../components/discount-settings/discount-settings.component";
+import {config} from './discount-page-config';
+import * as utils from "./discount-page-utils";
+import * as api from "../../utils/api";
 
 const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
-const titles = ["Your Discounts", "Please choose your discount configuration", "Choose Products"];
-const steps = [<DiscountsSummery/>, <SubjectProducts/>, <DiscountSettings/>];
 
 const DiscountPageContainer = () => {
 
     const [currCondition, setCurrCondition] = useState({condition: {}});
     const [discounts, setDiscounts] = useState([]);
     const [currDiscount, setCurrDiscount] = useState({condition: [], products: [], percentage: 0});
-    const [step, setStep] = useState(0);
+    const [screen, moveToScreen] = useState(0);
     const [products, setProducts] = useState(undefined);
     const [storeName, setStoreName] = useState("");
     const [categories, setCategories] = useState(undefined);
     const [discountSubject, setDiscountSubject] = useState("products");
-    const [isFetching, setFetching] = useState(false);
+    const [mode, setMode] = useState({mode: config.modes.ADD, editedDiscount: 0});
     const [policyDiscounts, setPolicyDiscounts] = useState([]);
-
-    const client = axios.create({
-        headers: {"Access-Control-Allow-Credentials": "*"}
-    });
+    const [isFetching, setIsFetching] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            const productsRes = await client.get("http://localhost:4000/products");
-            const categoriesRes = await client.get("http://localhost:4000/stores/getCategories");
+            const productsRes = await api.getStoreProducts("store10");
+            const categoriesRes = await api.getStoreCategories("store10");
             const store = productsRes.data.data.products[0].storeName;
             setStoreName(store);
 
@@ -48,29 +42,35 @@ const DiscountPageContainer = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const policyRes = await client.get("http://localhost:4000/stores/getPolicy");
-            const fetchedDiscounts = policyRes.data.data.policy.discounts.map((d, index) => {
-                return {key: index + "", ...d};
+            const policyRes = await api.getDiscountPolicy("store10");
+            const keyedDiscounts = utils.addKeys(policyRes.data.data.policy.discounts);
+            const keyedConditions = keyedDiscounts.map(d => {
+                const currConditions = d.discount.condition;
+                return currConditions
+                    ? utils.addKeys(currConditions)
+                    : []
             });
-            setPolicyDiscounts(fetchedDiscounts);
+            keyedDiscounts.forEach((d, i) => {
+                d.discount.condition = keyedConditions[i];
+            });
+            setPolicyDiscounts(keyedDiscounts);
         };
 
         fetchData();
 
-    }, []);
+    }, [isFetching]);
 
     const submitDiscounts = () => {
-        // axiosClient.post("/stores/setDiscountsPolicy", {
-        //     body: {
-        //         policy: discounts,
-        //         storeName: "store-10"
-        //     },
-        // }).then(r => success("Your policy has been updated"));
+        api.setDiscountPolicy({
+            body: {storeName: "store10", policy: policyDiscounts}
+        }).then(r => console.log(JSON.stringify(r)));
+        setIsFetching(!isFetching);
     }
 
     const resetDiscount = () => {
         setCurrDiscount({condition: [], products: [], percentage: 0});
         setCurrCondition({condition: {}});
+        setMode({mode: config.modes.ADD, editedDiscount: -1})
     }
 
     const setCategory = (category) => {
@@ -101,8 +101,9 @@ const DiscountPageContainer = () => {
         discounts: discounts,
         condition: currCondition,
         setCondition: setCurrCondition,
-        steps: steps,
-        nextStep: setStep,
+        moveToScreen: moveToScreen,
+        mode: mode,
+        setMode: setMode,
         reset: resetDiscount,
         selectCategory: setCategory,
         switchSubject: switchSubject,
@@ -111,10 +112,10 @@ const DiscountPageContainer = () => {
 
     return (
         <DiscountPageCtx.Provider value={providerState}>
-            {policyDiscounts ? console.log(policyDiscounts) : null}
+            {currDiscount ? console.log(currDiscount) : null}
             {
                 policyDiscounts && products && categories
-                    ? <DiscountPage currStep={step} steps={steps} titles={titles}/>
+                    ? <DiscountPage screen={screen}/>
                     : <div style={spinnerStyle}>
                         <Spin tip="Loading..."/>
                     </div>
