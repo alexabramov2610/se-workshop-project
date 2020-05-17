@@ -38,19 +38,23 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
       [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
     );
 
+    expect(res.data).toBeDefined()
+
     const { data, error } = _serviceBridge.viewManagerPermissions({
       body: {
         managerToView: _newManagerCredentials.userName,
         storeName: _storeInformation.name,
       },
     });
-    const filtered = data.permissions.filter(
-      (perm) =>
-        perm.valueOf() === PERMISSION.CLOSE_STORE ||
-        perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
-    );
+    // const filtered = data.permissions.filter(
+    //   (perm) =>
+    //     perm.valueOf() === PERMISSION.CLOSE_STORE ||
+    //     perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
+    // );
 
-    expect(filtered.length).toBe(2);
+  //  expect(filtered.length).toBe(2);
+  expect(data.permissions).toContainEqual(PERMISSION.MODIFY_BUYING_METHODS)
+  expect(data.permissions).toContainEqual(PERMISSION.CLOSE_STORE)
   });
 
   test("store owner logged in valid manager grant permissions and grant again", () => {
@@ -59,6 +63,8 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
       _storeInformation,
       [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
     );
+    expect(res.data).toBeDefined()
+
     _serviceBridge.grantPermissions(_newManagerCredentials, _storeInformation, [
       PERMISSION.MODIFY_BUYING_METHODS,
       PERMISSION.CLOSE_STORE,
@@ -69,13 +75,16 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
         storeName: _storeInformation.name,
       },
     });
-    const filtered = data.permissions.filter(
-      (perm) =>
-        perm.valueOf() === PERMISSION.CLOSE_STORE ||
-        perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
-    );
+    // const filtered = data.permissions.filter(
+    //   (perm) =>
+    //     perm.valueOf() === PERMISSION.CLOSE_STORE ||
+    //     perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
+    // );
 
-    expect(filtered.length).toBe(2);
+    // expect(filtered.length).toBe(2);
+
+    expect(data.permissions).toContainEqual(PERMISSION.MODIFY_BUYING_METHODS)
+    expect(data.permissions).toContainEqual(PERMISSION.CLOSE_STORE)
   });
   test("store owner logged out valid manager details", () => {
     _serviceBridge.logout();
