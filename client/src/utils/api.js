@@ -4,11 +4,13 @@ import openSocket from 'socket.io-client';
 const https = require('https');
 let socket;
 const initData = { body: { firstAdminName: "admin1", firstAdminPassword: "admin123" } }
-const baseDomain = "http://localhost:5000"
+const baseDomain = "https://localhost:4000"
 
 const instance = axios.create({
+    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     withCredentials: true,
-    crossDomain: true
+    crossDomain: true,
+    // https: true
 });
 
 
