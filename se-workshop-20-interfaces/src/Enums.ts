@@ -62,9 +62,9 @@ export enum EventCode {
 }
 
 export enum Operators {
-    OR,
-    AND,
-    XOR,
+    OR = "OR",
+    AND = "AND",
+    XOR = "XOR"
 }
 
 export enum NotificationsType {

@@ -68,10 +68,6 @@ export async function setDiscountsPolicy(req,res) {
     const result = wrapHttp(req, ServiceFacade.setDiscountsPolicy);
     return res.send(result)
 }
-export async function getDiscountsPolicy(req,res) {
-    const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
-    return res.send(result)
-}
 
 export async function addDiscount(req,res) {
     const result = wrapHttp(req, ServiceFacade.addDiscount);
@@ -135,14 +131,23 @@ export async function setPurchasePolicy(req,res) {
 
 
 // get
-// getManagerPermissions
+
+export async function getDiscountsPolicy(req,res) {
+    try {
+        const getStoresWithLimitReq = { body: { storeName: req.query.storeName }, token: req.cookies['token']};
+        req.body = getStoresWithLimitReq;
+        const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
 
 export async function getManagerPermissions(req,res) {
     try {
         const getStoresWithLimitReq = { body: { managerToView: "", storeName: req.query.storeName }, token: req.cookies['token']};
         req.body = getStoresWithLimitReq;
         const result = wrapHttp(req, ServiceFacade.getManagerPermissions);
-        console.log('ressss : ' +JSON.stringify(result));
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);

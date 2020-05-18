@@ -17,7 +17,6 @@ router.post("/removeProductsWithQuantity", StoreController.removeProductsWithQua
 router.post("/addNewProducts", StoreController.addNewProducts);
 router.post("/removeProducts", StoreController.removeProducts);
 router.post("/setDiscountsPolicy", StoreController.setDiscountsPolicy);
-router.post("/getDiscountsPolicy", StoreController.getDiscountsPolicy);
 router.post("/addDiscount", StoreController.addDiscount);
 router.post("/removeProductDiscount", StoreController.removeProductDiscount);
 router.post("/assignStoreOwner", StoreController.assignStoreOwner);
@@ -38,5 +37,6 @@ router.get("/getProducts/", StoreController.getAllProductsInStore);      // usag
 router.get("/getCategories/", StoreController.getAllCategoriesInStore);      // usage: stores/getCategories/?storeName=shufersal
 router.get("/getAllCategories/", StoreController.getAllCategories);      // usage: stores/getAllCategories
 router.get("/getManagerPermissions/", StoreController.getManagerPermissions);       //usage: stores/getManagerPermissions/?storeName=shufersal
+router.get("/getDiscountsPolicy", StoreController.getDiscountsPolicy);              //usage: stores/getDiscountsPolicy/?storeName=shufersal
 
 export default router;
