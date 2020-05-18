@@ -32,12 +32,13 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
  });
 
   test("store owner logged in valid manager", () => {
+    const tmp=2
     const res = _serviceBridge.grantPermissions(
       _newManagerCredentials,
       _storeInformation,
       [PERMISSION.MODIFY_BUYING_METHODS, PERMISSION.CLOSE_STORE]
     );
-
+    
     expect(res.data).toBeDefined()
 
     const { data, error } = _serviceBridge.viewManagerPermissions({
