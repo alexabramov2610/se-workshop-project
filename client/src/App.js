@@ -12,13 +12,13 @@ import { SignInAndSignUpPage } from './pages/sign-in-and-sign-up/sign-in-and-sig
 import * as api from '../src/utils/api'
 import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
-import { StorePage } from './pages/store-page/store-page'
 import { SearchPage } from './pages/search-page/serch-page'
 import { PersonalInfo } from './pages/personal-info-page/personal-info'
 import { CartCtx } from './contexts/cart-context'
 import { history } from './utils/config'
 import * as config from './utils/config'
 import DiscountPageContainer from "./pages/discount-page/discount-page-container";
+import StorePageContainer from "./pages/store-page/store-page-container";
 
 class App extends React.Component {
     constructor(props) {
@@ -94,7 +94,7 @@ class App extends React.Component {
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         {/*<Route path="/store/manageProducts/:storename" component={} />*/}
-                        <Route path="/store/:storename" component={StorePage} />
+                        <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />}/>
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
                     </Switch>

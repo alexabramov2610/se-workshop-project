@@ -35,7 +35,7 @@ class StorePage extends React.Component {
                                     backgroundColor: "white",
                                 }}
                             >
-                                {/*<ProductsGrid storeName={props.storeName}/>*/}
+                                <ProductsGrid storeName={props.storeName}/>
                             </Content>
                             <Sider>
                                 <StoreMenu onChange={this.onChange} />
