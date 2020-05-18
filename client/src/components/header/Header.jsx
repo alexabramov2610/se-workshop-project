@@ -49,7 +49,7 @@ export class Header extends React.Component {
               to="/search"
               className="hvr-underline-from-center"
             >
-              Search
+              SEARCH
             </Link>
 
             <Link

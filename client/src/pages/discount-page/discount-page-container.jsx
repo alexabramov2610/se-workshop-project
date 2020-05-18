@@ -1,31 +1,33 @@
 import React, {useEffect, useState} from "react";
 import {DiscountPageCtx} from "./discount-page-ctx";
 import DiscountPage from "./discount-page.component";
-import {Spin} from "antd";
 import {config} from './discount-page-config';
 import * as utils from "./discount-page-utils";
 import * as api from "../../utils/api";
-
-const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
+import Spinner from "../../components/spinner/spinner";
+import {useParams} from "react-router-dom";
 
 const DiscountPageContainer = () => {
 
+    const {storename} = useParams();
     const [currCondition, setCurrCondition] = useState({condition: {}});
     const [discounts, setDiscounts] = useState([]);
     const [currDiscount, setCurrDiscount] = useState({condition: [], products: [], percentage: 0});
     const [screen, moveToScreen] = useState(0);
     const [products, setProducts] = useState(undefined);
-    const [storeName, setStoreName] = useState("");
+    const [storeName, setStoreName] = useState(storename);
     const [categories, setCategories] = useState(undefined);
     const [discountSubject, setDiscountSubject] = useState("products");
     const [mode, setMode] = useState({mode: config.modes.ADD, editedDiscount: 0});
     const [policyDiscounts, setPolicyDiscounts] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [fetching, setFetching] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            const productsRes = await api.getStoreProducts("store10");
-            const categoriesRes = await api.getStoreCategories("store10");
+            console.log(storeName);
+            const productsRes = await api.getStoreProducts(storeName);
+            const categoriesRes = await api.getStoreCategories(storeName);
             const store = productsRes.data.data.products[0].storeName;
             setStoreName(store);
 
@@ -42,7 +44,7 @@ const DiscountPageContainer = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const policyRes = await api.getDiscountPolicy("store10");
+            const policyRes = await api.getDiscountPolicy(storeName);
             const keyedDiscounts = utils.addKeys(policyRes.data.data.policy.discounts);
             const keyedConditions = keyedDiscounts.map(d => {
                 const currConditions = d.discount.condition;
@@ -58,13 +60,19 @@ const DiscountPageContainer = () => {
 
         fetchData();
 
-    }, [isFetching]);
+    }, [fetching]);
 
-    const submitDiscounts = () => {
-        api.setDiscountPolicy({
-            body: {storeName: "store10", policy: policyDiscounts}
+    const submitDiscounts = async () => {
+        setIsLoading(true);
+        await api.setDiscountPolicy({
+            body: {
+                storeName: storeName, policy: {
+                    discounts: policyDiscounts
+                }
+            }
         }).then(r => console.log(JSON.stringify(r)));
-        setIsFetching(!isFetching);
+        setIsLoading(false);
+        setFetching(!fetching);
     }
 
     const resetDiscount = () => {
@@ -112,13 +120,11 @@ const DiscountPageContainer = () => {
 
     return (
         <DiscountPageCtx.Provider value={providerState}>
-            {currDiscount ? console.log(currDiscount) : null}
+            {console.log(policyDiscounts)}
             {
-                policyDiscounts && products && categories
-                    ? <DiscountPage screen={screen}/>
-                    : <div style={spinnerStyle}>
-                        <Spin tip="Loading..."/>
-                    </div>
+                !policyDiscounts || !products || !categories || isLoading
+                    ? <Spinner message={"Loading..."}/>
+                    : <DiscountPage screen={screen}/>
             }
         </DiscountPageCtx.Provider>
     );

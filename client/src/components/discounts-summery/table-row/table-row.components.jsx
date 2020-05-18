@@ -42,6 +42,20 @@ function TableRow({index, discount}) {
         moveToScreen(config.steps.EDIT_ADD);
     };
 
+    const getActions = (props) => {
+        return (
+            <span style={basicStyle}>
+                <Space>
+                    <Popconfirm title="Are you sure delete this discount from the policy?"
+                                onConfirm={() => handleRemove(props)}><a
+                        href="#">delete</a></Popconfirm>
+                    <Button type="link" onClick={() => handleEditMode(props)}>edit</Button>
+                </Space>
+            </span>
+        );
+
+    }
+
     return (
         <Draggable draggableId={discount.key} index={index}>
             {provided => (
@@ -53,14 +67,7 @@ function TableRow({index, discount}) {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                             >
-                                <span style={basicStyle}>
-                                    <Space>
-                                        <Popconfirm title="Are you sure delete this discount from the policy?"
-                                                    onConfirm={() => handleRemove(props)}><a
-                                            href="#">delete</a></Popconfirm>
-                                        <Button type="link" onClick={() => handleEditMode(props)}>edit</Button>
-                                    </Space>
-                                </span>
+                                {getActions(props)}
                                 <span style={basicStyle}>{parsedSubject}</span>
                                 <span style={basicStyle}>{products}</span>
                                 <span style={basicStyle}>{currDiscount.percentage}%</span>
@@ -70,7 +77,8 @@ function TableRow({index, discount}) {
                                     <PresentableDropdown inputs={conditions}/>
                                 </span>
                                 <span style={basicStyle}>{coupon}</span>
-                                <SelectableDropdownComponent inputs={["AND", "OR", "XOR"]} initialValue={discount.operator}/>
+                                <SelectableDropdownComponent inputs={["AND", "OR", "XOR"]}
+                                                             initialValue={discount.operator} discountKey={discount.key}/>
                             </Row>
                     }
                 </DiscountPageCtx.Consumer>
