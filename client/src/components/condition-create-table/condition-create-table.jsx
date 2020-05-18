@@ -13,7 +13,7 @@ const headerStyle = {border: 'none'};
 const ConditionCreateTable = ({disabled}) => {
 
     const handleRemove = (k, props) => {
-        utils.removeConditionFromEditedDiscount(k, props);
+        utils.removeConditionFromDiscount(k, props);
     }
 
     const getConditions = ({mode, policyDiscounts, discount}) => {
@@ -38,6 +38,66 @@ const ConditionCreateTable = ({disabled}) => {
         utils.decreaseMinAmount(cond, props);
     }
 
+    const getEditProductCell = (props, cond) => {
+        const {condition} = cond;
+
+        return (
+            <Table.Cell>
+                <SearchSelect options={utils.getPresentedProducts(props)}
+                              initialValue={condition.catalogNumber ? condition.catalogNumber : utils.emptyField}
+                              onChangeCallback={(e, props) => handleProductEdit(e, cond, props)}
+                              bordered={false}
+                />
+            </Table.Cell>
+        );
+    }
+
+    const getConditionEditCell = (props, cond) => {
+        const {condition} = cond;
+
+        return (
+            <Table.Cell>{
+                condition.minAmount
+                    ? <Space>
+                        {`Buy ${condition.minAmount} items, get ${utils.getPercentage(props)}%
+                                                    off selected products`}
+                        <ArrowUpOutlined onClick={() => handleMinAmountEditInc(props, cond)}/>
+                        <ArrowDownOutlined onClick={() => handleMinAmountEditDec(props, cond)}/>
+                    </Space>
+                    : `Get ${utils.getPercentage(props)}% off selected products if product: ${condition.catalogNumber} has discount`
+
+            }</Table.Cell>
+
+        );
+    }
+
+    const getEditOperatorCell = (cond) => {
+        return (
+            <Table.Cell>
+                <SearchSelect options={utils.basicOperators}
+                              initialValue={cond.operator ? cond.operator : utils.emptyField}
+                              onChangeCallback={(e, props) => handleOperatorEdit(e, cond, props)}
+                              bordered={false}
+                />
+            </Table.Cell>
+        );
+    }
+
+    const getDeleteCell = (props, cond) => {
+        return (
+            <Table.Cell>
+                <Popconfirm
+                    title="Are you sure delete this condition?"
+                    onConfirm={() => handleRemove(cond.key, props)}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <a href="#">delete</a>
+                </Popconfirm>
+            </Table.Cell>
+        );
+    }
+
     return (
         <DiscountPageCtx.Consumer>
             {
@@ -52,45 +112,12 @@ const ConditionCreateTable = ({disabled}) => {
                         </Table.Header>
                         <Table.Body>
                             {getConditions(props).map(cond => {
-                                const {condition} = cond;
-
                                 return (
                                     <Table.Row>
-                                        <Table.Cell>
-                                            <SearchSelect options={utils.getPresentedProducts(props)}
-                                                          initialValue={condition.catalogNumber ? condition.catalogNumber : utils.emptyField}
-                                                          onChangeCallback={(e, props) => handleProductEdit(e, cond, props)}
-                                                          bordered={false}
-                                            />
-                                        </Table.Cell>
-                                        <Table.Cell>{
-                                            condition.minAmount
-                                                ? <Space>
-                                                    {`Buy ${condition.minAmount} items, get ${utils.getPercentage(props)}%
-                                                    off selected products`}
-                                                    <ArrowUpOutlined onClick={() => handleMinAmountEditInc(props, cond)}/>
-                                                    <ArrowDownOutlined onClick={() => handleMinAmountEditDec(props, cond)}/>
-                                                </Space>
-                                                : `Get ${utils.getPercentage(props)}% off selected products if product: ${condition.catalogNumber} has discount`
-
-                                        }</Table.Cell>
-                                        <Table.Cell>
-                                            <SearchSelect options={utils.basicOperators}
-                                                          initialValue={cond.operator ? cond.operator : utils.emptyField}
-                                                          onChangeCallback={(e, props) => handleOperatorEdit(e, cond, props)}
-                                                          bordered={false}
-                                            />
-                                        </Table.Cell>
-                                        <Table.Cell>
-                                            <Popconfirm
-                                                title="Are you sure delete this condition?"
-                                                onConfirm={() => handleRemove(cond.key, props)}
-                                                okText="Yes"
-                                                cancelText="No"
-                                            >
-                                                <a href="#">delete</a>
-                                            </Popconfirm>
-                                        </Table.Cell>
+                                        {getEditProductCell(props, cond)}
+                                        {getConditionEditCell(props, cond)}
+                                        {getEditOperatorCell(cond)}
+                                        {getDeleteCell(props, cond)}
                                     </Table.Row>
                                 );
                             })}

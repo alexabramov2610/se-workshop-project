@@ -52,6 +52,9 @@ export abstract class Discount {
         this._percentage = value;
     }
 
+    get category(): ProductCategory{
+        return this._category;
+    }
     abstract calc(bag: BagItem[]): BagItem[];
 
     isRelevant(bagItem: BagItem[]): boolean {
@@ -77,6 +80,7 @@ export abstract class Discount {
     protected addMinutes(date, minutes): Date {
         return new Date(date.getTime() + minutes * 60000);
     }
+
 
 
 }

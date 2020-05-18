@@ -1,12 +1,51 @@
 import React from "react";
-import { JoinCards } from "../../components/home-products-collection/home-join-cards";
-import { CarouselUI } from "../../components/carousel/carousel";
-import { ProductsGrid } from "../../components/products-grid/products-grid";
+import {ProductsGrid} from "../../components/products-grid/products-grid";
+import {Layout} from "antd";
+import {StoreMenu} from "../../components/store-menu/store-menu.component";
+import {StorePageCtx} from "./store-page-ctx";
+
+
+const {Sider, Header, Content} = Layout;
+const titles = ["Our Products", "Your Discount Policy", "Your Buying Policy", "Manage Permissions"];
+const steps = [];
 
 class StorePage extends React.Component {
-  render() {
-    return <ProductsGrid storename={this.props.match.params.storename} />;
-  }
+
+    state = {title: titles[0]};
+
+    onChange = (e) => {
+        const titleIdx = parseInt(e.key) - 1;
+        this.setState({title: titles[titleIdx]});
+    }
+
+    render() {
+        return (
+            <StorePageCtx.Consumer>
+                {
+                    props => <Layout className="site-layout" style={{backgroundColor: "white"}}>
+                        <Header style={{backgroundColor: "white", fontSize: "25px"}}>
+                            {this.state.title}
+                        </Header>
+                        <Layout>
+                            <Content
+                                className="site-layout-background"
+                                style={{
+                                    padding: "0px 30px",
+                                    minHeight: "70vh",
+                                    backgroundColor: "white",
+                                }}
+                            >
+                                {/*<ProductsGrid storeName={props.storeName}/>*/}
+                            </Content>
+                            <Sider>
+                                <StoreMenu onChange={this.onChange} />
+                            </Sider>
+                        </Layout>
+                    </Layout>
+                }
+            </StorePageCtx.Consumer>
+        );
+    }
 }
 
-export { StorePage };
+export {StorePage};
