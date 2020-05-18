@@ -16,4 +16,6 @@ export const DiscountWrapper = styled.div`
     display: flex; 
     align-items: center;
     margin-top: -20px;
+    letter-spacing: 1px !important;
+    // font-weight: 600 !important;
 `

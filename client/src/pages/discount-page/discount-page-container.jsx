@@ -5,15 +5,17 @@ import {config} from './discount-page-config';
 import * as utils from "./discount-page-utils";
 import * as api from "../../utils/api";
 import Spinner from "../../components/spinner/spinner";
+import {useParams} from "react-router-dom";
 
 const DiscountPageContainer = () => {
 
+    const {storename} = useParams();
     const [currCondition, setCurrCondition] = useState({condition: {}});
     const [discounts, setDiscounts] = useState([]);
     const [currDiscount, setCurrDiscount] = useState({condition: [], products: [], percentage: 0});
     const [screen, moveToScreen] = useState(0);
     const [products, setProducts] = useState(undefined);
-    const [storeName, setStoreName] = useState("");
+    const [storeName, setStoreName] = useState(storename);
     const [categories, setCategories] = useState(undefined);
     const [discountSubject, setDiscountSubject] = useState("products");
     const [mode, setMode] = useState({mode: config.modes.ADD, editedDiscount: 0});
@@ -23,8 +25,9 @@ const DiscountPageContainer = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const productsRes = await api.getStoreProducts("store10");
-            const categoriesRes = await api.getStoreCategories("store10");
+            console.log(storeName);
+            const productsRes = await api.getStoreProducts(storeName);
+            const categoriesRes = await api.getStoreCategories(storeName);
             const store = productsRes.data.data.products[0].storeName;
             setStoreName(store);
 
@@ -41,7 +44,7 @@ const DiscountPageContainer = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const policyRes = await api.getDiscountPolicy("store10");
+            const policyRes = await api.getDiscountPolicy(storeName);
             const keyedDiscounts = utils.addKeys(policyRes.data.data.policy.discounts);
             const keyedConditions = keyedDiscounts.map(d => {
                 const currConditions = d.discount.condition;
@@ -63,7 +66,7 @@ const DiscountPageContainer = () => {
         setIsLoading(true);
         await api.setDiscountPolicy({
             body: {
-                storeName: "store10", policy: {
+                storeName: storeName, policy: {
                     discounts: policyDiscounts
                 }
             }
