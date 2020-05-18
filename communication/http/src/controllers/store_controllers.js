@@ -4,10 +4,6 @@ import {invalidRes, wrapHttp} from "./http_request_wrapper";
 /*
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"username": "tnewusername", "password": "newuser"}, "token": "a8658714-a66b-45c7-9c40-cc9bb6f188dd"}'   http://localhost:4000/users/register
  */
-export async function viewStoreInfo(req,res) {
-    const result = wrapHttp(req, ServiceFacade.viewStoreInfo);
-    return res.send(result)
-}
 
 export async function viewProductInfo(req,res) {
     const result = wrapHttp(req, ServiceFacade.viewProductInfo);
@@ -191,4 +187,15 @@ export async function getAllCategoriesInStore(req, res) {
 export async function getAllCategories(req, res) {
     const result = wrapHttp(req, ServiceFacade.getAllCategories);
     return res.send(result);
+}
+
+export async function viewStoreInfo(req,res) {
+    try {
+        const getAllCategoriesReq = { body: { storeName: req.query.storeName } };
+        req.body = getAllCategoriesReq;
+        const result = wrapHttp(req, ServiceFacade.viewStoreInfo);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
 }

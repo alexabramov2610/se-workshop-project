@@ -4,7 +4,6 @@ import * as StoreController from "../controllers/store_controllers";
 const router = express.Router();
 
 
-router.post("/viewStoreInfo", StoreController.viewStoreInfo);
 router.post("/viewProductInfo", StoreController.viewProductInfo);
 router.post("/search", StoreController.search);
 router.post("/purchase", StoreController.purchase);
@@ -38,5 +37,6 @@ router.get("/getCategories/", StoreController.getAllCategoriesInStore);      // 
 router.get("/getAllCategories/", StoreController.getAllCategories);      // usage: stores/getAllCategories
 router.get("/getManagerPermissions/", StoreController.getManagerPermissions);       //usage: stores/getManagerPermissions/?storeName=shufersal
 router.get("/getDiscountsPolicy", StoreController.getDiscountsPolicy);              //usage: stores/getDiscountsPolicy/?storeName=shufersal
+router.get("/getStoreInfo", StoreController.viewStoreInfo);                        //usage: stores/getStoreInfo/?storeName=shufersal
 
 export default router;
