@@ -82,7 +82,7 @@ describe("Guest Search, UC: 2.5", () => {
             storeRating: Rating.LOW,
             productRating: Rating.MEDIUM
         };
-        _testSearchQuery = {productName: ""};
+        _testSearchQuery = {productName: "blabla"};
         _testSearchData = {
             token: "123",
             body: {
