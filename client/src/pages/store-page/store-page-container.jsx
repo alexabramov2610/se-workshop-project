@@ -1,29 +1,27 @@
 import React, {useEffect, useState} from "react";
 import {StorePageCtx} from "./store-page-ctx";
-import {getStoreInfo} from "../../utils";
+import {viewStoreInfo} from "../../utils/api";
 import {StorePage} from "./store-page";
 import {Spin} from "antd";
+import {useParams} from "react-router-dom";
+import Spinner from "../../components/spinner/spinner";
 
-
-const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
 
 const StorePageContainer = ({isLoggedIn}) => {
 
+    const {storename} = useParams();
     const [storeData, setStoreData] = useState(undefined);
 
     useEffect(async () => {
-        const storeInfo = await getStoreInfo("store9");
+        const storeInfo = await viewStoreInfo(storename);
         setStoreData(storeInfo.data.data.info);
     }, []);
 
     return storeData
         ? <StorePageCtx.Provider value={storeData}>
-            <StorePage isLoggedIn={isLoggedIn} />
+            <StorePage isLoggedIn={isLoggedIn}/>
         </StorePageCtx.Provider>
-
-        : <div style={spinnerStyle}>
-            <Spin tip="Loading..."/>
-        </div>
+        : <Spinner message={"Loading your store"}/>
 }
 
 export default StorePageContainer;
