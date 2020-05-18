@@ -5,10 +5,9 @@ import * as utils from "./discount-page-utils";
 export const verifyDiscountSetting = ({mode, discount, policyDiscounts}) => {
     let valid = true;
     if (utils.isEditMode(mode)) {
-        policyDiscounts.forEach(discount => {
-            console.log(discount);
-            valid = utils.isEditedDiscount(discount.key, mode) ? discount.duration && discount.percentage : true
-        })
+        const editedDiscount = utils.getEditedDiscount(policyDiscounts, mode);
+        console.log(policyDiscounts);
+        valid = editedDiscount.discount.duration > -1 && editedDiscount.discount.percentage > -1;
     } else if (!discount.duration || !discount.percentage) {
         valid = false;
     }

@@ -40,7 +40,7 @@ export const addKeys = (collection) => {
     });
 }
 
-export const removeConditionFromEditedDiscount = (k, props) => {
+export const removeConditionFromDiscount = (k, props) => {
     isEditMode(props.mode)
         ? props.setPolicyDiscounts(prevPolicyDiscounts => {
             return prevPolicyDiscounts.map(d => {

@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {DiscountPageCtx} from "./discount-page-ctx";
 import DiscountPage from "./discount-page.component";
-import {Spin} from "antd";
 import {config} from './discount-page-config';
 import * as utils from "./discount-page-utils";
 import * as api from "../../utils/api";
-
-const spinnerStyle = {textAlign: "center", alignItems: "center", paddingTop: "240px"};
+import Spinner from "../../components/spinner/spinner";
 
 const DiscountPageContainer = () => {
 
@@ -20,7 +18,8 @@ const DiscountPageContainer = () => {
     const [discountSubject, setDiscountSubject] = useState("products");
     const [mode, setMode] = useState({mode: config.modes.ADD, editedDiscount: 0});
     const [policyDiscounts, setPolicyDiscounts] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [fetching, setFetching] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -58,13 +57,19 @@ const DiscountPageContainer = () => {
 
         fetchData();
 
-    }, [isFetching]);
+    }, [fetching]);
 
-    const submitDiscounts = () => {
-        api.setDiscountPolicy({
-            body: {storeName: "store10", policy: policyDiscounts}
+    const submitDiscounts = async () => {
+        setIsLoading(true);
+        await api.setDiscountPolicy({
+            body: {
+                storeName: "store10", policy: {
+                    discounts: policyDiscounts
+                }
+            }
         }).then(r => console.log(JSON.stringify(r)));
-        setIsFetching(!isFetching);
+        setIsLoading(false);
+        setFetching(!fetching);
     }
 
     const resetDiscount = () => {
@@ -112,13 +117,11 @@ const DiscountPageContainer = () => {
 
     return (
         <DiscountPageCtx.Provider value={providerState}>
-            {currDiscount ? console.log(currDiscount) : null}
+            {console.log(policyDiscounts)}
             {
-                policyDiscounts && products && categories
-                    ? <DiscountPage screen={screen}/>
-                    : <div style={spinnerStyle}>
-                        <Spin tip="Loading..."/>
-                    </div>
+                !policyDiscounts || !products || !categories || isLoading
+                    ? <Spinner message={"Loading..."}/>
+                    : <DiscountPage screen={screen}/>
             }
         </DiscountPageCtx.Provider>
     );

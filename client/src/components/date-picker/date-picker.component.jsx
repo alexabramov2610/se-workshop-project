@@ -20,7 +20,7 @@ const DatePicker = () => {
         if (mode.mode === config.modes.EDIT) {
             setPolicyDiscounts(prevPolicyDiscounts => {
                     let editedDiscount = utils.getEditedDiscount(prevPolicyDiscounts, mode);
-                    editedDiscount.discount.startDate = value ? value[0].toDate() : undefined;
+                    editedDiscount.discount.startDate = value ? value[0].toDate() : 0;
                     editedDiscount.discount.duration = datesDurationInDays(value);
                     return prevPolicyDiscounts.map(d => d.key === mode.editedDiscount ? editedDiscount : d);
                 }
@@ -29,7 +29,7 @@ const DatePicker = () => {
             setDiscount(prevDiscount => {
                 return {
                     ...prevDiscount,
-                    startDate: value ? value[0].toDate() : 0,
+                    startDate: value[0] ? value[0].toDate() : 0,
                     duration: datesDurationInDays(value)
                 }
             });

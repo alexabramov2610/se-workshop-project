@@ -6,6 +6,7 @@ import {Button as SButton} from "semantic-ui-react";
 import * as verifier from "../../pages/discount-page/settings-verifier";
 import {config} from '../../pages/discount-page/discount-page-config';
 import * as utils from "../../pages/discount-page/discount-page-utils";
+import {StagesContainer} from "./stages.styles";
 
 const {Step} = Steps;
 
@@ -51,7 +52,7 @@ const Stages = ({stage}) => {
         <DiscountPageCtx.Consumer>
             {
                 props => {
-                    return <div style={{display: 'flex', flexDirection: 'column', justifyContent: "flex-end"}}>
+                    return <StagesContainer>
                         <Space style={{float: "right"}}>
                             {
                                 stage === config.steps.REVIEW_SUBMIT
@@ -75,7 +76,7 @@ const Stages = ({stage}) => {
                             <Step title="choose subject and products"/>
                             <Step title="select configurations and discounts"/>
                         </Steps>
-                    </div>
+                    </StagesContainer>
                 }
 
             }

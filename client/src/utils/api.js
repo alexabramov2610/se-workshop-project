@@ -69,15 +69,17 @@ const getStoreCategories = async (storeName) => {
 const addToCart = async (req) => {
     return instance.post(`${baseDomain}/users/saveProduct/`, req);
 }
+
 const viewCart = async () => {
     return instance.get(`${baseDomain}/users/viewCart/`);
 }
+
 const getDiscountPolicy = async (storeName) => {
-    return instance.get(`${baseDomain}/stores/getDiscountPolicy/?storeName=${storeName}`);
+    return instance.get(`${baseDomain}/stores/getDiscountsPolicy/?storeName=${storeName}`);
 }
 
 const setDiscountPolicy = async (req) => {
-    return instance.post(`${baseDomain}/stores/setDiscountPolicy/`, req);
+    return instance.post(`${baseDomain}/stores/setDiscountsPolicy/`, req);
 }
 
 const getPersonalInfo = async (req) => {

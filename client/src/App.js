@@ -92,7 +92,7 @@ class App extends React.Component {
                     <Switch>
                         <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route path="/category" component={CategoryPage} />
-                        <Route path={"/set-discount"} component={DiscountPage} />}
+                        <Route path={"/set-discount"} component={DiscountPageContainer} />}
                         <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                         <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
                         <Route path="/store/:storename" component={StorePage} />

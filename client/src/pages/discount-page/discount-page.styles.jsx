@@ -11,11 +11,6 @@ export const DiscountPageBody = styled.div`
     min-height: 70vh;;
 `
 
-export const ArrowContainer = styled.div`
-    font-size: 30px;
-    cursor: pointer;
-`
-
 export const DiscountWrapper = styled.div`
     width: 100%;
     display: flex; 
