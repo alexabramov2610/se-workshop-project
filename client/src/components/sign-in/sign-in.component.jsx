@@ -26,11 +26,11 @@ class SignIn extends React.Component {
 
     try {
       login(userName, password).then(({ data }) => {
-        if (!data.error || data.error.message === "Already at this state") {
+        if (!data.error) {
           this.props.onLogin(userName);
           config.history.push("/");
         } else {
-          alert("invalid details");
+          alert(data.error);
         }
       });
     } catch (error) {
