@@ -19,7 +19,6 @@ export class ProductsGrid extends React.Component {
     const { data } = await api.getStoreProducts(this.props.storename);
     const products = data.data.products.map((e) => e.product);
     this.setState({ products });
-    console.log(products);
   }
 
   render() {
@@ -40,6 +39,8 @@ export class ProductsGrid extends React.Component {
                 price={p.price}
                 key={index}
                 rating={p.rating}
+                store={this.props.storename}
+                cn={p.catalogNumber}
               />
             ))}{" "}
         </ProductGridContainer>

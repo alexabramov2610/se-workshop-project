@@ -187,6 +187,9 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.viewManagerPermissions));
 }
+export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.getManagerPermissions));
+}
 
 /*
 UC-4.7
@@ -233,27 +236,34 @@ export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res
 Additional req from FE
  */
 export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    return runIfOpen(req, StoreService.getStoresWithOffset);
+    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    // return runIfOpen(req, StoreService.getStoresWithOffset);
 }
 export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
-    return runIfOpen(req, StoreService.getAllProductsInStore);
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
+    // return runIfOpen(req, StoreService.getAllProductsInStore);
 }
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    return runIfOpen(req, StoreService.getAllCategoriesInStore);
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
+    // return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
 export const isSystemUp = (): Res.BoolResponse => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
     return { data: { result: tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
 }
 export const verifyToken = (req: Req. Request): Res.BoolResponse => {
-    return runIfOpen(req, runIfHaveToken(UserService.verifyToken));
+    return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Res.GetLoggedInUserResponse => {
-    // return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    return runIfOpen(req, UserService.isLoggedInUser);
+    return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
+    // return runIfOpen(req, UserService.isLoggedInUser);
+}
+export const getAllCategories = (req: Req.Request): Res.GetCategoriesResponse => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
+}
+
+export const getPersonalDetails = (req: Req.Request): Res.GetPersonalDetailsResponse => {
+    return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
 }
 
 /*
@@ -301,7 +311,7 @@ export {tradingSystem}
 
 
 /** --------------------------------- testing --------------------------------- */
-import {t1, t2, t3} from "../testSocket";
+import {t1, t2, t3, t4} from "../testSocket";
 export const test1 = () : any => {
     t1();
 }
@@ -310,5 +320,8 @@ export const test2 = () : any => {
 }
 export const test3 = () : any => {
     t3();
+}
+export const test4 = () : any => {
+    t4();
 }
 

@@ -84,7 +84,7 @@ echo -e "${BLUE}===========================================================${NC}
 echo -e "${BLUE}===================== INSTALLING CLIENT ===================${NC}"
 echo -e "${BLUE}===========================================================${NC}"
 cd $client
-#sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  websocket
 echo -e "${BLUE}===========================================================${NC}"

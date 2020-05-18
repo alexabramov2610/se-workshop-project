@@ -176,7 +176,9 @@ export class UserManager {
     }
 
     viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
-        const user = this.getUserByToken(req.token)
+        const user = this.getUserByToken(req.token);
+        if (!user)
+            return { data: { result: false, cart: undefined}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const cartRes: Cart = this.transferToCartRes(user.cart)
         return {data: {result: true, cart: cartRes}}
     }

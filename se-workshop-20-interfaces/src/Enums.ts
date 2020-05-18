@@ -4,29 +4,29 @@ export enum TradingSystemState {
 }
 
 export enum ManagementPermission {
-    WATCH_PURCHASES_HISTORY,
-    WATCH_USER_QUESTIONS,
-    REPLY_USER_QUESTIONS,
-    MODIFY_BUYING_METHODS,
-    MODIFY_DISCOUNT,
-    MANAGE_INVENTORY,
-    CLOSE_STORE,
+    WATCH_PURCHASES_HISTORY = "WATCH_PURCHASES_HISTORY",
+    WATCH_USER_QUESTIONS = "WATCH_USER_QUESTIONS",
+    REPLY_USER_QUESTIONS = "REPLY_USER_QUESTIONS",
+    MODIFY_BUYING_METHODS = "MODIFY_BUYING_METHODS",
+    MODIFY_DISCOUNT = "MODIFY_DISCOUNT",
+    MANAGE_INVENTORY = "MANAGE_INVENTORY",
+    CLOSE_STORE = "CLOSE_STORE",
 }
 
 export enum ProductCategory {
-    GENERAL,
-    ELECTRONICS,
-    HOBBIES,
-    HOME,
-    CLOTHING,
+    GENERAL = "GENERAL",
+    ELECTRONICS = "ELECTRONICS",
+    HOBBIES = "HOBBIES",
+    HOME = "HOME",
+    CLOTHING = "CLOTHING",
 }
 
 export enum Rating {
-    VERY_LOW,
-    LOW,
-    MEDIUM,
-    HIGH,
-    VERY_HIGH
+    VERY_LOW = 1,
+    LOW = 2,
+    MEDIUM = 3,
+    HIGH = 4,
+    VERY_HIGH = 5
 }
 
 export enum DiscountsTypes {
@@ -62,9 +62,9 @@ export enum EventCode {
 }
 
 export enum Operators {
-    OR,
-    AND,
-    XOR,
+    OR = "OR",
+    AND = "AND",
+    XOR = "XOR"
 }
 
 export enum NotificationsType {

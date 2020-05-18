@@ -32,7 +32,6 @@ export const NotificationsContainer = styled.div`
   height: 400px;
   display: flex;
   flex-direction: column;
-  white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   overflow: auto;
   padding-right: 15px;

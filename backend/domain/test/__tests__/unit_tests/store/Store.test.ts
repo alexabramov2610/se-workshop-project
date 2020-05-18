@@ -1,14 +1,19 @@
 import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
-import {Item, Product, Store} from "../../../../src/trading_system/internal_api";
+import {Item, Product, Receipt, Store} from "../../../../src/trading_system/internal_api";
 import {
+    BagItem,
+    IPayment,
     IProduct as ProductReq,
     ProductCatalogNumber,
+    ProductCategory,
     ProductInStore,
     ProductWithQuantity,
-    SearchFilters, SearchQuery
+    Purchase,
+    SearchFilters,
+    SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Req, Res} from 'se-workshop-20-interfaces'
-import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
+import {Res} from 'se-workshop-20-interfaces'
+import {ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 describe("Store Management Unit Tests", () => {
     let store: Store;
@@ -21,12 +26,40 @@ describe("Store Management Unit Tests", () => {
         storeManager = new StoreManager("name");
     });
 
+    test("init test - getters & setters", () => {
+        const storeName: string = "store";
+        let desc: string = "storeDescription";
+        store = new Store("store", "storeDescription");
+        expect(store.storeOwners).toBeDefined();
+        expect(store.storeOwners).toHaveLength(0);
+        expect(store.discountPolicy).toBeDefined();
+        expect(store.purchasePolicy).toBeDefined();
+        expect(store.description).toBeDefined();
+        expect(store.description.length > 0).toBe(true);
+        expect(store.rating).toBeDefined();
+        expect(store.products).toBeDefined();
+        expect(store.products.size).toBe(0);
+        expect(store.storeName).toBe(storeName);
+        expect(store.UUID).toBeDefined();
+        expect(store.UUID.length > 0).toBe(true);
+        expect(store.getPurchasesHistory()).toBeDefined();
+        expect(store.getPurchasesHistory()).toHaveLength(0);
+        expect(store.getContactUsMessages()).toBeDefined();
+        expect(store.getContactUsMessages()).toHaveLength(0);
+
+        desc = "test description";
+        store.description = "test description";
+        expect(store.description).toBe(desc);
+    });
+
 
     test("view store info success", () => {
         const dor = new StoreOwner("dor")
+        const dor2 = new StoreManager("dor2")
         const chair = new Product("chair", 6, 200, ProductCategory.HOME)
         store.addStoreOwner(dor)
         store.addNewProducts([chair])
+        store.addStoreManager(dor2);
 
         const res = store.viewStoreInfo()
         expect(res.data.result).toBeTruthy();
@@ -453,6 +486,7 @@ describe("Store Management Unit Tests", () => {
     test("addStoreOwner success", () => {
         const res: Res.BoolResponse = store.addStoreOwner(storeOwner);
         expect(res.data.result).toBeTruthy();
+        expect(store.getStoreOwner(storeOwner.name)).toMatchObject(storeOwner);
     });
 
     test("addStoreOwner failure", () => {
@@ -467,6 +501,7 @@ describe("Store Management Unit Tests", () => {
     test("addStoreManager success", () => {
         const res: Res.BoolResponse = store.addStoreManager(storeManager);
         expect(res.data.result).toBeTruthy();
+        expect(store.getStoreManager(storeManager.name)).toMatchObject(storeManager);
     });
 
     test("addStoreManager failure", () => {
@@ -553,7 +588,7 @@ describe("Store Management Unit Tests", () => {
         const products: Product[] = generateValidProducts(5);
         store.addNewProducts(products);
         const items: Item[] = generateValidItems(10, 0, 1, 0);
-        const product: ProductReq = {catalogNumber: 1, category: ProductCategory.ELECTRONICS, name: "name", price: 5}
+        const product: ProductReq = {catalogNumber: 1, category: ProductCategory.ELECTRONICS, name: "name", price: 5, rating: Rating.MEDIUM}
         let res: Item[] = store.getItemsFromStock(product, 3);
         expect(res).toHaveLength(0);
         store.addItems(items);
@@ -589,8 +624,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(expectedRes.length);
@@ -620,9 +656,10 @@ describe("Store Management Unit Tests", () => {
             product: {
                 catalogNumber: products[0].catalogNumber,
                 category: products[0].category,
+                rating: Rating.MEDIUM,
                 name: products[0].name,
                 price: products[0].price
-            }, storeName: store.storeName
+            }, storeName: store.storeName, storeRating: Rating.MEDIUM
         }];
 
         expect(productsInStore).toHaveLength(expectedRes.length);
@@ -655,8 +692,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM,
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(5);
@@ -703,8 +741,9 @@ describe("Store Management Unit Tests", () => {
                     catalogNumber: i + 1,
                     category: products[i].category,
                     name: products[i].name,
-                    price: products[i].price
-                }, storeName: store.storeName
+                    price: products[i].price,
+                    rating: Rating.MEDIUM,
+                }, storeName: store.storeName, storeRating: Rating.MEDIUM
             });
 
         expect(productsInStore).toHaveLength(5);
@@ -721,6 +760,37 @@ describe("Store Management Unit Tests", () => {
         expect(productsInStore).toMatchObject(expectedRes);
     });
 
+
+    test("add receipt", () => {
+        const purchase1: Purchase = { userName: "alex", price: 50, item: { id: 1, catalogNumber: 1}, storeName: "what-store"};
+        const purchase2: Purchase = { userName: "alex", price: 50, item: { id: 2, catalogNumber: 1}, storeName: "what-store"};
+        const payment: IPayment = { totalCharged: 100, lastCC4: "1111"};
+        const purchases: Purchase[] = [purchase1, purchase2];
+        const receipt: Receipt = new Receipt(purchases, payment);
+        store.addReceipt(purchases, payment);
+
+        expect(store.getPurchasesHistory()).toContainEqual(receipt);
+    });
+
+
+    test("getBagPrice", () => {
+        const price1: number = 50;
+        const price2: number = 1352;
+        const price3: number = 210;
+        const finalPrice: number = price1 + price2 + price3;
+
+        const bagItem1: BagItem = { amount: price1, finalPrice: price1,
+            product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price1}
+        };
+        const bagItem2: BagItem = { amount: price2, finalPrice: price2,
+            product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price2}
+        };
+        const bagItem3: BagItem = { amount: price3, finalPrice: price3,
+            product: { catalogNumber: 1, name: "name", rating: Rating.MEDIUM, category: ProductCategory.ELECTRONICS, price: price3}
+        };
+        const bagItems: BagItem[] = [bagItem1, bagItem2, bagItem3];
+        expect(store.getBagPrice(bagItems)).toBe(finalPrice);
+    });
 
     function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
         const products: ProductCatalogNumber[] = [];

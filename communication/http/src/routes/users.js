@@ -8,12 +8,11 @@ router.post("/login", UserController.login);
 router.post("/logout", UserController.logout);
 router.post("/saveProduct", UserController.saveProductToCart);
 router.post("/removeProduct", UserController.removeProductFromCart);
-router.post("/viewCart", UserController.viewCart);
-router.post("/viewRegisteredUserPurchasesHistory", UserController.viewRegisteredUserPurchasesHistory);
 
 
-router.get("/", (req, res) => res.send('users!'));
-router.get("/:userName", (req, res) => res.send('specific user!!'));
+router.get("/viewCart", UserController.viewCart);
+router.get("/personalDetails", UserController.personalDetails);
+router.get("/viewRegisteredUserPurchasesHistory", UserController.viewRegisteredUserPurchasesHistory);
 
 
 export default router;

@@ -34,7 +34,7 @@ const errorMsg:ErrorMessages = {
     E_STORE_ADDITION: "Could not add store.",
     E_ASSIGN: "Failed assigning",
     E_INVALID_PROD: "Invalid product.",
-    E_PERMISSION: "This manager dont have this permission.",
+    E_PERMISSION: "This manager doesn't have this permission.",
     E_INVALID_PERM: "Invalid permissions.",
     E_NOT_ASSIGNER: "Not assigner of user ",
     E_STOCK: "This product not in stock.",

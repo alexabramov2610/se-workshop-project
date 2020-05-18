@@ -47,6 +47,11 @@ export class Store {
     private _contactUsMessages: ContactUsMessage[];
     private _firstOwner: StoreOwner;
     private _purchasePolicy: PurchasePolicy;
+    private _discountPolicy: Discount;
+    private _description: string;
+    private _rating: Rating;
+    private _products: Map<Product, Item[]>;
+    private _storeOwners: StoreOwner[];
 
     constructor(storeName: string, description) {
         this._UUID = uuid();
@@ -59,21 +64,20 @@ export class Store {
         this._rating = Rating.MEDIUM;
         this._discountPolicy = new DiscountPolicy();
         this._purchasePolicy = new PurchasePolicyImpl();
+        this._contactUsMessages = [];
     }
 
-    private _storeOwners: StoreOwner[];
+    get purchasePolicy(): PurchasePolicy {
+        return this._purchasePolicy;
+    }
 
     get storeOwners(): StoreOwner[] {
         return this._storeOwners;
     }
 
-    private _discountPolicy: Discount;
-
     get discountPolicy(): Discount {
         return this._discountPolicy;
     }
-
-    private _description: string;
 
     get description(): string {
         return this._description;
@@ -83,13 +87,9 @@ export class Store {
         this._description = value;
     }
 
-    private _rating: Rating;
-
     get rating(): Rating {
         return this._rating;
     }
-
-    private _products: Map<Product, Item[]>;
 
     get products(): Map<Product, Item[]> {
         return this._products;
@@ -101,6 +101,14 @@ export class Store {
 
     get UUID(): string {
         return this._UUID;
+    }
+
+    getPurchasesHistory(): Receipt[] {
+        return this._receipts;
+    }
+
+    getContactUsMessages(): ContactUsMessage[] {
+        return this._contactUsMessages;
     }
 
     addItems(items: Item[]): Res.ItemsAdditionResponse {
@@ -346,9 +354,10 @@ export class Store {
                     name: product.name,
                     price: product.price,
                     category: product.category,
-                    catalogNumber: product.catalogNumber
+                    catalogNumber: product.catalogNumber,
+                    rating: product.rating
                 };
-                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName};
+                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName, storeRating: this.rating};
                 products.push(matchingProdInStore);
             }
         }
@@ -364,7 +373,7 @@ export class Store {
                 return true;
             }
         }
-        logger.warn(`user: ${JSON.stringify(userName)} is not an owner of store ${this.storeName}`)
+        logger.debug(`user: ${JSON.stringify(userName)} is not an owner of store ${this.storeName}`)
         return false;
     }
 
@@ -376,7 +385,7 @@ export class Store {
                 return true;
             }
         }
-        logger.warn(`user: ${userName} is not a manager of store ${this.storeName}`)
+        logger.debug(`user: ${userName} is not a manager of store ${this.storeName}`)
         return false;
     }
 
@@ -408,14 +417,6 @@ export class Store {
         return product ? this._products.get(product).length : 0;
     }
 
-    getPurchasesHistory(): Receipt[] {
-        return this._receipts;
-    }
-
-    getContactUsMessages(): ContactUsMessage[] {
-        return this._contactUsMessages;
-    }
-
     getStoreManager(userName: string): StoreManager {
         return this._storeManagers.find((manager: StoreManager) => manager.name === userName)
     }
@@ -433,7 +434,7 @@ export class Store {
         return itemsToReturn;
     }
 
-    addReceipt(purchases: Purchase[], payment: IPayment) {
+    addReceipt(purchases: Purchase[], payment: IPayment): void {
         this._receipts.push(new Receipt(purchases, payment))
     }
 
@@ -456,10 +457,6 @@ export class Store {
             newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration, discount.products)
         }
         return newDiscount.id;
-    }
-
-    get purchasePolicy(): PurchasePolicy {
-        return this._purchasePolicy;
     }
 
     removeDiscount(catalogNumber: number, discountID: string): boolean {
@@ -533,7 +530,7 @@ export class Store {
                 isValid: true
             }
         } else {
-            const error: string = `invalid product: ${JSON.stringify(product)}`;
+            const error: string = `invalid product: ${product}`;
             logger.warn(error);
             return {
                 isValid: false, error
@@ -562,14 +559,20 @@ export class Store {
     }
 
     private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
-        if (typeof query.productName !== "undefined" && query.productName !== product.name)
+        if (typeof query.productName !== "undefined" && query.productName.length > 0 && query.productName !== product.name)
             return false;
-        if (typeof filters.priceRange !== "undefined" && (product.price < filters.priceRange.min || filters.priceRange.max < product.price))
+
+        if (typeof filters.priceRange !== "undefined" && (
+            ((<unknown>filters.priceRange.min) !== "" && product.price < filters.priceRange.min) ||
+            ((<unknown>filters.priceRange.max) !== "" && filters.priceRange.max < product.price)))
             return false;
-        if (typeof filters.productCategory !== "undefined" && filters.productCategory !== product.category)
+
+        if (typeof filters.productCategory !== "undefined" && (<unknown>filters.productCategory) !== "" && filters.productCategory !== product.category)
             return false;
-        if (typeof filters.productRating !== "undefined" && filters.productRating !== product.rating)
+
+        if (typeof filters.productRating !== "undefined" && (<unknown>filters.productRating) !== "" && filters.productRating !== product.rating)
             return false;
+
         return true;
     }
 

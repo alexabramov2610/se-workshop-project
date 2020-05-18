@@ -422,15 +422,17 @@ export class StoreManagement {
 
     viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
         const store: Store = this.findStoreByName(storeName);
-        if (!store) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN)) return {
-            data: {result: false, receipts: []},
-            error: {message: errorMsg.E_PERMISSION}
-        }
-        const ireceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
+        if (!store)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN))
+            return {
+                data: {result: false, receipts: []},
+                error: {message: errorMsg.E_PERMISSION}
+            }
+        const iReceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
             return {purchases: r.purchases, date: r.date}
         })
-        return {data: {result: true, receipts: ireceipts}}
+        return {data: {result: true, receipts: iReceipts}}
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
@@ -473,11 +475,11 @@ export class StoreManagement {
     }
 
     search(filters: SearchFilters, query: SearchQuery): Res.SearchResponse {
-        if (query.storeName) {
+        if (query.storeName && query.storeName.length > 0) {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
                 return {data: {result: false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
-            if (!filters.storeRating || filters.storeRating === store.rating)
+            if (!filters.storeRating || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
                 return {data: {result: true, products: store.search(filters, query)}};
             else
                 return {data: {result: true, products: []}};
@@ -485,7 +487,7 @@ export class StoreManagement {
 
         let productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
-            if (typeof filters.storeRating === "undefined" || filters.storeRating === store.rating)
+            if (typeof filters.storeRating === "undefined" || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
                 productsFound = productsFound.concat(store.search(filters, query));
         }
         return {data: {result: true, products: productsFound}};
@@ -544,6 +546,24 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_MANGER_NOT_EXISTS}};
         const permissions = managerToView.getPermissions();
         return {data: {result: true, permissions}}
+    }
+
+    getManagerPermissions(username: string, storeName: string): Res.ViewManagerPermissionResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const storeOwner: StoreOwner = store.getStoreOwner(username);
+        if (storeOwner)
+            return { data: { result: true, permissions: this.getAllPermissions() } };
+        const storeManager: StoreManager = store.getStoreManager(username);
+        if (!storeManager)
+            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
+        return { data: {result: true, permissions: storeManager.getPermissions()}}
+
+    }
+
+    getAllPermissions(): ManagementPermission[] {
+        return Object.keys(ManagementPermission).map((key:any) => ManagementPermission[key]);
     }
 
 
@@ -654,14 +674,16 @@ export class StoreManagement {
 
     getAllProductsInStore(storeName: string): Res.GetAllProductsInStoreResponse {
         const productInStore: ProductInStore[] = [];
-        if (!this._storeByStoreName.has(storeName))
+        const store: Store = this._storeByStoreName.get(storeName);
+        if (!store)
             return {data: {products: []}};
 
-        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
+        const prodIterator = store.products.keys();
         let currProd: Product = prodIterator.next().value;
         while (currProd) {
             const currProductInStore: ProductInStore = {
                 storeName,
+                storeRating: store.rating,
                 product: {
                     catalogNumber: currProd.catalogNumber,
                     price: currProd.price,
@@ -677,7 +699,7 @@ export class StoreManagement {
         return {data: {products: productInStore}};
     }
 
-    getAllCategoriesInStore(storeName: string): Res.GetAllCategoriesInStoreResponse {
+    getAllCategoriesInStore(storeName: string): Res.GetCategoriesResponse {
         const categoriesInStore: ProductCategory[] = [];
         if (!this._storeByStoreName.has(storeName))
             return {data: {categories: []}};
@@ -712,6 +734,27 @@ export class StoreManagement {
             error: {message: errorMsg.VERIFY_POLICY_FAILED + "in store" + storeName}
         }
     }
+
+    getStoresInfoOfManagedBy(username: string): StoreInfo[] {
+        let stores: StoreInfo[] = [];
+        this._stores.forEach(store => {
+            if (store.verifyIsStoreManager(username))
+                stores.push(store.viewStoreInfo().data.info);
+            }
+        )
+        return stores;
+    }
+
+    getStoresInfoOfOwnedBy(username: string): StoreInfo[] {
+        let stores: StoreInfo[] = [];
+        this._stores.forEach(store => {
+                if (store.verifyIsStoreOwner(username))
+                    stores.push(store.viewStoreInfo().data.info);
+            }
+        )
+        return stores;
+    }
+
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;
@@ -808,4 +851,6 @@ export class StoreManagement {
         }
 
     }
+
+
 }

@@ -30,7 +30,7 @@ describe("Store Management Unit Tests", () => {
         token: "1"
     };
     cart.set("storeName", [{
-        product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20},
+        product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20, rating: Rating.MEDIUM},
         amount: 2
     }])
 
@@ -334,6 +334,7 @@ describe("Store Management Unit Tests", () => {
         const productsReq: ProductReq[] = [];
         for (const prod of products) {
             const prodReq: ProductReq = {
+                rating: Rating.MEDIUM,
                 catalogNumber: prod.catalogNumber,
                 name: prod.name,
                 price: prod.price,
@@ -1029,7 +1030,7 @@ describe("Store Management Unit Tests", () => {
         });
     }
 
-    function prepareMockToSaveProduct() {
+    function prepareMockToSaveProduct(isValidStore: boolean) {
         mocked(UserManager).mockImplementation((): any => {
             return {
                 getUserByToken: () => user,
@@ -1040,14 +1041,14 @@ describe("Store Management Unit Tests", () => {
 
 
         mocked(StoreManagement).mockImplementation((): any => {
-            return {findStoreByName: () => store}
+            return {findStoreByName: () => isValidStore ? store : undefined}
         });
 
 
     }
 
     test("saveProductToCart success test", () => {
-        prepareMockToSaveProduct()
+        prepareMockToSaveProduct(true)
         tradingSystemManager = new TradingSystemManager();
         const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
         jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(true);
@@ -1063,6 +1064,43 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeTruthy()
 
     })
+
+    test("saveProductToCart success failre - invalid store", () => {
+        prepareMockToSaveProduct(false)
+        tradingSystemManager = new TradingSystemManager();
+        const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
+        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(true);
+        jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
+
+        const req: Req.SaveToCartRequest = {
+            body: {storeName: store.storeName, catalogNumber: 12, amount: 3},
+            token: 'whatever'
+        }
+        const res = tradingSystemManager.saveProductToCart(req);
+
+        // expect(user.cart.get(store.storeName)).toEqual([{product: p, amount: req.body.amount}]);
+        expect(res.data.result).toBeFalsy()
+    })
+
+    test("saveProductToCart success failre - invalid amount", () => {
+        prepareMockToSaveProduct(true)
+        tradingSystemManager = new TradingSystemManager();
+        const p: Product = new Product('prod', 12, 5, ProductCategory.HOME)
+        jest.spyOn(store, 'isProductAmountInStock').mockReturnValueOnce(true);
+        jest.spyOn(store, 'getProductByCatalogNumber').mockReturnValueOnce(p)
+
+        const req: Req.SaveToCartRequest = {
+            body: {storeName: store.storeName, catalogNumber: 12, amount: -1},
+            token: 'whatever'
+        }
+        const res = tradingSystemManager.saveProductToCart(req);
+
+        // expect(user.cart.get(store.storeName)).toEqual([{product: p, amount: req.body.amount}]);
+        expect(res.data.result).toBeFalsy()
+    })
+
+
+
 
     function prepareMockToVerifyCart(isSuccess: boolean): void {
         const operationResMock: Res.BoolResponse = isSuccess ? {data: {result: true}} : {
@@ -1268,6 +1306,36 @@ describe("Store Management Unit Tests", () => {
         expect(verifyStoreRes.data.result).toBe(!isStoreExists && isUserValid);
     });
 
+
+
+
+    test("viewProductInfo", () => {
+        const req : Req.ProductInfoRequest = { body: { storeName: "store", catalogNumber: 1}, token: ""};
+        const res : Res.ProductInfoResponse = { data: {  result: true } }
+        mocked(StoreManagement).mockImplementation((): any => { return { viewProductInfo: () => res } });
+        tradingSystemManager = new TradingSystemManager();
+        expect(tradingSystemManager.viewProductInfo(req)).toBe(res);
+    });
+
+    test("viewCart", () => {
+        const req : Req.ViewCartReq = { body: {}, token: ""};
+        const res : Res.ViewCartRes = { data: {  result: true } }
+        mocked(UserManager).mockImplementation((): any => { return { viewCart: () => res } });
+        tradingSystemManager = new TradingSystemManager();
+        expect(tradingSystemManager.viewCart(req)).toBe(res);
+    });
+
+
+
+
+
+
+
+
+
+    //// ---------------------------
+
+
     function prepareMocksForStoreManagement(succ: boolean, isLoggedIn: boolean) {
         const createStoreRes: Res.BoolResponse = {data: {result: succ}};
         const item: Item = new Item(5, 10);
@@ -1327,7 +1395,7 @@ describe("Store Management Unit Tests", () => {
     function generateProducts(numOfItems: number): ProductReq[] {
         const products: ProductReq[] = [];
         for (let i = 0; i < numOfItems; i++)
-            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.ELECTRONICS});
+            products.push({name: 'name', catalogNumber: 2, price: 5, category: ProductCategory.ELECTRONICS, rating: Rating.MEDIUM,});
 
         return products;
     }

@@ -125,6 +125,10 @@ export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): R
     return ts.viewManagerPermissions(req);
 }
 
+export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+    return ts.getManagerPermissions(req);
+}
+
 export const search = (req: Req.SearchRequest): Res.SearchResponse => {
     return ts.search(req);
 }
@@ -181,6 +185,10 @@ export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Re
     return ts.getAllProductsInStore(req);
 }
 
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetAllCategoriesInStoreResponse => {
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse => {
     return ts.getAllCategoriesInStore(req);
+}
+
+export const getAllCategories = (req: Req.Request): Res.GetAllCategoriesResponse => {
+    return ts.getAllCategories();
 }

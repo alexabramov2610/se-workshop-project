@@ -126,18 +126,28 @@ interface GetAllProductsInStoreResponse extends Response {
   data: { products: ProductInStore[] }
 }
 
-interface GetAllCategoriesInStoreResponse extends Response {
-  data: { categories: ProductCategory[] }
-}
-
 interface GetLoggedInUserResponse extends Response {
   data: { username: string }
 }
 
+interface GetCategoriesResponse extends Response {
+  data: { categories: ProductCategory[] }
+}
+
+interface GetAllCategoriesResponse extends Response {
+  data: { categories: string[] }
+}
+
+interface GetPersonalDetailsResponse extends Response {
+  data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+}
+
 export {
+  GetPersonalDetailsResponse,
+  GetAllCategoriesResponse,
+  GetCategoriesResponse,
   GetLoggedInUserResponse,
   GetAllProductsInStoreResponse,
-  GetAllCategoriesInStoreResponse,
   GetStoresWithOffsetResponse,
   DeliveryResponse,
   AddDiscountResponse,

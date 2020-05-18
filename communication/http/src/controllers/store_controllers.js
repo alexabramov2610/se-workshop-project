@@ -129,6 +129,31 @@ export async function setPurchasePolicy(req,res) {
     return res.send(result)
 }
 
+
+// get
+
+export async function getDiscountsPolicy(req,res) {
+    try {
+        const getStoresWithLimitReq = { body: { storeName: req.query.storeName }, token: req.cookies['token']};
+        req.body = getStoresWithLimitReq;
+        const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
+
+export async function getManagerPermissions(req,res) {
+    try {
+        const getStoresWithLimitReq = { body: { managerToView: "", storeName: req.query.storeName }, token: req.cookies['token']};
+        req.body = getStoresWithLimitReq;
+        const result = wrapHttp(req, ServiceFacade.getManagerPermissions);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
+
 export async function getStoresWithLimit(req, res) {
     try {
         const getStoresWithLimitReq = { body: { offset: req.query.offset, limit: req.query.limit }, token: req.cookies['token']};
@@ -161,4 +186,9 @@ export async function getAllCategoriesInStore(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
+}
+
+export async function getAllCategories(req, res) {
+    const result = wrapHttp(req, ServiceFacade.getAllCategories);
+    return res.send(result);
 }

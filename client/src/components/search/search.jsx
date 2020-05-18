@@ -1,51 +1,251 @@
 import React from "react";
-import { login } from "../../utils/api";
+import * as api from "../../utils/api";
+// import { ProductBox } from "../product-box/product-box";
+import { ProductBox } from "../../components/product-box/product-box";
+import { ProductGridContainer } from "../../components/products-grid/products-grid-container.styles.jsx";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
+import { InputGroup, FormControl, Dropdown, Button } from "react-bootstrap";
 import * as config from "../../utils/config";
 import {
-  SignInContainer,
+  SearchContainer,
   SignInTitle,
   ButtonsBarContainer,
+  FiltersContainer,
+  SearchInputsContainer,
 } from "./search.styles";
 
-class SignIn extends React.Component {
+const Category = {
+  GENERAL: 0,
+  ELECTRONICS: 1,
+  HOBBIES: 2,
+  HOME: 3,
+  CLOTHING: 4,
+};
+Object.freeze(Category);
+class Search extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      searchQuery: "",
+      productName: "",
+      storeName: "",
+      productRating: "",
+      storeRating: "",
+      min: "",
+      max: "",
     };
+    this.updateRating = this.updateRating.bind(this);
+    this.clearFilters = this.clearFilters.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { searchQuery } = this.state;
-    config.history.push(`/search/${searchQuery}`);
+    const {
+      productCategory,
+      productName,
+      storeName,
+      productRating,
+      storeRating,
+      min,
+      max,
+    } = this.state;
+    const req = {
+      body: {
+        searchQuery: { storeName, productName },
+        filters: {
+          priceRange: { min, max },
+          productRating:
+            productRating !== "" ? Number.parseInt(productRating) - 1 : "",
+          storeRating:
+            storeRating !== "" ? Number.parseInt(storeRating) - 1 : "",
+          productCategory,
+        },
+      },
+    };
+    const { data } = await api.search(req);
+    const products = data.data.products.map((e) => {
+      return { ...e.product, store: e.storeName };
+    });
+    this.setState({ products }, () => console.log("abs s", this.state));
   };
-
   handleChange = (event) => {
     const { value, name } = event.target;
-
     this.setState({ [name]: value });
   };
-
+  updateRating(type, rating) {
+    this.setState({ [type]: rating }, () => console.log(this.state));
+  }
+  clearFilters() {
+    this.setState({
+      storeName: "",
+      productName: "",
+      priceRange: "",
+      productRating: "",
+      storeRating: "",
+      productCategory: undefined,
+      min: "",
+      max: "",
+    });
+  }
   render() {
     return (
       <div>
-        <FormInput
-          name="searchQuery"
-          type="text"
-          handleChange={this.handleChange}
-          value={this.state.searchQuery}
-          label="Search"
-          required
-        />
-        <ButtonsBarContainer>
-          <CustomButton type="submit"> Search </CustomButton>
-        </ButtonsBarContainer>
+        <SearchContainer>
+          <SignInTitle>Search Items</SignInTitle>
+          <form onSubmit={this.handleSubmit}>
+            <SearchInputsContainer>
+              <FormInput
+                name="productName"
+                type="text"
+                handleChange={this.handleChange}
+                value={this.state.productName}
+                label="Product Name"
+                required
+              />
+              <FormInput
+                name="storeName"
+                type="text"
+                handleChange={this.handleChange}
+                value={this.state.storeName}
+                label="Store Name"
+                required
+              />
+            </SearchInputsContainer>
+            <FiltersContainer>
+              <div style={{ minWidth: "155px" }}>
+                <FilterDropDown
+                  name={this.state.storeRating}
+                  attrName="storeRating"
+                  array={[1, 2, 3, 4, 5]}
+                  handler={this.updateRating}
+                  prefix="Store Rating:"
+                />
+              </div>
+              <div style={{ minWidth: "155px" }}>
+                <FilterDropDown
+                  name={this.state.productRating}
+                  attrName="productRating"
+                  array={[1, 2, 3, 4, 5]}
+                  handler={this.updateRating}
+                  prefix="Product Rating:"
+                />
+              </div>
+              <div
+                style={{
+                  minWidth: "155px",
+                }}
+              >
+                <FilterDropDown
+                  name={
+                    this.state.productCategory
+                      ? Object.keys(Category)[this.state.productCategory]
+                      : ""
+                  }
+                  attrName="productCategory"
+                  array={Object.keys(Category)}
+                  handler={this.updateRating}
+                  isCategory={true}
+                  prefix="Category:"
+                />
+              </div>
+              <InputGroup className="mb-3" style={{}}>
+                <InputGroup.Prepend>
+                  <InputGroup.Text
+                    style={{
+                      backgroundColor: "white",
+                      border: "none",
+                      marginBottom: "",
+                      marginLeft: "-10px",
+                    }}
+                  >
+                    {" "}
+                    Min / Max Price
+                  </InputGroup.Text>
+                </InputGroup.Prepend>
+
+                <FormControl
+                  name="min"
+                  style={{ marginTop: "10px" }}
+                  type="number"
+                  onChange={this.handleChange}
+                  value={this.state.min}
+                />
+                <FormControl
+                  name="max"
+                  style={{ marginTop: "10px" }}
+                  type="number"
+                  onChange={this.handleChange}
+                  value={this.state.max}
+                />
+              </InputGroup>
+              <Button
+                onClick={this.clearFilters}
+                style={{ height: "60%", marginTop: "14px" }}
+                variant="dark"
+              >
+                Clear Filters
+              </Button>{" "}
+            </FiltersContainer>
+            <ButtonsBarContainer>
+              <CustomButton onClick={this.handleSubmit}> Search! </CustomButton>
+            </ButtonsBarContainer>
+          </form>
+        </SearchContainer>
+        <ProductGridContainer>
+          {this.state.products &&
+            this.state.products.length > 0 &&
+            this.state.products.map((p, index) => (
+              <ProductBox
+                name={p.name}
+                price={p.price}
+                key={index}
+                rating={p.rating}
+                store={p.store}
+                cn={p.catalogNumber}
+              />
+            ))}{" "}
+        </ProductGridContainer>
       </div>
     );
   }
 }
 
-export default SignIn;
+const FilterDropDown = ({
+  name,
+  attrName,
+  array,
+  handler,
+  isCategory = false,
+  prefix,
+}) => {
+  return (
+    <Dropdown style={{ marginTop: "15px", marginBottom: "20px" }}>
+      {prefix}
+      <Dropdown.Toggle variant="" id="dropdown-basic">
+        {name}
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        {array.map((r) => (
+          <Dropdown.Item
+            key={r}
+            onSelect={(ek, e) =>
+              handler(
+                attrName,
+                isCategory
+                  ? Category[e.target.innerText]
+                  : Number.parseInt(e.target.innerText)
+              )
+            }
+          >
+            {" "}
+            {r}
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+};
+
+export { Search };

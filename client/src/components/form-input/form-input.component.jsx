@@ -15,7 +15,7 @@ const FormInput = ({ handleChange, label, isScrollable, ...props }) => (
       <FormInputContainer onChange={handleChange} {...props} />
     )}
     {label ? (
-      <FormInputLabel className={props.value.length ? "shrink" : ""}>
+      <FormInputLabel className={props.value && props.value.length ? "shrink" : ""}>
         {label}
       </FormInputLabel>
     ) : null}

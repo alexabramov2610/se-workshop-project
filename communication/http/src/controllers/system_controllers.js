@@ -9,10 +9,6 @@ export async function systemInit(req,res) {
     return res.send(result)
 }
 
-export async function isLoggedIn(req, res) {
-    const result = wrapHttp(req, ServiceFacade.isLoggedInUser);
-    return res.send(result)
-}
 
 
 
@@ -20,17 +16,26 @@ export async function isLoggedIn(req, res) {
 
 // get
 
-export async function startNewSession(req,res) {
-    // if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-    //     ServiceFacade.verifyToken(req.cookies['token']).data.result) {
-    //     return res.send(req.cookies['token'])
-    // }
 
-    const token = wrapHttp(req, ServiceFacade.startNewSession);
+
+export async function isLoggedIn(req, res) {
+    const result = wrapHttp(req, ServiceFacade.isLoggedInUser);
+    return res.send(result)
+}
+
+export async function startNewSession(req,res) {
+    let token;
+    if (req.cookies['token'] && req.cookies['token'].length > 0 &&
+        ServiceFacade.verifyToken({ token: req.cookies['token'] }).data.result) {
+        token = req.cookies['token']
+    }
+    else
+        token = wrapHttp(req, ServiceFacade.startNewSession);
+
     res.cookie('token', token, {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7, // 1 week
-        secure: true
+        // secure: true
     });
     return res.send(token)
 }
