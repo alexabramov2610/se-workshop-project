@@ -2,17 +2,17 @@ import {Store, StoreManagement} from "../../../../src/store/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../../../../src/user/internal_api";
 import {
     BagItem,
-    IItem as ItemReq,
-    IProduct as ProductReq,
+    IItem as ItemReq, IPayment,
+    IProduct as ProductReq, IReceipt,
     ProductCatalogNumber,
     ProductInStore,
-    ProductWithQuantity,
+    ProductWithQuantity, Purchase,
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {errorMsg} from "../../../../src/api-int/Error";
 import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
-import {Product} from "../../../../src/trading_system/internal_api";
+import {Product, Receipt} from "../../../../src/trading_system/internal_api";
 import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 import {Res} from 'se-workshop-20-interfaces'
 
@@ -78,9 +78,8 @@ describe("Store Management Unit Tests", () => {
 
     test("verifyStoreOperation success", () => {
         const store: Store = new Store("name", "storeDescription");
-        jest.spyOn(store, "verifyIsStoreManager").mockReturnValue(true);
-        jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(true);
-        jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "verifyPermission").mockReturnValue(true);
 
         const user: StoreOwner = new StoreOwner("name");
         expect(storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY)).toBeTruthy();
@@ -88,8 +87,7 @@ describe("Store Management Unit Tests", () => {
 
     test("verifyStoreOperation failure - store doesn't exist", () => {
         const store: Store = new Store("name", "storeDescription");
-        jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(false);
-        jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(true);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(undefined);
 
         const user: StoreOwner = new StoreOwner("name");
         const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY);
@@ -99,9 +97,8 @@ describe("Store Management Unit Tests", () => {
     });
 
     test("verifyStoreOperation failure - not owner or manager", () => {
-        jest.spyOn(storeManagement, "verifyStoreExists").mockReturnValue(true);
-        jest.spyOn(storeManagement, "verifyStoreOwner").mockReturnValue(false);
-        jest.spyOn(storeManagement, "verifyStoreManager").mockReturnValue(false);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "verifyPermission").mockReturnValue(false);
 
         const user: StoreOwner = new StoreOwner("name");
         const res: Res.BoolResponse = storeManagement.verifyStoreOperation(store.storeName, user, ManagementPermission.MANAGE_INVENTORY);
@@ -556,6 +553,50 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(true);
     });
 
+    test("removeManagerPermissions - failure - verify permission fails", () => {
+        const isSuccessVerify: boolean = true;
+        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
+        const storeManager: StoreManager = new StoreManager("storeManager-mock");
+        const permissionToRemove: ManagementPermission = ManagementPermission.REPLY_USER_QUESTIONS;
+        const permissions: ManagementPermission[] = [permissionToRemove];
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(storeManagement, "verifyPermissions").mockReturnValue(false);
+        jest.spyOn(store, "getStoreOwner").mockReturnValue(storeOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValue(storeManager);
+        jest.spyOn(storeOwner, "isAssignerOfManager").mockReturnValue(true);
+
+
+        const actualRes: Res.BoolResponse = storeManagement.removeManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
+        expect(actualRes.data.result).toBe(false);
+        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
+        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(true);
+    });
+
+
+
+
+    test("removeStoreManager success", () => {
+        const isOperationValid: Res.BoolResponse = {data: {result: true}};
+        const alreadyOwner: StoreOwner = new StoreOwner("name1");
+        const managerToAssign: StoreManager = new StoreManager("name2");
+        alreadyOwner.assignStoreManager(managerToAssign);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(true);
+
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(alreadyOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValueOnce(managerToAssign);
+        jest.spyOn(store, "removeStoreManager").mockReturnValue(isOperationValid);
+
+        const res: Res.BoolResponse = storeManagement.removeStoreManager(store.storeName, managerToAssign, alreadyOwner);
+
+        expect(res.data.result).toBeTruthy();
+        expect(store.removeStoreManager).toBeCalledTimes(1);
+        expect(alreadyOwner.isAssignerOfManager(managerToAssign)).toBe(false);
+    });
+
+
 
     test("addManagerPermissions - Success", () => {
         const isSuccessVerify: boolean = true;
@@ -656,6 +697,28 @@ describe("Store Management Unit Tests", () => {
         expect(storeManager.getPermissions().length).toBeGreaterThan(0);
         expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
     });
+
+    test("addManagerPermissions - failure - verify permissions fails", () => {
+        const isSuccessVerify: boolean = true;
+        const storeOwner: StoreOwner = new StoreOwner("storeOwner-mock");
+        const storeManager: StoreManager = new StoreManager("storeManager-mock");
+        const permissionToRemove: ManagementPermission = ManagementPermission.CLOSE_STORE;
+        const permissions: ManagementPermission[] = [permissionToRemove];
+
+        mockVerifyStoreOperation(isSuccessVerify);
+        jest.spyOn(storeManagement, "findStoreByName").mockReturnValue(store);
+        jest.spyOn(storeManagement, "verifyPermissions").mockReturnValue(false);
+        jest.spyOn(store, "getStoreOwner").mockReturnValue(storeOwner);
+        jest.spyOn(store, "getStoreManager").mockReturnValue(storeManager);
+        jest.spyOn(storeOwner, "isAssignerOfManager").mockReturnValue(true);
+
+
+        const actualRes: Res.BoolResponse = storeManagement.addManagerPermissions(storeOwner, store.storeName, storeManager.name, permissions);
+        expect(actualRes.data.result).toBe(false);
+        expect(storeManager.getPermissions().length).toBeGreaterThan(0);
+        expect(storeManager.getPermissions().includes(permissionToRemove)).toBe(false);
+    });
+
 
 
     test("changeProductName - Success", () => {
@@ -1017,6 +1080,52 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBe(true);
         expect(res.data.products).toMatchObject(productsInStore);
     });
+
+
+    test("viewStorePurchaseHistory - success", () => {
+        const storeName: string = "storename";
+        const user: RegisteredUser = new RegisteredUser("user1", "pw");
+        const store: Store = new Store("store1", "description");
+        const purchase1: Purchase = { userName: "alex", price: 50, item: { id: 1, catalogNumber: 1}, storeName: "what-store"};
+        const purchase2: Purchase = { userName: "alex", price: 50, item: { id: 2, catalogNumber: 1}, storeName: "what-store"};
+        const payment: IPayment = { totalCharged: 100, lastCC4: "1111"};
+        const purchases: Purchase[] = [purchase1, purchase2];
+        const receipt: Receipt = new Receipt(purchases, payment);
+        const iReceipt: IReceipt = { date: receipt.date, purchases: receipt.purchases }
+
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
+        jest.spyOn(store, 'verifyPermission').mockReturnValueOnce(true);
+        jest.spyOn(store, 'getPurchasesHistory').mockReturnValueOnce([receipt]);
+
+        const res: Res.ViewShopPurchasesHistoryResponse = storeManagement.viewStorePurchaseHistory(user, storeName);
+        expect(res.data.result).toBe(true);
+        expect(res.data.receipts).toContainEqual(iReceipt);
+    });
+
+    test("viewStorePurchaseHistory - failure - invalid store", () => {
+        const storeName: string = "storename";
+        const user: RegisteredUser = new RegisteredUser("user1", "pw");
+
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(undefined);
+
+        const res: Res.ViewShopPurchasesHistoryResponse = storeManagement.viewStorePurchaseHistory(user, storeName);
+        expect(res.data.result).toBe(false);
+        expect(res.data.receipts).toHaveLength(0);
+    });
+
+    test("viewStorePurchaseHistory - failure - no permissions", () => {
+        const storeName: string = "storename";
+        const user: RegisteredUser = new RegisteredUser("user1", "pw");
+        const store: Store = new Store("store1", "description");
+
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValueOnce(store);
+        jest.spyOn(store, 'verifyPermission').mockReturnValueOnce(false);
+
+        const res: Res.ViewShopPurchasesHistoryResponse = storeManagement.viewStorePurchaseHistory(user, storeName);
+        expect(res.data.result).toBe(false);
+        expect(res.data.receipts).toHaveLength(0);
+    });
+
 
 
     test("verifyStoreBag - success", () => {

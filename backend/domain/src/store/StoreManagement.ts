@@ -422,15 +422,17 @@ export class StoreManagement {
 
     viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
         const store: Store = this.findStoreByName(storeName);
-        if (!store) return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN)) return {
-            data: {result: false, receipts: []},
-            error: {message: errorMsg.E_PERMISSION}
-        }
-        const ireceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
+        if (!store)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
+        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN))
+            return {
+                data: {result: false, receipts: []},
+                error: {message: errorMsg.E_PERMISSION}
+            }
+        const iReceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
             return {purchases: r.purchases, date: r.date}
         })
-        return {data: {result: true, receipts: ireceipts}}
+        return {data: {result: true, receipts: iReceipts}}
     }
 
     viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
