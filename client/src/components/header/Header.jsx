@@ -43,7 +43,7 @@ export class Header extends React.Component {
                 style={{ textDecoration: "none", color: "black" }}
                 to="/search"
               >
-                Search
+                SEARCH
               </Link>
             </OptionLink>
 
