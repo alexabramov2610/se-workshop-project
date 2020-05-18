@@ -792,6 +792,7 @@ export class StoreManagement {
             duration: discount.duration,
             percentage: discount.percentage,
             products: discount.productsInDiscount,
+            category: discount.category,
             condition: conditions
         }
 
