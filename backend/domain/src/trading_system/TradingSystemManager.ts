@@ -84,6 +84,8 @@ export class TradingSystemManager {
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
+            if (this._userManager.getUserByName(req.body.username).pendingEvents.length > 0)
+                logger.info(`sending ${this._userManager.getUserByName(req.body.username).pendingEvents.length} missing notifications..`)
             this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
                 event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
@@ -98,8 +100,9 @@ export class TradingSystemManager {
         logger.info(`logging out user... `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         const res: Res.BoolResponse = this._userManager.logout(req);
-        if (res.data.result) {
-            this._userManager.addGuestToken(req.token);
+        this._userManager.addGuestToken(req.token);
+        if (user) {
+            logger.info(`removing websocket client... `);
             this._publisher.removeClient(user.name);
             if (user)
                 logger.info(`logged out user: ${user.name}`);

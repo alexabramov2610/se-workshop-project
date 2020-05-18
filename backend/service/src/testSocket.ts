@@ -191,6 +191,8 @@ export function t1 (){
 
     console.log(token);
 
+    logout(token);
+
 
 
 

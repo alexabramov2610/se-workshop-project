@@ -86,11 +86,16 @@ function setOnCloseEvent(func) {
 }
 
 function removeClient(username) {
+    // let x = 0;
     if (LOGGED_IN_CLIENTS.has(username)) {
         const client = LOGGED_IN_CLIENTS.get(username);
         LOGGED_IN_CLIENTS.delete(username);
         client.terminate();
+        console.log("removed client!")
+        // x = 1;
     }
+    // if (x === 0)
+    // console.log("didn't remove client!")
 }
 
 export { sendMessageTo, terminate, setOnCloseEvent, removeClient };
