@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-
+import * as api from "../../utils/api";
 import {
   CartContainer,
   ShoppingIcon,
@@ -10,6 +10,7 @@ import CartDropdown from "../cart-dropdown/cart-dropdown.component";
 const CartIcon = ({ itemCount }) => {
   const [animate, setAnimate] = useState(false);
   const [dropdown, toggleDropDown] = useState(false);
+  const [items, getItems] = useState([]);
   const isMounting = useRef(true);
 
   useEffect(() => {
@@ -26,7 +27,9 @@ const CartIcon = ({ itemCount }) => {
     <React.Fragment>
       <div className={className} onAnimationEnd={() => setAnimate(false)}>
         <CartContainer
-          onClick={() => {
+          onClick={async () => {
+            const data = !dropdown && (await api.viewCart());
+            console.log(data)
             toggleDropDown(!dropdown);
           }}
         >

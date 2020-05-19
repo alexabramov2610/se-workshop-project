@@ -51,19 +51,7 @@ class App extends React.Component {
             });
         }
     }
-    // data: {
-    //     result: boolean;
-    //     cart?: {
-    //         products: {
-    //             storeName: string;
-    //             bagItems: {
-    //     product: IProduct;
-    //     amount: number;
-    //     finalPrice?: number;
-    // }[];
-    //         }
-    //     }
-    // };
+
     onLogout = () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);

@@ -30,7 +30,7 @@ class SignIn extends React.Component {
           this.props.onLogin(userName);
           config.history.push("/");
         } else {
-          alert(data.error);
+          alert(data.error.message);
         }
       });
     } catch (error) {
