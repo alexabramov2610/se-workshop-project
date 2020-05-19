@@ -31,7 +31,7 @@ export interface IProduct extends ProductCatalogNumber {
 }
 
 export interface Cart {
-    products: CartProduct[];
+    products: CartProduct[]
 }
 
 export interface CartProduct {

@@ -99,7 +99,7 @@ interface ViewRUserPurchasesHistoryRes extends Response {
 }
 
 interface ViewCartRes extends BoolResponse {
-  data: { result: boolean; cart?: Cart };
+  data: { result: boolean; cart?: Cart, total?:number};
 }
 
 interface SearchResponse extends Response {
