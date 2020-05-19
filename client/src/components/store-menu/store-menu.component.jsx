@@ -6,24 +6,32 @@ import {
     ShoppingOutlined,
     LockOutlined,
 } from '@ant-design/icons';
+import {StorePageCtx} from "../../pages/store-page/store-page-ctx";
 
 
 const {SubMenu} = Menu; //in case you need a sub menu
 
+const menuStyle = {height: '100%', borderLeft: '1px solid', backgroundColor: "white"};
+
 const StoreMenu = ({onChange}) => {
 
     return (
-        <Menu
-            onClick={(e) => onChange(e)}
-            mode="vertical"
-            style={{height: '100%', borderLeft: '1px solid'}}
-        >
-            <Menu.Item key="1" icon={<AppstoreAddOutlined />}>Manage Products</Menu.Item>
-            <Menu.Item key="2" icon={<PercentageOutlined />}>Manage Discount Policy</Menu.Item>
-            <Menu.Item key="3" icon={<ShoppingOutlined />}>Manage Buying Policy</Menu.Item>
-            <Menu.Item key="4" icon={<LockOutlined />}>Manage Permissions</Menu.Item>
+        <StorePageCtx.Consumer>
+            {
+                props => <Menu
+                    onClick={(e) => onChange(e)}
+                    mode="vertical"
+                    style={menuStyle}
+                    defaultSelectedKeys={["1"]}
+                >
+                    <Menu.Item key="1" icon={<AppstoreAddOutlined/>}>Manage Products</Menu.Item>
+                    <Menu.Item key="2" icon={<PercentageOutlined/>}>Manage Discount Policy</Menu.Item>
+                    <Menu.Item key="3" icon={<ShoppingOutlined/>}>Manage Buying Policy</Menu.Item>
+                    <Menu.Item key="4" icon={<LockOutlined/>}>Manage Permissions</Menu.Item>
+                </Menu>
 
-        </Menu>
+            }
+        </StorePageCtx.Consumer>
     );
 }
 

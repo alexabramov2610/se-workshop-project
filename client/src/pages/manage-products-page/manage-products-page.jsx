@@ -1,6 +1,6 @@
 import React from "react";
 import {ProductsGrid} from "../../components/products-grid/products-grid";
-import {Layout} from "antd";
+import {Divider, Layout} from "antd";
 import {Form, FormDropdown, FormSelect} from "semantic-ui-react";
 import {StoreMenu} from "../../components/store-menu/store-menu.component";
 import {ManageProductsPageCtx} from "./manage-products-page-ctx";
@@ -9,6 +9,8 @@ import {Title, FormContainer} from "./manage-products-page.styles";
 import FormInput from "../../components/form-input/form-input.component";
 import {CustomButton} from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
+import {config} from "../discount-page/discount-page-config";
+import {DiscountPageContainer} from "../discount-page/discount-page.styles";
 
 
 const {Header, Content} = Layout;
@@ -17,7 +19,7 @@ class ManageProductsPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {title: "Manage Products", productName: "", productPrice: "" }
+        this.state = {productName: "", productPrice: "" }
     }
 
     handleSubmit = async (event) => {
@@ -46,7 +48,7 @@ class ManageProductsPage extends React.Component {
                     props =>  <Layout className="site-layout" style={{backgroundColor: "white"}}>
                         <Header style={{backgroundColor: "white", fontSize: "25px"}}>
                             {console.log(props)}
-                            {this.state.title}
+                            <Divider style={{fontSize: "25px"}} orientation={"left"}>Manage Products</Divider>
                         </Header>
                         <Layout>
                             <Content
