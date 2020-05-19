@@ -36,7 +36,7 @@ socketServer.on('connection', (socketClient, req) => {  // usage: /?name=yossi
     if (username) {
         // console.log(`${username} connected`);
         LOGGED_IN_CLIENTS.set(username, socketClient)
-        socketClient.send(`hola ${username}`);
+        socketClient.send(JSON.stringify({id: 1, message: `WELCOME ${username.toUpperCase()}!`, type: 4}));
     }
     socketClient.on(('message'), (data) => {
         socketClient.send(`message back to ${username ? username : ""}`);
