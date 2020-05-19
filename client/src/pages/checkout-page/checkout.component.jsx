@@ -17,10 +17,18 @@ export class CheckoutPage extends React.Component {
   }
   async componentDidMount() {
     const { data } = await api.viewCart();
-    console.log("toatl:", data.data);
-    console.log(mapCartToItems(data.data.cart.products));
+    const total = data.data.total;
+    const items = mapCartToItems(data.data.cart.products);
+    this.setState({ items, total });
   }
-  
+  async componentDidUpdate(preProps) {
+    if (preProps !== this.props) {
+      const { data } = await api.viewCart();
+      const total = data.data.total;
+      const items = mapCartToItems(data.data.cart.products);
+      this.setState({ items, total });
+    }
+  }
   render() {
     return (
       <CheckoutPageContainer>
@@ -41,11 +49,11 @@ export class CheckoutPage extends React.Component {
             <span>Remove</span>
           </HeaderBlockContainer>
         </CheckoutHeaderContainer>
-        {/* {this.state.cartItems &&
-        cartItems.map((cartItem) => (
-          <CheckoutItem key={cartItem.id} cartItem={cartItem} />
-        ))} */}
-        {/* <TotalContainer>TOTAL: ${this.state.total}</TotalContainer> */}
+        {this.state.items &&
+          this.state.items.map((cartItem) => (
+            <CheckoutItem key={cartItem.id} cartItem={cartItem} />
+          ))}
+        <TotalContainer>TOTAL: ₪ {this.state.total}</TotalContainer>
         <WarningContainer>
           *Please use the following test credit card for payments*
           <br />

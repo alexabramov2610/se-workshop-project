@@ -1,5 +1,6 @@
 import React from "react";
-
+import * as api from "../../utils/api";
+import { CartCtx } from "../../contexts/cart-context";
 import {
   CheckoutItemContainer,
   ImageContainer,
@@ -7,6 +8,18 @@ import {
   QuantityContainer,
   RemoveButtonContainer,
 } from "./checkout-item.styles";
+
+const removeItemH = async (item, cartCountUpdater) => {
+  const req = {
+    body: {
+      storeName: item.store,
+      catalogNumber: item.cn,
+      amount: item.quantity,
+    },
+  };
+  await api.removeItemFromCart(req);
+  await cartCountUpdater();
+};
 
 export const CheckoutItem = ({
   cartItem,
@@ -22,16 +35,18 @@ export const CheckoutItem = ({
       </ImageContainer>
       <TextContainer>{name}</TextContainer>
       <QuantityContainer>
-        <div onClick={() => removeItem(cartItem)}>&#10094;</div>
         <span>{quantity}</span>
-        <div onClick={() => addItemToCart(cartItem)}>&#10095;</div>
       </QuantityContainer>
       <TextContainer>{price} &#8362;</TextContainer>
-      <RemoveButtonContainer onClick={() => clearItem(cartItem)}>
-        &#10005;
-      </RemoveButtonContainer>
+      <CartCtx.Consumer>
+        {(value) => (
+          <RemoveButtonContainer
+            onClick={() => removeItemH(cartItem, value.cartCountUpdater)}
+          >
+            &#10005;
+          </RemoveButtonContainer>
+        )}
+      </CartCtx.Consumer>
     </CheckoutItemContainer>
   );
 };
-
-
