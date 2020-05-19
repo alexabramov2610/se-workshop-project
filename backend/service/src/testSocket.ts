@@ -107,18 +107,12 @@ export function t1 (){
     const prod3: Product = new Product("אזני המן", 3, 300, ProductCategory.CLOTHING);
     const prod4: Product = new Product("שערות סבתא", 4, 400, ProductCategory.HOBBIES);
 
-    const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
-    const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
-    const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
-    const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
-
-    const item5: IItem = {id: 5, catalogNumber: prod1.catalogNumber};
-    const item6: IItem = {id: 6, catalogNumber: prod2.catalogNumber};
-    const item7: IItem = {id: 7, catalogNumber: prod3.catalogNumber};
-    const item8: IItem = {id: 8, catalogNumber: prod4.catalogNumber};
-
     const products: Product[] = [prod1, prod2, prod3, prod4];
-    const items: IItem[] = [item1, item2, item3, item4, item5, item6, item7, item8];
+    let items = [];
+    for (let i = 0; i < 20; i++) {
+        const item: IItem = {id: i+1, catalogNumber: products[i%products.length].catalogNumber};
+        items.push(item);
+    }
 
     addNewProducts(storeName, products, token, true);
     addNewItems(storeName, items, token, true);
@@ -502,9 +496,9 @@ export function t4 (){
 /** 3 users buy from store: Best-Store! */
 export function t5 (){
     // prepare
-    const buyer1: RegisteredUser = new RegisteredUser("ilovebuying", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("ilovespending", "buyer1password");
-    const buyer3: RegisteredUser = new RegisteredUser("ilovemoney", "buyer1password");
+    const buyer1: RegisteredUser = new RegisteredUser("בזבזן גדול", "buyer1password");
+    const buyer2: RegisteredUser = new RegisteredUser("אוהב לקנות הכל", "buyer1password");
+    const buyer3: RegisteredUser = new RegisteredUser("love-spending", "buyer1password");
 
     const prod1: Product = new Product("במבה אסם", 1, 100, ProductCategory.GENERAL);
     const prod2: Product = new Product("ביסלי גריל", 2, 200, ProductCategory.ELECTRONICS);
