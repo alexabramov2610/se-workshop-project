@@ -1,31 +1,38 @@
 import React, {useEffect, useState} from "react";
 import {StorePageCtx} from "./store-page-ctx";
-import {viewStoreInfo} from "../../utils/api";
 import {StorePage} from "./store-page";
-import {Spin} from "antd";
 import {useParams} from "react-router-dom";
 import Spinner from "../../components/spinner/spinner";
 import * as api from "../../utils/api";
-import * as utils from "../discount-page/discount-page-utils";
 
 
 const StorePageContainer = ({isLoggedIn}) => {
 
     const {storename} = useParams();
-    const [storeData, setStoreData] = useState(undefined);
+    const [storeInfo, setStoreInfo] = useState(undefined);
+    const [permissions, setPermissions] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            const storeInfo = await viewStoreInfo(storename);
-            setStoreData(storeInfo.data.data.info);
+            const storeInfo = await api.viewStoreInfo(storename);
+            const permissionsRes = await api.getPermissions(storename);
+            setStoreInfo(storeInfo.data.data.info);
+
+            if (permissionsRes.data.data.result)
+                setPermissions(permissionsRes.data.data.permissions);
         };
 
         fetchData();
 
     }, []);
 
-    return storeData
-        ? <StorePageCtx.Provider value={storeData}>
+    let providerState = {
+        info: storeInfo,
+        permissions: permissions
+    }
+
+    return storeInfo && permissions
+        ? <StorePageCtx.Provider value={providerState}>
             <StorePage isLoggedIn={isLoggedIn}/>
         </StorePageCtx.Provider>
         : <Spinner message={"Loading your store"}/>

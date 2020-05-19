@@ -10,7 +10,7 @@ const DiscountPage = ({screen}) => {
     return (
         <DiscountWrapper>
             <DiscountPageContainer>
-                <Divider style={{fontSize: "20px"}} orientation={"left"}>{config.titles[screen]}</Divider>
+                <Divider style={{fontSize: "25px"}} orientation={"left"}>{config.titles[screen]}</Divider>
                 <DiscountPageBody>
                     {config.screens[screen]}
                 </DiscountPageBody>

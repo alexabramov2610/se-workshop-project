@@ -25,7 +25,7 @@ const ManageProductsContainer = ({isLoggedIn}) => {
         ? <ManageProductsPageCtx.Provider value={storeData}>
             <ManageProductsPage isLoggedIn={isLoggedIn}/>
         </ManageProductsPageCtx.Provider>
-        : <Spinner message={"Loading your store"}/>
+        : <Spinner message={"Loading your products"}/>
 }
 
 export default ManageProductsContainer;
