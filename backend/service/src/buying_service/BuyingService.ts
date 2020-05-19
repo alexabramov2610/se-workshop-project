@@ -18,8 +18,8 @@ export const purchase = (req: Req.PurchaseRequest): Res.PurchaseResponse => {
     const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
     if (!calcRes)
         return calcRes
-    if(req.body.total && req.body.total !== calcRes.data.price){
-        return {data: calcRes.data, error: {message: "Total price has been changed.", options: {newPrice: calcRes.data.price}}}
+    if(req.body.total && +req.body.total !== calcRes.data.price){
+        return {data: {result: false}, error: {message: "Total price has been changed.", options: {oldPrice: req.body.total, newPrice: calcRes.data.price}}}
     }
     const isPaid: Res.PaymentResponse = ts.pay({
         body: {price: calcRes.data.price, payment: req.body.payment},

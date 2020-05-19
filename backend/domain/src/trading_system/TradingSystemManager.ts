@@ -530,7 +530,7 @@ export class TradingSystemManager {
     }
 
     verifyUserLoggedIn(req: Req.Request): Res.BoolResponse {
-        logger.info(`checking if user is logged in`)
+        logger.debug(`checking if user is logged in`)
         return this._userManager.getLoggedInUserByToken(req.token) ? {data: {result: true}} : {
             data: {result: false},
             error: {message: errorMsg.E_NOT_LOGGED_IN}
@@ -538,7 +538,7 @@ export class TradingSystemManager {
     }
 
     verifyTokenExists(req: Req.Request): Res.BoolResponse {
-        logger.info(`checking if token exists`)
+        logger.debug(`checking if token exists`)
         return this._userManager.getUserByToken(req.token) ? {data: {result: true}} : {
             data: {result: false},
             error: {message: errorMsg.E_BAD_TOKEN}
@@ -546,17 +546,17 @@ export class TradingSystemManager {
     }
 
     verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
-        logger.info(`checking if products on stock`)
+        logger.debug(`checking if products on stock`)
         return this._storeManager.verifyProductOnStock(req);
     }
 
     verifyProducts(req: Req.VerifyProducts) {
-        logger.info(`verifying products`)
+        logger.debug(`verifying products`)
         return this._storeManager.verifyProducts(req);
     }
 
     verifyStorePermission(req: Req.VerifyStorePermission): Res.BoolResponse {
-        logger.info(`verifying store permissions`)
+        logger.debug(`verifying store permissions`)
         const user = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }

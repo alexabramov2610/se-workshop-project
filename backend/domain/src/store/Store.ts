@@ -401,14 +401,16 @@ export class Store {
     }
 
     getProductByCatalogNumber(catalogNumber: number): Product {
-        logger.debug(`searching product with catalog number: ${catalogNumber}`);
+        logger.info(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this._products.keys()) {
+            logger.debug(` product: ${JSON.stringify(product)}`);
+            logger.debug(`${product.catalogNumber} === ${catalogNumber}`+ (product.catalogNumber === catalogNumber))
             if (product.catalogNumber === catalogNumber) {
                 logger.debug(`found product: ${JSON.stringify(product)}`);
                 return product;
             }
         }
-        logger.debug(`could not find product with catalog number: ${catalogNumber}`);
+        logger.warn(`could not find product with catalog number: ${catalogNumber}`);
         return undefined;
     }
 
