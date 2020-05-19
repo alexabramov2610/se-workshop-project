@@ -1,7 +1,8 @@
 import React from "react";
 import * as api from "../../utils/api";
 import { CheckoutItem } from "../../components/checkout-item/checkout-item.component";
-
+import { PayForm } from "../../components/pay-form/pay-form";
+import { Divider } from "semantic-ui-react";
 import {
   CheckoutPageContainer,
   CheckoutHeaderContainer,
@@ -31,35 +32,34 @@ export class CheckoutPage extends React.Component {
   }
   render() {
     return (
-      <CheckoutPageContainer>
-        <CheckoutHeaderContainer>
-          <HeaderBlockContainer>
-            <span>Product</span>
-          </HeaderBlockContainer>
-          <HeaderBlockContainer>
-            <span>Description</span>
-          </HeaderBlockContainer>
-          <HeaderBlockContainer>
-            <span>Quantity</span>
-          </HeaderBlockContainer>
-          <HeaderBlockContainer>
-            <span>Price</span>
-          </HeaderBlockContainer>
-          <HeaderBlockContainer>
-            <span>Remove</span>
-          </HeaderBlockContainer>
-        </CheckoutHeaderContainer>
-        {this.state.items &&
-          this.state.items.map((cartItem) => (
-            <CheckoutItem key={cartItem.id} cartItem={cartItem} />
-          ))}
+      <div>
+        <CheckoutPageContainer>
+          <CheckoutHeaderContainer>
+            <HeaderBlockContainer>
+              <span>Product</span>
+            </HeaderBlockContainer>
+            <HeaderBlockContainer>
+              <span>Description</span>
+            </HeaderBlockContainer>
+            <HeaderBlockContainer>
+              <span>Quantity</span>
+            </HeaderBlockContainer>
+            <HeaderBlockContainer>
+              <span>Price</span>
+            </HeaderBlockContainer>
+            <HeaderBlockContainer>
+              <span>Remove</span>
+            </HeaderBlockContainer>
+          </CheckoutHeaderContainer>
+          {this.state.items &&
+            this.state.items.map((cartItem) => (
+              <CheckoutItem key={cartItem.id} cartItem={cartItem} />
+            ))}
+        </CheckoutPageContainer>
+        <Divider style={{ width: "55%", margin: "auto",marginTop:'50px' }} />
         <TotalContainer>TOTAL: ₪ {this.state.total}</TotalContainer>
-        <WarningContainer>
-          *Please use the following test credit card for payments*
-          <br />
-          4242 4242 4242 4242 - Exp: 01/20 - CVV: 123
-        </WarningContainer>
-      </CheckoutPageContainer>
+        <PayForm />
+      </div>
     );
   }
 }

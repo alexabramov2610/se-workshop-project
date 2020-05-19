@@ -1,9 +1,10 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const CheckoutPageContainer = styled.div`
   width: 55%;
-  min-height: 90vh;
   display: flex;
+  max-height: 50vh;
+  overflow-y: auto;
   flex-direction: column;
   align-items: center;
   margin: 50px auto 0;
@@ -33,8 +34,10 @@ export const HeaderBlockContainer = styled.div`
 `;
 
 export const TotalContainer = styled.div`
-  margin-top: 30px;
-  margin-left: auto;
+  width: 55%;
+  margin: auto;
+  margin-bottom: 40px;
+  margin-top: 40px;
   font-size: 36px;
 `;
 
