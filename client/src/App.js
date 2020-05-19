@@ -30,30 +30,43 @@ class App extends React.Component {
         }
         this.onLogin = this.onLogin.bind(this);
         this.handleInit = this.handleInit.bind(this);
+        this.cartCountUpdater = this.cartCountUpdater.bind(this);
     }
 
-    onLogin = (username) => {
+    onLogin = async (username) => {
         console.log(username)
         this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
-
-
+        await this.cartCountUpdater();
     }
+
     addToCart = async (req) => {
         const { data } = await api.addToCart(req);
         const isAdded = data.data.result;
         if (isAdded) {
-            const data = await api.viewCart()
-            await this.setState(prevState => {
-                return {
-                    cartItemsCounter: prevState.cartItemsCounter + 1
-                }
-            });
+            await this.cartCountUpdater();
+            // const data = await api.viewCart()
+            // await this.setState(prevState => {
+            //     return {
+            //         cartItemsCounter: data.data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0)
+            //     }
+            // });
         }
     }
 
-    onLogout = () => {
+    cartCountUpdater = async () =>
+        await api.viewCart().then( ({ data }) => {
+            console.log("count: " + data.data.cart.products.length )
+            this.setState(prevState => {
+                return {
+                    cartItemsCounter : data.data.result ? data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0) : prevState.cartItemsCounter
+                }
+            });
+        });
+
+    onLogout = async () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
+        await this.cartCountUpdater();
     }
 
     handleInit({ token, status, isSystemUp }) {
@@ -65,6 +78,7 @@ class App extends React.Component {
 
     async componentDidMount() {
         api.init(this.handleInit);
+        await this.cartCountUpdater();
     }
 
     render() {

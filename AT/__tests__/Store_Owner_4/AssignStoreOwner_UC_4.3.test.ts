@@ -1,5 +1,7 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials, User } from "../../src/test_env/types";
+import * as utils from "../../utils"
+
 
 describe("Add Remove Edit Products, UC: 3.2", () => {
   let _serviceBridge: Bridge;
@@ -25,6 +27,9 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge.register(_newOwnerCreds);
   });
 
+  afterAll(() => {
+    utils.terminateSocket();
+ });
   test("Add Store Owner - Happy Path: valid store ,not already assigned", () => {
     _serviceBridge.login(_driver.getLoginDefaults());
     _serviceBridge.createStore(_storeInformation);

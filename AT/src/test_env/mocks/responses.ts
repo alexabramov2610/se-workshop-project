@@ -158,12 +158,13 @@ const SearchResponse: ISearchResponse = {
     data: {
         products: [
             {
-                storeName: "store-name1",
+                storeName: "store-name1",storeRating:5,
                 product: {
                     name: "p-name1",
                     category: ProductCategory.ELECTRONICS,
                     catalogNumber: 123,
                     price: 20,
+                    
                 }
             },
         ],

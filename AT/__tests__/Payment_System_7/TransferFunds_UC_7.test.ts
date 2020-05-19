@@ -3,6 +3,7 @@ import {
     Driver,
 } from "../../";
 import {PayRequest} from "se-workshop-20-interfaces/dist/src/Request";
+import * as utils from "../../utils"
 
 
 describe("Guest buy items, UC: 2.8", () => {
@@ -25,6 +26,11 @@ describe("Guest buy items, UC: 2.8", () => {
             }
         }
 
+    });
+
+
+    afterAll(() => {
+        utils.terminateSocket();
     });
 
     test("Valid request", () => {
