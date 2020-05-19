@@ -170,6 +170,7 @@ interface PurchaseRequest extends Request {
             city: string,
             country: string,
         }
+        total?: number
     }
 }
 

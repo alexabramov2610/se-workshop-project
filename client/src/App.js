@@ -14,6 +14,7 @@ import { AdminInit } from './pages/admin-init/admin-init.component';
 import { CreateStorePage } from './pages/create-store/create-store-page.component'
 import { SearchPage } from './pages/search-page/serch-page'
 import { PersonalInfo } from './pages/personal-info-page/personal-info'
+import ManageProductsContainer from './pages/manage-products-page/manage-products-page-container'
 import { CartCtx } from './contexts/cart-context'
 import { history } from './utils/config'
 import * as config from './utils/config'
@@ -94,7 +95,7 @@ class App extends React.Component {
                         <Route path="/store/manageDiscountsPolicy/:storename" component={DiscountPageContainer} />
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
-                        {/*<Route path="/store/manageProducts/:storename" component={} />*/}
+                        <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
