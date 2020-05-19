@@ -15,9 +15,15 @@ export const StoreFormContainer = styled.div`
   margin: auto;
 `;
 
-export const SignUpTitle = styled.h2`
+export const Title = styled.h2`
   margin: 10px 0;
 `;
 export const CreateStoreTitle = styled.h2`
   margin: 10px 0;
+`;
+export const StoresGridContainer = styled.div`
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 5px;
 `;
