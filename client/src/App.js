@@ -43,7 +43,6 @@ class App extends React.Component {
         const isAdded = data.data.result;
         if (isAdded) {
             const data = await api.viewCart()
-            console.log('cart requests returns:', data, 'req is: {body:{}}')
             await this.setState(prevState => {
                 return {
                     cartItemsCounter: prevState.cartItemsCounter + 1
