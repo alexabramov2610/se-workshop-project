@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import CartItem from "../cart-item/cart-item.component";
 import {
   CartDropdownContainer,
@@ -36,14 +37,9 @@ const CartDropdown = ({ history, isVisible, items, setItems, hideMe }) => {
             <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
           )}
         </CartItemsContainer>
-        <CartDropdownButton
-          onClick={() => {
-            history.push("/checkout");
-            console.log("droppedown");
-          }}
-        >
-          GO TO CHECKOUT
-        </CartDropdownButton>
+        <Link to="/checkout">
+          <CartDropdownButton>GO TO CHECKOUT</CartDropdownButton>
+        </Link>
       </CartDropdownContainer>
     </OutsideAlerter>
   ) : null;
