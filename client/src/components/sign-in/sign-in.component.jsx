@@ -8,6 +8,7 @@ import {
   SignInTitle,
   ButtonsBarContainer,
 } from "./sign-in.styles";
+import * as wssClient from "../../utils/wss.client";
 
 class SignIn extends React.Component {
   constructor(props) {
@@ -25,6 +26,7 @@ class SignIn extends React.Component {
     const { userName, password } = this.state;
 
     try {
+      await wssClient.init(userName);
       login(userName, password).then(({ data }) => {
         if (!data.error) {
           this.props.onLogin(userName);

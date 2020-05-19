@@ -38,7 +38,8 @@ async function createStore(storeName, description) {
 }
 
 function startConnection(cb) {
-    openSocket("ws://localhost:8000/?name=alex")
+    console.log("STARTING CONNECTION");
+    openSocket("wss://localhost:8000/?name=alex")
 }
 
 async function login(username, password) {

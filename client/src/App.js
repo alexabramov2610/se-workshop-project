@@ -21,6 +21,10 @@ import * as config from './utils/config'
 import DiscountPageContainer from "./pages/discount-page/discount-page-container";
 import StorePageContainer from "./pages/store-page/store-page-container";
 import { CheckoutPage } from './pages/checkout-page/checkout.component'
+import * as wssClient from "./utils/wss.client";
+
+
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -35,8 +39,7 @@ class App extends React.Component {
     }
 
     onLogin = async (username) => {
-        console.log(username)
-        this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
+        this.setState({isLoggedIn: true, systemIsClose: false}, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }
 

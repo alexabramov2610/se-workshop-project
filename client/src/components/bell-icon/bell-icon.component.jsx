@@ -1,98 +1,97 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, {useRef, useState, useEffect} from "react";
+import * as wssClient from "../../utils/wss.client";
 
 import {
-  BellContainer,
-  BellIconContainer,
-  NotificationCountContainer,
+    BellContainer,
+    BellIconContainer,
+    NotificationCountContainer,
 } from "./bell-icon.styles.jsx";
 import NotificationDropdown from "../notifications-dropdown/notification-dropdown.component";
 import {
-  NotificationContainer,
-  NotificationManager,
+    NotificationContainer,
+    NotificationManager,
 } from "react-notifications";
-import { startConnection } from "../../utils";
 
 const types = {
-  INFO: "info",
-  WARNING: "warning",
-  ERROR: "error",
-  SUCCESS: "success",
+    INFO: 1,
+    WARNING: 2,
+    ERROR: 3,
+    SUCCESS: 4,
 };
 
-const BellIcon = ({ isLoggedIn }) => {
-  const [animate, setAnimate] = useState(false);
-  const [dropdownVisible, toggleDropdown] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const isMounting = useRef(true);
+const BellIcon = () => {
+    const [animate, setAnimate] = useState(false);
+    const [dropdownVisible, toggleDropdown] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const isMounting = useRef(true);
 
-  useEffect(() => {
-    isLoggedIn && startConnection((message) => handleNotification(message));
-  }, []);
+    useEffect(() => {
+        wssClient.setOnMessage(handleNotification);
+    }, []);
 
-  useEffect(() => {
-    if (isMounting.current) {
-      isMounting.current = false;
-    } else {
-      setAnimate(true);
-    }
-  }, [notifications]);
+    useEffect(() => {
+        if (isMounting.current) {
+            isMounting.current = false;
+        } else {
+            setAnimate(true);
+        }
+    }, [notifications]);
 
-  const notifyUser = (payload) => {
-    switch (payload.type) {
-      case types.INFO: {
-        NotificationManager.info(payload.message);
-        break;
-      }
-      case types.ERROR: {
-        NotificationManager.error(payload.message);
-        break;
-      }
-      case types.WARNING: {
-        NotificationManager.warning(payload.message);
-        break;
-      }
-      case types.SUCCESS: {
-        NotificationManager.success(payload.message);
-        break;
-      }
-      default:
-        throw new Error("Unknown notification");
-    }
-  };
+    const notifyUser = (payload) => {
+        switch (payload.type) {
+            case types.INFO: {
+                NotificationManager.info(payload.message);
+                break;
+            }
+            case types.ERROR: {
+                NotificationManager.error(payload.message);
+                break;
+            }
+            case types.WARNING: {
+                NotificationManager.warning(payload.message);
+                break;
+            }
+            case types.SUCCESS: {
+                NotificationManager.success(payload.message);
+                break;
+            }
+            default:
+                throw new Error("Unknown notification");
+        }
+    };
 
-  const handleNotification = (payload) => {
-    setNotifications((prevNotifications) => [...prevNotifications, payload]);
-    notifyUser(payload);
-  };
+    const handleNotification = (res) => {
+        const payload = JSON.parse(res.data);
+        setNotifications((prevNotifications) => [...prevNotifications, payload]);
+        notifyUser(payload);
+    };
 
-  const removeNotification = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.filter((n) => n.id !== id)
+    const removeNotification = (id) => {
+        setNotifications((prevNotifications) =>
+            prevNotifications.filter((n) => n.id !== id)
+        );
+    };
+
+    const className = `animated hvr-underline-from-center ${animate ? "shake" : ""}`;
+    return (
+        <React.Fragment>
+            <div className={className} onAnimationEnd={() => setAnimate(false)}>
+                <BellContainer onClick={() => toggleDropdown(!dropdownVisible)}>
+                    <BellIconContainer/>
+                    <NotificationCountContainer>
+                        {notifications.length}
+                    </NotificationCountContainer>
+                </BellContainer>
+            </div>
+            <NotificationDropdown
+                isVisible={dropdownVisible}
+                notifications={notifications}
+                clearNotifications={() => setNotifications([])}
+                removeNotification={removeNotification}
+            />
+            <NotificationContainer/>
+        </React.Fragment>
     );
-  };
-
-  const className = `animated hvr-underline-from-center ${
-    animate ? "shake" : ""
-  }`;
-  return (
-    <React.Fragment>
-      <div className={className} onAnimationEnd={() => setAnimate(false)}>
-        <BellContainer onClick={() => toggleDropdown(!dropdownVisible)}>
-          <BellIconContainer />
-          <NotificationCountContainer>
-            {notifications.length}
-          </NotificationCountContainer>
-        </BellContainer>
-      </div>
-      <NotificationDropdown
-        isVisible={dropdownVisible}
-        notifications={notifications}
-        clearNotifications={() => setNotifications([])}
-        removeNotification={removeNotification}
-      />
-      <NotificationContainer />
-    </React.Fragment>
-  );
 };
 
 export default BellIcon;
