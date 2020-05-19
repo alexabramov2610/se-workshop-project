@@ -19,7 +19,7 @@ const Row = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-const basicStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-start", width: "14.2%"};
+const basicStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-start", width: "14.2%", alignItems: "center"};
 
 function TableRow({index, discount}) {
     const currDiscount = discount.discount;
@@ -44,14 +44,12 @@ function TableRow({index, discount}) {
 
     const getActions = (props) => {
         return (
-            <span style={basicStyle}>
-                <Space>
-                    <Popconfirm title="Are you sure delete this discount from the policy?"
-                                onConfirm={() => handleRemove(props)}><a
-                        href="#">delete</a></Popconfirm>
-                    <Button type="link" onClick={() => handleEditMode(props)}>edit</Button>
-                </Space>
-            </span>
+            <Space>
+                <Popconfirm title="Are you sure delete this discount from the policy?"
+                            onConfirm={() => handleRemove(props)}><a
+                    href="#">delete</a></Popconfirm>
+                <Button type="link" onClick={() => handleEditMode(props)}>edit</Button>
+            </Space>
         );
 
     }
@@ -67,7 +65,7 @@ function TableRow({index, discount}) {
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                             >
-                                {getActions(props)}
+                                <span style={basicStyle}>{getActions(props)}</span>
                                 <span style={basicStyle}>{parsedSubject}</span>
                                 <span style={basicStyle}>{products}</span>
                                 <span style={basicStyle}>{currDiscount.percentage}%</span>
@@ -78,7 +76,8 @@ function TableRow({index, discount}) {
                                 </span>
                                 <span style={basicStyle}>{coupon}</span>
                                 <SelectableDropdownComponent inputs={["AND", "OR", "XOR"]}
-                                                             initialValue={discount.operator} discountKey={discount.key}/>
+                                                             initialValue={discount.operator}
+                                                             discountKey={discount.key}/>
                             </Row>
                     }
                 </DiscountPageCtx.Consumer>
