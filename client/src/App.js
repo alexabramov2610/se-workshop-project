@@ -48,21 +48,16 @@ class App extends React.Component {
         const isAdded = data.data.result;
         if (isAdded) {
             await this.cartCountUpdater();
-            // const data = await api.viewCart()
-            // await this.setState(prevState => {
-            //     return {
-            //         cartItemsCounter: data.data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0)
-            //     }
-            // });
         }
     }
 
     cartCountUpdater = async () =>
         await api.viewCart().then(({ data }) => {
-
             this.setState(prevState => {
                 return {
-                    cartItemsCounter: data.data.result ? data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0) : prevState.cartItemsCounter
+                    cartItemsCounter: data.data.result ?
+                        data.data.cart.products.reduce((acc, product) => acc + product.bagItems.reduce((acc, bag) => acc + bag.amount, 0), 0) :
+                        prevState.cartItemsCounter
                 }
             });
         });
@@ -101,7 +96,7 @@ class App extends React.Component {
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
-                        <Route exact path="/checkout" component={CheckoutPage} />
+                        <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
                     </Switch>
                 </Router>

@@ -1,5 +1,6 @@
 import React from "react";
 import * as api from "../../utils/api";
+import {FiBox} from "react-icons/fi";
 import {
   CartItemContainer,
   ItemDetailsContainer,
@@ -12,7 +13,7 @@ const CartItem = ({ item, clearItemFromCart, setItems }) => {
   const { price, store, name, quantity, cn } = item;
   return (
     <CartItemContainer>
-      <CartItemImage src={""} alt="item" />
+      <FiBox style={{marginRight: "4px", marginTop:"34px", marginBottom: "2px"}}/>
       <ItemDetailsContainer>
         <span>{name}</span>
         <span>{store}</span>

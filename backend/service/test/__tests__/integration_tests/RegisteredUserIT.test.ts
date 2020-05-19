@@ -68,7 +68,7 @@ describe("Registered User Integration Tests", () => {
                     cardDetails: {
                         holderName: "tal",
                         number: "1234-4567-7890-" + lastCC4,
-                        expYear: "2021",
+                        expYear: "21",
                         expMonth: "5",
                         cvv: "400"
                     }, address: "batyam", city: "batya", country: "israel"

@@ -766,10 +766,12 @@ describe("Store Management Unit Tests", () => {
         const purchase2: Purchase = { userName: "alex", price: 50, item: { id: 2, catalogNumber: 1}, storeName: "what-store"};
         const payment: IPayment = { totalCharged: 100, lastCC4: "1111"};
         const purchases: Purchase[] = [purchase1, purchase2];
-        const receipt: Receipt = new Receipt(purchases, payment);
         store.addReceipt(purchases, payment);
 
-        expect(store.getPurchasesHistory()).toContainEqual(receipt);
+        const resReceipt: Receipt[] = store.getPurchasesHistory();
+        expect(resReceipt).toHaveLength(1);
+        expect(resReceipt[0].purchases).toMatchObject(purchases);
+        expect(resReceipt[0].payment).toMatchObject(payment);
     });
 
 

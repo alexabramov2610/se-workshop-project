@@ -1,12 +1,14 @@
 import React from "react";
 import { Form } from "semantic-ui-react";
 import { PayFormContainer } from "./pay-form.styles";
+import { BuySuccess } from "../BuyFeedBack/buyfeedback.component";
 import * as api from "../../utils/api";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
 export class PayForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = { buySucc: false };
   }
 
   handleChange = (event) => {
@@ -14,7 +16,7 @@ export class PayForm extends React.Component {
     console.log(this.state);
     this.setState({ [name]: value });
   };
-  handleSubmit() {
+  async handleSubmit() {
     console.log("hopa");
     const {
       holderName,
@@ -32,25 +34,33 @@ export class PayForm extends React.Component {
     const req = {
       body: {
         payment: {
-          CardDetails: {
+          cardDetails: {
             holderName: holderName,
             number: ccnumber,
             expMonth,
             expYear,
             cvv,
           },
-          adress: street + homeNumber,
+          address: street + homeNumber,
           city,
           country,
         },
         total,
       },
     };
-    api.purchase(req);
+    const { data } = await api.purchase(req);
+    if (data.data.result) {
+      this.setState({ buySucc: true });
+      await this.props.cartCountUpdater();
+    } else {
+      alert("something went wrong");
+    }
   }
 
   render() {
-    return (
+    return this.state.buySucc ? (
+      <BuySuccess />
+    ) : (
       <PayFormContainer>
         <Form>
           <Form.Group>

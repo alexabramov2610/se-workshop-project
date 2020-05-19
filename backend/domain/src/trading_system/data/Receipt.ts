@@ -20,6 +20,11 @@ export class Receipt {
         return this._date;
     }
 
+
+    get payment(): IPayment {
+        return this._payment;
+    }
+
     addPurchase(newPurchase: Purchase): void {
         this._purchases = this._purchases.concat([newPurchase]);
     }
