@@ -45,6 +45,7 @@ export class PaymentSystem {
             logger.info("payment system is not connected");
             return false;
         }
+        logger.info("trying to charge" );
         let isPaid: boolean = false;
         if (this._paymentSys) {
             try {
@@ -80,8 +81,9 @@ export class PaymentSystem {
             return this._paymentSys.validateCreditCard();
         } else {
             const today: Date = new Date();
-            const expOk: boolean = (Number.parseInt(creditCard.expYear, 10) > today.getFullYear() || (parseInt(creditCard.expYear, 10) === today.getFullYear() && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1))
-            return creditCard.holderName.length > 0 && creditCard.number.length > 0 && creditCard.cvv.length > 0 && expOk;
+            const expOk: boolean = (parseInt('20' + creditCard.expYear, 10) > today.getFullYear() ||
+                (parseInt(creditCard.expYear, 10) === today.getFullYear() && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1))
+            return creditCard.holderName && creditCard.holderName.length > 0 && creditCard.number && creditCard.number.length > 0 && creditCard.cvv && creditCard.cvv.length > 0 && expOk;
         }
     }
 

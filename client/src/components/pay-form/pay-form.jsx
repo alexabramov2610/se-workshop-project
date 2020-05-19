@@ -32,7 +32,7 @@ export class PayForm extends React.Component {
     const req = {
       body: {
         payment: {
-          CardDetails: {
+          cardDetails: {
             holderName: holderName,
             number: ccnumber,
             expMonth,
