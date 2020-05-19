@@ -9,6 +9,10 @@ const {Sider, Header, Content} = Layout;
 const titles = ["Our Products", "Your Discount Policy", "Your Buying Policy", "Manage Permissions"];
 const steps = [];
 
+const layoutStyle = {backgroundColor: "white"};
+const headerStyle = {backgroundColor: "white", fontSize: "25px"};
+const contentStyle = {padding: "0px 30px", minHeight: "70vh", backgroundColor: "white",};
+
 class StorePage extends React.Component {
 
     state = {title: titles[0]};
@@ -22,23 +26,16 @@ class StorePage extends React.Component {
         return (
             <StorePageCtx.Consumer>
                 {
-                    props => <Layout className="site-layout" style={{backgroundColor: "white"}}>
-                        <Header style={{backgroundColor: "white", fontSize: "25px"}}>
+                    props => <Layout className="site-layout" style={layoutStyle}>
+                        <Header style={headerStyle}>
                             {this.state.title}
                         </Header>
                         <Layout>
-                            <Content
-                                className="site-layout-background"
-                                style={{
-                                    padding: "0px 30px",
-                                    minHeight: "70vh",
-                                    backgroundColor: "white",
-                                }}
-                            >
+                            <Content className="site-layout-background" style={contentStyle}>
                                 <ProductsGrid storeName={props.storeName}/>
                             </Content>
                             <Sider>
-                                <StoreMenu onChange={this.onChange} />
+                                <StoreMenu onChange={this.onChange}/>
                             </Sider>
                         </Layout>
                     </Layout>
