@@ -7,8 +7,8 @@ import {
   CartItemsContainer,
 } from "./cart-dropdown.styles";
 import { CartCtx } from "../../contexts/cart-context";
-
-const CartDropdown = ({ history, isVisible, items, setItems }) => {
+import { OutsideAlerter } from "../OutSideAlerter/outsider-click-detector";
+const CartDropdown = ({ history, isVisible, items, setItems, hideMe }) => {
   const itemsWithStores =
     items &&
     items.map((p) =>
@@ -25,25 +25,27 @@ const CartDropdown = ({ history, isVisible, items, setItems }) => {
   const cartItmes = [].concat.apply([], itemsWithStores);
 
   return isVisible ? (
-    <CartDropdownContainer>
-      <CartItemsContainer>
-        {cartItmes && cartItmes.length > 0 ? (
-          cartItmes.map((cartItem, index) => (
-            <CartItem key={index} setItems={setItems} item={cartItem} />
-          ))
-        ) : (
-          <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
-        )}
-      </CartItemsContainer>
-      <CartDropdownButton
-        onClick={() => {
-          history.push("/checkout");
-          console.log("droppedown");
-        }}
-      >
-        GO TO CHECKOUT
-      </CartDropdownButton>
-    </CartDropdownContainer>
+    <OutsideAlerter handleOutSideClick={hideMe}>
+      <CartDropdownContainer>
+        <CartItemsContainer>
+          {cartItmes && cartItmes.length > 0 ? (
+            cartItmes.map((cartItem, index) => (
+              <CartItem key={index} setItems={setItems} item={cartItem} />
+            ))
+          ) : (
+            <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
+          )}
+        </CartItemsContainer>
+        <CartDropdownButton
+          onClick={() => {
+            history.push("/checkout");
+            console.log("droppedown");
+          }}
+        >
+          GO TO CHECKOUT
+        </CartDropdownButton>
+      </CartDropdownContainer>
+    </OutsideAlerter>
   ) : null;
 };
 export default CartDropdown;

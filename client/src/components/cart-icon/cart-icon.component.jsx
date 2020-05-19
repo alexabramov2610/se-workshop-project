@@ -48,6 +48,7 @@ const CartIcon = ({ itemCount }) => {
       {dropdown && (
         <CartDropdown
           setItems={(items) => setItems(items)}
+          hideMe={() => toggleDropDown(!dropdown)}
           isVisible={dropdown}
           items={itemss}
         />
