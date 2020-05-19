@@ -182,7 +182,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - success", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "50", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: PaymentSystemMockPaySuccess = new PaymentSystemMockPaySuccess();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -192,7 +192,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - Exception", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "00", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: PaymentSystemMockPayException = new PaymentSystemMockPayException();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -202,7 +202,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - failure - can't connect", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2000", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "00", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const mockDelSystem: RealSystemMockFailure = new RealSystemMockFailure();
         paymentSystem.setPaymentSys(mockDelSystem);
@@ -220,7 +220,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - success - without external", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "50", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const res: boolean = paymentSystem.pay(amount, creditCard);
         expect(res).toBeTruthy();
@@ -228,7 +228,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - failure - without external - invalid credit card", () => {
         const amount: number = 500;
-        const creditCard: CreditCard = { cvv: "", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "", expMonth: "11", expYear: "50", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const res: boolean = paymentSystem.pay(amount, creditCard);
         expect(res).toBe(false);
@@ -236,7 +236,7 @@ describe("External System Unit Tests", () => {
 
     test("PaymentSystem pay - failure - without external - invalid balance", () => {
         const amount: number = 3000;
-        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "2050", holderName: "mock-holder", number:"123" };
+        const creditCard: CreditCard = { cvv: "111", expMonth: "11", expYear: "50", holderName: "mock-holder", number:"123" };
         const paymentSystem: PaymentSystem = new PaymentSystem();
         const res: boolean = paymentSystem.pay(amount, creditCard);
         expect(res).toBe(false);
