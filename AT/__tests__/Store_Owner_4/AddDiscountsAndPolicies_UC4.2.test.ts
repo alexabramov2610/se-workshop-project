@@ -57,7 +57,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         _testEggs = new ProductBuilder().withName("testProduct2").withCatalogNumber(456).withPrice(30).getProduct();
         _testBanana = new ProductBuilder().withName("testProduct3").withCatalogNumber(789).withPrice(2).getProduct();
         _testCola = new ProductBuilder().withName("testProduct4").withCatalogNumber(555).withPrice(50).getProduct();
-        _testGold = new ProductBuilder().withName("testExpensiveProduct").withCatalogNumber(777).withPrice(999999).getProduct();
+        _testGold = new ProductBuilder().withName("testExpensiveProduct").withCategory(ProductCategory.CLOTHING).withCatalogNumber(777).withPrice(99999).getProduct();
 
         _testMilk1 = new ItemBuilder().withId(1).withCatalogNumber(_testMilk.catalogNumber).getItem();
         _testEggs1 = new ItemBuilder().withId(2).withCatalogNumber(_testEggs.catalogNumber).getItem();
@@ -142,6 +142,57 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     const reducedPrice: number = _testMilk.price - (_testMilk.price * _testSimpleDiscount1.percentage / 100);
     expect(totalCharged).toEqual(reducedPrice);
 });
+
+test('simple catagory discount',()=>{
+
+    const storeName=_testStore1.name
+    const startDate=new Date()
+    const categoryDiscount:IDiscount= {
+        startDate,
+        duration:3,
+        products: [],
+        category:ProductCategory.CLOTHING,
+        percentage: 10,
+    }
+    
+    const policy:IDiscountPolicy = {discounts: [{discount: categoryDiscount, operator: Operators.AND}]}
+    const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+                    body: {storeName, policy},
+                    token: '123'
+                }
+    
+    _driver.loginWithDefaults();
+    const makeDiscountRes = _serviceBridge.setDiscountsPolicy(setPolicyReq);
+
+    const _testShoes = new ProductBuilder().withName("Shoes").withCatalogNumber(219).withPrice(50).withCategory(ProductCategory.CLOTHING).getProduct();
+    const _testShoes1 = new ItemBuilder().withId(100).withCatalogNumber(_testShoes.catalogNumber).getItem();
+
+    _serviceBridge.addProductsToStore(_testStore1, [_testShoes]);
+    _serviceBridge.addItemsToStore(_testStore1, [_testShoes1]);
+    _serviceBridge.logout();
+
+    expect(makeDiscountRes.data.result).toBeTruthy()
+    
+
+    const {data, error} = _driver.given.store(_testStore1).products([_testShoes]).makeABuy();
+    expect(data).toBeDefined();
+    expect(data.receipt.purchases.length).toBe(1)
+
+
+    
+    const totalCharged=data.receipt.payment.totalCharged
+
+    const reducedPrice: number = _testShoes.price - (_testShoes.price * categoryDiscount.percentage / 100);
+    expect(totalCharged).toEqual(reducedPrice);
+
+
+
+
+
+
+
+
+})
 
     test(" Buy items with XOR discount(50 on milk or 50 on cola but noth both)",()=>{
         const storeName=_testStore1.name
@@ -367,29 +418,6 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
     })
 
-    // test('buy with simple systemPolicy buying policy',()=>{
-    //     const storeName=_testStore1.name
-    //     const today=new Date().getDay()   
-    //     const simplePolicy1 = {systemPolicy:{notForSellDays:[WeekDays.FRIDAY]}}    //change day
-
-    //     const policy:IPurchasePolicy = {policy:[
-    //         {policy: simplePolicy1, operator: Operators.OR}
-    //     ]}
-    //     const setPolicyReq: Req.SetPurchasePolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
-    //     const makePolicyRes: Res.BoolResponse = _serviceBridge.setPurchasePolicy(setPolicyReq);
-    //     expect(makePolicyRes.data.result).toBeTruthy()
-
-    //     const {data, error} = _driver.given.store(_testStore1).products([_testCola,_testBanana]).makeABuy(1); 
-    //     expect(error).toBeDefined()
-    //     expect(data.result).toBeFalsy()
-
-    // })
-
-    
-
   
 
 
@@ -449,7 +477,6 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
        
     })
 
-    //bug????????????????
     test('buy with Comp XOR buying policy',()=>{
         const storeName=_testStore1.name
         const simplePolicy1 = {productPolicy:{catalogNumber:_testCola.catalogNumber,minAmount: 1, maxAmount: 3}}

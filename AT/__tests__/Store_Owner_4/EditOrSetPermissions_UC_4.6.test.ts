@@ -32,7 +32,6 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
  });
 
   test("store owner logged in valid manager", () => {
-    const tmp=2
     const res = _serviceBridge.grantPermissions(
       _newManagerCredentials,
       _storeInformation,
@@ -47,13 +46,7 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
         storeName: _storeInformation.name,
       },
     });
-    // const filtered = data.permissions.filter(
-    //   (perm) =>
-    //     perm.valueOf() === PERMISSION.CLOSE_STORE ||
-    //     perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
-    // );
 
-  //  expect(filtered.length).toBe(2);
   expect(data.permissions).toContainEqual(PERMISSION.MODIFY_BUYING_METHODS)
   expect(data.permissions).toContainEqual(PERMISSION.CLOSE_STORE)
   });
@@ -76,13 +69,7 @@ describe("Edit or Set Permissions, UC: 4.6", () => {
         storeName: _storeInformation.name,
       },
     });
-    // const filtered = data.permissions.filter(
-    //   (perm) =>
-    //     perm.valueOf() === PERMISSION.CLOSE_STORE ||
-    //     perm.valueOf() === PERMISSION.MODIFY_BUYING_METHODS
-    // );
-
-    // expect(filtered.length).toBe(2);
+ 
 
     expect(data.permissions).toContainEqual(PERMISSION.MODIFY_BUYING_METHODS)
     expect(data.permissions).toContainEqual(PERMISSION.CLOSE_STORE)
