@@ -61,7 +61,10 @@ const search = async (req) => {
     return instance.post(`${baseDomain}/stores/search`, req);
 
 }
+const removeItemFromCart = async (req) => {
+    return instance.post(`${baseDomain}/users/removeProduct`, req);
 
+}
 const getStoreCategories = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getCategories/?storeName=${storeName}`);
 }
@@ -94,4 +97,4 @@ const viewStoreInfo = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getStoreInfo/?storeName=${storeName}`);
 }
 
-export { viewStoreInfo, viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export { removeItemFromCart, viewStoreInfo, viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };

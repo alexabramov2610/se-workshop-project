@@ -16,6 +16,7 @@ import {
   IResponse,
 } from "./mocks/responses";
 import { Res, Req } from "se-workshop-20-interfaces";
+import { Operators } from "se-workshop-20-interfaces/dist/src/Enums";
 
 let real: Partial<Bridge> = Adapter;
 
@@ -110,6 +111,11 @@ const Proxy: Bridge = {
 
   watchCart() {
     return real.watchCart ? real.watchCart() : DummyValues.CartResponse;
+  },
+
+  removeProductFromCart(req: Req.RemoveFromCartRequest){
+    return real.removeProductFromCart? real.removeProductFromCart(req): DummyValues.Response;
+    
   },
 
   // addDiscount(req: Req.AddDiscountRequest): Res.AddDiscountResponse {
@@ -265,7 +271,19 @@ addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse{
 removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse {
   return real.removeProductDiscount ? real.removeProductDiscount(req) : { data: { result: true } }
 
+},
+setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse{
+  return real.setPurchasePolicy ? real.setPurchasePolicy(req) : { data: { result: true } }
+
+},
+viewPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse{
+  return real.viewPurchasePolicy ? real.viewPurchasePolicy(req) : {data:{policy:{policy:[
+    {operator:Operators.OR,policy:{productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}}}
+        ]}}}
 }
+
+
+
 
 
 

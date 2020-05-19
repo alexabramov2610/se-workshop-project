@@ -7,33 +7,43 @@ import {
   CartItemsContainer,
 } from "./cart-dropdown.styles";
 import { CartCtx } from "../../contexts/cart-context";
-const CartDropdown = ({ history, isVisible }) => (
-  <CartCtx.Consumer>
-    {(value) =>
-      isVisible ? (
-        <CartDropdownContainer>
-          <CartItemsContainer>
-            {value && value.cartItems && value.cartItems.length ? (
-              value.cartItems.map((cartItem) => (
-                cartItem
-                // <CartItem key={cartItem.id} item={cartItem} />
-              ))
-            ) : (
-              <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
-            )}
-          </CartItemsContainer>
-          <CartDropdownButton
-            onClick={() => {
-              history.push("/checkout");
-              console.log("droppedown");
-            }}
-          >
-            GO TO CHECKOUT
-          </CartDropdownButton>
-        </CartDropdownContainer>
-      ) : null
-    }
-  </CartCtx.Consumer>
-);
 
+const CartDropdown = ({ history, isVisible, items, setItems }) => {
+  const itemsWithStores =
+    items &&
+    items.map((p) =>
+      p.bagItems.map((bi) => {
+        return {
+          store: p.storeName,
+          name: bi.product._name,
+          price: bi.product._price,
+          cn: bi.product._catalogNumber,
+          quantity: bi.amount,
+        };
+      })
+    );
+  const cartItmes = [].concat.apply([], itemsWithStores);
+
+  return isVisible ? (
+    <CartDropdownContainer>
+      <CartItemsContainer>
+        {cartItmes && cartItmes.length > 0 ? (
+          cartItmes.map((cartItem, index) => (
+            <CartItem key={index} setItems={setItems} item={cartItem} />
+          ))
+        ) : (
+          <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
+        )}
+      </CartItemsContainer>
+      <CartDropdownButton
+        onClick={() => {
+          history.push("/checkout");
+          console.log("droppedown");
+        }}
+      >
+        GO TO CHECKOUT
+      </CartDropdownButton>
+    </CartDropdownContainer>
+  ) : null;
+};
 export default CartDropdown;

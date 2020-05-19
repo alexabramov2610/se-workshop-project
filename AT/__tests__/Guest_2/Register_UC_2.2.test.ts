@@ -1,5 +1,5 @@
 import {Driver, Bridge, Credentials} from '../..';
-import * as utils from "../utils"
+import * as utils from "../../utils"
 
 
 describe("Guest Registration, UC: 2.2", () => {
@@ -14,7 +14,7 @@ describe("Guest Registration, UC: 2.2", () => {
 
     afterAll(() => {
         utils.terminateSocket();
-     });
+    });
 
     test("Valid Details", () => {
         _credentials.userName = "validUsername";

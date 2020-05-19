@@ -31,7 +31,7 @@ class SignUp extends React.Component {
       password: "",
       confirmPassword: "",
     });
-    register(displayName, password);
+    await register(displayName, password);
   };
 
   handleChange = (event) => {

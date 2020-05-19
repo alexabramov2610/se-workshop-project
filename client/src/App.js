@@ -30,43 +30,43 @@ class App extends React.Component {
         }
         this.onLogin = this.onLogin.bind(this);
         this.handleInit = this.handleInit.bind(this);
+        this.cartCountUpdater = this.cartCountUpdater.bind(this);
     }
 
-    onLogin = (username) => {
+    onLogin = async (username) => {
         console.log(username)
         this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
-
-
+        await this.cartCountUpdater();
     }
+
     addToCart = async (req) => {
         const { data } = await api.addToCart(req);
         const isAdded = data.data.result;
         if (isAdded) {
-            const data = await api.viewCart()
-            console.log('cart requests returns:', data, 'req is: {body:{}}')
-            await this.setState(prevState => {
-                return {
-                    cartItemsCounter: prevState.cartItemsCounter + 1
-                }
-            });
+            await this.cartCountUpdater();
+            // const data = await api.viewCart()
+            // await this.setState(prevState => {
+            //     return {
+            //         cartItemsCounter: data.data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0)
+            //     }
+            // });
         }
     }
-    // data: {
-    //     result: boolean;
-    //     cart?: {
-    //         products: {
-    //             storeName: string;
-    //             bagItems: {
-    //     product: IProduct;
-    //     amount: number;
-    //     finalPrice?: number;
-    // }[];
-    //         }
-    //     }
-    // };
-    onLogout = () => {
+
+    cartCountUpdater = async () =>
+        await api.viewCart().then(({ data }) => {
+
+            this.setState(prevState => {
+                return {
+                    cartItemsCounter: data.data.result ? data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0) : prevState.cartItemsCounter
+                }
+            });
+        });
+
+    onLogout = async () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
+        await this.cartCountUpdater();
     }
 
     handleInit({ token, status, isSystemUp }) {
@@ -78,11 +78,12 @@ class App extends React.Component {
 
     async componentDidMount() {
         api.init(this.handleInit);
+        await this.cartCountUpdater();
     }
 
     render() {
         return (!this.state.systemIsClose) ? (
-            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter }} >
+            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
                     <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                     <Switch>
@@ -94,7 +95,7 @@ class App extends React.Component {
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         {/*<Route path="/store/manageProducts/:storename" component={} />*/}
-                        <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />}/>
+                        <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
                     </Switch>

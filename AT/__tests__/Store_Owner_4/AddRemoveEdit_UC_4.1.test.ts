@@ -1,9 +1,11 @@
 import { Bridge, Driver } from "../../";
 import { Store, Credentials } from "../../src/test_env/types";
 import { ProductBuilder } from "../../src/test_env/mocks/builders/product-builder";
+import * as utils from "../../utils"
 
 
-describe("Add Remove Edit Products, UC: 3.2", () => {
+
+describe("Add Remove Edit Products, UC: 4.1", () => {
   let _serviceBridge: Bridge;
   let _storeInformation: Store;
   let _driver: Driver;
@@ -18,6 +20,10 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     _serviceBridge = _driver.getBridge();
     _storeInformation = { name: "some-store" };
   });
+
+  afterAll(() => {
+    utils.terminateSocket();
+ });
 
   test("Add product - Happy Path: add product to new store", () => {
     const { name } = _serviceBridge.createStore(_storeInformation).data;
