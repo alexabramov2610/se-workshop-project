@@ -145,7 +145,7 @@ describe("Guest buy items, UC: 2.8", () => {
                         holderName: "Mr Cat",
                         number: "4242424242424242",
                         expMonth: "12",
-                        expYear: "2008",
+                        expYear: "08",
                         cvv: "123",
                     },
                     address: "St. Cats 123",

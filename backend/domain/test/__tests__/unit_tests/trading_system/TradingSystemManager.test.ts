@@ -1173,7 +1173,7 @@ describe("Store Management Unit Tests", () => {
             prepareMockToPay(true)
             tradingSystemManager = new TradingSystemManager();
             const req: Req.PayRequest = {
-                body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,cvv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+                body: {cardDetails:{holderName: "tal",number: 152, expYear:21, expMonth:5,cvv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
                 token: mockToken
             }
             const res = tradingSystemManager.pay(req)
@@ -1186,7 +1186,7 @@ describe("Store Management Unit Tests", () => {
             prepareMockToPay(false)
             tradingSystemManager = new TradingSystemManager();
             const req: Req.PayRequest = {
-                body: {cardDetails:{holderName: "tal",number: 152, expYear:2021, expMonth:5,cvv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
+                body: {cardDetails:{holderName: "tal",number: 152, expYear:21, expMonth:5,cvv:40},address:"batyam",city:"batya",country:"israel",price: 30 },
                 token: mockToken
             }
             const res = tradingSystemManager.pay(req)

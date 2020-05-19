@@ -111,7 +111,7 @@ export const getPurchaseReq = (token: string): Req.PurchaseRequest =>{
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"

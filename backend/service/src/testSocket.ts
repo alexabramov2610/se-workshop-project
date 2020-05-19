@@ -142,7 +142,7 @@ export function t1 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
@@ -174,7 +174,7 @@ export function t1 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
@@ -234,7 +234,7 @@ export function t2 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
@@ -536,7 +536,7 @@ export function t5 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
@@ -564,7 +564,7 @@ export function t5 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
@@ -590,7 +590,7 @@ export function t5 (){
                 cardDetails: {
                     holderName: "tal",
                     number: "152",
-                    expYear: "2021",
+                    expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
