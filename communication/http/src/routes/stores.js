@@ -4,7 +4,7 @@ import * as StoreController from "../controllers/store_controllers";
 const router = express.Router();
 
 
-router.post("/viewProductInfo", StoreController.viewProductInfo);
+
 router.post("/search", StoreController.search);
 router.post("/purchase", StoreController.purchase);
 router.post("/createStore", StoreController.createStore);
@@ -29,7 +29,7 @@ router.post("/viewUsersContactUsMessages", StoreController.viewUsersContactUsMes
 router.post("/viewStorePurchasesHistory", StoreController.viewStorePurchasesHistory);
 router.post("/setPurchasePolicy", StoreController.setPurchasePolicy);
 
-
+router.get("/viewProductInfo", StoreController.viewProductInfo);// usage: stores/viewProductInfo/?storeName=store&catalogNumber=123
 router.get("/", (req, res) => res.send('Hello World! -> /'));
 router.get("/getStores/", StoreController.getStoresWithLimit);      // usage: stores/getStores/?offset=2&limit=3
 router.get("/getProducts/", StoreController.getAllProductsInStore);      // usage: stores/getProducts/?storeName=shufersal

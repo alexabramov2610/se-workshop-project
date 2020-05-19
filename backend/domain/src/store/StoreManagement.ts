@@ -554,16 +554,16 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const storeOwner: StoreOwner = store.getStoreOwner(username);
         if (storeOwner)
-            return { data: { result: true, permissions: this.getAllPermissions() } };
+            return {data: {result: true, permissions: this.getAllPermissions()}};
         const storeManager: StoreManager = store.getStoreManager(username);
         if (!storeManager)
             return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
-        return { data: {result: true, permissions: storeManager.getPermissions()}}
+        return {data: {result: true, permissions: storeManager.getPermissions()}}
 
     }
 
     getAllPermissions(): ManagementPermission[] {
-        return Object.keys(ManagementPermission).map((key:any) => ManagementPermission[key]);
+        return Object.keys(ManagementPermission).map((key: any) => ManagementPermission[key]);
     }
 
 
@@ -629,8 +629,10 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        if (!store.getProductByCatalogNumber(req.body.catalogNumber))
+        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        if (!product) {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
+        }
         const stockAmount: number = store.getProductQuantity(req.body.catalogNumber)
         if (stockAmount < req.body.amount)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK, options: {available: stockAmount}}};
@@ -644,16 +646,22 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const productsNotExists = [];
         for (const catalogNumber of req.body.productsCatalogNumbers) {
-            if (!store.getProductByCatalogNumber(catalogNumber))
+            if (!store.getProductByCatalogNumber(catalogNumber)) {
+                logger.debug(`product ${catalogNumber} not found`)
+                logger.debug(`products in store ${store.storeName} :` + Array.from(store.products.keys()).map((s) => s.catalogNumber))
                 productsNotExists.push(catalogNumber)
+            }
         }
-        if (productsNotExists.length === 0)
+        if (productsNotExists.length === 0) {
             return {data: {result: true}};
-        else
+        } else {
+            logger.warn(productsNotExists)
             return {
                 data: {result: false},
                 error: {message: errorMsg.E_PROD_DOES_NOT_EXIST, options: {productsNotExists}}
             }
+        }
+
 
     }
 
@@ -738,8 +746,8 @@ export class StoreManagement {
     getStoresInfoOfManagedBy(username: string): StoreInfo[] {
         let stores: StoreInfo[] = [];
         this._stores.forEach(store => {
-            if (store.verifyIsStoreManager(username))
-                stores.push(store.viewStoreInfo().data.info);
+                if (store.verifyIsStoreManager(username))
+                    stores.push(store.viewStoreInfo().data.info);
             }
         )
         return stores;

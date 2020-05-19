@@ -96,8 +96,10 @@ const viewPersonalPurchasesHistory = async (req) => {
 const viewStoreInfo = async (storeName) => {
     return instance.get(`${baseDomain}/stores/getStoreInfo/?storeName=${storeName}`);
 }
-
+const viewProductInfo = async (storeName, catalogNumber) => {
+    return instance.get(`${baseDomain}/stores/viewProductInfo/?storeName=${storeName}&catalogNumber=${catalogNumber}`);
+}
 const purchase = async (req) => {
     return instance.post(`${baseDomain}/stores/purchase/`, req);
 }
-export { purchase, removeItemFromCart, viewStoreInfo, viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
+export {purchase,viewProductInfo, removeItemFromCart, viewStoreInfo, viewPersonalPurchasesHistory, getPersonalInfo, viewCart, addToCart, setDiscountPolicy, getDiscountPolicy, startConnection, login, init, register, logout, getStores, createStore, getStoreProducts, adminInit, search, getStoreCategories };
