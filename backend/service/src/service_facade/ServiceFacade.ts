@@ -311,7 +311,7 @@ export {tradingSystem}
 
 
 /** --------------------------------- testing --------------------------------- */
-import {t1, t2, t3, t4} from "../testSocket";
+import {t1, t2, t3, t4, t5} from "../testSocket";
 export const test1 = () : any => {
     t1();
 }
@@ -324,4 +324,6 @@ export const test3 = () : any => {
 export const test4 = () : any => {
     t4();
 }
-
+export const test5 = () : any => {
+    t5();
+}

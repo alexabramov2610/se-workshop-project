@@ -10,7 +10,7 @@ import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 
 const storeOwnerName: string = "alex";
 const storeOwnerPassword: string = "store-owner-pw";
-const storeName: string = "store-name";
+const storeName: string = "חנות מטורפת";
 const storeDesc: string = "store-Description";
 
 
@@ -23,6 +23,10 @@ let token: string;
 const adminName: string = "admin";
 const adminPassword: string = "admin123123";
 let adminToken: string;
+
+export const getSession = (): string => {
+    return ServiceFacade.startNewSession();
+}
 
 export const getAdminSession = (): string => {
     return adminToken = ServiceFacade.startNewSession();
@@ -98,18 +102,23 @@ export function t1 (){
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
     const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
 
-    const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
+    const prod1: Product = new Product("חתול מעופף", 1, 100, ProductCategory.GENERAL);
+    const prod2: Product = new Product("ביסלי גריל", 2, 200, ProductCategory.ELECTRONICS);
+    const prod3: Product = new Product("אזני המן", 3, 300, ProductCategory.CLOTHING);
+    const prod4: Product = new Product("שערות סבתא", 4, 400, ProductCategory.HOBBIES);
 
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
     const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
     const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
 
+    const item5: IItem = {id: 5, catalogNumber: prod1.catalogNumber};
+    const item6: IItem = {id: 6, catalogNumber: prod2.catalogNumber};
+    const item7: IItem = {id: 7, catalogNumber: prod3.catalogNumber};
+    const item8: IItem = {id: 8, catalogNumber: prod4.catalogNumber};
+
     const products: Product[] = [prod1, prod2, prod3, prod4];
-    const items: IItem[] = [item1, item2, item3, item4];
+    const items: IItem[] = [item1, item2, item3, item4, item5, item6, item7, item8];
 
     addNewProducts(storeName, products, token, true);
     addNewItems(storeName, items, token, true);
@@ -488,4 +497,113 @@ export function t4 (){
     addNewItems(storeName10, items, token, true);
 
     console.log(token)
+}
+
+/** 3 users buy from store: Best-Store! */
+export function t5 (){
+    // prepare
+    const buyer1: RegisteredUser = new RegisteredUser("ilovebuying", "buyer1password");
+    const buyer2: RegisteredUser = new RegisteredUser("ilovespending", "buyer1password");
+    const buyer3: RegisteredUser = new RegisteredUser("ilovemoney", "buyer1password");
+
+    const prod1: Product = new Product("במבה אסם", 1, 100, ProductCategory.GENERAL);
+    const prod2: Product = new Product("ביסלי גריל", 2, 200, ProductCategory.ELECTRONICS);
+    const prod3: Product = new Product("אזני המן", 3, 300, ProductCategory.CLOTHING);
+    const prod4: Product = new Product("שערות סבתא", 4, 400, ProductCategory.HOBBIES);
+
+    const products: Product[] = [prod1, prod2, prod3, prod4];
+
+    token = getSession();
+    registerUser(buyer1.name, buyer1.password, token, false);
+    registerUser(buyer2.name, buyer2.password, token, false);
+    registerUser(buyer3.name, buyer3.password, token, false);
+
+
+    // buyer 1 buys
+    loginUser(buyer1.name, buyer1.password, token, false);
+
+    // save prod1 -X2, prod2 -X1
+    let saveProductToCartReq: Req.SaveToCartRequest = {
+        body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+        token: token
+    }
+    ServiceFacade.saveProductToCart(saveProductToCartReq)
+
+    saveProductToCartReq = {
+        body: {storeName, catalogNumber: products[1].catalogNumber, amount: 1},
+        token: token
+    }
+    ServiceFacade.saveProductToCart(saveProductToCartReq)
+
+    // buy
+    let purchaseReq: Req.PurchaseRequest = {
+        body: {
+            payment: {
+                cardDetails: {
+                    holderName: "tal",
+                    number: "152",
+                    expYear: "2021",
+                    expMonth: "5",
+                    cvv: "40"
+                }, address: "batyam", city: "batya", country: "israel"
+            }
+        }, token: token
+    }
+    ServiceFacade.purchase(purchaseReq);
+
+
+    // buyer 2 buys
+    loginUser(buyer2.name, buyer2.password, token, true);
+    // save prod2 -X1, prod3 -X2
+    ServiceFacade.saveProductToCart(saveProductToCartReq)
+
+    saveProductToCartReq = {
+        body: {storeName, catalogNumber: products[2].catalogNumber, amount: 2},
+        token: token
+    }
+    ServiceFacade.saveProductToCart(saveProductToCartReq)
+
+    // buy
+    purchaseReq = {
+        body: {
+            payment: {
+                cardDetails: {
+                    holderName: "tal",
+                    number: "152",
+                    expYear: "2021",
+                    expMonth: "5",
+                    cvv: "40"
+                }, address: "batyam", city: "batya", country: "israel"
+            }
+        }, token: token
+    }
+    ServiceFacade.purchase(purchaseReq)
+
+
+    // buyer 3 buys
+    loginUser(buyer3.name, buyer3.password, token, true);
+    // save prod4 -X2
+    saveProductToCartReq = {
+        body: {storeName, catalogNumber: products[3].catalogNumber, amount: 2},
+        token: token
+    }
+    ServiceFacade.saveProductToCart(saveProductToCartReq)
+
+    // buy
+    purchaseReq = {
+        body: {
+            payment: {
+                cardDetails: {
+                    holderName: "tal",
+                    number: "152",
+                    expYear: "2021",
+                    expMonth: "5",
+                    cvv: "40"
+                }, address: "batyam", city: "batya", country: "israel"
+            }
+        }, token: token
+    }
+    ServiceFacade.purchase(purchaseReq)
+
+    logout(token);
 }
