@@ -48,7 +48,7 @@ export class CheckoutPage extends React.Component {
               <span>Product</span>
             </HeaderBlockContainer>
             <HeaderBlockContainer>
-              <span>Description</span>
+              <span>Name</span>
             </HeaderBlockContainer>
             <HeaderBlockContainer>
               <span>Quantity</span>

@@ -1,5 +1,6 @@
 import React from "react";
 import * as api from "../../utils/api";
+import {FiBox} from "react-icons/fi";
 import { CartCtx } from "../../contexts/cart-context";
 import {
   CheckoutItemContainer,
@@ -31,7 +32,7 @@ export const CheckoutItem = ({
   return (
     <CheckoutItemContainer>
       <ImageContainer>
-        <img src={imageUrl} alt="item" />
+      <FiBox style={{marginRight: "4px", marginBottom: "2px"}}/>
       </ImageContainer>
       <TextContainer>{name}</TextContainer>
       <QuantityContainer>
