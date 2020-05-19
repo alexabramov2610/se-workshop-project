@@ -39,6 +39,7 @@ export interface Bridge {
     quantity: number
   ): DummyTypes.IResponse;
   watchCart(): Res.ViewCartRes;
+  
   setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   setDiscountToItem(
     store: Store,
@@ -78,6 +79,7 @@ export interface Bridge {
   ): Res.ViewRUserPurchasesHistoryRes;
   purchase(req: Partial<Req.PurchaseRequest>): Res.PurchaseResponse;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Res.BoolResponse;
+  removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
   viewManagerPermissions(
     req: Partial<Req.ViewManagerPermissionRequest>
   ): Res.ViewManagerPermissionResponse;
@@ -87,5 +89,7 @@ export interface Bridge {
   setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
    addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
   removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
+  setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse
+  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse
 
 }

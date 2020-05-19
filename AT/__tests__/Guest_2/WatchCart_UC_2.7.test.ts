@@ -6,8 +6,7 @@ import {
 } from "../../";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
 import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-import * as utils from "../utils"
-
+import * as utils from "../../utils"
 
 
 describe("Guest watch cart, UC: 2.7", () => {
@@ -41,7 +40,7 @@ describe("Guest watch cart, UC: 2.7", () => {
 
     afterAll(() => {
         utils.terminateSocket();
-     });
+    });
 
     test("Non empty cart", () => {
         _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
