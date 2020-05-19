@@ -1,4 +1,4 @@
-export const init = (username) => {
+export const init = async (username) => {
     client = new WebSocket(`wss://localhost:8000/?name=${username}`);
     client.onmessage = onMessageBackup;
 }

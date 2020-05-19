@@ -39,9 +39,6 @@ class App extends React.Component {
     }
 
     onLogin = async (username) => {
-        console.log(username)
-
-        wssClient.init(username);
         this.setState({isLoggedIn: true, systemIsClose: false}, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }

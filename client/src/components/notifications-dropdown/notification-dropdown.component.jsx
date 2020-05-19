@@ -14,17 +14,14 @@ const NotificationDropdown = ({notifications, isVisible, clearNotifications, rem
                     ? (
                         notifications.map((notification) => (
                             <Notification key={notification.id} message={notification.message}
-                                          removeNotification={removeNotification}/>
+                                          removeNotification={() => removeNotification(notification.id)}/>
                         )))
                     : (
                         <EmptyMessageContainer>You don't have notifications yet</EmptyMessageContainer>
                     )}
             </NotificationsContainer>
             <NotificationsDropdownButton
-                onClick={() => {
-                    clearNotifications();
-                }}
-            >
+                onClick={() => clearNotifications()}>
                 Clear
             </NotificationsDropdownButton>
         </NotificationsDropdownContainer> : null

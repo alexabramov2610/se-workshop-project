@@ -19,7 +19,7 @@ const types = {
     SUCCESS: 4,
 };
 
-const BellIcon = ({isLoggedIn}) => {
+const BellIcon = () => {
     const [animate, setAnimate] = useState(false);
     const [dropdownVisible, toggleDropdown] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -61,9 +61,7 @@ const BellIcon = ({isLoggedIn}) => {
     };
 
     const handleNotification = (res) => {
-        console.log(res);
         const payload = JSON.parse(res.data);
-        console.log(payload);
         setNotifications((prevNotifications) => [...prevNotifications, payload]);
         notifyUser(payload);
     };
