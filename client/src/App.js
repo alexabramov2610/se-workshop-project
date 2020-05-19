@@ -20,7 +20,7 @@ import { history } from './utils/config'
 import * as config from './utils/config'
 import DiscountPageContainer from "./pages/discount-page/discount-page-container";
 import StorePageContainer from "./pages/store-page/store-page-container";
-
+import { CheckoutPage } from './pages/checkout-page/checkout.component'
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -98,6 +98,7 @@ class App extends React.Component {
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
+                        <Route exact path="/checkout" component={CheckoutPage} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
                     </Switch>
                 </Router>

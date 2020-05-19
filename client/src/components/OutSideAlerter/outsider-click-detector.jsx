@@ -31,7 +31,8 @@ export class OutsideAlerter extends Component {
    */
   handleClickOutside(event) {
     if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
-      this.props.handleOutSideClick();
+      event.target.getAttribute("id") !== "Capa_1" &&
+        this.props.handleOutSideClick();
     }
   }
 
