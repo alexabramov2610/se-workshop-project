@@ -53,8 +53,6 @@ class App extends React.Component {
 
     cartCountUpdater = async () =>
         await api.viewCart().then(({ data }) => {
-            console.log(JSON.stringify(data.data.cart.products));
-
             this.setState(prevState => {
                 return {
                     cartItemsCounter: data.data.result ?
