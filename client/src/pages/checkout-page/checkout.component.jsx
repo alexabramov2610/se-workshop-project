@@ -18,15 +18,24 @@ export class CheckoutPage extends React.Component {
   }
   async componentDidMount() {
     const { data } = await api.viewCart();
-    const total = data.data.total;
-    const items = mapCartToItems(data.data.cart.products);
+    const total = data.data && data.data.total;
+
+    const items =
+      data.data &&
+      data.data.cart &&
+      data.data.cart.products &&
+      mapCartToItems(data.data.cart.products);
     this.setState({ items, total });
   }
   async componentDidUpdate(preProps) {
     if (preProps !== this.props) {
       const { data } = await api.viewCart();
-      const total = data.data.total;
-      const items = mapCartToItems(data.data.cart.products);
+      const total = data.data && data.data.total;
+      const items =
+        data.data &&
+        data.data.cart &&
+        data.data.cart.products &&
+        mapCartToItems(data.data.cart.products);
       this.setState({ items, total });
     }
   }
@@ -56,7 +65,7 @@ export class CheckoutPage extends React.Component {
               <CheckoutItem key={cartItem.id} cartItem={cartItem} />
             ))}
         </CheckoutPageContainer>
-        <Divider style={{ width: "55%", margin: "auto",marginTop:'50px' }} />
+        <Divider style={{ width: "55%", margin: "auto", marginTop: "50px" }} />
         <TotalContainer>TOTAL: ₪ {this.state.total}</TotalContainer>
         <PayForm />
       </div>

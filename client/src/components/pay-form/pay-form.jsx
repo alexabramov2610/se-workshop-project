@@ -6,7 +6,7 @@ import { CustomButton } from "../../components/custom-button/custom-button.compo
 export class PayForm extends React.Component {
   constructor(props) {
     super(props);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange = (event) => {
@@ -14,7 +14,7 @@ export class PayForm extends React.Component {
     console.log(this.state);
     this.setState({ [name]: value });
   };
-  onSubmit() {
+  handleSubmit() {
     console.log("hopa");
     const {
       holderName,
@@ -123,7 +123,7 @@ export class PayForm extends React.Component {
             />
           </Form.Group>
         </Form>
-        <CustomButton onClick={() => this.onSubmit}>Pay!</CustomButton>
+        <CustomButton onClick={() => this.handleSubmit()}>Pay!</CustomButton>
       </PayFormContainer>
     );
   }
