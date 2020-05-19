@@ -2,26 +2,30 @@ import React from "react";
 import {ProductsGrid} from "../../components/products-grid/products-grid";
 import {Layout} from "antd";
 import {StoreMenu} from "../../components/store-menu/store-menu.component";
-import {ManageProudctsPageCtx} from "./manage-proudcts-page-ctx";
+import {ManageProductsPageCtx} from "./manage-products-page-ctx";
+import {useParams} from "react-router-dom";
 
 
-const {Sider, Header, Content} = Layout;
+const {Header, Content} = Layout;
 const titles = ["Our Products", "Your Discount Policy", "Your Buying Policy", "Manage Permissions"];
 const steps = [];
+
 
 class ManageProductsPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {title= "Manage Products"}
+        this.state = {title: "Manage Products"}
     }
 
     render() {
         return (
-            <ManageProudctsPageCtx.Consumer>
+            <ManageProductsPageCtx.Consumer>
                 {
-                    props => <Layout className="site-layout" style={{backgroundColor: "white"}}>
+
+                    props =>  <Layout className="site-layout" style={{backgroundColor: "white"}}>
                         <Header style={{backgroundColor: "white", fontSize: "25px"}}>
+                            {console.log(props)}
                             {this.state.title}
                         </Header>
                         <Layout>
@@ -33,15 +37,12 @@ class ManageProductsPage extends React.Component {
                                     backgroundColor: "white",
                                 }}
                             >
-                                <ProductsGrid storeName={props.storeName}/>
+                                <ProductsGrid storeName={props.storeName} manage={true} />
                             </Content>
-                            <Sider>
-                                <StoreMenu onChange={this.onChange} />
-                            </Sider>
                         </Layout>
                     </Layout>
                 }
-            </ManageProudctsPageCtx.Consumer>
+            </ManageProductsPageCtx.Consumer>
         );
     }
 }

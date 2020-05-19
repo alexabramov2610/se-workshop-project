@@ -60,6 +60,10 @@ export const viewCart = (req: Req.ViewCartReq): Res.ViewCartRes => {
     const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
     if (!calcRes)
         return calcRes
+    const viewCartRes: Res.ViewCartRes  = ts.viewCart(req);
+    if(!viewCartRes)
+        return viewCartRes
+    return {data: { result: true, cart: viewCartRes.data.cart, total: calcRes.data.price}};
     return ts.viewCart(req);
 }
 
