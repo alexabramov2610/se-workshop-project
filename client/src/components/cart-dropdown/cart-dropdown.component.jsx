@@ -8,29 +8,29 @@ import {
 } from "./cart-dropdown.styles";
 import { CartCtx } from "../../contexts/cart-context";
 
-// data: {
-//     result: boolean;
-//     cart?: {
-//         products: {
-//             storeName: string;
-//             bagItems: {
-//     product: IProduct;
-//     amount: number;
-//     finalPrice?: number;
-// }[];
-//         }
-//     }
-// };
+const CartDropdown = ({ history, isVisible, items, setItems }) => {
+  const itemsWithStores =
+    items &&
+    items.map((p) =>
+      p.bagItems.map((bi) => {
+        return {
+          store: p.storeName,
+          name: bi.product._name,
+          price: bi.product._price,
+          cn: bi.product._catalogNumber,
+          quantity: bi.amount,
+        };
+      })
+    );
+  const cartItmes = [].concat.apply([], itemsWithStores);
 
-const CartDropdown = ({ history, isVisible, items }) =>
-  isVisible ? (
+  return isVisible ? (
     <CartDropdownContainer>
       <CartItemsContainer>
-        {items && items.length > 0 ? (
-          items.map(
-            (cartItem) => cartItem
-            // <CartItem key={cartItem.id} item={cartItem} />
-          )
+        {cartItmes && cartItmes.length > 0 ? (
+          cartItmes.map((cartItem, index) => (
+            <CartItem key={index} setItems={setItems} item={cartItem} />
+          ))
         ) : (
           <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
         )}
@@ -45,5 +45,5 @@ const CartDropdown = ({ history, isVisible, items }) =>
       </CartDropdownButton>
     </CartDropdownContainer>
   ) : null;
-
+};
 export default CartDropdown;
