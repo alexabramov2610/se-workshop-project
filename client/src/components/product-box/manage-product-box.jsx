@@ -48,9 +48,13 @@ export class ManageProductBox extends React.Component{
             </Card.Body>
             <Card.Footer>
                 <CustomButton
-                    style={{ margin: "auto" }}
+                    style={{ margin: "auto" , marginBottom: 5 }}
                     onClick={(ev) => ev }>
                     Remove </CustomButton>
+                <CustomButton
+                    style={{ margin: "auto"}}
+                    onClick={(ev) => ev }>
+                    Manage Items </CustomButton>
             </Card.Footer>
         </Card>
     }
