@@ -41,7 +41,7 @@ export class PayForm extends React.Component {
             expYear,
             cvv,
           },
-          adress: street + homeNumber,
+          address: street + homeNumber,
           city,
           country,
         },
@@ -51,6 +51,7 @@ export class PayForm extends React.Component {
     const { data } = await api.purchase(req);
     if (data.data.result) {
       this.setState({ buySucc: true });
+      await this.props.cartCountUpdater();
     } else {
       alert("something went wrong");
     }
