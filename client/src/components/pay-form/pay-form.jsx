@@ -49,7 +49,7 @@ export class PayForm extends React.Component {
       },
     };
     const { data } = await api.purchase(req);
-    if (!data.result) {
+    if (data.result) {
       this.setState({ buySucc: true });
     } else {
       alert("something went wrong");
