@@ -6,6 +6,7 @@ import {
   CartItemImage,
   RemoveButtonContainer,
 } from "./cart-item.styles";
+import { CartCtx } from "../../contexts/cart-context";
 
 const CartItem = ({ item, clearItemFromCart, setItems }) => {
   const { price, store, name, quantity, cn } = item;
@@ -19,14 +20,23 @@ const CartItem = ({ item, clearItemFromCart, setItems }) => {
           {quantity} x {price} &#8362;
         </span>
       </ItemDetailsContainer>
-      <RemoveButtonContainer onClick={async () => removeItem(item, setItems)}>
-        &#10005;
-      </RemoveButtonContainer>
+
+      <CartCtx.Consumer>
+        {(value) => (
+          <RemoveButtonContainer
+            onClick={async () =>
+              removeItem(item, setItems, value.cartCountUpdater)
+            }
+          >
+            &#10005;
+          </RemoveButtonContainer>
+        )}
+      </CartCtx.Consumer>
     </CartItemContainer>
   );
 };
 
-const removeItem = async (item, setItems) => {
+const removeItem = async (item, setItems, cartCountUpdater) => {
   const req = {
     body: {
       storeName: item.store,
@@ -35,6 +45,7 @@ const removeItem = async (item, setItems) => {
     },
   };
   await api.removeItemFromCart(req);
+  await cartCountUpdater();
   const { data } = await api.viewCart();
   data && data.data && data.data.cart && setItems(data.data.cart.products);
 };

@@ -54,11 +54,11 @@ class App extends React.Component {
     }
 
     cartCountUpdater = async () =>
-        await api.viewCart().then( ({ data }) => {
-            console.log("count: " + data.data.cart.products.length )
+        await api.viewCart().then(({ data }) => {
+
             this.setState(prevState => {
                 return {
-                    cartItemsCounter : data.data.result ? data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0) : prevState.cartItemsCounter
+                    cartItemsCounter: data.data.result ? data.data.cart.products.reduce((acc, bag) => acc + bag.bagItems.length, 0) : prevState.cartItemsCounter
                 }
             });
         });
@@ -83,7 +83,7 @@ class App extends React.Component {
 
     render() {
         return (!this.state.systemIsClose) ? (
-            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter }} >
+            <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
                     <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
                     <Switch>
@@ -95,7 +95,7 @@ class App extends React.Component {
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         {/*<Route path="/store/manageProducts/:storename" component={} />*/}
-                        <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />}/>
+                        <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
                     </Switch>
