@@ -6,7 +6,7 @@ export class MinPayCondition extends Condition {
 
     public constructor(catalogNumber: number, minPay: number) {
         super()
-        this._minPay = minPay;
+        this._minPay = +minPay;
     }
 
     isSatisfied(bag: BagItem[]): boolean {

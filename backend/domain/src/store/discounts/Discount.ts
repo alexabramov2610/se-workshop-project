@@ -7,10 +7,10 @@ export abstract class Discount {
 
     constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], category?: ProductCategory) {
         this._id = uuid();
-        this._percentage = percentage;
-        this._duration = duration;
+        this._percentage = +percentage;
+        this._duration = +duration;
         this._startDate = startDate;
-        this._productsInDiscount = productsInDiscount;
+        this._productsInDiscount = productsInDiscount.map((p)=> +p);
         this._category = category
     }
 

@@ -6,8 +6,8 @@ import {RegisteredUser} from "../../../user/users/RegisteredUser";
 export class BagPolicy extends PurchasePolicy {
     public constructor(minAmount: number, maxAmount: number) {
         super()
-        this._minAmount = minAmount
-        this._maxAmount = maxAmount
+        this._minAmount = +minAmount
+        this._maxAmount = +maxAmount
     }
 
     private _minAmount: number;

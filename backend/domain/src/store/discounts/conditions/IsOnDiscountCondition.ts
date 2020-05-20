@@ -6,7 +6,7 @@ export class IsOnDiscountCondition extends Condition {
 
     public constructor(catalogNumber: number) {
         super()
-        this._catalogNumber = catalogNumber;
+        this._catalogNumber = +catalogNumber;
     }
 
     isSatisfied(bag: BagItem[]): boolean {

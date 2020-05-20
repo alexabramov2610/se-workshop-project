@@ -7,8 +7,8 @@ export class MinAmountCondition extends Condition {
 
     public constructor(catalogNumber: number, minAmount: number) {
         super()
-        this._catalogNumber = catalogNumber;
-        this._minAmount = minAmount;
+        this._catalogNumber = +catalogNumber;
+        this._minAmount = +minAmount;
     }
 
     isSatisfied(bag: BagItem[]): boolean {

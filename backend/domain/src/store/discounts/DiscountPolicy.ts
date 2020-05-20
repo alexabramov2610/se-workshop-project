@@ -1,6 +1,9 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {loggers} from "winston";
+import {loggerW} from "../../api-int/Logger";
+const logger = loggerW(__filename)
 
 export class DiscountPolicy extends Discount {
     private _children: Map<Discount, Operators>;// storename -> items
@@ -14,6 +17,7 @@ export class DiscountPolicy extends Discount {
         let currentBag: BagItem[] = Array.from(bag);
         let skip: boolean = false;
         for (const [discount, nextOp] of this._children) {
+            logger.info(`calc discount ${JSON.stringify(discount)}`)
             if (discount.isRelevant(bag) && !skip) {
                 currentBag = discount.calc(currentBag);
                 if (nextOp === Operators.OR)

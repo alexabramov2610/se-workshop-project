@@ -4,7 +4,7 @@ import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {RegisteredUser} from "../../user/users/RegisteredUser";
 
 export class PurchasePolicyImpl extends PurchasePolicy {
-    public
+
 
     public constructor() {
         super()

@@ -6,9 +6,9 @@ import {RegisteredUser} from "../../../user/users/RegisteredUser";
 export class ProductPolicy extends PurchasePolicy {
     public constructor(catalogNumber: number, minAmount: number, maxAmount: number) {
         super()
-        this._catalogNumber = catalogNumber;
-        this._minAmount = minAmount
-        this._maxAmount = maxAmount
+        this._catalogNumber = +catalogNumber;
+        this._minAmount = +minAmount
+        this._maxAmount = +maxAmount
     }
 
     private _catalogNumber: number;

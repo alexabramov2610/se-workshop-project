@@ -357,7 +357,11 @@ export class Store {
                     catalogNumber: product.catalogNumber,
                     rating: product.rating
                 };
-                const matchingProdInStore: ProductInStore = {product: matchingProduct, storeName: this.storeName, storeRating: this.rating};
+                const matchingProdInStore: ProductInStore = {
+                    product: matchingProduct,
+                    storeName: this.storeName,
+                    storeRating: this.rating
+                };
                 products.push(matchingProdInStore);
             }
         }
@@ -404,7 +408,7 @@ export class Store {
         logger.info(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this._products.keys()) {
             logger.debug(` product: ${JSON.stringify(product)}`);
-            logger.debug(`${product.catalogNumber} === ${catalogNumber}`+ (product.catalogNumber === catalogNumber))
+            logger.debug(`${product.catalogNumber} === ${catalogNumber}` + (product.catalogNumber === catalogNumber))
             if (product.catalogNumber === +catalogNumber) {
                 logger.debug(`found product: ${JSON.stringify(product)}`);
                 return product;
@@ -471,6 +475,7 @@ export class Store {
         const newPolicy: Discount = new DiscountPolicy();
         for (const discountInPolicy of discounts) {
             const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
+            logger.info(`New discount ${JSON.stringify(newDiscount)}`)
 
             newPolicy.add(newDiscount, discountInPolicy.operator);
         }
@@ -480,6 +485,8 @@ export class Store {
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
         const bagItemAfterDiscount: BagItem[] = this._discountPolicy.calc(bagItems);
+        logger.info(`Done calculateing for store ${this.storeName}`)
+
         return bagItemAfterDiscount;
     }
 
@@ -495,7 +502,7 @@ export class Store {
         const newPolicy: PurchasePolicy = new PurchasePolicyImpl();
         for (const purchasePolicy of policy) {
             const newPurchasePolicy: PurchasePolicy = this.parseIPurchasePolicy(purchasePolicy.policy);
-            if(!newPurchasePolicy)
+            if (!newPurchasePolicy)
                 return false;
             newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
         }
@@ -584,20 +591,21 @@ export class Store {
             const conditions: Map<Condition, Operators> = new Map();
             for (const iCondition of iDiscount.condition) {
                 const nextCondition: Condition = this.parseICondition(iCondition.condition);
-                conditions.set(nextCondition, iCondition.operator);
+                if (nextCondition)
+                    conditions.set(nextCondition, iCondition.operator);
             }
-            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions,iDiscount.category)
+            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions, iDiscount.category)
         }
-        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products,iDiscount.category)
+        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, iDiscount.category)
     }
 
     private parseICondition(ifCondition: ICondition): Condition {
-        if (ifCondition.minPay) {
+        if (ifCondition.minPay || +ifCondition.minPay === 0) {
             return new MinPayCondition(ifCondition.catalogNumber, ifCondition.minPay);
-        } else if (ifCondition.minAmount) {
+        } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
             return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
         }
-        logger.warn("parse condition failed")
+        logger.warn(`parse condition failed ${JSON.stringify(ifCondition)}`)
         return undefined;
     }
 
@@ -615,7 +623,7 @@ export class Store {
         return purchasePolicy;
     }
 
-    verifyStorePolicy(user: RegisteredUser, bagItems: BagItem[]) :boolean{
-        return this.purchasePolicy.isSatisfied(bagItems,user);
+    verifyStorePolicy(user: RegisteredUser, bagItems: BagItem[]): boolean {
+        return this.purchasePolicy.isSatisfied(bagItems, user);
     }
 }

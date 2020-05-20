@@ -526,6 +526,7 @@ export class StoreManagement {
     }
 
     calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
+        logger.info(`calculate final prices in store ${storeName}`)
         const store: Store = this.findStoreByName(storeName);
         // reset prices from last check
         for (const bagItem of bagItems) {
