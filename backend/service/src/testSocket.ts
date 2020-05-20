@@ -250,6 +250,8 @@ export function t2 (){
     addNewProducts(storeName, products, token, true);
     addNewItems(storeName, items, token, true);
 
+    let stringToPrint: string[] = [];
+
     console.log('generating 10 tokens...')
     for (let i = 0; i < 10; i++) {
         const t = NewSessionSession();
@@ -258,10 +260,10 @@ export function t2 (){
 
         registerUser(users[i].name, users[i].password, token, false);
         loginUser(users[i].name, users[i].password, t, false);
-        console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
+        // console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
+        // console.log(`purchase request ${i}:`)
 
-        console.log(`purchase request ${i}:`)
-        console.log(`curl --cacert server.cert -k --header "Content-Type: application/json"  --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
+        // stringToPrint.push(`curl --cacert server.cert -k --header "Content-Type: application/json" "token: ${get}" --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
     }
 }
 
@@ -421,8 +423,8 @@ export function t4 (){
     token = NewSessionSession();
 
     // store 1
-    registerUser(buyer2.name, buyer2.password, token, false);
-    loginUser(buyer2.name, buyer2.password, token, false);
+    registerUser(buyer1.name, buyer1.password, token, false);
+    loginUser(buyer1.name, buyer1.password, token, false);
     createStore(storeName1, token);
     addNewProducts(storeName1, products, token, true);
     addNewItems(storeName1, items, token, true);
