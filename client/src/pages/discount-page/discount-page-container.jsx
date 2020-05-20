@@ -28,6 +28,11 @@ const DiscountPageContainer = () => {
             console.log(storeName);
             const productsRes = await api.getStoreProducts(storeName);
             const categoriesRes = await api.getStoreCategories(storeName);
+            // console.log(JSON.stringify(productsRes.data.data))
+            if (productsRes.data.data.products.length === 0) {
+                alert("no products found")
+                return;
+            }
             const store = productsRes.data.data.products[0].storeName;
             setStoreName(store);
 
