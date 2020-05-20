@@ -591,6 +591,7 @@ export class Store {
             const conditions: Map<Condition, Operators> = new Map();
             for (const iCondition of iDiscount.condition) {
                 const nextCondition: Condition = this.parseICondition(iCondition.condition);
+                logger.info(`${JSON.stringify(nextCondition)} ${JSON.stringify(iCondition.operator)}`)
                 if (nextCondition)
                     conditions.set(nextCondition, iCondition.operator);
             }
@@ -601,8 +602,10 @@ export class Store {
 
     private parseICondition(ifCondition: ICondition): Condition {
         if (ifCondition.minPay || +ifCondition.minPay === 0) {
+            logger.info(`new min pay discount ${ifCondition.minPay} for product  `)
             return new MinPayCondition(ifCondition.catalogNumber, ifCondition.minPay);
         } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
+            logger.info(`new min amount discount ${ifCondition.minAmount}`)
             return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
         }
         logger.warn(`parse condition failed ${JSON.stringify(ifCondition)}`)

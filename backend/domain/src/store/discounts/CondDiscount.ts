@@ -66,7 +66,9 @@ export class CondDiscount extends Discount {
         }
         return true;
     }
-
+    isRelevant(bagItem: BagItem[]): boolean {
+        return this.isValid() && (bagItem.some((bagItem) => this.isProductInDiscount(bagItem)) || this.productsInDiscount === []);
+    }
     // tslint:disable-next-line:no-empty
     add(discount: Discount, operator: Operators): void {
     }
