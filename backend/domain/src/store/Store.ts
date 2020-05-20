@@ -522,8 +522,9 @@ export class Store {
             return {isValid: false, error: Error.E_INVALID_PROD}
 
         const isNameValid: boolean = product.name && product.name !== "";
-        const isIdValid: boolean = product.catalogNumber && product.catalogNumber > 0;
-        const isPriceValid: boolean = product.price && product.price > 0;
+        const isIdValid: boolean = product.catalogNumber && +product.catalogNumber > 0;
+        const isPriceValid: boolean = product.price && +product.price > 0;
+        logger.info(`got category ${product.category}`)
         const isCategoryValid: boolean = Object.values(ProductCategory).includes(product.category);
 
         if (isNameValid && isIdValid && isPriceValid && isCategoryValid) {
@@ -532,7 +533,7 @@ export class Store {
                 isValid: true
             }
         } else {
-            const error: string = `invalid product: ${product}`;
+            const error: string = `invalid product: ${product}. isNameValid ${isNameValid} isIdValid ${isIdValid} isPriceValid ${isPriceValid} isCategoryValid ${isCategoryValid} `;
             logger.warn(error);
             return {
                 isValid: false, error

@@ -30,10 +30,6 @@ export async function removeProductFromCart(req,res) {
 }
 
 
-
-
-
-
 // get
 
 export async function viewCart(req,res) {

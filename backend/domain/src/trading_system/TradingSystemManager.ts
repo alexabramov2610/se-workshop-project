@@ -556,7 +556,7 @@ export class TradingSystemManager {
     }
 
     verifyStorePermission(req: Req.VerifyStorePermission): Res.BoolResponse {
-        logger.debug(`verifying store permissions`)
+        logger.info(`verifying store permissions`)
         const user = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }
