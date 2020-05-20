@@ -8,55 +8,56 @@ import { CustomButton } from "../../components/custom-button/custom-button.compo
 import * as api from "../../utils/api";
 import { CartCtx } from "../../contexts/cart-context";
 import { ProductDetails } from "./products-box.styles";
-export class ManageProductBox extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            info: {}
-        }
-    }
-    async componentDidMount() {
-        const {data} = await api.viewProductInfo(this.props.store, this.props.cn)
-        const info = data.data.info
-        this.setState({info});
-    }
-    render() {
+export class ManageProductBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      info: {},
+    };
+  }
+  async componentDidMount() {
+    const { data } = await api.viewProductInfo(this.props.store, this.props.cn);
+    const info = data.data.info;
+    this.setState({ info });
+  }
+  render() {
+    return (
+      <Card classsName="text-center grid-item">
+        <Card.Body>
+          <Card.Title>
+            <FiBox style={{ marginRight: "4px", marginBottom: "2px" }} />
+            {this.props.name}
+          </Card.Title>
+          <ProductDetails>
+            <div>Price: {this.props.price}</div>
 
-        return  <Card classsName="text-center grid-item">
-            <Card.Body>
-                <Card.Title>
-                    <FiBox style={{ marginRight: "4px", marginBottom: "2px" }} />
-                    {this.props.name}
-                </Card.Title>
-                <ProductDetails>
-                    <div>Price: {this.props.price}</div>
-                    <div>Quantity: {this.state.info.quantity}</div>
-
-                    <div>
-                        Store: <Link to={`/store/${this.props.store}`}>{this.props.store}</Link>
-                    </div>
-                    <div>
-                        Rating :{" "}
-                        {[1, 2, 3, 4, 5].map(
-                            (e, index) =>
-                                index < this.props.rating && (
-                                    <AiFillStar key={index} style={{ marginBottom: "2px" }} />
-                                )
-                        )}
-                    </div>
-                </ProductDetails>
-            </Card.Body>
-            <Card.Footer>
-                <CustomButton
-                    style={{ margin: "auto" , marginBottom: 5 }}
-                    onClick={(ev) => ev }>
-                    Remove </CustomButton>
-                <CustomButton
-                    style={{ margin: "auto"}}
-                    onClick={(ev) => ev }>
-                    Manage Items </CustomButton>
-            </Card.Footer>
-        </Card>
-    }
+            <div>
+              Store:{" "}
+              <Link to={`/store/${this.props.store}`}>{this.props.store}</Link>
+            </div>
+            <div>
+              Rating :{" "}
+              {[1, 2, 3, 4, 5].map(
+                (e, index) =>
+                  index < this.props.rating && (
+                    <AiFillStar key={index} style={{ marginBottom: "2px" }} />
+                  )
+              )}
+            </div>
+          </ProductDetails>
+        </Card.Body>
+        <Card.Footer>
+          <CustomButton
+            style={{ margin: "auto", marginBottom: 5 }}
+            onClick={(ev) => ev}
+          >
+            Remove{" "}
+          </CustomButton>
+          <CustomButton style={{ margin: "auto" }} onClick={(ev) => ev}>
+            Manage Items{" "}
+          </CustomButton>
+        </Card.Footer>
+      </Card>
+    );
+  }
 }
-
