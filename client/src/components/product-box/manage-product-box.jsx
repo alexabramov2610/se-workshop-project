@@ -30,7 +30,7 @@ export class ManageProductBox extends React.Component {
           </Card.Title>
           <ProductDetails>
             <div>Price: {this.props.price}</div>
-
+            <div>Quantity: {this.state.info.quantity}</div>
             <div>
               Store:{" "}
               <Link to={`/store/${this.props.store}`}>{this.props.store}</Link>

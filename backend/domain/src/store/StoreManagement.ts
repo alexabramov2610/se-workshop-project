@@ -646,9 +646,9 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const productsNotExists = [];
         for (const catalogNumber of req.body.productsCatalogNumbers) {
-            if (!store.getProductByCatalogNumber(catalogNumber)) {
-                logger.debug(`product ${catalogNumber} not found`)
-                logger.debug(`products in store ${store.storeName} :` + Array.from(store.products.keys()).map((s) => s.catalogNumber))
+            if (!store.getProductByCatalogNumber(+catalogNumber)) {
+                logger.warn(`product ${catalogNumber} not found`)
+                logger.warn(`products in store ${store.storeName} :` + Array.from(store.products.keys()).map((s) => s.catalogNumber))
                 productsNotExists.push(catalogNumber)
             }
         }
@@ -809,7 +809,7 @@ export class StoreManagement {
     private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
         const products: Product[] = [];
         for (const productReq of productsReqs) {
-            const product: Product = new Product(productReq.name, productReq.catalogNumber, productReq.price, productReq.category);
+            const product: Product = new Product(productReq.name, +productReq.catalogNumber, productReq.price, productReq.category);
             products.push(product);
         }
         return products;

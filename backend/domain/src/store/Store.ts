@@ -405,7 +405,7 @@ export class Store {
         for (const product of this._products.keys()) {
             logger.debug(` product: ${JSON.stringify(product)}`);
             logger.debug(`${product.catalogNumber} === ${catalogNumber}`+ (product.catalogNumber === catalogNumber))
-            if (product.catalogNumber === catalogNumber) {
+            if (product.catalogNumber === +catalogNumber) {
                 logger.debug(`found product: ${JSON.stringify(product)}`);
                 return product;
             }
