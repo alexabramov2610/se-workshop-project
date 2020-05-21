@@ -37,11 +37,10 @@ class StorePage extends React.Component {
                                         ? screens[this.state.screen]
                                         : <ProductsGrid storeName={props.info.storeName}/>}
                                 </Content>
-                                {isManager ?
-                                    <Sider>
-                                        <StoreMenu onChange={this.onChange}/>
-                                    </Sider>
-                                    : null}
+                                {isManager &&
+                                <Sider>
+                                    <StoreMenu onChange={this.onChange}/>
+                                </Sider>}
                             </Layout>
                         </Layout>);
                     }

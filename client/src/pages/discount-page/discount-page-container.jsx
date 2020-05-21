@@ -71,7 +71,8 @@ const DiscountPageContainer = () => {
         setIsLoading(true);
         await api.setDiscountPolicy({
             body: {
-                storeName: storeName, policy: {
+                storeName: storeName,
+                policy: {
                     discounts: policyDiscounts
                 }
             }
