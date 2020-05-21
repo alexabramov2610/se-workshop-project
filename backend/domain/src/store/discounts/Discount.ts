@@ -79,7 +79,7 @@ export abstract class Discount {
     }
 
     protected addMinutes(date, minutes): Date {
-        l
+
         return new Date(date.getTime() + minutes * 60000);
     }
 
