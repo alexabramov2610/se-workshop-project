@@ -774,19 +774,19 @@ export class StoreManagement {
                 const catalogNumber: number = condition.getCatalogNumber();
                 const minPay: number = condition.getMinPay();
                 const minAmount: number = condition.getMinAmount();
-                if (!minAmount && !minPay) {
+                if (typeof minAmount === undefined && typeof minPay === undefined) {
                     conditions.push({
                         condition: {
                             catalogNumber
                         }, operator
                     })
-                } else if (minPay) {
+                } else if (minPay >= 0) {
                     conditions.push({
                         condition: {
                             minPay
                         }, operator
                     })
-                } else if (minAmount) {
+                } else if (minAmount >= 0) {
                     conditions.push({
                         condition: {
                             catalogNumber,

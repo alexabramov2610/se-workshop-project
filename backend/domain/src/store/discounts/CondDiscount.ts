@@ -9,7 +9,6 @@ const logger = loggerW(__filename)
 export class CondDiscount extends Discount {
     private _conditions: Map<Condition, Operators>;
 
-
     public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>, category?: ProductCategory) {
         super(startDate, duration, percentage, productsInDiscount, category);
         this._conditions = conditions;
@@ -20,22 +19,25 @@ export class CondDiscount extends Discount {
 
         const res: BagItem[] = [];
         for (const bagItem of bag) {
-            if (this.isProductInDiscount(bagItem) || this.productsInDiscount.length === 0) {
+            if (this.isProductInDiscount(bagItem) || this.isStoreDiscount()) {
                 const minAmount = this.findMinAmount(bagItem.product.catalogNumber);
-                logger.info(`product in discount! calculating price... min amount is ${minAmount}`)
+                logger.info(`product ${bagItem.product.catalogNumber}  cat ${bagItem.product.category} in discount! calculating price... min amount is ${minAmount}`)
                 let diffAmount = 1;
-                if (minAmount !== -1){
+                if (minAmount !== -1) {
                     diffAmount = Math.floor(bagItem.amount / (minAmount + 1)) / bagItem.amount;
                 }
-                logger.info(`new final price ${bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100))}`)
-
+                const newPrice: number = bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100));
+                logger.info(`new final price for product ${bagItem.product.catalogNumber} is ${newPrice}`)
                 res.push({
                     product: bagItem.product,
                     amount: bagItem.amount,
-                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100))
+                    finalPrice: newPrice
                 })
-            } else
+            } else {
+                logger.info(`product ${bagItem.product.catalogNumber} cat ${bagItem.product.category} NOT in discount!`)
                 res.push({product: bagItem.product, amount: bagItem.amount, finalPrice: bagItem.finalPrice})
+            }
+
         }
         return res;
     }
@@ -58,7 +60,11 @@ export class CondDiscount extends Discount {
     }
 
     isRelevant(bagItem: BagItem[]): boolean {
-        return this.isValid() && (bagItem.some((bagItem) => this.isProductInDiscount(bagItem)) || this.productsInDiscount.length === 0);
+        const isValid : boolean = this.isValid();
+        const bagOnDiscount: boolean = bagItem.some((bagItem) => this.isProductInDiscount(bagItem));
+        const isStoreDiscount : boolean = this.productsInDiscount.length === 0 && (this.isStoreDiscount());
+        logger.info(`isValid? ${isValid} , bagOnDiscount ${bagOnDiscount} isStoreDiscount ${isStoreDiscount}`)
+        return isValid && (bagOnDiscount || isStoreDiscount);
     }
 
     // tslint:disable-next-line:no-empty
@@ -86,5 +92,14 @@ export class CondDiscount extends Discount {
 
     get conditions(): Map<Condition, Operators> {
         return this._conditions;
+    }
+
+    private isStoreDiscount(): boolean {
+        const conditions: Condition[] = Array.from(this._conditions.keys());
+        for (const c of conditions) {
+            if (typeof c.getMinPay() !== undefined &&  c.getMinPay() >= 0)
+                return true;
+        }
+        return false;
     }
 }

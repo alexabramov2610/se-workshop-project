@@ -475,7 +475,6 @@ export class Store {
         const newPolicy: Discount = new DiscountPolicy();
         for (const discountInPolicy of discounts) {
             const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
-            logger.info(`New discount ${JSON.stringify(newDiscount)}`)
 
             newPolicy.add(newDiscount, discountInPolicy.operator);
         }
@@ -485,7 +484,7 @@ export class Store {
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
         const bagItemAfterDiscount: BagItem[] = this._discountPolicy.calc(bagItems);
-        logger.info(`Done calculateing for store ${this.storeName}`)
+        logger.info(`Done calculating for store ${this.storeName}`)
 
         return bagItemAfterDiscount;
     }
@@ -587,17 +586,25 @@ export class Store {
     }
 
     private parseIDiscount(iDiscount: IDiscount): Discount {
-        if (iDiscount.condition) {
+        let newDiscount: Discount;
+        if (iDiscount.condition && iDiscount.condition.length > 0) {
             const conditions: Map<Condition, Operators> = new Map();
             for (const iCondition of iDiscount.condition) {
+                logger.info(`parsing condition ${JSON.stringify(iCondition.condition)} OP ${JSON.stringify(iCondition.operator)}`)
                 const nextCondition: Condition = this.parseICondition(iCondition.condition);
-                logger.info(`${JSON.stringify(nextCondition)} ${JSON.stringify(iCondition.operator)}`)
-                if (nextCondition)
+
+                if (nextCondition) {
+                    logger.info(`New Condition! ${JSON.stringify(nextCondition)}`)
                     conditions.set(nextCondition, iCondition.operator);
+                }
             }
-            return new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions, iDiscount.category)
+            newDiscount = new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, conditions, iDiscount.category)
+            logger.info(`New CondDiscount ${JSON.stringify(newDiscount)}`)
+            return newDiscount
         }
-        return new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, iDiscount.category)
+        newDiscount = new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.products, iDiscount.category)
+        logger.info(`New ShownDiscount ${JSON.stringify(newDiscount)}`)
+        return newDiscount;
     }
 
     private parseICondition(ifCondition: ICondition): Condition {

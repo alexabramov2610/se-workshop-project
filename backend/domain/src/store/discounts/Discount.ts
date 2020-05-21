@@ -59,7 +59,10 @@ export abstract class Discount {
     abstract calc(bag: BagItem[]): BagItem[];
 
     isRelevant(bagItem: BagItem[]): boolean {
-        return this.isValid() && bagItem.some((bagItem) => this.isProductInDiscount(bagItem));
+        const isValid : boolean = this.isValid();
+        const bagOnDiscount: boolean = bagItem.some((bagItem) => this.isProductInDiscount(bagItem));
+        logger.info(`isValid? ${isValid} , bagOnDiscount ${bagOnDiscount}`)
+        return isValid && bagOnDiscount;
     }
 
     abstract add(discount: Discount, operator: Operators): void;

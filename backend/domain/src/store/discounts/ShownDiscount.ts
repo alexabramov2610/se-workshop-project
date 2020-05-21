@@ -1,7 +1,9 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {loggerW} from "../../api-int/Logger";
 
+const logger = loggerW(__filename)
 export class ShownDiscount extends Discount {
 
     public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], category?: ProductCategory) {
@@ -12,12 +14,15 @@ export class ShownDiscount extends Discount {
         const res: BagItem[] = [];
         for (const bagItem of bag) {
             if (this.isProductInDiscount(bagItem)) {
+                const finalPrice: number = bagItem.finalPrice - ((bagItem.finalPrice * this.percentage) / 100);
+                logger.info(`product ${bagItem.product.catalogNumber} cat ${bagItem.product.category} in discount! calculating.. new price ${finalPrice}`)
                 res.push({
                     product: bagItem.product,
                     amount: bagItem.amount,
-                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage) / 100)
+                    finalPrice
                 })
             } else {
+                logger.info(`product ${bagItem.product.catalogNumber} cat ${bagItem.product.category} NOT in discount!`)
                 res.push({product: bagItem.product, amount: bagItem.amount, finalPrice: bagItem.finalPrice})
             }
 
