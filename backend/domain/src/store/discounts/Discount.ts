@@ -1,7 +1,8 @@
 import {v4 as uuid} from 'uuid';
 import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
-
+import {loggerW} from "../../api-int/Logger";
+const logger = loggerW(__filename)
 export abstract class Discount {
     protected _category: ProductCategory;
 
@@ -9,7 +10,7 @@ export abstract class Discount {
         this._id = uuid();
         this._percentage = +percentage;
         this._duration = +duration;
-        this._startDate = startDate;
+        this._startDate = new Date(startDate);
         this._productsInDiscount = productsInDiscount.map((p)=> +p);
         this._category = category
     }
@@ -78,6 +79,7 @@ export abstract class Discount {
     }
 
     protected addMinutes(date, minutes): Date {
+        l
         return new Date(date.getTime() + minutes * 60000);
     }
 

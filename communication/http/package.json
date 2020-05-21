@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "comp": "babel src -d dist && cp server.cert ./dist/ && cp server.key ./dist/",
-    "start": "NODE_ENV=development PORT=4000 nodemon --exec babel-node src/index.js",
+    "start": "NODE_ENV=development PORT=4000 DEBUG=1 nodemon --exec babel-node src/index.js",
     "start:prod": "NODE_ENV=production npm run comp && npm run serve",
     "start:intellij": "sudo npm run comp && sudo npm run serve",
     "serve": "node dist/index.js",
