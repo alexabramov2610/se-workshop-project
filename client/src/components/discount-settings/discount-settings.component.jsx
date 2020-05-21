@@ -50,7 +50,7 @@ const DiscountSettings = () => {
             const editedDiscount = utils.getEditedDiscount(props.policyDiscounts, props.mode);
             return editedDiscount.discount.condition[0].condition.minPay;
         }
-        return props.discount.condition[0] ? props.discount.condition[0].condition.minPay : 0;
+        return props.discount.condition[0] ? props.discount.condition[0].condition.minPay : "";
     }
 
     const getCouponCode = ({mode, policyDiscounts, discount}) => {
@@ -94,7 +94,7 @@ const DiscountSettings = () => {
                             onChange={e => handleMinPayChange(e, props)}
                             size="small"
                             formatter={value => `${value}$`}
-                            min={0} defaultValue={0}
+                            min={0}
                         />
                     </div>
                 </Space>

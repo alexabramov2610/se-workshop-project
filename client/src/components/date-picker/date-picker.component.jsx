@@ -16,8 +16,8 @@ const DatePicker = () => {
         return value ? Math.round(Math.abs((value[0] - value[1]) / oneDay)) : 0;
     }
 
-    const handleDatesSelection = (value, {setDiscount, setPolicyDiscounts, mode}) => {
-        if (mode.mode === config.modes.EDIT) {
+    const handleDatesSelection = (value, {setDiscount, setPolicyDiscounts, mode, discount}) => {
+        if (utils.isEditMode(mode)) {
             setPolicyDiscounts(prevPolicyDiscounts => {
                     let editedDiscount = utils.getEditedDiscount(prevPolicyDiscounts, mode);
                     editedDiscount.discount.startDate = value ? value[0].toDate() : 0;
