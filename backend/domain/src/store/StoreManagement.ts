@@ -479,7 +479,7 @@ export class StoreManagement {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
                 return {data: {result: false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
-            if (!filters.storeRating || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
+            if (!filters.storeRating || (filters.storeRating as unknown) === "" || filters.storeRating === store.rating)
                 return {data: {result: true, products: store.search(filters, query)}};
             else
                 return {data: {result: true, products: []}};
@@ -487,7 +487,7 @@ export class StoreManagement {
 
         let productsFound: ProductInStore[] = [];
         for (const store of this._stores) {
-            if (typeof filters.storeRating === "undefined" || (<unknown>filters.storeRating) === "" || filters.storeRating === store.rating)
+            if (typeof filters.storeRating === "undefined" || (filters.storeRating as unknown) === "" || filters.storeRating === store.rating)
                 productsFound = productsFound.concat(store.search(filters, query));
         }
         return {data: {result: true, products: productsFound}};
@@ -745,7 +745,7 @@ export class StoreManagement {
     }
 
     getStoresInfoOfManagedBy(username: string): StoreInfo[] {
-        let stores: StoreInfo[] = [];
+        const stores: StoreInfo[] = [];
         this._stores.forEach(store => {
                 if (store.verifyIsStoreManager(username))
                     stores.push(store.viewStoreInfo().data.info);
@@ -755,7 +755,7 @@ export class StoreManagement {
     }
 
     getStoresInfoOfOwnedBy(username: string): StoreInfo[] {
-        let stores: StoreInfo[] = [];
+        const stores: StoreInfo[] = [];
         this._stores.forEach(store => {
                 if (store.verifyIsStoreOwner(username))
                     stores.push(store.viewStoreInfo().data.info);

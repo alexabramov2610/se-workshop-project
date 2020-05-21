@@ -573,14 +573,14 @@ export class Store {
             return false;
 
         if (typeof filters.priceRange !== "undefined" && (
-            ((<unknown>filters.priceRange.min) !== "" && product.price < filters.priceRange.min) ||
-            ((<unknown>filters.priceRange.max) !== "" && filters.priceRange.max < product.price)))
+            ((filters.priceRange.min as unknown) !== "" && product.price < filters.priceRange.min) ||
+            ((filters.priceRange.max as unknown) !== "" && filters.priceRange.max < product.price)))
             return false;
 
-        if (typeof filters.productCategory !== "undefined" && (<unknown>filters.productCategory) !== "" && filters.productCategory !== product.category)
+        if (typeof filters.productCategory !== "undefined" && (filters.productCategory as unknown) !== "" && filters.productCategory !== product.category)
             return false;
 
-        if (typeof filters.productRating !== "undefined" && (<unknown>filters.productRating) !== "" && filters.productRating !== product.rating)
+        if (typeof filters.productRating !== "undefined" && (filters.productRating as unknown) !== "" && filters.productRating !== product.rating)
             return false;
 
         return true;
@@ -602,8 +602,8 @@ export class Store {
 
     private parseICondition(ifCondition: ICondition): Condition {
         if (ifCondition.minPay || +ifCondition.minPay === 0) {
-            logger.info(`new min pay discount ${ifCondition.minPay} for product  `)
-            return new MinPayCondition(ifCondition.catalogNumber, ifCondition.minPay);
+            logger.info(`new min pay discount ${ifCondition.minPay} for store`)
+            return new MinPayCondition(ifCondition.minPay);
         } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
             logger.info(`new min amount discount ${ifCondition.minAmount}`)
             return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);

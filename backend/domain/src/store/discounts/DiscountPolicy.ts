@@ -17,8 +17,9 @@ export class DiscountPolicy extends Discount {
         let currentBag: BagItem[] = Array.from(bag);
         let skip: boolean = false;
         for (const [discount, nextOp] of this._children) {
-            logger.info(`calc discount ${JSON.stringify(discount)}`)
+            logger.info(`check if discount is relevant ${JSON.stringify(discount)}`)
             if (discount.isRelevant(bag) && !skip) {
+                logger.info(`calc discount ${JSON.stringify(discount)} operator ${nextOp}`)
                 currentBag = discount.calc(currentBag);
                 if (nextOp === Operators.OR)
                     return currentBag;

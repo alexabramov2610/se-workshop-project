@@ -2,50 +2,37 @@ import {Discount} from "./Discount";
 import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Condition} from "./conditions/Condition";
+import {loggerW} from "../../api-int/Logger";
+
+const logger = loggerW(__filename)
 
 export class CondDiscount extends Discount {
     private _conditions: Map<Condition, Operators>;
 
 
-    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>,category?: ProductCategory) {
+    public constructor(startDate: Date, duration: number, percentage: number, productsInDiscount: number[], conditions: Map<Condition, Operators>, category?: ProductCategory) {
         super(startDate, duration, percentage, productsInDiscount, category);
         this._conditions = conditions;
     }
 
-    /*
-    number of discount to get for the given amount - min amount is 3
-    given 5 bisli get discount for 5/4 = 1
-
     calc(bag: BagItem[]): BagItem[] {
-        const res: BagItem[] = [];
-        for (const bagItem of bag) {
-            if (this.isProductInDiscount(bagItem.product.catalogNumber) && this.minAmount < bagItem.amount) {
-                const diffAmount = Math.floor(bagItem.amount / (this.minAmount + 1));
-                res.push({
-                    product: bagItem.product,
-                    amount: bagItem.amount,
-                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100 * bagItem.amount))
-                })
-            } else
-                res.push({product: bagItem.product, amount: bagItem.amount, finalPrice: bagItem.finalPrice})
-        }
-        return res;
-    }
-    */
-    calc(bag: BagItem[]): BagItem[] {
-        if(!this.isSatisfied(bag)) return bag;
+        if (!this.isSatisfied(bag)) return bag;
 
         const res: BagItem[] = [];
         for (const bagItem of bag) {
-            if (this.isProductInDiscount(bagItem)){
+            if (this.isProductInDiscount(bagItem) || this.productsInDiscount.length === 0) {
                 const minAmount = this.findMinAmount(bagItem.product.catalogNumber);
+                logger.info(`product in discount! calculating price... min amount is ${minAmount}`)
                 let diffAmount = 1;
-                if(minAmount !== -1)
-                    diffAmount=  Math.floor(bagItem.amount / (minAmount + 1)) /bagItem.amount;
+                if (minAmount !== -1){
+                    diffAmount = Math.floor(bagItem.amount / (minAmount + 1)) / bagItem.amount;
+                }
+                logger.info(`new final price ${bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100))}`)
+
                 res.push({
                     product: bagItem.product,
                     amount: bagItem.amount,
-                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage*diffAmount) / (100))
+                    finalPrice: bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100))
                 })
             } else
                 res.push({product: bagItem.product, amount: bagItem.amount, finalPrice: bagItem.finalPrice})
@@ -55,10 +42,13 @@ export class CondDiscount extends Discount {
 
     isSatisfied(bag: BagItem[]): boolean {
         for (const [condition, nextOp] of this._conditions) {
+            logger.info(`check condition ${JSON.stringify(condition)} operator ${nextOp}`)
             if (condition.isSatisfied(bag)) {
+                logger.info(`Satisfied!`)
                 if (nextOp === Operators.OR)
                     return true;
             } else {
+                logger.info(`Not Satisfied!`)
                 if (nextOp === Operators.AND) {
                     return false;
                 }
@@ -66,9 +56,11 @@ export class CondDiscount extends Discount {
         }
         return true;
     }
+
     isRelevant(bagItem: BagItem[]): boolean {
-        return this.isValid() && (bagItem.some((bagItem) => this.isProductInDiscount(bagItem)) || this.productsInDiscount === []);
+        return this.isValid() && (bagItem.some((bagItem) => this.isProductInDiscount(bagItem)) || this.productsInDiscount.length === 0);
     }
+
     // tslint:disable-next-line:no-empty
     add(discount: Discount, operator: Operators): void {
     }
@@ -82,9 +74,10 @@ export class CondDiscount extends Discount {
     }
 
     private findMinAmount(catalogNumber: number) {
-        const conditions:Condition[] = Array.from(this._conditions.keys());
-        for(const c of conditions){
-            if(c.getCatalogNumber() === catalogNumber){
+        const conditions: Condition[] = Array.from(this._conditions.keys());
+        for (const c of conditions) {
+            if (c.getCatalogNumber() === catalogNumber) {
+                logger.info(`c.getCatalogNumber() ${c.getCatalogNumber()} === catalog number ${catalogNumber}`)
                 return c.getMinAmount();
             }
         }
