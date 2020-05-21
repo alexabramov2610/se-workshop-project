@@ -613,7 +613,7 @@ export class TradingSystemManager {
         const managedStores: StoreInfo[] = this._storeManager.getStoresInfoOfManagedBy(user.name);
         const ownedStores: StoreInfo[] = this._storeManager.getStoresInfoOfOwnedBy(user.name);
         const purchasesHistory: IReceipt[] = this.viewRegisteredUserPurchasesHistory(req).data.receipts;
-        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores: managedStores, ownedStores: ownedStores, purchasesHistory: purchasesHistory } };
+        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores, ownedStores, purchasesHistory } };
 
     }
 }
