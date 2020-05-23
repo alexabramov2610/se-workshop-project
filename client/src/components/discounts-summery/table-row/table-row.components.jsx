@@ -19,7 +19,13 @@ const Row = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-const basicStyle = {display: "flex", flexWrap: "wrap", justifyContent: "flex-start", width: "14.2%", alignItems: "center"};
+const basicStyle = {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    width: "14.2%",
+    alignItems: "center"
+};
 
 function TableRow({index, discount}) {
     const currDiscount = discount.discount;
@@ -37,7 +43,8 @@ function TableRow({index, discount}) {
         });
     };
 
-    const handleEditMode = ({moveToScreen, setMode}) => {
+    const handleEditMode = ({moveToScreen, setMode, setCondition}) => {
+        setCondition({condition: {}});
         setMode({mode: config.modes.EDIT, editedDiscount: discount.key});
         moveToScreen(config.steps.EDIT_ADD);
     };

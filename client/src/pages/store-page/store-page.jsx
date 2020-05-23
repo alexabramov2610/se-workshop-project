@@ -5,14 +5,14 @@ import {StoreMenu} from "../../components/store-menu/store-menu.component";
 import {StorePageCtx} from "./store-page-ctx";
 import ManageProductsContainer from "../manage-products-page/manage-products-page-container";
 import DiscountPageContainer from "../discount-page/discount-page-container";
+import StoreOverview from "../../components/store-overview/store-overview.component";
+import * as utils from "./store-page-utils";
 
 
-const {Sider, Header, Content} = Layout;
-// const titles = ["Our Products", "Your Discount Policy", "Your Buying Policy", "Manage Permissions"];
-const screens = [<ManageProductsContainer/>, <DiscountPageContainer/>];
+const {Sider, Content} = Layout;
+const screens = [<StoreOverview/>, <ManageProductsContainer/>, <DiscountPageContainer/>];
 
 const layoutStyle = {backgroundColor: "white"};
-// const headerStyle = {backgroundColor: "white", fontSize: "25px"};
 const contentStyle = {padding: "0px 30px", minHeight: "70vh", backgroundColor: "white",};
 
 class StorePage extends React.Component {
@@ -29,15 +29,12 @@ class StorePage extends React.Component {
             <StorePageCtx.Consumer>
                 {
                     props => {
-                        const isManager = props.permissions.length !== 0;
                         return (<Layout className="site-layout" style={layoutStyle}>
                             <Layout>
                                 <Content className="site-layout-background" style={contentStyle}>
-                                    {isManager
-                                        ? screens[this.state.screen]
-                                        : <ProductsGrid storeName={props.info.storeName}/>}
+                                    {screens[this.state.screen]}
                                 </Content>
-                                {isManager &&
+                                {utils.isManager(props) &&
                                 <Sider>
                                     <StoreMenu onChange={this.onChange}/>
                                 </Sider>}
