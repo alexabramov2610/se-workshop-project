@@ -9,7 +9,7 @@ import {
   Cart,
   IPayment,
   IContactUsMessage,
-  Error, IDiscountPolicy, IPurchasePolicy,
+  Error, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission,
 } from "./CommonInterface";
 import {
   ManagementPermission,
@@ -142,7 +142,12 @@ interface GetPersonalDetailsResponse extends Response {
   data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
 }
 
+interface GetAllManagersPermissionsResponse extends Response {
+  data: {result: boolean, permissions: ManagerNamePermission[]}
+}
+
 export {
+  GetAllManagersPermissionsResponse,
   GetPersonalDetailsResponse,
   GetAllCategoriesResponse,
   GetCategoriesResponse,

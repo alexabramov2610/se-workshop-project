@@ -192,3 +192,10 @@ export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest)
 export const getAllCategories = (req: Req.Request): Res.GetAllCategoriesResponse => {
     return ts.getAllCategories();
 }
+
+export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest): Res.GetAllManagersPermissionsResponse => {
+    const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.VIEW_MANAGER_PERMISSION, req.token)
+    if (!havePermission.data.result)
+        return {data: {result: false, permissions: []}, error: havePermission.error}
+    return ts.getManagersPermissions(req);
+}

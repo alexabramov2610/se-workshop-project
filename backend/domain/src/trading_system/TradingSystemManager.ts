@@ -616,4 +616,9 @@ export class TradingSystemManager {
         return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores, ownedStores, purchasesHistory } };
 
     }
+
+    getManagersPermissions(req: Req.GetAllManagersPermissionsRequest): Res.GetAllManagersPermissionsResponse {
+        logger.info(`retrieving managers permissions in store: ${req.body.storeName}`);
+        return this._storeManager.getManagersPermissions(req.body.storeName);
+    }
 }

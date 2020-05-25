@@ -4,9 +4,10 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy
+    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
+import {Response} from "./Response";
 
 interface Request {
     body: any;
@@ -246,8 +247,12 @@ interface GetAllCategoriesInStoreRequest extends Request {
     body: { storeName: string }
 }
 
+interface GetAllManagersPermissionsRequest extends Request {
+    body: { storeName: string }
+}
 
 export {
+    GetAllManagersPermissionsRequest,
     GetAllCategoriesInStoreRequest,
     GetAllProductsInStoreRequest,
     GetStoresWithOffsetRequest,

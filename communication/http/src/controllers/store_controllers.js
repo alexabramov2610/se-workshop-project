@@ -211,5 +211,15 @@ export async function viewProductInfo(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
+}
 
+export async function getManagersPermissions(req, res) {
+    try {
+        const viewProductInfoReq = {body: {storeName: req.query.storeName}};
+        req.body = viewProductInfoReq;
+        const result = wrapHttp(req, ServiceFacade.getManagersPermissions);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
 }

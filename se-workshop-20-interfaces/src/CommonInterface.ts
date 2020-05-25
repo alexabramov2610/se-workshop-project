@@ -1,4 +1,4 @@
-import {Operators, ProductCategory, Rating, WeekDays} from "./Enums";
+import {ManagementPermission, Operators, ProductCategory, Rating, WeekDays} from "./Enums";
 
 export {ProductCategory};
 
@@ -185,4 +185,9 @@ export interface ProductInStore {
     product: IProduct;
     storeName: string;
     storeRating: Rating
+}
+
+export interface ManagerNamePermission {
+    managerName: string,
+    permissions: ManagementPermission[]
 }
