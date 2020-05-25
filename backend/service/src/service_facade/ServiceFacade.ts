@@ -181,6 +181,9 @@ UC-4.6
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addManagerPermissions));
 }
+export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPermissionRequest): Res.BoolResponse => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.addMultipleManagersPermissions));
+}
 export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeManagerPermissions));
 }

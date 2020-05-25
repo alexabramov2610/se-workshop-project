@@ -91,6 +91,10 @@ interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
 }
 
+interface ChangeMultipleManagerPermissionRequest extends Request {
+    body: { storeName: string, permissions: ManagerNamePermission[] }
+}
+
 interface ViewManagerPermissionRequest extends Request {
     body: { managerToView: string, storeName: string }
 }
@@ -252,6 +256,7 @@ interface GetAllManagersPermissionsRequest extends Request {
 }
 
 export {
+    ChangeMultipleManagerPermissionRequest,
     GetAllManagersPermissionsRequest,
     GetAllCategoriesInStoreRequest,
     GetAllProductsInStoreRequest,

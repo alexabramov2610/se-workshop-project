@@ -22,6 +22,7 @@ router.post("/assignStoreOwner", StoreController.assignStoreOwner);
 router.post("/removeStoreOwner", StoreController.removeStoreOwner);
 router.post("/assignStoreManager", StoreController.assignStoreManager);
 router.post("/addManagerPermissions", StoreController.addManagerPermissions);
+router.post("/addMultipleManagersPermissions", StoreController.addMultipleManagersPermissions);
 router.post("/removeManagerPermissions", StoreController.removeManagerPermissions);
 router.post("/viewManagerPermissions", StoreController.viewManagerPermissions);
 router.post("/removeStoreManager", StoreController.removeStoreManager);

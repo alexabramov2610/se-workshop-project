@@ -91,6 +91,11 @@ export async function addManagerPermissions(req, res) {
     return res.send(result)
 }
 
+export async function addMultipleManagersPermissions(req, res) {
+    const result = wrapHttp(req, ServiceFacade.addMultipleManagersPermissions);
+    return res.send(result)
+}
+
 export async function removeManagerPermissions(req, res) {
     const result = wrapHttp(req, ServiceFacade.removeManagerPermissions);
     return res.send(result)
