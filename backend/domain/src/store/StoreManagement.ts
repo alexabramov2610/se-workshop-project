@@ -332,7 +332,7 @@ export class StoreManagement {
 
         const userManagerToRemove: StoreManager = store.getStoreManager(managerToChange);
         if (!userManagerToRemove) {   // not store owner
-            error = errorMsg.E_NOT_OWNER;
+            error = errorMsg.E_NOT_MANAGER;
             logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
                 ${managerToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
@@ -379,7 +379,7 @@ export class StoreManagement {
 
         const userManagerToAdd: StoreManager = store.getStoreManager(usernameToChange);
         if (!userManagerToAdd) {   // not store owner
-            error = errorMsg.E_NOT_OWNER;
+            error = errorMsg.E_NOT_MANAGER;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
