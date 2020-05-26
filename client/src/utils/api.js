@@ -1,6 +1,8 @@
 import axios from "axios";
 import openSocket from "socket.io-client";
 
+
+
 const https = require("https");
 let socket;
 const initData = {
@@ -144,7 +146,23 @@ const addProduct = async (storeName, catalogNumber, name, price, category) => {
   return instance.post(`${baseDomain}/stores/addNewProducts`, req);
 };
 
+const changeProductName = async (storeName,catalogNumber, newName) => {
+  const req = {
+    body: { storeName,catalogNumber,newName },
+  };
+  return instance.post(`${baseDomain}/stores/changeProductName`, req);
+};
+const changeProductPrice = async (storeName, catalogNumber,newPrice) => {
+  const req = {
+    body: { storeName,catalogNumber,newPrice },
+  };
+  return instance.post(`${baseDomain}/stores/changeProductPrice`, req);
+};
+
+
 export {
+  changeProductName,
+  changeProductPrice,
   addProduct,
   getPermissions,
   purchase,

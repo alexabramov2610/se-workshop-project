@@ -6,7 +6,7 @@ import { ManageProductsPageCtx } from "./manage-products-page-ctx";
 import { Title, FormContainer } from "./manage-products-page.styles";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
-
+import * as Message from '../../components/custom-alert/custom-alert'
 const { Header, Content } = Layout;
 const Category = {
   GENERAL: 0,
@@ -39,13 +39,19 @@ class ManageProductsPage extends React.Component {
       productPrice: "",
       category: 0,
     });
-    await api.addProduct(
+    const addRes = await api.addProduct(
       storeName,
       catalogNumber,
       productName,
       productPrice,
       category
     );
+    if(addRes.data.data.result){
+      Message.success("Added product!")
+      window.location.reload();
+    }
+    else
+      Message.error(addRes.data.error.message)
 
   };
 
@@ -62,7 +68,6 @@ class ManageProductsPage extends React.Component {
         {(props) => (
           <Layout className="site-layout" style={{ backgroundColor: "white" }}>
             <Header style={{ backgroundColor: "white", fontSize: "25px" }}>
-              {console.log(props)}
               <Divider style={{ fontSize: "25px" }} orientation={"left"}>
                 Manage Products
               </Divider>
@@ -113,6 +118,7 @@ class ManageProductsPage extends React.Component {
                           return { key: i, text: c, value: c };
                         })}
                         onChange={this.handleChange}
+                        required={true}
                       />
                     </Form.Group>
 
