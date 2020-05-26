@@ -1,5 +1,4 @@
 import React from "react";
-import {ProductsGrid} from "../../components/products-grid/products-grid";
 import {Layout} from "antd";
 import {StoreMenu} from "../../components/store-menu/store-menu.component";
 import {StorePageCtx} from "./store-page-ctx";
@@ -7,10 +6,18 @@ import ManageProductsContainer from "../manage-products-page/manage-products-pag
 import DiscountPageContainer from "../discount-page/discount-page-container";
 import StoreOverview from "../../components/store-overview/store-overview.component";
 import * as utils from "./store-page-utils";
+import ManagePermissionsPageContainer from "../manage-permissions-page/manage-permissions-page-container";
 
 
 const {Sider, Content} = Layout;
-const screens = [<StoreOverview/>, <ManageProductsContainer/>, <DiscountPageContainer/>];
+const screens = [
+    <StoreOverview/>,
+    <div>EDIT STORE INFO</div>,
+    <ManageProductsContainer/>,
+    <DiscountPageContainer/>,
+    <div>MANAGE BUYING POLICY</div>,
+    <ManagePermissionsPageContainer/>
+    ];
 
 const layoutStyle = {backgroundColor: "white"};
 const contentStyle = {padding: "0px 30px", minHeight: "70vh", backgroundColor: "white",};

@@ -1,4 +1,4 @@
-import {warning} from "../../components/modal/modal";
+import * as Modal from "../../components/modal/modal";
 import {config} from './discount-page-config';
 import * as utils from "./discount-page-utils";
 
@@ -11,14 +11,14 @@ export const verifyDiscountSetting = ({mode, discount, policyDiscounts}) => {
     } else if (!discount.duration || !discount.percentage) {
         valid = false;
     }
-    if (!valid) warning("Discount Percentage and duration are mandatory fields");
+    if (!valid) Modal.warning("Discount Percentage and duration are mandatory fields");
     return valid;
 }
 
 export const verifyConditionSetting = ({condition}) => {
     console.log("got here");
     if (condition.condition && !condition.condition.catalogNumber || !condition.operator) {
-        warning("Fill all condition fields, including product, operator and minimum amount / on discount");
+        Modal.warning("Fill all condition fields, including product, operator and minimum amount / on discount");
         return false;
     }
     return true;
@@ -32,7 +32,7 @@ export const verifyProductsSetting = ({subject, discount, mode, policyDiscounts}
         && policyDiscounts.filter(d => d.key === mode.editedDiscount)[0].discount.products.length === 0;
 
     if (isAddModeAndNoProducts || isEditModeAndNoProducts) {
-        warning("Products must be chosen for that kind of discount");
+        Modal.warning("Products must be chosen for that kind of discount");
         return false;
     }
     return true;
@@ -40,7 +40,7 @@ export const verifyProductsSetting = ({subject, discount, mode, policyDiscounts}
 
 export const verifyStoreSetting = ({subject, discount}) => {
     if (subject === "store" && !discount.condition[0]) {
-        warning("Minimum subtotal is mandatory for sore discount");
+        Modal.warning("Minimum subtotal is mandatory for sore discount");
         return false;
     }
     return true;

@@ -5,7 +5,8 @@ import {
     PercentageOutlined,
     ShoppingOutlined,
     LockOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    EditOutlined
 } from '@ant-design/icons';
 import {StorePageCtx} from "../../pages/store-page/store-page-ctx";
 import * as utils from "../../pages/store-page/store-page-utils";
@@ -23,13 +24,16 @@ const StoreMenu = ({onChange}) => {
                 defaultSelectedKeys={["1"]}
             >
                 <Menu.Item key="1" icon={<AppstoreOutlined/>}>Store Overview</Menu.Item>
+                {utils.isManager(props) &&
+                <Menu.Item key="2" icon={<EditOutlined />}>Edit Store Info</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MANAGE_INVENTORY, props.permissions) &&
-                <Menu.Item key="2" icon={<AppstoreAddOutlined/>}>Manage Products</Menu.Item>}
+                <Menu.Item key="3" icon={<AppstoreAddOutlined/>}>Manage Products</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MODIFY_DISCOUNT, props.permissions) &&
-                <Menu.Item key="3" icon={<PercentageOutlined/>}>Manage Discount Policy</Menu.Item>}
+                <Menu.Item key="4" icon={<PercentageOutlined/>}>Manage Discount Policy</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MODIFY_BUYING_METHODS, props.permissions) &&
-                <Menu.Item key="4" icon={<ShoppingOutlined/>}>Manage Buying Policy</Menu.Item>}
-                {utils.isOwner(props) && <Menu.Item key="5" icon={<LockOutlined/>}>Manage Permissions</Menu.Item>}
+                <Menu.Item key="5" icon={<ShoppingOutlined/>}>Manage Buying Policy</Menu.Item>}
+                {utils.isOwner(props) &&
+                <Menu.Item key="6" icon={<LockOutlined/>}>Manage Permissions</Menu.Item>}
             </Menu>
             }
         </StorePageCtx.Consumer>

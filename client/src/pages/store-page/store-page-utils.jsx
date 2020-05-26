@@ -19,3 +19,8 @@ export const isManager = (props) => {
 export const hasPermission = (permission, permissions) => {
     return permissions.includes(permission);
 }
+
+export const initialManagersPermissions = [
+    permissions.MANAGE_INVENTORY,
+    permissions.MODIFY_BUYING_METHODS
+];

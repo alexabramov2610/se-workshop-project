@@ -2,10 +2,12 @@ import React, {useEffect, useState} from "react";
 import {DiscountPageCtx} from "./discount-page-ctx";
 import DiscountPage from "./discount-page.component";
 import {config} from './discount-page-config';
-import * as utils from "./discount-page-utils";
+import * as dpUtils from "./discount-page-utils";
 import * as api from "../../utils/api";
 import Spinner from "../../components/spinner/spinner";
 import {useParams} from "react-router-dom";
+import * as generalUtils from "../../utils/utils";
+import * as Message from "../../components/custom-alert/custom-alert";
 
 const DiscountPageContainer = () => {
 
@@ -42,11 +44,11 @@ const DiscountPageContainer = () => {
     useEffect(() => {
         const fetchData = async () => {
             const policyRes = await api.getDiscountPolicy(storeName);
-            const keyedDiscounts = utils.addKeys(policyRes.data.data.policy.discounts);
+            const keyedDiscounts = generalUtils.addKeys(policyRes.data.data.policy.discounts);
             const keyedConditions = keyedDiscounts.map(d => {
                 const currConditions = d.discount.condition;
                 return currConditions
-                    ? utils.addKeys(currConditions)
+                    ? generalUtils.addKeys(currConditions)
                     : []
             });
             keyedDiscounts.forEach((d, i) => {
@@ -68,9 +70,10 @@ const DiscountPageContainer = () => {
                     discounts: policyDiscounts
                 }
             }
-        }).then(r => console.log(JSON.stringify(r)));
-        setIsLoading(false);
+        }).then(r => {});
         setFetching(!fetching);
+        setIsLoading(false);
+        Message.success("Discount policy changed successfully");
     }
 
     const resetDiscount = () => {
@@ -95,6 +98,7 @@ const DiscountPageContainer = () => {
     }
 
     let providerState = {
+        isLoading: isLoading,
         setPolicyDiscounts: setPolicyDiscounts,
         policyDiscounts: policyDiscounts,
         products: products,
@@ -120,7 +124,7 @@ const DiscountPageContainer = () => {
         <DiscountPageCtx.Provider value={providerState}>
             {console.log(policyDiscounts)}
             {
-                !policyDiscounts || !products || !categories || isLoading
+                !policyDiscounts || !products || !categories
                     ? <Spinner message={"Loading..."}/>
                     : <DiscountPage screen={screen}/>
             }

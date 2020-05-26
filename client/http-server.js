@@ -5,6 +5,16 @@ const app = express()
 const port = 4000
 app.use(cors());
 
+const permissions = {
+    WATCH_PURCHASES_HISTORY: "WATCH_PURCHASES_HISTORY",
+    WATCH_USER_QUESTIONS: "WATCH_USER_QUESTIONS",
+    REPLY_USER_QUESTIONS: "REPLY_USER_QUESTIONS",
+    MODIFY_BUYING_METHODS: "MODIFY_BUYING_METHODS",
+    MODIFY_DISCOUNT: "MODIFY_DISCOUNT",
+    MANAGE_INVENTORY: "MANAGE_INVENTORY",
+    CLOSE_STORE: "CLOSE_STORE"
+}
+
 const mockCategories = {
     data: {
         categories: [
@@ -108,11 +118,22 @@ let mockPolicy = {
     }
 }
 
+const mockPermissions = {
+    data: {
+        permissions: [
+            {managerName: "yosi", permissions: [permissions.MODIFY_BUYING_METHODS, permissions.MODIFY_DISCOUNT]},
+            {managerName: "dani", permissions: [permissions.REPLY_USER_QUESTIONS, permissions.CLOSE_STORE]},
+            {managerName: "dor", permissions: []}
+        ]
+    }
+}
 
-app.get('/getStores', (req, res) => res.send({add: "ad"}))
-app.get('/products', (req, res) => res.send(mockProducts))
-app.get('/stores/getCategories', (req, res) => res.send(mockCategories))
-app.get('/stores/getPolicy', (req, res) => res.send(mockPolicy))
-app.post('/stores/getPolicy', (res) => mockPolicy.data.policy.discounts.push(res.body));
+// app.get('/getStores', (req, res) => res.send({add: "ad"}))
+// app.get('/products', (req, res) => res.send(mockProducts))
+// app.get('/stores/getCategories', (req, res) => res.send(mockCategories))
+// app.get('/stores/getPolicy', (req, res) => res.send(mockPolicy))
+app.get('/stores/getPermissions', (req, res) => res.send(mockPermissions))
+app.get('/stores/getInfo', (req, res) => res.send(mockPermissions))
+// app.post('/stores/getPolicy', (res) => mockPolicy.data.policy.discounts.push(res.body));
 
 app.listen(port, () => console.log(`express server is running`))

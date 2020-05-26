@@ -2,7 +2,6 @@ import React from 'react'
 import {Button, Space, Steps} from 'antd';
 import 'antd/dist/antd.css';
 import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
-import {Button as SButton} from "semantic-ui-react";
 import * as verifier from "../../pages/discount-page/settings-verifier";
 import {config} from '../../pages/discount-page/discount-page-config';
 import * as utils from "../../pages/discount-page/discount-page-utils";
@@ -48,6 +47,12 @@ const Stages = ({stage}) => {
         props.submit();
     }
 
+    const handleCancel = (props) => {
+        props.reset();
+        props.moveToScreen(config.steps.REVIEW_SUBMIT);
+
+    }
+
     return (
         <DiscountPageCtx.Consumer>
             {
@@ -56,19 +61,23 @@ const Stages = ({stage}) => {
                         <Space style={{float: "right"}}>
                             {
                                 stage === config.steps.REVIEW_SUBMIT
-                                    ? <SButton onClick={() => handleSubmit(props)} type="primary"
-                                               color={"green"} size={"small"}>Submit</SButton>
-
-                                    : null
+                                && <Button onClick={() => handleSubmit(props)}
+                                           type="primary"
+                                           style={{backgroundColor: "#0fa432", border: "none"}}
+                                           loading={props.isLoading}
+                                >
+                                    Submit
+                                </Button>
                             }
                             {
                                 stage === config.steps.REVIEW_SUBMIT
-                                    ? <Button onClick={() => handleNewDiscount(props)} type="primary">New
-                                        Discount
+                                    ? <Button onClick={() => handleNewDiscount(props)} type="primary">
+                                        New Discount
                                     </Button>
                                     : <Button onClick={() => handleConfirm(props)} type="primary">Continue</Button>
                             }
-                            <Button ghost type="primary">Cancel</Button>
+                            {stage !== config.steps.REVIEW_SUBMIT &&
+                            <Button ghost type="primary" onClick={() => handleCancel(props)}>Cancel</Button>}
                         </Space>
 
                         <Steps size="small" current={stage} style={{marginBottom: "10px", marginTop: "20px"}}>
