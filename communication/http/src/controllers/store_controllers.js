@@ -91,6 +91,11 @@ export async function addManagerPermissions(req, res) {
     return res.send(result)
 }
 
+export async function addMultipleManagersPermissions(req, res) {
+    const result = wrapHttp(req, ServiceFacade.addMultipleManagersPermissions);
+    return res.send(result)
+}
+
 export async function removeManagerPermissions(req, res) {
     const result = wrapHttp(req, ServiceFacade.removeManagerPermissions);
     return res.send(result)
@@ -211,5 +216,15 @@ export async function viewProductInfo(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
+}
 
+export async function getManagersPermissions(req, res) {
+    try {
+        const viewProductInfoReq = {body: {storeName: req.query.storeName}};
+        req.body = viewProductInfoReq;
+        const result = wrapHttp(req, ServiceFacade.getManagersPermissions);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
 }

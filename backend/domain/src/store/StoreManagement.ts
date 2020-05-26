@@ -22,7 +22,7 @@ import {
     IPurchasePolicy,
     StoreInfo,
     IPurchasePolicyElement,
-    ISimplePurchasePolicy
+    ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -762,6 +762,20 @@ export class StoreManagement {
             }
         )
         return stores;
+    }
+
+    getManagersPermissions(storeName: string): Res.GetAllManagersPermissionsResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return {data: {result: false, permissions: []}, error: { message: errorMsg.E_INVALID_STORE} }
+        let permissions: ManagerNamePermission[] = [];
+
+        store.storeManagers.forEach(storeManager => {
+            permissions.push({ managerName: storeManager.name, permissions: storeManager.getPermissions() })
+        })
+
+        return { data: {result: true, permissions: permissions} }
+
     }
 
 

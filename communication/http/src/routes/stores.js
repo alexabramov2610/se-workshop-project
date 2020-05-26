@@ -22,6 +22,7 @@ router.post("/assignStoreOwner", StoreController.assignStoreOwner);
 router.post("/removeStoreOwner", StoreController.removeStoreOwner);
 router.post("/assignStoreManager", StoreController.assignStoreManager);
 router.post("/addManagerPermissions", StoreController.addManagerPermissions);
+router.post("/updateManagersPermissions", StoreController.addMultipleManagersPermissions);
 router.post("/removeManagerPermissions", StoreController.removeManagerPermissions);
 router.post("/viewManagerPermissions", StoreController.viewManagerPermissions);
 router.post("/removeStoreManager", StoreController.removeStoreManager);
@@ -38,5 +39,6 @@ router.get("/getAllCategories/", StoreController.getAllCategories);      // usag
 router.get("/getManagerPermissions/", StoreController.getManagerPermissions);       //usage: stores/getManagerPermissions/?storeName=shufersal
 router.get("/getDiscountsPolicy", StoreController.getDiscountsPolicy);              //usage: stores/getDiscountsPolicy/?storeName=shufersal
 router.get("/getStoreInfo", StoreController.viewStoreInfo);                        //usage: stores/getStoreInfo/?storeName=shufersal
+router.get("/getManagersPermissions", StoreController.getManagersPermissions);                        //usage: stores/getStoreInfo/?storeName=shufersal
 
 export default router;

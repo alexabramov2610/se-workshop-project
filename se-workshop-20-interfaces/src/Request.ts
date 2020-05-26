@@ -4,9 +4,10 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy
+    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
+import {Response} from "./Response";
 
 interface Request {
     body: any;
@@ -88,6 +89,10 @@ interface ViewShopPurchasesHistoryRequest extends Request {
 
 interface ChangeManagerPermissionRequest extends Request {
     body: { managerToChange: string, storeName: string, permissions: ManagementPermission[] }
+}
+
+interface ChangeMultipleManagerPermissionRequest extends Request {
+    body: { storeName: string, permissions: ManagerNamePermission[] }
 }
 
 interface ViewManagerPermissionRequest extends Request {
@@ -246,8 +251,13 @@ interface GetAllCategoriesInStoreRequest extends Request {
     body: { storeName: string }
 }
 
+interface GetAllManagersPermissionsRequest extends Request {
+    body: { storeName: string }
+}
 
 export {
+    ChangeMultipleManagerPermissionRequest,
+    GetAllManagersPermissionsRequest,
     GetAllCategoriesInStoreRequest,
     GetAllProductsInStoreRequest,
     GetStoresWithOffsetRequest,

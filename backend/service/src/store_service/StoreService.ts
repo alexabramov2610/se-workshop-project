@@ -1,6 +1,7 @@
 import {Res, Req} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagerNamePermission} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export const createStore = (req: Req.OpenStoreRequest
 ): Res.BoolResponse => {
@@ -121,6 +122,22 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
     return ts.addManagerPermissions(req);
 }
+export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPermissionRequest): Res.BoolResponse => {
+    let errors: string[] = [];
+    req.body.permissions.forEach((permission: ManagerNamePermission) => {
+        const addManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
+            body: { storeName: req.body.storeName, managerToChange: permission.managerName, permissions: permission.permissions}};
+        const removeManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
+            body: { storeName: req.body.storeName, managerToChange: permission.managerName, permissions: Object.values(ManagementPermission)}};
+        removeManagerPermissions(removeManagerPermissionsReq);
+        const addManagerPermissionsRes: Res.BoolResponse = addManagerPermissions(addManagerPermissionsReq);
+        if (!addManagerPermissionsRes.data.result)
+            errors.push(addManagerPermissionsRes.error.message)
+    });
+    if (errors.length > 0)
+        return { data: { result: errors.length !== req.body.permissions.length }, error: { message: errors.join("\n") }}
+    return { data: { result: true } }
+}
 export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
     return ts.viewManagerPermissions(req);
 }
@@ -191,4 +208,11 @@ export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest)
 
 export const getAllCategories = (req: Req.Request): Res.GetAllCategoriesResponse => {
     return ts.getAllCategories();
+}
+
+export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest): Res.GetAllManagersPermissionsResponse => {
+    const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.VIEW_MANAGER_PERMISSION, req.token)
+    if (!havePermission.data.result)
+        return {data: {result: false, permissions: []}, error: havePermission.error}
+    return ts.getManagersPermissions(req);
 }

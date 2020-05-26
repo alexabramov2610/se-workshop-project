@@ -103,6 +103,10 @@ export class Store {
         return this._UUID;
     }
 
+    get storeManagers(): StoreManager[] {
+        return this._storeManagers;
+    }
+
     getPurchasesHistory(): Receipt[] {
         return this._receipts;
     }
