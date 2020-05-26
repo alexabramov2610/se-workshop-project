@@ -1,4 +1,5 @@
 import React from "react";
+import * as Modal from "../modal/modal";
 import { Form } from "semantic-ui-react";
 import { PayFormContainer } from "./pay-form.styles";
 import { BuySuccess } from "../BuyFeedBack/buyfeedback.component";
@@ -29,8 +30,8 @@ export class PayForm extends React.Component {
       ccnumber,
       cvv,
     } = this.state;
-    const expMonth = exp.split("/")[0];
-    const expYear = exp.split("/")[1];
+    const expMonth = exp && exp.split("/")[0];
+    const expYear = exp && exp.split("/")[1];
     const req = {
       body: {
         payment: {
@@ -53,7 +54,7 @@ export class PayForm extends React.Component {
       this.setState({ buySucc: true });
       await this.props.cartCountUpdater();
     } else {
-      alert("something went wrong");
+      Modal.warning(data.error.message);
     }
   }
 
