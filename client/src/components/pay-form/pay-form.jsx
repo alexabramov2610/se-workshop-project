@@ -45,7 +45,7 @@ export class PayForm extends React.Component {
           city,
           country,
         },
-        total,
+        total: this.props.total,
       },
     };
     const { data } = await api.purchase(req);
@@ -92,21 +92,14 @@ export class PayForm extends React.Component {
               label="Street"
               name="street"
               placeholder="Street"
-              width={8}
+              width={12}
             />
             <Form.Input
               onChange={this.handleChange}
               label="Number"
               name="homeNumber"
               placeholder="Number"
-              width={2}
-            />
-            <Form.Input
-              onChange={this.handleChange}
-              label="Total Amount"
-              name="total"
-              placeholder="Total Amount"
-              width={6}
+              width={4}
             />
           </Form.Group>
           <Form.Group>

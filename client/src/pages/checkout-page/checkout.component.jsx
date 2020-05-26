@@ -67,7 +67,10 @@ export class CheckoutPage extends React.Component {
         </CheckoutPageContainer>
         <Divider style={{ width: "55%", margin: "auto", marginTop: "50px" }} />
         <TotalContainer>TOTAL: ₪ {this.state.total}</TotalContainer>
-        <PayForm cartCountUpdater={this.props.cartCountUpdater} />
+        <PayForm
+          total={this.state.total}
+          cartCountUpdater={this.props.cartCountUpdater}
+        />
       </div>
     );
   }
