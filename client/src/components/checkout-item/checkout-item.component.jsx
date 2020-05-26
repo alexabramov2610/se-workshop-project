@@ -41,12 +41,12 @@ export const CheckoutItem = ({ cartItem }) => {
         {quantity * price !== finalPrice ? (
           <div>
             <span style={{ textDecoration: "line-through" }}>
-              {quantity * price}
+              {quantity * price} &#8362;
             </span>
-            <span style={{ marginLeft: "7px" }}>{finalPrice}</span>
+            <span style={{ marginLeft: "7px" }}>{finalPrice} &#8362;</span>
           </div>
         ) : (
-          <span>{quantity * price}</span>
+          <span>{quantity * price} &#8362;</span>
         )}
       </TotalContainer>
       <CartCtx.Consumer>
