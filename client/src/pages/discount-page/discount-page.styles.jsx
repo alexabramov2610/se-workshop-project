@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const DiscountPageContainer = styled.div`
-    width: 85%;
+    width: 100%;
     margin: auto;
 `
 

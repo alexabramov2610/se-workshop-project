@@ -23,6 +23,7 @@ import DiscountPageContainer from "./pages/discount-page/discount-page-container
 import StorePageContainer from "./pages/store-page/store-page-container";
 import { CheckoutPage } from './pages/checkout-page/checkout.component'
 import * as wssClient from "./utils/wss.client";
+import ManagePermissionsPageContainer from "./pages/manage-permissions-page/manage-permissions-page-container";
 
 
 
@@ -91,7 +92,7 @@ class App extends React.Component {
                         <Route path="/category" component={CategoryPage} />
                         <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                         <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
-                        <Route path="/store/manageDiscountsPolicy/:storename" component={DiscountPageContainer} />
+                        {/*<Route path="/store/permissions" component={ManagePermissionsPageContainer} />*/}
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />

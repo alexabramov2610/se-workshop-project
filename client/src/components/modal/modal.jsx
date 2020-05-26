@@ -12,3 +12,11 @@ export function warning(message) {
         content: message,
     });
 }
+
+export function error(message) {
+    Modal.error({
+        title: 'You are doing something wrong...',
+        content: message,
+    });
+}
+

@@ -34,12 +34,6 @@ export const isEditedDiscount = (key, mode) => {
     return key === mode.editedDiscount;
 }
 
-export const addKeys = (collection) => {
-    return collection.map((item, index) => {
-        return {key: index + "", ...item};
-    });
-}
-
 export const removeConditionFromDiscount = (k, props) => {
     isEditMode(props.mode)
         ? props.setPolicyDiscounts(prevPolicyDiscounts => {

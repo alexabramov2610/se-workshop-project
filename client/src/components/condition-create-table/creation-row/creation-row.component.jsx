@@ -46,7 +46,7 @@ const CreationRow = () => {
                 ...props.discount,
                 condition: [...props.discount.condition, {key: props.discount.condition.length, ...props.condition}],
             })
-        props.setCondition({condition: {}});
+        // props.setCondition({condition: {}});
     }
 
     const handleAmountChange = (e, props) => {
@@ -67,6 +67,46 @@ const CreationRow = () => {
         });
     }
 
+    const getProductCell = (presentProducts) => {
+        return (
+            <Table.Cell style={{width: "33.3%"}}>
+                <SearchSelect onChangeCallback={handleProductSelection}
+                              placeholder={"product"} bordered={false} options={presentProducts}/>
+            </Table.Cell>
+        );
+    }
+
+    const getConditionsCell = (props) => {
+        return (
+            <Table.Cell style={{width: "33.3%"}}>
+                <Radio.Group buttonStyle="solid" size={"small"}
+                             defaultValue="onDiscount"
+                             onChange={handleConditionChange}>
+                    <Radio.Button value="minAmount">Minimum Amount</Radio.Button>
+                    <Space>
+                        <Radio.Button value="onDiscount">On Discount</Radio.Button>
+                        <InputNumber disabled={!amountView}
+                                     size="small"
+                                     min={0} defaultValue={0}
+                                     onChange={e => handleAmountChange(e, props)}
+                        />
+                    </Space>
+                </Radio.Group>
+            </Table.Cell>
+        );
+    }
+
+    const getOperatorCell = (props) => {
+        return (
+            <Table.Cell style={{width: "33.3%"}}>
+                <SearchSelect placeholder={"operator"}
+                              bordered={false} options={utils.basicOperators}
+                              onChangeCallback={(e) => handleOperatorChange(e, props)}
+                />
+            </Table.Cell>
+        );
+    }
+
     return (
         <DiscountPageCtx.Consumer>
             {
@@ -74,31 +114,9 @@ const CreationRow = () => {
                     const presentProducts = utils.getPresentedProducts(props);
                     return <React.Fragment>
                         <Table.Row>
-                            <Table.Cell style={{width: "33.3%"}}>
-                                <SearchSelect onChangeCallback={handleProductSelection}
-                                              placeholder={"product"} bordered={false} options={presentProducts}/>
-                            </Table.Cell>
-                            <Table.Cell style={{width: "33.3%"}}>
-                                <Radio.Group buttonStyle="solid" size={"small"}
-                                             defaultValue="onDiscount"
-                                             onChange={handleConditionChange}>
-                                    <Radio.Button value="minAmount">Minimum Amount</Radio.Button>
-                                    <Space>
-                                        <Radio.Button value="onDiscount">On Discount</Radio.Button>
-                                        <InputNumber disabled={!amountView}
-                                                     size="small"
-                                                     min={0} defaultValue={0}
-                                                     onChange={e => handleAmountChange(e, props)}
-                                        />
-                                    </Space>
-                                </Radio.Group>
-                            </Table.Cell>
-                            <Table.Cell style={{width: "33.3%"}}>
-                                <SearchSelect placeholder={"operator"}
-                                              bordered={false} options={utils.basicOperators}
-                                              onChangeCallback={(e) => handleOperatorChange(e, props)}
-                                />
-                            </Table.Cell>
+                            {getProductCell(presentProducts)}
+                            {getConditionsCell(props)}
+                            {getOperatorCell(props)}
                         </Table.Row>
                         <Button size={"small"} type="primary" onClick={() => handleAddition(props)}>
                             Add Condition

@@ -91,14 +91,17 @@ const SubjectProducts = () => {
                     });
 
                     return <div style={{overflow: 'hidden'}}>
-                        <Radio.Group onChange={(e) => props.switchSubject(e.target.value)} defaultValue={"products"}
+                        <Radio.Group onChange={(e) => props.switchSubject(e.target.value)}
+                                     value={props.subject}
                                      style={{display: 'flex'}}>
                             <Radio.Button value="store">STORE</Radio.Button>
                             <Radio.Button value="products">PRODUCTS</Radio.Button>
                             <Radio.Button verticalAlign='middle' value="category">
-                                <SearchSelect bordered={false} placeholder={"CATEGORY"} options={categories}
-                                              onChangeCallback={props.selectCategory}/>
+                                CATEGORY
                             </Radio.Button>
+                            {props.subject === "category" &&
+                            <SearchSelect bordered={false} placeholder={"Pick Category"} options={categories}
+                                          onChangeCallback={props.selectCategory}/>}
                         </Radio.Group>
                         <Divider/>
                         {props.subject === 'products'
