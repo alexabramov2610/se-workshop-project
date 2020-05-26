@@ -57,6 +57,9 @@ export class CheckoutPage extends React.Component {
               <span>Price</span>
             </HeaderBlockContainer>
             <HeaderBlockContainer>
+              <span>Total</span>
+            </HeaderBlockContainer>
+            <HeaderBlockContainer>
               <span>Remove</span>
             </HeaderBlockContainer>
           </CheckoutHeaderContainer>
@@ -67,7 +70,10 @@ export class CheckoutPage extends React.Component {
         </CheckoutPageContainer>
         <Divider style={{ width: "55%", margin: "auto", marginTop: "50px" }} />
         <TotalContainer>TOTAL: ₪ {this.state.total}</TotalContainer>
-        <PayForm cartCountUpdater={this.props.cartCountUpdater} />
+        <PayForm
+          total={this.state.total}
+          cartCountUpdater={this.props.cartCountUpdater}
+        />
       </div>
     );
   }
@@ -76,12 +82,14 @@ export class CheckoutPage extends React.Component {
 const mapCartToItems = (items) => {
   const itemsWithStores = items.map((p) =>
     p.bagItems.map((bi) => {
+      console.log(bi);
       return {
         store: p.storeName,
         name: bi.product._name,
         price: bi.product._price,
         cn: bi.product._catalogNumber,
         quantity: bi.amount,
+        finalPrice: bi.finalPrice,
       };
     })
   );

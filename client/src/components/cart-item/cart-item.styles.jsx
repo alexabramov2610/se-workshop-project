@@ -25,4 +25,5 @@ export const ItemDetailsContainer = styled.div`
 export const RemoveButtonContainer = styled.div`
   ${"" /* align-self: center; */}
   cursor: pointer;
+  margin: auto;
 `;

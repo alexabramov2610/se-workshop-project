@@ -6,12 +6,12 @@ export function success(message) {
     });
 }
 
-export function warning(message) {
+export function warning(message, title = "You are doing something wrong...") {
     Modal.warning({
-        title: 'You are doing something wrong...',
-        content: message,
+      title,
+      content: message,
     });
-}
+  }
 
 export function error(message) {
     Modal.error({

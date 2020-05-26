@@ -8,10 +8,11 @@ export const CheckoutItemContainer = styled.div`
   padding: 15px 0;
   font-size: 20px;
   align-items: center;
+  
 `;
 
 export const ImageContainer = styled.div`
-  width: 23%;
+  width: 19%;
   padding-right: 15px;
 
   img {
@@ -21,21 +22,31 @@ export const ImageContainer = styled.div`
 `;
 
 export const TextContainer = styled.span`
-  width: 23%;
+  width: 19%;
 `;
 
 export const QuantityContainer = styled(TextContainer)`
   display: flex;
 
   span {
-    margin: 0 10px;
+    
   }
 
   div {
     cursor: pointer;
   }
 `;
+export const TotalContainer = styled(TextContainer)`
+  display: flex;
 
+  span {
+    margin-left:-10px;
+  }
+
+  div {
+    cursor: pointer;
+  }
+`;
 export const RemoveButtonContainer = styled.div`
   padding-left: 12px;
   cursor: pointer;

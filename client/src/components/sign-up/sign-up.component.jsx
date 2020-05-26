@@ -1,4 +1,5 @@
 import React from "react";
+import * as Modal from "../modal/modal";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
 import { SignUpContainer, SignUpTitle } from "./sign-up.styles";
@@ -21,7 +22,7 @@ class SignUp extends React.Component {
     const { displayName, email, password, confirmPassword } = this.state;
 
     if (password !== confirmPassword) {
-      alert("passwords don't match");
+      Modal.warning("passwords don't match");
       return;
     }
     console.log(this.state);
