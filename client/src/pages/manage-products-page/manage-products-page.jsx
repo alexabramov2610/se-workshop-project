@@ -6,9 +6,6 @@ import { ManageProductsPageCtx } from "./manage-products-page-ctx";
 import { Title, FormContainer } from "./manage-products-page.styles";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
-import { config } from "../discount-page/discount-page-config";
-import { DiscountPageContainer } from "../discount-page/discount-page.styles";
-import { InputGroup, FormControl, Dropdown, Button } from "react-bootstrap";
 
 const { Header, Content } = Layout;
 const Category = {
@@ -33,9 +30,9 @@ class ManageProductsPage extends React.Component {
   updateCat(value) {
     this.setState({ category: value });
   }
-  handleSubmit = async (storeName) => {
+  handleSubmit = async (event,storeName) => {
+    event.preventDefault()
     const { catalogNumber, productName, productPrice, category } = this.state;
-    console.log(this.state);
     this.setState({
       catalogNumber: "",
       productName: "",
@@ -49,6 +46,7 @@ class ManageProductsPage extends React.Component {
       productPrice,
       category
     );
+
   };
 
   handleChange = (event) => {
@@ -119,13 +117,12 @@ class ManageProductsPage extends React.Component {
                     </Form.Group>
 
                     <CustomButton
-                      onClick={() => this.handleSubmit(props.storeName)}
+                      onClick={(ev) => this.handleSubmit(ev,props.storeName)}
                     >
                       Add product!
                     </CustomButton>
                   </Form>
                 </FormContainer>
-
                 <ProductsGrid storeName={props.storeName} manage={true} />
               </Content>
             </Layout>

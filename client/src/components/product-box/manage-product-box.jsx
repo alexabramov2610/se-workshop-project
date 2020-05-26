@@ -47,15 +47,17 @@ export class ManageProductBox extends React.Component {
           </ProductDetails>
         </Card.Body>
         <Card.Footer>
+
+          <CustomButton style={{ margin: "auto", marginBottom: 5 }} onClick={() => history.push(`/store/${this.props.store}/${this.props.cn}`)}>
+            Edit
+          </CustomButton>
           <CustomButton
-            style={{ margin: "auto", marginBottom: 5 }}
+            style={{ margin: "auto" }}
             onClick={(ev) => ev}
           >
-            Remove{" "}
+            Remove
           </CustomButton>
-          <CustomButton style={{ margin: "auto" }} onClick={(ev) => ev}>
-            Manage Items{" "}
-          </CustomButton>
+
         </Card.Footer>
       </Card>
     );
