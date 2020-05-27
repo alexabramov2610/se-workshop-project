@@ -46,7 +46,7 @@ class ManageProductItemsPage extends React.Component {
         let somethingChanged = false;
         if(productName !== this.props.info.name){
             const nameRes = await api.changeProductName(this.props.store, this.props.cn,productName);
-            console.log(nameRes)
+
             if(nameRes.data.data.result){
                 Message.success("Product name changed!")
                 somethingChanged= true;
@@ -120,7 +120,7 @@ class ManageProductItemsPage extends React.Component {
                                             <CustomButton
                                                 onClick={(ev) => this.submitEditProduct(ev, props.storeName)}
                                             >
-                                                Change name!
+                                                EDIT!
                                             </CustomButton>
 
                                         </Form>
