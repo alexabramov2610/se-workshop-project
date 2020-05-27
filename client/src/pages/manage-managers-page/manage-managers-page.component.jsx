@@ -24,6 +24,12 @@ const ManagePermissionsPage = () => {
         title: 'Manager Name',
         dataIndex: 'managerName',
         width: '30%',
+        filters: props.managers.map(m => {
+            return {text: m, value: m};
+        }),
+        onFilter: (value, record) => record.managerName.indexOf(value) === 0,
+        sorter: (a, b) => a.managerName < b.managerName,
+        sortDirections: ['descend', 'ascend'],
     };
     const permissionsColumn = {
         title: 'Permissions',
