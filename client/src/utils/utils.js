@@ -15,6 +15,10 @@ export const prettierCollection = (collection) => {
 };
 
 export const uglierCollection = (collection) => {
-    return collection.map(item => item.replace(/' '/g, '_').toUpperCase());
+    return collection.map(item => item.replace(/\s+/g, '_').toUpperCase());
 };
+
+export const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
