@@ -144,6 +144,20 @@ const addProduct = async (storeName, catalogNumber, name, price, category) => {
   return instance.post(`${baseDomain}/stores/addNewProducts`, req);
 };
 
+const changeProductName = async (storeName,catalogNumber, newName) => {
+  const req = {
+    body: { storeName,catalogNumber,newName },
+  };
+  return instance.post(`${baseDomain}/stores/changeProductName`, req);
+};
+const changeProductPrice = async (storeName, catalogNumber,newPrice) => {
+  const req = {
+    body: { storeName,catalogNumber,newPrice },
+  };
+  return instance.post(`${baseDomain}/stores/changeProductPrice`, req);
+};
+
+
 const getManagersPermissions = async (storeName) => {
   return instance.get(`${baseDomain}/stores/getManagersPermissions/?storeName=${storeName}`);
 }
@@ -166,6 +180,8 @@ export {
   assignStoreManager,
   updateManagersPermissions,
   getManagersPermissions,
+  changeProductName,
+  changeProductPrice,
   addProduct,
   getPermissions,
   purchase,

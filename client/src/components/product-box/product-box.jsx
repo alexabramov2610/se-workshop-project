@@ -37,14 +37,7 @@ export const ProductBox = ({name, price, rating, store, cn}) => (
                 {(value) => (
                     <CustomButton
                         style={{margin: "auto"}}
-                        onClick={(ev) =>
-                            value.addToCart({
-                                body: {
-                                    storeName: store,
-                                    catalogNumber: cn,
-                                    amount: 1,
-                                },
-                            })
+                        onClick={handleClick(value, store, cn)
                         }
                     >
                         Add To Cart
@@ -54,3 +47,13 @@ export const ProductBox = ({name, price, rating, store, cn}) => (
         </Card.Footer>
     </Card>
 );
+function handleClick(value, store, cn) {
+    return (ev) => value.addToCart({
+        body: {
+            storeName: store,
+            catalogNumber: cn,
+            amount: 1,
+        },
+    });
+}
+

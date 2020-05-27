@@ -2,6 +2,7 @@ import React from "react";
 import { login } from "../../utils/api";
 import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
+import * as Modal from "../modal/modal";
 import * as config from "../../utils/config";
 import {
   SignInContainer,
@@ -32,7 +33,7 @@ class SignIn extends React.Component {
           this.props.onLogin(userName);
           config.history.push("/");
         } else {
-          alert(data.error.message);
+          Modal.warning(data.error.message);
         }
       });
     } catch (error) {

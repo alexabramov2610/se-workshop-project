@@ -20,6 +20,7 @@ const CartDropdown = ({ history, isVisible, items, setItems, hideMe }) => {
           price: bi.product._price,
           cn: bi.product._catalogNumber,
           quantity: bi.amount,
+          finalPrice: bi.finalPrice,
         };
       })
     );

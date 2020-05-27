@@ -5,6 +5,7 @@ import {
     Route,
 } from "react-router-dom";
 import { Router } from 'react-router';
+import * as Modal from './components/modal/modal'
 import HomePageContainer from './pages/home-page/home-page-container';
 import CategoryPage from "./pages/category-page/category-page";
 import { Header } from './components/header'
@@ -41,7 +42,7 @@ class App extends React.Component {
     }
 
     onLogin = async (username) => {
-        this.setState({isLoggedIn: true, systemIsClose: false}, () => config.setLoggedInUser(username))
+        this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }
 
@@ -50,6 +51,8 @@ class App extends React.Component {
         const isAdded = data.data.result;
         if (isAdded) {
             await this.cartCountUpdater();
+        } else {
+            Modal.warning("",data.error.message)
         }
     }
 
