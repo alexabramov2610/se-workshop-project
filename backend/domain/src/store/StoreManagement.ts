@@ -261,14 +261,16 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
-        const newTuple: StringTuple[] = [[userWhoRemoves.name, userToRemove.name]];
-        ownersToRemove = newTuple.concat(ownersToRemove)
-
         const res: Res.BoolResponse = ownersToRemove.reduce((res: Res.BoolResponse, ownersTuple) => {
             if (!res.data.result)
                 return res
             const currRemover: StoreOwner = store.getStoreOwner(ownersTuple[0]);
             const currToRemove: StoreOwner = store.getStoreOwner(ownersTuple[1]);
+
+            currToRemove.assignedStoreManagers.forEach((manager: StoreManager) => {
+                store.removeStoreManager(manager);
+            })
+
             const additionRes: Res.BoolResponse = store.removeStoreOwner(currToRemove);
             if (additionRes.data.result && currRemover)
                 currRemover.removeStoreOwner(currToRemove);
@@ -293,7 +295,6 @@ export class StoreManagement {
                 .concat(this.concatAllStoreOwnersToRemove(currAssigned))
         }, [])
     }
-
 
     removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:

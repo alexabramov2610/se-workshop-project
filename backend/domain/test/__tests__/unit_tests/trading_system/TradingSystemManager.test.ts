@@ -466,18 +466,11 @@ describe("Store Management Unit Tests", () => {
     }
 
     test("assignStoreManager success", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = true;
 
         prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (const prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = {
             token: mockToken,
@@ -488,10 +481,23 @@ describe("Store Management Unit Tests", () => {
         expect(res.data.result).toBeTruthy();
     });
 
+    test("assignStoreManager failure - same user", () => {
+        const isLoggedIn: boolean = true;
+        const isSuccess: boolean = true;
+
+        prepareAssignStoreManagerMock(isLoggedIn, isSuccess);
+        tradingSystemManager = new TradingSystemManager();
+
+        const req: Req.AssignStoreOwnerRequest = {
+            token: mockToken,
+            body: {storeName: store.storeName, usernameToAssign: user.name}
+        };
+        const res: Res.BoolResponse = tradingSystemManager.assignStoreManager(req)
+
+        expect(res.data.result).toBeFalsy();
+    });
 
     test("assignStoreManager failure - not valid user", () => {
-        const numOfItems: number = 5;
-        const products: ProductReq[] = generateProducts(numOfItems);
         const isLoggedIn: boolean = true;
         const isSuccess: boolean = false;
 
@@ -499,11 +505,6 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "removeProductsByCatalogNumber").mockReturnValue(undefined);
 
         tradingSystemManager = new TradingSystemManager();
-        const productsReq: ProductCatalogNumber[] = [];
-        for (const prod of products) {
-            const prodReq: ProductCatalogNumber = {catalogNumber: prod.catalogNumber};
-            productsReq.push(prodReq);
-        }
 
         const req: Req.AssignStoreOwnerRequest = {
             token: mockToken,

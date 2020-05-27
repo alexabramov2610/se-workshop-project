@@ -187,6 +187,8 @@ export class TradingSystemManager {
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        if (req.body.usernameToAssign === usernameWhoAssigns.name)
+            return {data: {result: false}, error: {message: errorMsg.E_ASSIGN_SELF}};
         return this._storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
     }
 
@@ -197,7 +199,10 @@ export class TradingSystemManager {
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const ownersToRemove: StringTuple[] = this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName);
+
+        const newTuple: StringTuple[] = [[usernameWhoRemoves.name, usernameToRemove.name]];
+        const ownersToRemove: StringTuple[] = newTuple
+            .concat(this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName));
 
         const res: Res.BoolResponse = this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
 
@@ -205,9 +210,7 @@ export class TradingSystemManager {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
             const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [req.body.storeName]);
 
-            const ownersToRemoveWithFirstOwner: StringTuple[] = ownersToRemove.concat([[usernameWhoRemoves.name, usernameToRemove.name]])
-
-            const events: Event.StoreOwnerEvent[] = ownersToRemoveWithFirstOwner.reduce((acc, curr) =>
+            const events: Event.StoreOwnerEvent[] = ownersToRemove.reduce((acc, curr) =>
                 acc.concat({
                     username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: req.body.storeName,
                     notification: {type: NotificationsType.GREEN, message: msg}

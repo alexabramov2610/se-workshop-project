@@ -45,4 +45,8 @@ export class StoreOwner extends StoreManager {
     get assignedStoreOwners(): StoreOwner[] {
         return this._assignedStoreOwners;
     }
+
+    get assignedStoreManagers(): RegisteredUser[] {
+        return this._assignedStoreManagers;
+    }
 }

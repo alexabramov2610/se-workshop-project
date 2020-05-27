@@ -268,7 +268,7 @@ describe("Store Management Unit Tests", () => {
         jest.spyOn(store, "getStoreOwner").mockReturnValueOnce(ownerToAssign);
         jest.spyOn(store, "removeStoreOwner").mockReturnValue(isOperationValid);
 
-        const res: Res.BoolResponse = storeManagement.removeStoreOwner(store.storeName, ownerToAssign, alreadyOwner, []);
+        const res: Res.BoolResponse = storeManagement.removeStoreOwner(store.storeName, ownerToAssign, alreadyOwner, [[alreadyOwner.name, ownerToAssign.name]]);
 
         expect(res.data.result).toBeTruthy();
         expect(store.removeStoreOwner).toBeCalledTimes(1);
@@ -305,6 +305,7 @@ describe("Store Management Unit Tests", () => {
 
 
         const ownersToRemove: StringTuple[] = [
+            [alreadyOwner.name, ownerToAssign.name],
             [ownerToAssign.name, ownerToAssign_3.name],
             [ownerToAssign.name, ownerToAssign_4.name],
             [ownerToAssign_3.name, ownerToAssign_5.name],
@@ -383,6 +384,7 @@ describe("Store Management Unit Tests", () => {
 
 
         const ownersToRemove: StringTuple[] = [
+            [alreadyOwner.name, ownerToAssign.name],
             [ownerToAssign.name, ownerToAssign_3.name],
             [ownerToAssign.name, ownerToAssign_4.name],
             [ownerToAssign_3.name, ownerToAssign_5.name],
