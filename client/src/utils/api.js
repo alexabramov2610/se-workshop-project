@@ -144,7 +144,28 @@ const addProduct = async (storeName, catalogNumber, name, price, category) => {
   return instance.post(`${baseDomain}/stores/addNewProducts`, req);
 };
 
+const getManagersPermissions = async (storeName) => {
+  return instance.get(`${baseDomain}/stores/getManagersPermissions/?storeName=${storeName}`);
+}
+
+const updateManagersPermissions = async (req) => {
+  console.log(req);
+  return instance.post(`${baseDomain}/stores/updateManagersPermissions`, req);
+}
+
+const assignStoreManager = async (req) => {
+  return instance.post(`${baseDomain}/stores/assignStoreManager`, req);
+}
+
+const removeStoreManager = async (req) => {
+  return instance.post(`${baseDomain}/stores/removeStoreManager`, req);
+}
+
 export {
+  removeStoreManager,
+  assignStoreManager,
+  updateManagersPermissions,
+  getManagersPermissions,
   addProduct,
   getPermissions,
   purchase,

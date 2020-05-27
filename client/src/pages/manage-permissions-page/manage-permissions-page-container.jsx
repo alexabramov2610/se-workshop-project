@@ -5,7 +5,6 @@ import * as generalUtils from "../../utils/utils";
 import {ManagePermissionsPageCtx} from "./manage-permissions-page-ctx";
 import ManagePermissionsPage from "./manage-permissions-page.component";
 import * as Message from '../../components/custom-alert/custom-alert';
-import axios from "axios";
 
 const ManagePermissionsPageContainer = () => {
 
@@ -13,39 +12,37 @@ const ManagePermissionsPageContainer = () => {
     const [managersPermissions, setManagersPermissions] = useState([]);
     const [managers, setManagers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
-    const client = axios.create({
-        baseURL: "http://localhost:4000",
-        headers: {'Access-Control-Allow-Origin': '*'}
-    });
+    const [fetchingPermissions, setFetchingPermissions] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            // const managersPermissionsRes = await api.getManagersPermissions(storename);
-            // const managersPermissions = generalUtils.addKeys(managersPermissionsRes.data.data)
-            // setManagersPermissions(managersPermissions);
-
-            const mpr = await client.get("/stores/getPermissions");
-            const mp = generalUtils.addKeys(mpr.data.data.permissions);
-            setManagersPermissions(mp);
-            setManagers(mp.map(m => m.managerName))
+            const managersPermissionsRes = await api.getManagersPermissions(storename);
+            const managersPermissionsVal = generalUtils.addKeys(managersPermissionsRes.data.data.permissions);
+            setManagersPermissions(managersPermissionsVal);
+            setManagers(managersPermissionsVal.map(m => m.managerName));
         }
 
         fetchData();
-    }, [])
+    }, [fetchingPermissions])
 
-    function sleep(ms) { //TODO: remove
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    const handleSubmit = async () => { //TODO: handle submit
+    const handleSubmit = async () => {
         setIsLoading(true);
-        await sleep(5000);
+        await generalUtils.sleep(1000);
+        await api.updateManagersPermissions({
+                body: {
+                    storeName: storename,
+                    permissions: managersPermissions
+                }
+            }
+        ).then((err) => console.log("from here", err));
         setIsLoading(false);
         Message.success("Permissions changed successfully")
     }
 
     let providerState = {
+        fetchingFlag: fetchingPermissions,
+        updatePermissions: setFetchingPermissions,
+        storeName: storename,
         managersPermissions: managersPermissions,
         setManagersPermissions: setManagersPermissions,
         managers: managers,
@@ -55,7 +52,6 @@ const ManagePermissionsPageContainer = () => {
 
     return (
         <ManagePermissionsPageCtx.Provider value={providerState}>
-            {console.log(managersPermissions)}
             <ManagePermissionsPage/>
         </ManagePermissionsPageCtx.Provider>
     );

@@ -7,6 +7,7 @@ import DiscountPageContainer from "../discount-page/discount-page-container";
 import StoreOverview from "../../components/store-overview/store-overview.component";
 import * as utils from "./store-page-utils";
 import ManagePermissionsPageContainer from "../manage-permissions-page/manage-permissions-page-container";
+import AddManagerModal from "../../components/add-manager-modal/add-manager-modal.component";
 
 
 const {Sider, Content} = Layout;
@@ -17,7 +18,7 @@ const screens = [
     <DiscountPageContainer/>,
     <div>MANAGE BUYING POLICY</div>,
     <ManagePermissionsPageContainer/>
-    ];
+];
 
 const layoutStyle = {backgroundColor: "white"};
 const contentStyle = {padding: "0px 30px", minHeight: "70vh", backgroundColor: "white",};
