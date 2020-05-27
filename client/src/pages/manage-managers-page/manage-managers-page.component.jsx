@@ -1,15 +1,15 @@
 import React, {useContext, useState} from 'react';
-import {Table, Button, Popconfirm, Space, Input} from 'antd';
+import {Table, Button, Popconfirm, Space, Input, Divider} from 'antd';
 import SearchSelect from "../../components/search-select/search-select.component";
 import * as spUtils from "../store-page/store-page-utils";
 import * as generalUtils from "../../utils/utils";
-import {ManagePermissionsPageCtx} from "./manage-permissions-page-ctx";
+import {ManageManagersPageCtx} from "./manage-managers-page-ctx";
 import AddManagerModal from "../../components/add-manager-modal/add-manager-modal.component";
 import * as api from "../../utils/api";
 
 
-const ManagePermissionsPage = () => {
-    const props = useContext(ManagePermissionsPageCtx);
+const ManageManagersPage = () => {
+    const props = useContext(ManageManagersPageCtx);
     const [visible, setVisible] = useState(false);
 
     const showManagerModal = () => {
@@ -24,6 +24,12 @@ const ManagePermissionsPage = () => {
         title: 'Manager Name',
         dataIndex: 'managerName',
         width: '30%',
+        filters: props.managers.map(m => {
+            return {text: m, value: m};
+        }),
+        onFilter: (value, record) => record.managerName.indexOf(value) === 0,
+        sorter: (a, b) => a.managerName < b.managerName,
+        sortDirections: ['descend', 'ascend'],
     };
     const permissionsColumn = {
         title: 'Permissions',
@@ -80,6 +86,7 @@ const ManagePermissionsPage = () => {
 
     return (
         <div>
+            <Divider orientation="left" style={{fontSize: "25px"}}>Store Managers</Divider>
             <Space>
                 <Button
                     onClick={props.submit}
@@ -119,4 +126,4 @@ const ManagePermissionsPage = () => {
 }
 
 
-export default ManagePermissionsPage;
+export default ManageManagersPage;

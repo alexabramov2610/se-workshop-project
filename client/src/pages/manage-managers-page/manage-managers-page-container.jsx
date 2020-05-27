@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import * as api from "../../utils/api";
 import * as generalUtils from "../../utils/utils";
-import {ManagePermissionsPageCtx} from "./manage-permissions-page-ctx";
-import ManagePermissionsPage from "./manage-permissions-page.component";
+import {ManageManagersPageCtx} from "./manage-managers-page-ctx";
+import ManageManagersPage from "./manage-managers-page.component";
 import * as Message from '../../components/custom-alert/custom-alert';
 
-const ManagePermissionsPageContainer = () => {
+const ManageManagersPageContainer = () => {
 
     const {storename} = useParams();
     const [managersPermissions, setManagersPermissions] = useState([]);
@@ -51,11 +51,11 @@ const ManagePermissionsPageContainer = () => {
     }
 
     return (
-        <ManagePermissionsPageCtx.Provider value={providerState}>
-            <ManagePermissionsPage/>
-        </ManagePermissionsPageCtx.Provider>
+        <ManageManagersPageCtx.Provider value={providerState}>
+            <ManageManagersPage/>
+        </ManageManagersPageCtx.Provider>
     );
 
 }
 
-export default ManagePermissionsPageContainer;
+export default ManageManagersPageContainer;
