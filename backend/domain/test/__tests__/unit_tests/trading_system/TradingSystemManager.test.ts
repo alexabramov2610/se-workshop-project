@@ -523,7 +523,8 @@ describe("Store Management Unit Tests", () => {
         };
         mocked(StoreManagement).mockImplementation((): any => {
             return {
-                removeStoreOwner: () => operationResMock
+                removeStoreOwner: () => operationResMock,
+                getStoreOwnersToRemove: () => []
             }
         });
     }

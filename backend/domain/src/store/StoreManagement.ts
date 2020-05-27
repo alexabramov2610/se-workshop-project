@@ -26,7 +26,7 @@ import {
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW, UserRole} from '../api-int/internal_api'
+import {errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {CondDiscount} from "./discounts/CondDiscount";
@@ -225,7 +225,7 @@ export class StoreManagement {
         return additionRes;
     }
 
-    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
+    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser, ownersToRemove: StringTuple[]): Res.BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
@@ -261,11 +261,39 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
-        const additionRes: Res.BoolResponse = store.removeStoreOwner(userOwnerToRemove);
-        if (additionRes.data.result)
-            userWhoRemovesOwner.removeStoreOwner(userOwnerToRemove);
-        return additionRes;
+        const newTuple: StringTuple[] = [[userWhoRemoves.name, userToRemove.name]];
+        ownersToRemove = newTuple.concat(ownersToRemove)
+
+        const res: Res.BoolResponse = ownersToRemove.reduce((res: Res.BoolResponse, ownersTuple) => {
+            if (!res.data.result)
+                return res
+            const currRemover: StoreOwner = store.getStoreOwner(ownersTuple[0]);
+            const currToRemove: StoreOwner = store.getStoreOwner(ownersTuple[1]);
+            const additionRes: Res.BoolResponse = store.removeStoreOwner(currToRemove);
+            if (additionRes.data.result && currRemover)
+                currRemover.removeStoreOwner(currToRemove);
+            return additionRes;
+        }, {data: {result: true}});
+
+        return res;
     }
+
+    getStoreOwnersToRemove(toRemove: string, storeName: string): StringTuple[] {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return [];
+        const firstOwner: StoreOwner = store.getStoreOwner(toRemove);
+        return this.concatAllStoreOwnersToRemove(firstOwner);
+    }
+
+    private concatAllStoreOwnersToRemove(firstOwner: StoreOwner): StringTuple[] {
+        return firstOwner.assignedStoreOwners.reduce((acc: StringTuple[], currAssigned: StoreOwner) => {
+            return acc
+                .concat([[firstOwner.name, currAssigned.name]])
+                .concat(this.concatAllStoreOwnersToRemove(currAssigned))
+        }, [])
+    }
+
 
     removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
@@ -777,7 +805,6 @@ export class StoreManagement {
         return { data: {result: true, permissions: permissions} }
 
     }
-
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;

@@ -12,7 +12,7 @@ import {
 } from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {Product} from "./data/Product";
-import {ExternalSystems, loggerW, UserRole,} from "../api-int/internal_api";
+import {ExternalSystems, loggerW, StringTuple, UserRole,} from "../api-int/internal_api";
 import {
     BagItem,
     Cart,
@@ -192,23 +192,32 @@ export class TradingSystemManager {
 
     removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Res.BoolResponse {
         logger.info(`removing user: ${req.body.usernameToRemove} as an owner in store: ${req.body.storeName} `);
+
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const res: Res.BoolResponse = this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
-        if (res.data.result) {
-            logger.info(`successfully remove user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
-            const storeName: string = req.body.storeName;
-            const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
-            const event: Event.StoreOwnerEvent = {
-                username: req.body.usernameToRemove, code: EventCode.REMOVED_AS_STORE_OWNER, storeName,
-                notification: {type: NotificationsType.GREEN, message: msg}
-            };
-            if (this._publisher.notify(event).length !== 0)
-                usernameToRemove.saveNotification(event);
+        const ownersToRemove: StringTuple[] = this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName);
 
-            this._publisher.unsubscribe(req.body.usernameToRemove, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
+        const res: Res.BoolResponse = this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
+
+        if (res.data.result) {
+            logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
+            const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [req.body.storeName]);
+
+            const ownersToRemoveWithFirstOwner: StringTuple[] = ownersToRemove.concat([[usernameWhoRemoves.name, usernameToRemove.name]])
+
+            const events: Event.StoreOwnerEvent[] = ownersToRemoveWithFirstOwner.reduce((acc, curr) =>
+                acc.concat({
+                    username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: req.body.storeName,
+                    notification: {type: NotificationsType.GREEN, message: msg}
+                }), []);
+
+            events.forEach(event => {
+                if (this._publisher.notify(event).length !== 0)
+                    this._userManager.getUserByName(event.username).saveNotification(event);
+                this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
+            })
         }
         return res;
     }
