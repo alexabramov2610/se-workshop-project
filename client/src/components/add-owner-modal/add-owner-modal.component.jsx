@@ -9,10 +9,10 @@ const statuses = {
     error: "error"
 };
 
-const AddManagerModal = ({visible, onCancel, storeName, updatePermissions, fetchingFlag}) => {
+const AddOwnerModal = ({visible, onCancel, storeName, updateOwners, fetchingFlag}) => {
 
     const [status, setStatus] = useState("");
-    const [newManager, setNewManager] = useState(undefined);
+    const [newOwner, setNewOwner] = useState(undefined);
     const [errorMessage, setErrorMessage] = useState("");
 
     const analyzeResult = (res) => {
@@ -21,22 +21,22 @@ const AddManagerModal = ({visible, onCancel, storeName, updatePermissions, fetch
             setStatus(statuses.error);
         } else {
             setStatus(statuses.success);
-            updatePermissions(!fetchingFlag);
+            updateOwners(!fetchingFlag);
         }
     };
 
     const onOk = async () => {
-        if (!newManager || newManager.length <= 0) {
+        if (!newOwner || newOwner.length <= 0) {
             setStatus(statuses.error);
             setErrorMessage("username must be 1 characters or more");
         } else {
             setErrorMessage("");
             setStatus(statuses.validating);
             await generalUtils.sleep(1000);
-            await api.assignStoreManager({
+            await api.assignStoreOwner({
                 body: {
                     storeName: storeName,
-                    usernameToAssign: newManager
+                    usernameToAssign: newOwner
                 }
             }).then(r => analyzeResult(r));
         }
@@ -44,29 +44,29 @@ const AddManagerModal = ({visible, onCancel, storeName, updatePermissions, fetch
 
     const handleCancel = () => {
         setErrorMessage("");
-        setNewManager(undefined);
+        setNewOwner(undefined);
         setStatus("");
         onCancel();
     }
 
     return (
-        <Modal title="Add Manager"
+        <Modal title="Add Owner"
                visible={visible}
                onOk={onOk}
                okText={"Add"}
                onCancel={handleCancel}
         >
-            <h3>{`${storeName} new manager`}</h3>
+            <h3>{`${storeName} new owner`}</h3>
             <Form.Item
                 hasFeedback
                 validateStatus={status}
                 help={errorMessage}
             >
-                <Input value={newManager}
-                       onChange={(e) => setNewManager(e.target.value)}
-                       placeholder={"Manager Name"}
+                <Input value={newOwner}
+                       onChange={(e) => setNewOwner(e.target.value)}
+                       placeholder={"Owner Name"}
                 />
             </Form.Item>
         </Modal>);
 }
-export default AddManagerModal;
+export default AddOwnerModal;

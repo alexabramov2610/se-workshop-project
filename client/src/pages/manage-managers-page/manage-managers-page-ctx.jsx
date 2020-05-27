@@ -1,2 +1,2 @@
 import React from "react";
-export const ManagePermissionsPageCtx = React.createContext({});
+export const ManageManagersPageCtx = React.createContext({});

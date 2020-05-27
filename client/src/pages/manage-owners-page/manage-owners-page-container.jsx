@@ -2,60 +2,56 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import * as api from "../../utils/api";
 import * as generalUtils from "../../utils/utils";
-import {ManageManagersPageCtx} from "./manage-managers-page-ctx";
-import ManageManagersPage from "./manage-managers-page.component";
 import * as Message from '../../components/custom-alert/custom-alert';
+import ManageOwnersPage from "./manage-owners-page.component";
+import {ManageOwnersPageCtx} from "./manage-owners-page-ctx";
 
-const ManageManagersPageContainer = () => {
+const ManageOwnersPageContainer = () => {
 
     const {storename} = useParams();
-    const [managersPermissions, setManagersPermissions] = useState([]);
-    const [managers, setManagers] = useState([]);
+    const [owners, setOwners] = useState([]);
+    const [ownersByMe, setOwnersByMe] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [fetchingPermissions, setFetchingPermissions] = useState(false);
+    const [fetchingOwners, setFetchingOwners] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            const managersPermissionsRes = await api.getManagersPermissions(storename);
-            const managersPermissionsVal = generalUtils.addKeys(managersPermissionsRes.data.data.permissions);
-            setManagersPermissions(managersPermissionsVal);
-            setManagers(managersPermissionsVal.map(m => m.managerName));
+            const infoRes = await api.viewStoreInfo(storename);
+            const ownersByMeRes = await api.getOwnersAssignedByMe(storename);
+
+            if(infoRes.data.data.result && ownersByMeRes.data.data.result){
+                setOwners(infoRes.data.data.info.storeOwnersNames);
+                setOwnersByMe(ownersByMeRes.data.data.owners);
+            }
         }
 
         fetchData();
-    }, [fetchingPermissions])
+    }, [fetchingOwners])
 
     const handleSubmit = async () => {
         setIsLoading(true);
         await generalUtils.sleep(1000);
-        await api.updateManagersPermissions({
-                body: {
-                    storeName: storename,
-                    permissions: managersPermissions
-                }
-            }
-        ).then((err) => console.log("from here", err));
         setIsLoading(false);
         Message.success("Permissions changed successfully")
     }
 
     let providerState = {
-        fetchingFlag: fetchingPermissions,
-        updatePermissions: setFetchingPermissions,
+        fetchingFlag: fetchingOwners,
+        updateOwners: setFetchingOwners,
         storeName: storename,
-        managersPermissions: managersPermissions,
-        setManagersPermissions: setManagersPermissions,
-        managers: managers,
+        owners: owners,
+        ownersByMe: ownersByMe,
         isLoading: isLoading,
         submit: handleSubmit
     }
 
     return (
-        <ManageManagersPageCtx.Provider value={providerState}>
-            <ManageManagersPage/>
-        </ManageManagersPageCtx.Provider>
+        <ManageOwnersPageCtx.Provider value={providerState}>
+            {console.log(owners, ownersByMe)}
+            <ManageOwnersPage/>
+        </ManageOwnersPageCtx.Provider>
     );
 
 }
 
-export default ManageManagersPageContainer;
+export default ManageOwnersPageContainer;

@@ -1,2 +1,2 @@
 import React from "react";
-export const ManageManagersPageCtx = React.createContext({});
+export const ManageOwnersPageCtx = React.createContext({});
