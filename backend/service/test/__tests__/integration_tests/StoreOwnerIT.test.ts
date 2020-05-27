@@ -14,6 +14,7 @@ import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import * as utils from "./utils"
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 import {Product} from "domain_layer/dist/src/trading_system/data/Product";
+import {StringTuple} from "domain_layer/dist/src/api-int/internal_api";
 
 
 describe("Store Owner Integration Tests", () => {
@@ -558,6 +559,96 @@ describe("Store Owner Integration Tests", () => {
 
         expect(removeStoreOwnerResponse.data.result).toBe(false);
 
+    });
+
+    it("assign and remove store owners - multiple assignees", () => {
+        const store: Store = new Store("name", "store desc");
+        const pw: string = "ababababababa";
+        const owners: StoreOwner[] = [
+            new StoreOwner("name2"),
+            new StoreOwner("name3"),
+            new StoreOwner("name4"),
+            new StoreOwner("name5"),
+            new StoreOwner("name6"),
+            new StoreOwner("name7"),
+            new StoreOwner("name8")
+        ]
+
+        /** storeOwnerRegisteredUser -> owners[0]
+         *  storeOwnerRegisteredUser -> owners[1]
+         *
+         *  owners[0] -> owners[2]
+         *  owners[0] -> owners[3]
+         *
+         *  owners[1] -> owners[4]
+         *  owners[1] -> owners[5]
+         *
+         *  owners[4] -> owners[6]
+         */
+
+        utils.logout(token);
+
+        for (const owner of owners) {
+            utils.registerUser(owner.name, pw, token, false);
+        }
+
+
+        // assignStoreOwnerRequest -> 0,1
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
+        let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {
+            body: {storeName, usernameToAssign: owners[0].name},
+            token
+        };
+        let assignStoreOwnerResponse: Res.BoolResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        assignStoreOwnerRequest = { body: {storeName, usernameToAssign: owners[1].name}, token };
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+
+        // 0 -> 2,3
+        utils.loginUser(owners[0].name, pw, token, true);
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[2].name}, token};
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[3].name}, token};
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        // 1 -> 4,5
+        utils.loginUser(owners[1].name, pw, token, true);
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[4].name}, token};
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[5].name}, token};
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+        // 4 -> 6
+        utils.loginUser(owners[4].name, pw, token, true);
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[6].name}, token};
+        assignStoreOwnerResponse = ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+        expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+
+        // storeOwnerRegisteredUser removes owner1: 4,5,6 should be removed
+        utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
+        const removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName, usernameToRemove: owners[1].name}, token};
+        const removeStoreOwnerResponse: Res.BoolResponse = ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
+
+        expect(removeStoreOwnerResponse.data.result).toBe(true);
+
+        const storeInfoReq: Req.StoreInfoRequest = { body: { storeName }, token };
+        const storeInfoRes: Res.StoreInfoResponse = ServiceFacade.viewStoreInfo(storeInfoReq);
+
+        const expectedOwners: string[] = [storeOwnerRegisteredUser.name, owners[0].name, owners[2].name, owners[3].name]
+
+        expect(storeInfoRes.data.result).toBe(true);
+        expect(storeInfoRes.data.info.storeOwnersNames).toHaveLength(4);
+        expectedOwners.forEach(ownerName => expect(storeInfoRes.data.info.storeOwnersNames).toContainEqual(ownerName))
     });
 
     it("assign, remove store managers and change permissions", () => {

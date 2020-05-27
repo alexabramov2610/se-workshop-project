@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {StorePageCtx} from "./store-page-ctx";
-import {StorePage} from "./store-page";
+import {StorePage} from "./store-page.component";
 import {useParams} from "react-router-dom";
 import Spinner from "../../components/spinner/spinner";
 import * as api from "../../utils/api";
@@ -31,11 +31,13 @@ const StorePageContainer = ({isLoggedIn}) => {
         permissions: permissions
     }
 
-    return storeInfo && permissions
-        ? <StorePageCtx.Provider value={providerState}>
-            <StorePage isLoggedIn={isLoggedIn}/>
-        </StorePageCtx.Provider>
-        : <Spinner message={"Loading your store"}/>
+    return (
+        storeInfo && permissions
+            ? <StorePageCtx.Provider value={providerState}>
+                <StorePage isLoggedIn={isLoggedIn}/>
+            </StorePageCtx.Provider>
+            : <Spinner message={"Loading your store"}/>
+    );
 }
 
 export default StorePageContainer;

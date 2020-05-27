@@ -1,27 +1,35 @@
-import React, {useContext} from 'react';
-import {Table, Button, Popconfirm, Space} from 'antd';
+import React, {useContext, useState} from 'react';
+import {Table, Button, Popconfirm, Space, Input, Divider} from 'antd';
 import SearchSelect from "../../components/search-select/search-select.component";
 import * as spUtils from "../store-page/store-page-utils";
 import * as generalUtils from "../../utils/utils";
-import {ManagePermissionsPageCtx} from "./manage-permissions-page-ctx";
+import {ManageManagersPageCtx} from "./manage-managers-page-ctx";
+import AddManagerModal from "../../components/add-manager-modal/add-manager-modal.component";
+import * as api from "../../utils/api";
 
 
-const ManagePermissionsPage = () => {
-    const props = useContext(ManagePermissionsPageCtx);
-    const managers = generalUtils.addValueKey(props.managers);
+const ManageManagersPage = () => {
+    const props = useContext(ManageManagersPageCtx);
+    const [visible, setVisible] = useState(false);
+
+    const showManagerModal = () => {
+        setVisible(true);
+    };
+
+    const hideManagerModal = () => {
+        setVisible(false);
+    };
 
     const managerNameColumn = {
         title: 'Manager Name',
         dataIndex: 'managerName',
         width: '30%',
-        render: (text, record) => {
-            return <SearchSelect bordered={false}
-                                 placeholder={"Manager"}
-                                 value={getRecord(record.key).managerName}
-                                 options={managers}
-                                 onChangeCallback={(e) => handleManagerChange(e, record.key)}
-            />
-        }
+        filters: props.managers.map(m => {
+            return {text: m, value: m};
+        }),
+        onFilter: (value, record) => record.managerName.indexOf(value) === 0,
+        sorter: (a, b) => a.managerName < b.managerName,
+        sortDirections: ['descend', 'ascend'],
     };
     const permissionsColumn = {
         title: 'Permissions',
@@ -59,12 +67,6 @@ const ManagePermissionsPage = () => {
         return props.managersPermissions[index];
     }
 
-    const handleManagerChange = (newName, key) => {
-        props.setManagersPermissions(prevManagersPermissions => {
-            return prevManagersPermissions.map(mp => mp.key === key ? {...mp, managerName: newName} : mp);
-        })
-    }
-
     const handlePermissionsChange = (newPermissions, key) => {
         const capitalPermissions = generalUtils.uglierCollection(newPermissions);
         props.setManagersPermissions(prevManagersPermissions => {
@@ -72,25 +74,19 @@ const ManagePermissionsPage = () => {
         })
     }
 
-    const handleDelete = key => {
-        props.setManagersPermissions(prevManagersPermissions => {
-            return prevManagersPermissions.filter(item => item.key !== key);
-        })
-    };
-
-    const handleAdd = () => {
-        const newData = {
-            key: (props.managersPermissions.length + 1) + "",
-            managerName: props.managersPermissions[0].managerName,
-            permissions: []
-        };
-        props.setManagersPermissions(prevManagersPermissions => {
-            return [...prevManagersPermissions, newData];
-        })
+    const handleDelete = async (key) => {
+        await api.removeStoreManager({
+            body: {
+                storeName: props.storeName,
+                usernameToRemove: getRecord(key).managerName
+            }
+        });
+        props.updatePermissions(!props.fetchingFlag);
     };
 
     return (
         <div>
+            <Divider orientation="left" style={{fontSize: "25px"}}>Store Managers</Divider>
             <Space>
                 <Button
                     onClick={props.submit}
@@ -102,14 +98,14 @@ const ManagePermissionsPage = () => {
                         border: "none"
                     }}
                 >
-                    Submit
+                    Update Permissions
                 </Button>
                 <Button
-                    onClick={handleAdd}
+                    onClick={showManagerModal}
                     type="primary"
                     style={{marginBottom: 16}}
                 >
-                    Add Permissions
+                    Add Manager
                 </Button>
             </Space>
             <Table
@@ -119,9 +115,15 @@ const ManagePermissionsPage = () => {
                 columns={columns}
                 pagination={{pageSize: 7}}
             />
+            <AddManagerModal visible={visible}
+                             storeName={props.storeName}
+                             onCancel={hideManagerModal}
+                             updatePermissions={props.updatePermissions}
+                             fetchingFlag={props.fetchingFlag}
+            />
         </div>
     );
 }
 
 
-export default ManagePermissionsPage;
+export default ManageManagersPage;

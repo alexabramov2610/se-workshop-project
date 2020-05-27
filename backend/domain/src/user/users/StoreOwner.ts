@@ -2,7 +2,7 @@ import {RegisteredUser, StoreManager} from "../internal_api"
 
 export class StoreOwner extends StoreManager {
     private _assignedStoreManagers: RegisteredUser[];
-    private _assignedStoreOwners: RegisteredUser[];
+    private _assignedStoreOwners: StoreOwner[];
 
     constructor(name: string) {
         super(name);
@@ -42,4 +42,11 @@ export class StoreOwner extends StoreManager {
         return false;
     }
 
+    get assignedStoreOwners(): StoreOwner[] {
+        return this._assignedStoreOwners;
+    }
+
+    get assignedStoreManagers(): RegisteredUser[] {
+        return this._assignedStoreManagers;
+    }
 }

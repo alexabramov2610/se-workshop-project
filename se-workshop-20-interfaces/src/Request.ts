@@ -255,7 +255,12 @@ interface GetAllManagersPermissionsRequest extends Request {
     body: { storeName: string }
 }
 
+interface GetOwnersAssignedByRequest extends Request {
+    body: { storeName: string }
+}
+
 export {
+    GetOwnersAssignedByRequest,
     ChangeMultipleManagerPermissionRequest,
     GetAllManagersPermissionsRequest,
     GetAllCategoriesInStoreRequest,

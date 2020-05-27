@@ -1,8 +1,6 @@
 import axios from "axios";
 import openSocket from "socket.io-client";
 
-
-
 const https = require("https");
 let socket;
 const initData = {
@@ -152,6 +150,7 @@ const changeProductName = async (storeName,catalogNumber, newName) => {
   };
   return instance.post(`${baseDomain}/stores/changeProductName`, req);
 };
+
 const changeProductPrice = async (storeName, catalogNumber,newPrice) => {
   const req = {
     body: { storeName,catalogNumber,newPrice },
@@ -159,8 +158,43 @@ const changeProductPrice = async (storeName, catalogNumber,newPrice) => {
   return instance.post(`${baseDomain}/stores/changeProductPrice`, req);
 };
 
+const getManagersPermissions = async (storeName) => {
+  return instance.get(`${baseDomain}/stores/getManagersPermissions/?storeName=${storeName}`);
+};
+
+const updateManagersPermissions = async (req) => {
+  console.log(req);
+  return instance.post(`${baseDomain}/stores/updateManagersPermissions`, req);
+};
+
+const assignStoreManager = async (req) => {
+  return instance.post(`${baseDomain}/stores/assignStoreManager`, req);
+};
+
+const removeStoreManager = async (req) => {
+  return instance.post(`${baseDomain}/stores/removeStoreManager`, req);
+};
+
+const getOwnersAssignedByMe = async (storeName) => {
+  return instance.get(`${baseDomain}/stores/getOwnersAssignedBy/?storeName=${storeName}`);
+};
+
+const assignStoreOwner = async (req) => {
+  return instance.post(`${baseDomain}/stores/assignStoreOwner`, req);
+}
+
+const removeStoreOwner = async (req) => {
+  return instance.post(`${baseDomain}/stores/removeStoreOwner`, req);
+}
 
 export {
+  removeStoreOwner,
+  assignStoreOwner,
+  getOwnersAssignedByMe,
+  removeStoreManager,
+  assignStoreManager,
+  updateManagersPermissions,
+  getManagersPermissions,
   changeProductName,
   changeProductPrice,
   addProduct,

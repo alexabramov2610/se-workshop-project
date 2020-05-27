@@ -267,6 +267,9 @@ export const getAllCategories = (req: Req.Request): Res.GetCategoriesResponse =>
 export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest): Res.GetAllManagersPermissionsResponse => {
     return runIfOpen(req, runIfHaveToken(StoreService.getManagersPermissions))
 }
+export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Res.GetOwnersAssignedByResponse => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getOwnersAssignedBy))
+}
 export const getPersonalDetails = (req: Req.Request): Res.GetPersonalDetailsResponse => {
     return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
 }

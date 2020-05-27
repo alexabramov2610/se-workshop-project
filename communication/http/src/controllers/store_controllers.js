@@ -228,3 +228,14 @@ export async function getManagersPermissions(req, res) {
         return res.send(invalidRes);
     }
 }
+
+export async function getOwnersAssignedBy(req, res) {
+    try {
+        const viewProductInfoReq = {body: {storeName: req.query.storeName}};
+        req.body = viewProductInfoReq;
+        const result = wrapHttp(req, ServiceFacade.getOwnersAssignedBy);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}

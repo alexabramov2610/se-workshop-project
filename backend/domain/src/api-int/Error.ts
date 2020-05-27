@@ -50,7 +50,8 @@ const errorMsg:ErrorMessages = {
     E_USER_EXISTS:"User name is already taken",
     E_INVALID_PARAM: "Invalid parameters",
     SET_POLICY_FAILED: "Set policy failed!",
-    VERIFY_POLICY_FAILED: "Verifying policy failed"
+    VERIFY_POLICY_FAILED: "Verifying policy failed",
+    E_ASSIGN_SELF: "You cannot assign yourself"
 
 
 
