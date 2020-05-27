@@ -216,3 +216,7 @@ export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest
         return {data: {result: false, permissions: []}, error: havePermission.error}
     return ts.getManagersPermissions(req);
 }
+
+export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Res.GetOwnersAssignedByResponse => {
+    return ts.getOwnersAssignedBy(req);
+}

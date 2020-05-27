@@ -633,4 +633,13 @@ export class TradingSystemManager {
         logger.info(`retrieving managers permissions in store: ${req.body.storeName}`);
         return this._storeManager.getManagersPermissions(req.body.storeName);
     }
+
+    getOwnersAssignedBy(req: Req.GetAllManagersPermissionsRequest): Res.GetOwnersAssignedByResponse {
+        logger.info(`retrieving owners assigned`);
+        const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
+        if (!usernameWhoRemoves)
+            return { data: {result: false, owners: []}, error: { message: errorMsg.E_NOT_LOGGED_IN } }
+        return this._storeManager.getOwnersAssignedBy(req.body.storeName, usernameWhoRemoves);
+
+    }
 }

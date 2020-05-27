@@ -1350,6 +1350,37 @@ describe("Store Management Unit Tests", () => {
     });
 
 
+    test("getOwnersAssignedBy - success", () => {
+        const user: RegisteredUser = new RegisteredUser("user1", "pw");
+        const store: Store = new Store("store1", "description");
+        const storeOwner: StoreOwner = new StoreOwner("store1-owner");
+        const storeOwnerArr: StoreOwner[] = [
+                new StoreOwner("store1-owner1"), new StoreOwner("store1-owner2"),
+                new StoreOwner("store1-owner3"), new StoreOwner("store1-owner4") ]
+
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValue(store);
+        jest.spyOn(store, 'getStoreOwner').mockReturnValue(storeOwner);
+
+        storeOwnerArr.forEach(owner => storeOwner.assignStoreOwner(owner))
+
+
+        const res: Res.GetOwnersAssignedByResponse = storeManagement.getOwnersAssignedBy(store.storeName, user);
+        expect(res.data.result).toBe(true);
+        expect(res.data.owners).toHaveLength(storeOwnerArr.length);
+        storeOwnerArr.forEach(storeOwner => expect(res.data.owners).toContainEqual(storeOwner.name))
+    })
+
+    test("getOwnersAssignedBy - failure", () => {
+        const user: RegisteredUser = new RegisteredUser("user1", "pw");
+        const store: Store = new Store("store1", "description");
+
+        jest.spyOn(storeManagement, 'findStoreByName').mockReturnValue(undefined);
+
+        const res: Res.GetOwnersAssignedByResponse = storeManagement.getOwnersAssignedBy(store.storeName, user);
+        expect(res.data.result).toBe(false);
+        expect(res.data.owners).toHaveLength(0);
+    })
+
 
     test("verifyStoreBag - success", () => {
         //TODO

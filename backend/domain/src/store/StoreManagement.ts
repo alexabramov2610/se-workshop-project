@@ -76,6 +76,13 @@ export class StoreManagement {
         return store.storeName.length > 0 && store.UUID && store.UUID.length > 0;
     }
 
+    getOwnersAssignedBy(storeName: string, user: RegisteredUser): Res.GetOwnersAssignedByResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return { data: {result: false, owners: []}, error: { message: errorMsg.E_INVALID_STORE } }
+        return { data: {result: true, owners: store.getStoreOwner(user.name).assignedStoreOwners.reduce((acc, curr) => acc.concat(curr.name), []) }};
+    }
+
     verifyStoreOwner(storeName: string, user: RegisteredUser): boolean {
         const store: Store = this.findStoreByName(storeName);
         return store ? store.verifyIsStoreOwner(user.name) : false;

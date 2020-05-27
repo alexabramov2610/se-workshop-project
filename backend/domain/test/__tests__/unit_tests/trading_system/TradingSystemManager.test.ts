@@ -451,6 +451,36 @@ describe("Store Management Unit Tests", () => {
         expect(store.removeProductsByCatalogNumber).toBeCalledTimes(0);
     });
 
+    function prepareGetOwnersAssignedByMock(isLoggedIn: boolean, isSuccess: boolean) {
+        prepareMocksForInventoryManagement(isLoggedIn, isSuccess);
+        const operationResMock: Res.GetOwnersAssignedByResponse = isSuccess ? {data: {result: true, owners: []}} : {
+            data: {result: false, owners: []},
+            error: {message: 'mock err'}
+        };
+        mocked(StoreManagement).mockImplementation((): any => {
+            return {
+                getOwnersAssignedBy: () => operationResMock
+            }
+        });
+    }
+
+    test("getOwnersAssignedBy - success", () => {
+        const req: Req.GetAllManagersPermissionsRequest = { body: { storeName: "store-name" }, token: mockToken };
+
+        prepareGetOwnersAssignedByMock(true, true);
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.GetOwnersAssignedByResponse = tradingSystemManager.getOwnersAssignedBy(req);
+        expect(res.data.result).toBe(true);
+    });
+
+    test("getOwnersAssignedBy - failure", () => {
+        const req: Req.GetAllManagersPermissionsRequest = { body: { storeName: "store-name" }, token: mockToken };
+        prepareGetOwnersAssignedByMock(false, false);
+        tradingSystemManager = new TradingSystemManager();
+        const res: Res.GetOwnersAssignedByResponse = tradingSystemManager.getOwnersAssignedBy(req);
+        expect(res.data.result).toBe(false);
+    });
+
 
     function prepareAssignStoreManagerMock(isLoggedIn: boolean, isSuccess: boolean) {
         prepareMocksForInventoryManagement(isLoggedIn, isSuccess);

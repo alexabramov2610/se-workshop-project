@@ -146,7 +146,12 @@ interface GetAllManagersPermissionsResponse extends Response {
   data: {result: boolean, permissions: ManagerNamePermission[]}
 }
 
+interface GetOwnersAssignedByResponse extends Response {
+  data: {result: boolean, owners: string[]}
+}
+
 export {
+  GetOwnersAssignedByResponse,
   GetAllManagersPermissionsResponse,
   GetPersonalDetailsResponse,
   GetAllCategoriesResponse,
