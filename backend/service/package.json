@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/",
+    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/ && cp -r ./states ./dist",
     "start": "tsc && node dist/index.js",
     "start:comp": "cd ../domain && tsc && cd ../service && tsc && node dist/index.js",
     "test": "jest --maxWorkers=1 --forceExit --detectOpenHandles",
@@ -20,7 +20,8 @@
     "jest": "^25.2.7",
     "ts-jest": "^25.3.0",
     "tslint": "^6.1.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "yaml": "1.10.0"
   },
   "dependencies": {
     "domain_layer": "file:../domain",

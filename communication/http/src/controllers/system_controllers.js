@@ -9,6 +9,10 @@ export async function systemInit(req,res) {
     return res.send(result)
 }
 
+export async function initFromFile(req,res) {
+    const result = wrapHttp(req, ServiceFacade.initFromFile);
+    return res.send(result)
+}
 
 
 
