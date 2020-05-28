@@ -27,9 +27,9 @@ router.post("/removeManagerPermissions", StoreController.removeManagerPermission
 router.post("/viewManagerPermissions", StoreController.viewManagerPermissions);
 router.post("/removeStoreManager", StoreController.removeStoreManager);
 router.post("/viewUsersContactUsMessages", StoreController.viewUsersContactUsMessages);
-router.post("/viewStorePurchasesHistory", StoreController.viewStorePurchasesHistory);
 router.post("/setPurchasePolicy", StoreController.setPurchasePolicy);
 
+router.get("/viewStorePurchasesHistory", StoreController.viewStorePurchasesHistory); // usage: stores/viewStorePurchasesHistory/?storeName=shufersal
 router.get("/viewProductInfo", StoreController.viewProductInfo);// usage: stores/viewProductInfo/?storeName=store&catalogNumber=123
 router.get("/", (req, res) => res.send('Hello World! -> /'));
 router.get("/getStores/", StoreController.getStoresWithLimit);      // usage: stores/getStores/?offset=2&limit=3
