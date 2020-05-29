@@ -33,6 +33,11 @@ export const initSystemFromFile = (req: Req.Request): Res.BoolResponse => {
     }
 }
 
+const LogoutAndThrowError = (errorMsg: string, token: string): void => {
+    logout(token);
+    throw new Error(errorMsg);
+
+}
 
 const getSession = (): string => {
     return ServiceFacade.startNewSession();
@@ -42,17 +47,17 @@ const systemInit = (username: string, password: string): void => {
     adminToken = getSession();
     const initReq: Req.InitReq = {  body: { firstAdminName: username, firstAdminPassword: password } , token: adminToken};
     if (!ServiceFacade.systemInit(initReq).data.result)
-        throw new Error(`System init failed. {username: ${username}, password: ${password}`);
+        LogoutAndThrowError(`System init failed. {username: ${username}, password: ${password}`, adminToken)
     usersMap.set(username, password);
 }
 
 const registerUser = (username: string, password: string, token, isLoggedInNow: boolean): void => {
     if (isLoggedInNow) {
-        logout(username, token);
+        logout(token);
     }
     const regReq: Req.RegisterRequest = {body: {username, password}, token};
     if (!ServiceFacade.registerUser(regReq).data.result)
-        throw new Error(`Registration failed. {username: ${username}, password: ${password}`);
+        LogoutAndThrowError(`Registration failed. {username: ${username}, password: ${password}`, token)
     usersMap.set(username, password);
 }
 
@@ -65,28 +70,28 @@ const registerUsers = (users: any[]): void => {
 
 const loginUser = (username: string, password: string, token, isLoggedInNow: boolean): void => {
     if (isLoggedInNow) {
-        logout(username, token);
+        logout(token);
     }
     const loginReq: Req.LoginRequest = {body: {username, password}, token};
     if (!ServiceFacade.loginUser(loginReq).data.result)
-        throw new Error(`Login failed. {username: ${username}, password: ${password}}`)
+        LogoutAndThrowError(`Login failed. {username: ${username}, password: ${password}}`, token)
 }
 
-const logout = (username: string, token: string): void => {
+const logout = (token: string): void => {
     const logoutReq: Req.LogoutRequest = {body: {}, token};
     if (!ServiceFacade.logoutUser(logoutReq).data.result)
-        throw new Error(`Logout failed. {username: ${username}}`)
+        LogoutAndThrowError(`Logout failed.`, token)
 }
 
 const createStore = (storeName: string, token: string): void => {
     const req: Req.OpenStoreRequest = {body: {storeName, description: "store desc"}, token};
     if (!ServiceFacade.createStore(req).data.result)
-        throw new Error(`Create store failed. {storeName: ${storeName}}`)
+        LogoutAndThrowError(`Create store failed. {storeName: ${storeName}}`, token)
 }
 
 const addNewProducts = (storeName: string, products: Product[], token: string): void => {
     if (!ServiceFacade.addNewProducts({body: {storeName, products}, token}).data.result)
-        throw new Error(`Add new products failed. {storeName: ${storeName}}`)
+        LogoutAndThrowError(`Add new products failed. {storeName: ${storeName}}`, token)
     products.forEach(product => {
         if (!itemIds.has(product.catalogNumber))
             itemIds.set(product.catalogNumber, 0)
@@ -95,7 +100,7 @@ const addNewProducts = (storeName: string, products: Product[], token: string): 
 
 const addNewItems = (storeName: string, items: IItem[], token: string): void => {
     if (!ServiceFacade.addItems({body: {storeName, items}, token}).data.result)
-        throw new Error(`Add new items failed. {storeName: ${storeName}}`)
+        LogoutAndThrowError(`Add new items failed. {storeName: ${storeName}}`, token)
 }
 
 const assignStoreManager = (storeName: string, assigner: string, assignee: string, token: string): void => {
@@ -107,8 +112,7 @@ const assignStoreManager = (storeName: string, assigner: string, assignee: strin
     };
     const res = ServiceFacade.assignStoreManager(assignStoreManagerRequest);
     if (!res.data.result)
-        throw new Error(`Assign store manager failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`)
-
+        LogoutAndThrowError(`Assign store manager failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
 }
 
 const addPermissions = (manager: string, storeName: string, permissions: ManagementPermission[], token: string): void => {
@@ -120,7 +124,7 @@ const addPermissions = (manager: string, storeName: string, permissions: Managem
         }, token
     };
     if (!ServiceFacade.addManagerPermissions(changeManagerPermissionReq))
-        throw new Error(`Add manager permissions failed. {manager to add permissions: ${manager}, store name ${storeName}}`)
+        LogoutAndThrowError(`Add manager permissions failed. {manager to add permissions: ${manager}, store name ${storeName}}`, token)
 }
 
 const createStores = (stores: any[]): void => {
@@ -141,14 +145,14 @@ const createStores = (stores: any[]): void => {
             return acc.concat(currItems);
         }, []);
         addNewItems(store.storeName, items, token);
-        logout(store.owner, token);
+        logout(token);
 
         store.managers.forEach(currAssign => {
             loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
             assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
             if (currAssign.permissions && currAssign.permissions.length > 0)
                 addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
-            logout(currAssign.assigner, token);
+            logout(token);
         })
     })
 }
