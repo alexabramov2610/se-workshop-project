@@ -51,7 +51,8 @@ const errorMsg:ErrorMessages = {
     E_INVALID_PARAM: "Invalid parameters",
     SET_POLICY_FAILED: "Set policy failed!",
     VERIFY_POLICY_FAILED: "Verifying policy failed",
-    E_ASSIGN_SELF: "You cannot assign yourself"
+    E_ASSIGN_SELF: "You cannot assign yourself",
+    E_MAX_AMOUNT_REACHED: "You have reached the maximum amount of this product"
 
 
 

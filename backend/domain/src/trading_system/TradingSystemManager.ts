@@ -303,6 +303,16 @@ export class TradingSystemManager {
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        if (user.cart.has(req.body.storeName)) {
+            const storeBags: BagItem[] = user.cart.get(req.body.storeName);
+            let currHoldingAmount: number = 0;
+            storeBags.forEach(bag => {
+                if (bag.product.catalogNumber === req.body.catalogNumber)
+                    currHoldingAmount = bag.amount;
+            })
+           if (currHoldingAmount  + amount > store.getProductQuantity(req.body.catalogNumber))
+               return {data: {result: false}, error: {message: errorMsg.E_MAX_AMOUNT_REACHED}}
+        }
         logger.debug(`product: ${req.body.catalogNumber} added to cart`)
         this._userManager.saveProductToCart(user, req.body.storeName, product, amount);
         return {data: {result: true}}
