@@ -8,6 +8,8 @@ import {
 import FormInput from "../../components/form-input/form-input.component";
 import { CustomButton } from "../../components/custom-button/custom-button.component";
 import * as api from "../../utils/api";
+import * as Modal from "../../components/modal/modal";
+import Button from "antd/es/button";
 
 class AdminInit extends React.Component {
   constructor() {
@@ -15,6 +17,17 @@ class AdminInit extends React.Component {
     this.state = {
       afterInit: false,
     };
+  }
+
+
+  initFromFile = async (event) => {
+    event.preventDefault();
+    const { data } = await api.initFromFile();
+    console.log(data)
+    if (data.data && data.data.result)
+      this.setState({afterInit: true}, () => window.location.reload());
+    else
+      Modal.warning(data.error.message);
   }
 
   handleSubmit = async (event) => {
@@ -62,6 +75,8 @@ class AdminInit extends React.Component {
             />
 
             <CustomButton type="submit">Create Admin User</CustomButton>
+            <CustomButton  style={{marginTop: "20px"}} onClick={this.initFromFile}>Init from file</CustomButton>
+
           </form>
         </StoreFormContainer>
       </CreateStorePageContainer>

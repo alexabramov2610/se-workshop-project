@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/init", SystemControllers.systemInit);
 
-
+router.get("/initFile", SystemControllers.initFromFile);
 router.get("/status", SystemControllers.isLoggedIn);
 router.get("/healthcheck", SystemControllers.getIsSystemUp);
 router.get("/newtoken", SystemControllers.startNewSession);    // usage: stores/newtoken
