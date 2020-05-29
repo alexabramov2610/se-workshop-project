@@ -814,6 +814,18 @@ export class StoreManagement {
 
     }
 
+    getItemIds(storeName: string, catalogNumber: number): Res.GetItemsIdsResponse {
+        const store: Store = this.findStoreByName(storeName);
+        if (!store)
+            return { data: { result: false, items: [] }, error: { message: errorMsg.E_INVALID_STORE} }
+
+        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        if (!product)
+            return { data: { result: false, items: [] }, error: { message: errorMsg.E_PROD_DOES_NOT_EXIST} }
+
+        return { data: { result: true, items: store.products.get(product).reduce((acc, curr) => acc.concat(curr.id) ,[])}}
+    }
+
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
         const condDiscount: CondDiscount = discount as CondDiscount;
         let conditions: IConditionOfDiscount[];

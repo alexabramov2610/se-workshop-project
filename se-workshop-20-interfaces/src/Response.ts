@@ -150,7 +150,12 @@ interface GetOwnersAssignedByResponse extends Response {
   data: {result: boolean, owners: string[]}
 }
 
+interface GetItemsIdsResponse extends Response {
+  data: {result: boolean, items: number[]}
+}
+
 export {
+  GetItemsIdsResponse,
   GetOwnersAssignedByResponse,
   GetAllManagersPermissionsResponse,
   GetPersonalDetailsResponse,

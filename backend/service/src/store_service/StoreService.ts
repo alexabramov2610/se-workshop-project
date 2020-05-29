@@ -220,3 +220,10 @@ export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest
 export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Res.GetOwnersAssignedByResponse => {
     return ts.getOwnersAssignedBy(req);
 }
+
+export const getItemIds = (req: Req.GetItemsIdsRequest): Res.GetItemsIdsResponse => {
+    const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
+    if (!havePermission.data.result)
+        return {data: {result: false, items: []}, error: havePermission.error}
+    return ts.getItemIds(req);
+}

@@ -652,4 +652,9 @@ export class TradingSystemManager {
         return this._storeManager.getOwnersAssignedBy(req.body.storeName, usernameWhoRemoves);
 
     }
+
+    getItemIds(req: Req.GetItemsIdsRequest): Res.GetItemsIdsResponse {
+        return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
+    }
+
 }

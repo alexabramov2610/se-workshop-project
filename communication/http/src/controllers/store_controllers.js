@@ -250,3 +250,18 @@ export async function getOwnersAssignedBy(req, res) {
         return res.send(invalidRes);
     }
 }
+
+export async function getItemIds(req, res) {
+    try {
+        const getStoresWithLimitReq = {
+            body: {storeName: req.query.storeName, product: req.query.product},
+            token: req.cookies['token']
+        };
+        req.body = getStoresWithLimitReq;
+        const result = wrapHttp(req, ServiceFacade.getItemIds);
+        // console.log('ressss : ' +JSON.stringify(result));
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}

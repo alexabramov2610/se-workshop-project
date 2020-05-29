@@ -279,6 +279,9 @@ export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Res.Ge
 export const getPersonalDetails = (req: Req.Request): Res.GetPersonalDetailsResponse => {
     return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
 }
+export const getItemIds = (req: Req.GetItemsIdsRequest): Res.GetItemsIdsResponse => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getItemIds))
+}
 
 /*
 Utils

@@ -259,7 +259,12 @@ interface GetOwnersAssignedByRequest extends Request {
     body: { storeName: string }
 }
 
+interface GetItemsIdsRequest extends Request {
+    body: { storeName: string, product: number }
+}
+
 export {
+    GetItemsIdsRequest,
     GetOwnersAssignedByRequest,
     ChangeMultipleManagerPermissionRequest,
     GetAllManagersPermissionsRequest,
