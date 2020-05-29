@@ -7,6 +7,7 @@ service="$CWD/backend/service"
 client="$CWD/client"
 communication="$CWD/communication"
 publisher="$CWD/publisher"
+dal="$CWD/data-access"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -20,6 +21,13 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}======================= CLEANING API =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $api
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+
+#####  dal
+echo -e "${BLUE}============================================================${NC}"
+echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
+echo -e "${BLUE}============================================================${NC}"
+cd $dal
 sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  client

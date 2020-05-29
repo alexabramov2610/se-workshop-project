@@ -8,6 +8,7 @@ client="$CWD/client"
 http="$CWD/communication/http"
 websocket="$CWD/communication/websocket"
 publisher="$CWD/publisher"
+dal="$CWD/data-access"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -22,6 +23,13 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}======================= CLEANING API =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $api
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+
+#####  data access
+echo -e "${BLUE}============================================================${NC}"
+echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
+echo -e "${BLUE}============================================================${NC}"
+cd $dal
 sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  client
@@ -77,6 +85,13 @@ echo -e "${BLUE}===========================================================${NC}
 echo -e "${BLUE}====================== INSTALLING API =====================${NC}"
 echo -e "${BLUE}===========================================================${NC}"
 cd $api
+sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+
+#####  dal
+echo -e "${BLUE}===========================================================${NC}"
+echo -e "${BLUE}====================== INSTALLING DAL =====================${NC}"
+echo -e "${BLUE}===========================================================${NC}"
+cd $dal
 sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  client
@@ -138,6 +153,13 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}===================== COMPILING API ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $api
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+
+#####  dal
+echo -e "${BLUE}==========================================================${NC}"
+echo -e "${BLUE}===================== COMPILING DAL ======================${NC}"
+echo -e "${BLUE}==========================================================${NC}"
+cd $dal
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  client
