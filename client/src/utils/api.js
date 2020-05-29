@@ -38,6 +38,12 @@ async function adminInit(firstAdminName, firstAdminPassword) {
     .catch((e) => console.log("cant init system", e));
 }
 
+async function initFromFile() {
+  return instance.get(
+      `${baseDomain}/system/initFile`
+  );
+}
+
 async function register(username, password) {
   return instance.post(`${baseDomain}/users/register`, {
     body: { username, password },
@@ -188,6 +194,7 @@ const removeStoreOwner = async (req) => {
 }
 
 export {
+  initFromFile,
   removeStoreOwner,
   assignStoreOwner,
   getOwnersAssignedByMe,
