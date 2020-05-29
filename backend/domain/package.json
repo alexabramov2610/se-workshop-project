@@ -35,6 +35,6 @@
     "winston-daily-rotate-file": "^4.4.2",
     "se-workshop-20-interfaces": "file:../../se-workshop-20-interfaces",
     "publisher": "file:../../publisher",
-    "dal": "file:../../data-acccess"
+    "dal": "file:../../data-access"
   }
 }
