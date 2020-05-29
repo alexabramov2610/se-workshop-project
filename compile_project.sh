@@ -28,7 +28,7 @@ sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${N
 
 #####  api
 echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}===================== COMPILING API ======================${NC}"
+echo -e "${BLUE}===================== COMPILING DAL ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $dal
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"

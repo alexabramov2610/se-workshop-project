@@ -27,7 +27,7 @@ sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN
 
 #####  data access
 echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}======================= CLEANING API =======================${NC}"
+echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $dal
 sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
@@ -89,7 +89,7 @@ sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  dal
 echo -e "${BLUE}===========================================================${NC}"
-echo -e "${BLUE}====================== INSTALLING API =====================${NC}"
+echo -e "${BLUE}====================== INSTALLING DAL =====================${NC}"
 echo -e "${BLUE}===========================================================${NC}"
 cd $dal
 sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
@@ -157,7 +157,7 @@ sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${N
 
 #####  dal
 echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}===================== COMPILING API ======================${NC}"
+echo -e "${BLUE}===================== COMPILING DAL ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $dal
 sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"

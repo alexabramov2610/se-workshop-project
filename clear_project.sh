@@ -25,7 +25,7 @@ sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN
 
 #####  dal
 echo -e "${BLUE}============================================================${NC}"
-echo -e "${BLUE}======================= CLEANING API =======================${NC}"
+echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $dal
 sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
