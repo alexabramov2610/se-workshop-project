@@ -131,15 +131,26 @@ export async function setPurchasePolicy(req, res) {
 
 export async function getDiscountsPolicy(req, res) {
     try {
-        const getStoresWithLimitReq = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
-        req.body = getStoresWithLimitReq;
+        const getDiscountsPolicyReq = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
+        req.body = getDiscountsPolicyReq;
         const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
     }
 }
+// get
 
+export async function getPurchasePolicy(req, res) {
+    try {
+        const getPurchasePolicyReq = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
+        req.body = getPurchasePolicyReq;
+        const result = wrapHttp(req, ServiceFacade.viewPurchasePolicy);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
 export async function getManagerPermissions(req, res) {
     try {
         const getStoresWithLimitReq = {

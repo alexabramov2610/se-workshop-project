@@ -41,5 +41,6 @@ router.get("/getDiscountsPolicy", StoreController.getDiscountsPolicy);          
 router.get("/getStoreInfo", StoreController.viewStoreInfo);                        //usage: stores/getStoreInfo/?storeName=shufersal
 router.get("/getManagersPermissions", StoreController.getManagersPermissions);                        //usage: stores/getStoreInfo/?storeName=shufersal
 router.get("/getOwnersAssignedBy", StoreController.getOwnersAssignedBy);                        //usage: stores/getStoreInfo/?storeName=shufersal
+router.get("/getPurchasePolicy", StoreController.getPurchasePolicy);              //usage: stores/getPurchasePolicy/?storeName=shufersal
 
 export default router;
