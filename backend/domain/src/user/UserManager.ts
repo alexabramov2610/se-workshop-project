@@ -11,7 +11,7 @@ import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW} from "../api-int/internal_api";
-
+import {UserModel} from 'dal'
 const logger = loggerW(__filename)
 
 export class UserManager {
@@ -39,8 +39,14 @@ export class UserManager {
             logger.debug(`fail to register ,${userName} already exist `);
             return {data: {result: false}, error: {message: errorMsg.E_BU}}
         } else {
-            logger.debug(`${userName} has registered to the system `);
-            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
+
+            // this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
+            const newUser = new UserModel({cart: new Map(), name: userName, password: hashed})
+            newUser.save((err) => {
+                if (err) console.log(err)
+                else logger.debug(`${userName} has registered to the system `);
+
+            });
             return {data: {result: true}};
         }
     }

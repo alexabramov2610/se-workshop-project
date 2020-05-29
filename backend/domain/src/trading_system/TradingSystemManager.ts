@@ -15,7 +15,6 @@ import {Product} from "./data/Product";
 import {ExternalSystems, loggerW, StringTuple, UserRole,} from "../api-int/internal_api";
 import {
     BagItem,
-    Cart,
     IDiscountPolicy,
     IPurchasePolicy, IReceipt,
     Purchase, StoreInfo

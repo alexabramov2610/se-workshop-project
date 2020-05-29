@@ -17,5 +17,11 @@ const createInstance = (): TradingSystemManager => {
 }
 
 
+const registerReq ={
+    body: {username: 'ron', password: '123456'},
+    token: "token"};
+getInstance().register(registerReq);
+
+
 
 export {getInstance, createInstance, logoutUserByName};

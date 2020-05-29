@@ -50,4 +50,5 @@ export class RegisteredUser extends User {
     get pendingEvents(): Event[] {
         return this._pendingEvents;
     }
+
 }
