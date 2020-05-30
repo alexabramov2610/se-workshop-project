@@ -16,6 +16,10 @@ const userSchema = new Schema({
         of: Number,
         required: true
     },
+    loggedIn: {
+        type: Boolean,
+
+    }
 
 },
     {timestamps:false});

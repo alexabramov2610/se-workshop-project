@@ -238,7 +238,7 @@ export class Store {
         }
     }
 
-    removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
+    async removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse>  {
         logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
         const notRemovedProducts: ProductCatalogNumber[] = [];
         const itemsToReturn: Item[] = [];
@@ -283,7 +283,7 @@ export class Store {
 
     }
 
-    removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
+    async removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
         logger.debug(`removing ${products.length} items from store id: ${this._UUID}`)
         const productsNotRemoved: Product[] = [];
 

@@ -5,12 +5,12 @@ import {invalidRes, wrapHttp} from "./http_request_wrapper";
 curl --header "Content-Type: application/json" --request POST --data '{"body": {"firstAdminName": "tal", "firstAdminPassword": "taltal"}, "token": "1"}'   http://localhost:4000/system/init
  */
 export async function systemInit(req,res) {
-    const result = wrapHttp(req, ServiceFacade.systemInit);
+    const result = await wrapHttp(req, ServiceFacade.systemInit);
     return res.send(result)
 }
 
 export async function initFromFile(req,res) {
-    const result = wrapHttp(req, ServiceFacade.initFromFile);
+    const result = await wrapHttp(req, ServiceFacade.initFromFile);
     return res.send(result)
 }
 
@@ -23,18 +23,18 @@ export async function initFromFile(req,res) {
 
 
 export async function isLoggedIn(req, res) {
-    const result = wrapHttp(req, ServiceFacade.isLoggedInUser);
+    const result = await wrapHttp(req, ServiceFacade.isLoggedInUser);
     return res.send(result)
 }
 
 export async function startNewSession(req,res) {
     let token;
     if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-        ServiceFacade.verifyToken({ token: req.cookies['token'] }).data.result) {
+        await ServiceFacade.verifyToken({ token: req.cookies['token'] }).data.result) {
         token = req.cookies['token']
     }
     else
-        token = wrapHttp(req, ServiceFacade.startNewSession);
+        token = await wrapHttp(req, ServiceFacade.startNewSession);
 
     res.cookie('token', token, {
         httpOnly: true,
@@ -45,6 +45,6 @@ export async function startNewSession(req,res) {
 }
 
 export async function getIsSystemUp(req, res) {
-    const result = wrapHttp(req, ServiceFacade.isSystemUp);
+    const result =await wrapHttp(req, ServiceFacade.isSystemUp);
     return res.send(result)
 }

@@ -24,6 +24,8 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
+import {LogoutRequest, RegisterRequest} from "se-workshop-20-interfaces/dist/src/Request";
 
 const logger = loggerW(__filename)
 
@@ -66,20 +68,20 @@ export class TradingSystemManager {
         return {data: {state: this.state}};
     }
 
-    register(req: Req.RegisterRequest): Res.BoolResponse {
+    async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         logger.info(`trying to register new user: ${req.body.username} `);
+
         const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (rUser) {
             logger.debug(`logged in user, can't register `);
-            return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}};
+            return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
         }
-        const res = this._userManager.register(req);
-        return res;
+        return this._userManager.register(req)
     }
 
-    login(req: Req.LoginRequest): Res.BoolResponse {
+    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
         logger.info(`logging in user: ${req.body.username} `);
-        const res: Res.BoolResponse = this._userManager.login(req);
+        const res: Res.BoolResponse = await this._userManager.login(req);
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
@@ -95,10 +97,10 @@ export class TradingSystemManager {
         return res;
     }
 
-    logout(req: Req.LogoutRequest): Res.BoolResponse {
+    async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.info(`logging out user... `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
-        const res: Res.BoolResponse = this._userManager.logout(req);
+        const res: Res.BoolResponse = await this._userManager.logout(req);
         this._userManager.addGuestToken(req.token);
         if (user) {
             logger.info(`removing websocket client... `);
@@ -116,55 +118,55 @@ export class TradingSystemManager {
         this.logout(req);
     }
 
-    changeProductName(req: Req.ChangeProductNameRequest): Res.BoolResponse {
+    changeProductName(req: Req.ChangeProductNameRequest): Promise<Res.BoolResponse> {
         logger.info(`changing product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
-    changeProductPrice(req: Req.ChangeProductPriceRequest): Res.BoolResponse {
+    changeProductPrice(req: Req.ChangeProductPriceRequest): Promise<Res.BoolResponse> {
         logger.info(`changing product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
 
-    addItems(req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse {
+    addItems(req: Req.ItemsAdditionRequest): Promise<Res.ItemsAdditionResponse> {
         logger.info(`adding items to store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.addItems(user, req.body.storeName, req.body.items);
     }
 
-    removeItems(req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse {
+    removeItems(req: Req.ItemsRemovalRequest):Promise<Res.ItemsRemovalResponse> {
         logger.info(`removing items from store: ${req.body.storeName} `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeItems(user, req.body.storeName, req.body.items);
     }
 
-    removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse {
+    removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> {
         logger.info(`removing items from store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
     }
 
-    addNewProducts(req: Req.AddProductsRequest): Res.ProductAdditionResponse {
+    addNewProducts(req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> {
         logger.info(`adding products to store: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.addNewProducts(user, req.body.storeName, req.body.products);
     }
 
-    removeProducts(req: Req.ProductRemovalRequest): Res.ProductRemovalResponse {
+    removeProducts(req: Req.ProductRemovalRequest): Promise<Res.ProductRemovalResponse> {
         logger.info(`removing products from store: ${req.body.storeName} `);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeProducts(user, req.body.storeName, req.body.products);
     }
 
-    assignStoreOwner(req: Req.AssignStoreOwnerRequest): Res.BoolResponse {
+    async assignStoreOwner(req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> {
         logger.info(`assigning user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const res: Res.BoolResponse = this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        const res: Res.BoolResponse = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
         if (res.data.result) {
             logger.info(`successfully assigned user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
             this.subscribeNewStoreOwner(req.body.usernameToAssign, req.body.storeName);
@@ -180,7 +182,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    assignStoreManager(req: Req.AssignStoreManagerRequest): Res.BoolResponse {
+   async assignStoreManager(req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> {
         logger.info(`assigning user: ${req.body.usernameToAssign} as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
@@ -191,7 +193,7 @@ export class TradingSystemManager {
         return this._storeManager.assignStoreManager(req.body.storeName, usernameToAssign, usernameWhoAssigns);
     }
 
-    removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Res.BoolResponse {
+   async removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> {
         logger.info(`removing user: ${req.body.usernameToRemove} as an owner in store: ${req.body.storeName} `);
 
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
@@ -203,7 +205,7 @@ export class TradingSystemManager {
         const ownersToRemove: StringTuple[] = newTuple
             .concat(this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName));
 
-        const res: Res.BoolResponse = this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
+        const res: Res.BoolResponse = await this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
 
         if (res.data.result) {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
@@ -224,7 +226,7 @@ export class TradingSystemManager {
         return res;
     }
 
-    removeStoreManager(req: Req.RemoveStoreManagerRequest): Res.BoolResponse {
+    async removeStoreManager(req: Req.RemoveStoreManagerRequest): Promise<Res.BoolResponse> {
         logger.info(`removing user: ${req.body.usernameToRemove} as a manager in store: ${req.body.storeName}`)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
@@ -251,11 +253,11 @@ export class TradingSystemManager {
         return res;
     }
 
-    createStore(req: Req.OpenStoreRequest): Res.BoolResponse {
+    async createStore(req: Req.OpenStoreRequest): Promise<Res.BoolResponse> {
         logger.info(`creating store: ${req.body.storeName}`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
 
-        const res: Res.BoolResponse = this._storeManager.addStore(req.body.storeName, req.body.description, user);
+        const res: Res.BoolResponse = await this._storeManager.addStore(req.body.storeName, req.body.description, user);
         if (res.data.result) {
             this.subscribeNewStoreOwner(user.name, req.body.storeName);
             logger.info(`successfully created store: ${req.body.storeName}`)
@@ -263,36 +265,35 @@ export class TradingSystemManager {
         return res;
     }
 
-    viewStoreInfo(req: Req.StoreInfoRequest): Res.StoreInfoResponse {
+    viewStoreInfo(req: Req.StoreInfoRequest): Promise<Res.StoreInfoResponse> {
         logger.info(`retrieving store: ${req.body.storeName} info`);
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
-    removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
+    removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
         logger.info(`removing permissions for user: ${req.body.managerToChange}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
-    addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Res.BoolResponse {
+    addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
         logger.info(`adding permissions for user: ${req.body.managerToChange}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
     }
 
-    viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse {
+    viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> {
         logger.info(`retrieving store: ${req.body.storeName} contact us messages`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const res: Res.ViewUsersContactUsMessagesResponse = this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
-        return res;
+        return this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
     }
 
-    viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
+    viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
         logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
         return this._storeManager.viewProductInfo(req);
     }
 
-    saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
+    async saveProductToCart(req: Req.SaveToCartRequest): Promise<Res.BoolResponse> {
         logger.info(`saving product: ${req.body.catalogNumber} to cart`)
         const amount: number = req.body.amount;
         if (amount <= 0)
@@ -309,15 +310,15 @@ export class TradingSystemManager {
                 if (bag.product.catalogNumber === req.body.catalogNumber)
                     currHoldingAmount = bag.amount;
             })
-           if (currHoldingAmount  + amount > store.getProductQuantity(req.body.catalogNumber))
-               return {data: {result: false}, error: {message: errorMsg.E_MAX_AMOUNT_REACHED}}
+            if (currHoldingAmount + amount > store.getProductQuantity(req.body.catalogNumber))
+                return {data: {result: false}, error: {message: errorMsg.E_MAX_AMOUNT_REACHED}}
         }
         logger.debug(`product: ${req.body.catalogNumber} added to cart`)
         this._userManager.saveProductToCart(user, req.body.storeName, product, amount);
         return {data: {result: true}}
     }
 
-    removeProductFromCart(req: Req.RemoveFromCartRequest): Res.BoolResponse {
+    async removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse> {
         logger.info(`removing product: ${req.body.catalogNumber} from cart`)
         const user = this._userManager.getUserByToken(req.token);
         const store = this._storeManager.findStoreByName(req.body.storeName);
@@ -329,11 +330,11 @@ export class TradingSystemManager {
         return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
     }
 
-    viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
+    viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {
         return this._userManager.viewCart(req);
     }
 
-    search(req: Req.SearchRequest): Res.SearchResponse {
+    search(req: Req.SearchRequest): Promise<Res.SearchResponse> {
         logger.info(`searching products`)
         return this._storeManager.search(req.body.filters, req.body.searchQuery);
     }
@@ -383,7 +384,7 @@ export class TradingSystemManager {
         return {data: {result: true}}
     }
 
-    pay(req: Req.PayRequest): Res.PaymentResponse {
+    async pay(req: Req.PayRequest): Promise<Res.PaymentResponse> {
         logger.info(`trying to pay using external system`)
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
@@ -394,7 +395,7 @@ export class TradingSystemManager {
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
-    purchase(req: Req.UpdateStockRequest): Res.PurchaseResponse {
+    async purchase(req: Req.UpdateStockRequest): Promise<Res.PurchaseResponse> {
         logger.info(`purchase request: updating the stock of stores`)
         const user = this._userManager.getUserByToken(req.token);
         const rUser: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
@@ -455,18 +456,18 @@ export class TradingSystemManager {
         return this._userManager.verifyCredentials(req);
     }
 
-    viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+    viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
         logger.info(`viewing manager permissions`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const manager: RegisteredUser = this._userManager.getUserByName(req.body.managerToView);
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
-    getManagerPermissions(req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
+    async getManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
         logger.info(`viewing manager permissions`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         if (!user)
-            return { data: { result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+            return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
     }
 
@@ -484,7 +485,7 @@ export class TradingSystemManager {
     }
 
     // methods that are available for admin also
-    viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Res.ViewRUserPurchasesHistoryRes {
+    async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const userToView: RegisteredUser = (req.body && req.body.userName) ? this._userManager.getUserByName(req.body.userName) : user;
@@ -493,45 +494,44 @@ export class TradingSystemManager {
         const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
         if (userToView.name !== user.name && !isAdminReq)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const res: Res.ViewRUserPurchasesHistoryRes = this._userManager.viewRegisteredUserPurchasesHistory(userToView);
-        return res;
+        return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
     }
 
-    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse {
+    viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse>  {
         logger.info(`retrieving receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const res: Res.ViewShopPurchasesHistoryResponse = this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
-        return res;
+        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+
     }
 
 
-    setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse {
+    setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> {
         logger.info(`setting discount policy to store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)
     }
 
-    setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse {
+    setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest):  Promise<Res.BoolResponse> {
         logger.info(`setting discount policy to store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.setDiscountPolicy(user, req.body.storeName, req.body.policy)
     }
 
-    viewDiscountsPolicy(req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse {
+    async viewDiscountsPolicy(req: Req.ViewStoreDiscountsPolicyRequest): Promise<Res.ViewStoreDiscountsPolicyResponse> {
         logger.info(`retrieving discount policy of store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const policy: IDiscountPolicy = this._storeManager.getStoreDiscountPolicy(user, req.body.storeName)
         return {data: {policy}}
     }
 
-    viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse {
+    async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse> {
         logger.info(`retrieving purchase policy of store ${req.body.storeName} `)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
         const policy: IPurchasePolicy = this._storeManager.getStorePurchasePolicy(user, req.body.storeName)
         return {data: {policy}}
     }
 
-    deliver(req: Req.DeliveryRequest): Res.DeliveryResponse {
+    async deliver(req: Req.DeliveryRequest): Promise<Res.DeliveryResponse> {
         logger.info(`trying to deliver using external system`)
         const user = this._userManager.getUserByToken(req.token);
         const isDeliver: boolean = this._externalSystems.deliverySystem.deliver(req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address);
@@ -593,48 +593,76 @@ export class TradingSystemManager {
         this._publisher.terminateSocket();
     }
 
-    getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse {
+    getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse>  {
         logger.info(`getting stores by offset`);
         const limit: number = req.body.limit;
         const offset: number = req.body.offset;
         return this._storeManager.getStoresWithOffset(+limit, +offset);
     }
 
-    getAllProductsInStore(req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse {
+    getAllProductsInStore(req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> {
         logger.info(`getting all products in store ${req.body.storeName}`);
         const storeName: string = req.body.storeName;
         return this._storeManager.getAllProductsInStore(storeName);
     }
 
-    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse {
+    getAllCategoriesInStore(req: Req.GetAllCategoriesInStoreRequest):Promise<Res.GetCategoriesResponse> {
         logger.info(`getting all categories in store ${req.body.storeName}`);
         const storeName: string = req.body.storeName;
         return this._storeManager.getAllCategoriesInStore(storeName);
     }
 
-    getAllCategories(): Res.GetAllCategoriesResponse {
-        return { data: { categories: Object.keys(ProductCategory) } }
+   async getAllCategories():Promise<Res.GetAllCategoriesResponse> {
+        return {data: {categories: Object.keys(ProductCategory)}}
     }
 
-    isLoggedInUserByToken(req: Req.Request): Res.GetLoggedInUserResponse {
+   async isLoggedInUserByToken(req: Req.Request): Promise<Res.GetLoggedInUserResponse>  {
         logger.info(`checking is logged in user by received token`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         return {data: {username: user ? user.name : undefined}}
     }
 
-    getPersonalDetails(req: Req.Request):  Res.GetPersonalDetailsResponse {
+    async getPersonalDetails(req: Req.Request): Promise<Res.GetPersonalDetailsResponse> {
         logger.info(`getting personal details`);
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (!user)
-            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: [], purchasesHistory: undefined}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const viewCartRes: Res.ViewCartRes = this.viewCart(req);
+            return {
+                data: {
+                    result: false,
+                    cart: undefined,
+                    username: undefined,
+                    managedStores: [],
+                    ownedStores: [],
+                    purchasesHistory: undefined
+                }, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}
+            };
+        const viewCartRes: Res.ViewCartRes = await this.viewCart(req);
         if (!viewCartRes.data.result)
-            return { data: { result: false, cart: undefined, username: undefined, managedStores: [], ownedStores: [], purchasesHistory: undefined}, error: viewCartRes.error};
+            return {
+                data: {
+                    result: false,
+                    cart: undefined,
+                    username: undefined,
+                    managedStores: [],
+                    ownedStores: [],
+                    purchasesHistory: undefined
+                }, error: viewCartRes.error
+            };
 
         const managedStores: StoreInfo[] = this._storeManager.getStoresInfoOfManagedBy(user.name);
         const ownedStores: StoreInfo[] = this._storeManager.getStoresInfoOfOwnedBy(user.name);
-        const purchasesHistory: IReceipt[] = this.viewRegisteredUserPurchasesHistory(req).data.receipts;
-        return { data: { result: true, username: user.name, cart: viewCartRes.data.cart, managedStores, ownedStores, purchasesHistory } };
+        const viewUserRes: Res.ViewRUserPurchasesHistoryRes = await this.viewRegisteredUserPurchasesHistory(req)
+        const purchasesHistory: IReceipt[] =  viewUserRes.data.receipts;
+        return {
+            data: {
+                result: true,
+                username: user.name,
+                cart: viewCartRes.data.cart,
+                managedStores,
+                ownedStores,
+                purchasesHistory
+            }
+        };
 
     }
 
@@ -647,7 +675,7 @@ export class TradingSystemManager {
         logger.info(`retrieving owners assigned`);
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token);
         if (!usernameWhoRemoves)
-            return { data: {result: false, owners: []}, error: { message: errorMsg.E_NOT_LOGGED_IN } }
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         return this._storeManager.getOwnersAssignedBy(req.body.storeName, usernameWhoRemoves);
 
     }

@@ -3,26 +3,26 @@ import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ManagerNamePermission} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
-export const createStore = (req: Req.OpenStoreRequest
-): Res.BoolResponse => {
+export const createStore = async (req: Req.OpenStoreRequest
+): Promise<Res.BoolResponse> => {
     const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: req.body.storeName}, token: req.token}
     const verifyStoreRes: Res.BoolResponse = ts.verifyNewStore(verifyStoreReq);
     if (!verifyStoreRes.data.result) return verifyStoreRes
     return ts.createStore(req);
 }
 
-export const addItems = (req: Req.ItemsAdditionRequest): Res.ItemsAdditionResponse => {
+export const addItems = async (req: Req.ItemsAdditionRequest): Promise<Res.ItemsAdditionResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, itemsNotAdded: req.body.items}, error: havePermission.error}
     return ts.addItems(req);
 }
 
-export const viewStoreInfo = (req: Req.StoreInfoRequest): Res.StoreInfoResponse => {
+export const viewStoreInfo = (req: Req.StoreInfoRequest): Promise<Res.StoreInfoResponse> => {
     return ts.viewStoreInfo(req);
 }
 
-export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolResponse => {
+export const changeProductName = async (req: Req.ChangeProductNameRequest): Promise<Res.BoolResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
@@ -38,7 +38,7 @@ export const changeProductName = (req: Req.ChangeProductNameRequest): Res.BoolRe
     return ts.changeProductName(req);
 }
 
-export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.BoolResponse => {
+export const changeProductPrice = async (req: Req.ChangeProductPriceRequest): Promise<Res.BoolResponse> => {
     const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
@@ -51,28 +51,28 @@ export const changeProductPrice = (req: Req.ChangeProductPriceRequest): Res.Bool
     return ts.changeProductPrice(req);
 }
 
-export const removeItems = (req: Req.ItemsRemovalRequest): Res.ItemsRemovalResponse => {
+export const removeItems = async (req: Req.ItemsRemovalRequest): Promise<Res.ItemsRemovalResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, itemsNotRemoved: req.body.items}, error: havePermission.error}
     return ts.removeItems(req);
 }
 
-export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Res.ProductRemovalResponse => {
+export const removeProductsWithQuantity = async (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse>  => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
     return ts.removeProductsWithQuantity(req);
 }
 
-export const addNewProducts = (req: Req.AddProductsRequest): Res.ProductAdditionResponse => {
+export const addNewProducts = async (req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, productsNotAdded: req.body.products}, error: havePermission.error}
     return ts.addNewProducts(req);
 }
 
-export const viewProductInfo = (req: Req.ProductInfoRequest): Res.ProductInfoResponse => {
+export const viewProductInfo = async (req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> => {
     const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
@@ -85,44 +85,46 @@ export const viewProductInfo = (req: Req.ProductInfoRequest): Res.ProductInfoRes
     return ts.viewProductInfo(req);
 }
 
-export const removeProducts = (req: Req.ProductRemovalRequest): Res.ProductRemovalResponse => {
+export const removeProducts = async (req: Req.ProductRemovalRequest): Promise<Res.ProductRemovalResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
     return ts.removeProducts(req);
 }
 
-export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Res.BoolResponse => {
+export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.assignStoreOwner(req);
 }
 
-export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Res.BoolResponse => {
+export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.removeStoreOwner(req);
 }
 
-export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Res.BoolResponse => {
+export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> => {
     return ts.assignStoreManager(req);
 }
 
-export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Res.BoolResponse => {
+export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Promise<Res.BoolResponse> => {
     return ts.removeStoreManager(req);
 }
 
-export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Res.ViewShopPurchasesHistoryResponse => {
+export const viewStorePurchasesHistory = async (req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse>  => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.WATCH_PURCHASES_HISTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, receipts: []}, error: havePermission.error}
     return ts.viewStorePurchasesHistory(req);
 }
 
-export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
+export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return ts.removeManagerPermissions(req);
 }
 
-export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Res.BoolResponse => {
+export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return ts.addManagerPermissions(req);
 }
-export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPermissionRequest): Res.BoolResponse => {
+//todo
+/*
+export const addMultipleManagersPermissions = async (req: Req.ChangeMultipleManagerPermissionRequest): Promise<Res.BoolResponse> => {
     let errors: string[] = [];
     req.body.permissions.forEach((permission: ManagerNamePermission) => {
         const addManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
@@ -130,7 +132,7 @@ export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPer
         const removeManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
             body: { storeName: req.body.storeName, managerToChange: permission.managerName, permissions: Object.values(ManagementPermission)}};
         removeManagerPermissions(removeManagerPermissionsReq);
-        const addManagerPermissionsRes: Res.BoolResponse = addManagerPermissions(addManagerPermissionsReq);
+        const addManagerPermissionsRes: Res.BoolResponse = await addManagerPermissions(addManagerPermissionsReq);
         if (!addManagerPermissionsRes.data.result)
             errors.push(addManagerPermissionsRes.error.message)
     });
@@ -138,19 +140,21 @@ export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPer
         return { data: { result: errors.length !== req.body.permissions.length }, error: { message: errors.join("\n") }}
     return { data: { result: true } }
 }
-export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+
+ */
+export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> => {
     return ts.viewManagerPermissions(req);
 }
 
-export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse => {
+export const getManagerPermissions = (req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse>=> {
     return ts.getManagerPermissions(req);
 }
 
-export const search = (req: Req.SearchRequest): Res.SearchResponse => {
+export const search = (req: Req.SearchRequest): Promise<Res.SearchResponse> => {
     return ts.search(req);
 }
 
-export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest): Res.ViewUsersContactUsMessagesResponse => {
+export const viewUsersContactUsMessages = async (req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> => {
     const havePermission: Res.BoolResponse = verifyPermission(req.body.storeName, ManagementPermission.WATCH_USER_QUESTIONS, req.token)
     if (!havePermission.data.result)
         return {data: {result: false, messages: []}, error: havePermission.error}
@@ -171,17 +175,17 @@ export const removeDiscount = (req: Req.RemoveDiscountRequest): Res.BoolResponse
     return ts.removeDiscount(req)
 }
 
-export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Res.BoolResponse => {
+export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> => {
     return ts.setPurchasePolicy(req);
 }
-export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse => {
+export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse> => {
     return ts.viewPurchasePolicy(req);
 }
 
-export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest): Res.BoolResponse => {
+export const setDiscountsPolicy = (req: Req.SetDiscountsPolicyRequest):  Promise<Res.BoolResponse> => {
     return ts.setDiscountsPolicy(req);
 }
-export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Res.ViewStoreDiscountsPolicyResponse => {
+export const viewDiscountsPolicy = (req: Req.ViewStoreDiscountsPolicyRequest): Promise<Res.ViewStoreDiscountsPolicyResponse> => {
     return ts.viewDiscountsPolicy(req);
 }
 
@@ -194,19 +198,19 @@ const verifyPermission = (storeName: string, permission: ManagementPermission, t
     })
 }
 
-export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Res.GetStoresWithOffsetResponse => {
+export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse>  => {
     return ts.getStoresWithOffset(req);
 }
 
-export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Res.GetAllProductsInStoreResponse => {
+export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest):Promise<Res.GetAllProductsInStoreResponse> => {
     return ts.getAllProductsInStore(req);
 }
 
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Res.GetCategoriesResponse => {
+export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest):  Promise<Res.GetCategoriesResponse> => {
     return ts.getAllCategoriesInStore(req);
 }
 
-export const getAllCategories = (req: Req.Request): Res.GetAllCategoriesResponse => {
+export const getAllCategories = (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
     return ts.getAllCategories();
 }
 
