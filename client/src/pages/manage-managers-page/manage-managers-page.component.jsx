@@ -93,7 +93,7 @@ const ManageManagersPage = () => {
                     loading={props.isLoading}
                     type="primary"
                     style={{
-                        backgroundColor: "#0fa432",
+                        backgroundColor: "#16a085",
                         marginBottom: 16,
                         border: "none"
                     }}

@@ -193,7 +193,17 @@ const removeStoreOwner = async (req) => {
   return instance.post(`${baseDomain}/stores/removeStoreOwner`, req);
 }
 
+const getStoreBuyingPolicy = async (storeName) => {
+  return instance.get(`${baseDomain}/stores/getPurchasePolicy/?storeName=${storeName}`);
+}
+
+const setStoreBuyingPolicy = async (req) => {
+  return instance.post(`${baseDomain}/stores/setPurchasePolicy`, req);
+}
+
 export {
+  setStoreBuyingPolicy,
+  getStoreBuyingPolicy,
   initFromFile,
   removeStoreOwner,
   assignStoreOwner,
