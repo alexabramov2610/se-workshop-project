@@ -1,12 +1,12 @@
 import { Schema } from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
-const bagItemSchema = new Schema({
-    product: {type: Number},
+const eventSchema = new Schema({
+    notification: {type: Number},
     amount: {type: Number},
     finalPrice: {type: Number}
 });
 
-bagItemSchema.plugin(uniqueValidator);
+eventSchema.plugin(uniqueValidator);
 
-export default bagItemSchema;
+export default eventSchema;
