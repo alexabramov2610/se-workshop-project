@@ -24,8 +24,6 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
-import {LogoutRequest, RegisterRequest} from "se-workshop-20-interfaces/dist/src/Request";
 
 const logger = loggerW(__filename)
 
