@@ -44,7 +44,7 @@ export class TradingSystemManager {
         this.state = TradingSystemState.CLOSED;
     }
 
-    startNewSession(): string {
+    async startNewSession(): Promise<string> {
         logger.info(`starting new session...`);
         let newID: string = uuid();
         while (this._userManager.getUserByToken(newID)) {
@@ -558,7 +558,7 @@ export class TradingSystemManager {
         }
     }
 
-    verifyTokenExists(req: Req.Request): Res.BoolResponse {
+   async verifyTokenExists(req: Req.Request): Promise<Res.BoolResponse> {
         logger.debug(`checking if token exists`)
         return this._userManager.getUserByToken(req.token) ? {data: {result: true}} : {
             data: {result: false},

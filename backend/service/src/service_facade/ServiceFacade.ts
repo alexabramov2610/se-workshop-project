@@ -279,7 +279,7 @@ export const isSystemUp = async (): Promise<Res.BoolResponse> => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
     return { data: { result: await tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
 }
-export const verifyToken = (req: Req. Request): Promise<Res.BoolResponse> => {
+export const verifyToken = async (req: Req. Request): Promise<Res.BoolResponse> => {
     return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
@@ -309,7 +309,7 @@ Utils
 export const reset = (): void => {
     tradingSystem = createInstance();
 }
-export const startNewSession = (): string => {
+export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();
 }
 const runIfOpen = async (req: Req.Request, fn: any): Promise<any> => {
@@ -321,9 +321,9 @@ const runIfOpen = async (req: Req.Request, fn: any): Promise<any> => {
 }
 
 const runIfHaveToken = async (fn: any): Promise<any> => {
-    const f = function (req: Req.Request) {
+    const f = async function (req: Req.Request) {
         const isTokenExistsReq: Req.Request = {body: {}, token: req.token};
-        const isTokenExistsRes: Res.BoolResponse = tradingSystem.verifyTokenExists(isTokenExistsReq);
+        const isTokenExistsRes: Res.BoolResponse = await tradingSystem.verifyTokenExists(isTokenExistsReq);
         if (!isTokenExistsRes.data.result)
             return isTokenExistsRes
         return fn.call(this, req);
@@ -349,23 +349,19 @@ export {tradingSystem}
 
 
 /** --------------------------------- testing --------------------------------- */
-/*
 import {t1, t2, t3, t4, t5} from "../testSocket";
-import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
-import {InitReq} from "se-workshop-20-interfaces/dist/src/Request";
 export const test1 = () : any => {
-    t1();
+    return t1();
 }
 export const test2 = () : any => {
-    t2();
+    return t2();
 }
 export const test3 = () : any => {
-    t3();
+    return t3();
 }
 export const test4 = () : any => {
-    t4();
+    return t4();
 }
 export const test5 = () : any => {
-    t5();
+    return t5();
 }
-*/

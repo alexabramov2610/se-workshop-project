@@ -29,8 +29,9 @@ export async function isLoggedIn(req, res) {
 
 export async function startNewSession(req,res) {
     let token;
+    const verifyTokenRes = await ServiceFacade.verifyToken({ token: req.cookies['token'] });
     if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-        await ServiceFacade.verifyToken({ token: req.cookies['token'] }).data.result) {
+        verifyTokenRes.data.result) {
         token = req.cookies['token']
     }
     else
