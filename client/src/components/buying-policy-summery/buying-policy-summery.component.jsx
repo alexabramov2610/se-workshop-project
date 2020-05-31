@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import TableHeader from "./table-header/table-header.component";
 import {Empty} from "antd";
 import TableRow from "./table-row/table-row.component";
+import {BuyingPolicyPageCtx} from "../../pages/buying-policy-page/buying-policy-ctx";
 
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
@@ -12,13 +13,15 @@ const reorder = (list, startIndex, endIndex) => {
     return result;
 };
 
-const Rows = React.memo(function Rows({discounts}) {
-    return discounts.map((discount, index) => {
-        return <TableRow discount={discount} index={index} key={discount.key}/>;
+const Rows = React.memo(function Rows({rows}) {
+    return rows.map((row, index) => {
+        return <TableRow row={row} index={index} key={row.key}/>;
     });
 });
 
 function BuyingPolicySummery() {
+
+    const props = useContext(BuyingPolicyPageCtx);
 
     function onDragEnd(result) {
         if (!result.destination) {
@@ -29,25 +32,25 @@ function BuyingPolicySummery() {
             return;
         }
 
-        const policy = reorder(
-            [],
+        const newPolicy = reorder(
+            props.policy,
             result.source.index,
             result.destination.index
         );
 
-        // props.setPolicyDiscounts(policy);
+        props.setPolicy(newPolicy);
     }
 
     return (
-        <div style={{height: "60vh", overflowY: "scroll"}}>
+        <div style={{height: "65vh", overflowY: "scroll"}}>
             <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
                 <TableHeader/>
                 <Droppable droppableId="list">
                     {provided => (
-                        [].length === 0
+                        props.policy.length === 0
                             ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                             : <div ref={provided.innerRef} {...provided.droppableProps}>
-                                <Rows discounts={[]}/>
+                                <Rows rows={props.policy}/>
                                 {provided.placeholder}
                             </div>
                     )}
