@@ -201,7 +201,6 @@ const setStoreBuyingPolicy = async (req) => {
   return instance.post(`${baseDomain}/stores/setPurchasePolicy`, req);
 }
 const addItem = async (storeName, catalogNumber, id) => {
-  console.log(storeName)
   const req = { body: { storeName: storeName, items: [{ catalogNumber, id }] } }
   return instance.post(`${baseDomain}/stores/addItems`, req);
 }
@@ -211,10 +210,14 @@ const getProductItems = async (storeName, cn) => {
   return data && data.data && data.data.items
 };
 const removeItem = async (storeName, catalogNumber, id) => {
-  console.log(storeName)
   const req = { body: { storeName: storeName, items: [{ catalogNumber, id }] } }
   return instance.post(`${baseDomain}/stores/removeItems`, req);
 }
+const removeProduct = async (storeName, catalogNumber) => {
+  const req = { body: { storeName: storeName, products: [{ catalogNumber }] } }
+  return instance.post(`${baseDomain}/stores/removeProducts`, req);
+}
+
 export {
   setStoreBuyingPolicy,
   getStoreBuyingPolicy,
@@ -252,5 +255,6 @@ export {
   search,
   getStoreCategories, addItem,
   getProductItems,
-  removeItem
+  removeItem,
+  removeProduct
 };
