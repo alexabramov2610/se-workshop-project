@@ -96,7 +96,7 @@ export class UserManager {
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
         if (this.getUserByName(userName)) {
             logger.debug(`fail to register ,${userName} already exist `);
-            return {data: {result: false}, error: {message: errorMsg.E_BU}}
+            return  {data: {result: false}, error: {message: errorMsg.E_BU}}
         } else {
             logger.debug(`${userName} has registered to the system `);
             this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);

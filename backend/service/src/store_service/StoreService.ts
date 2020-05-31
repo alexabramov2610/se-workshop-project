@@ -122,11 +122,9 @@ export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return ts.addManagerPermissions(req);
 }
-//todo
-/*
 export const addMultipleManagersPermissions = async (req: Req.ChangeMultipleManagerPermissionRequest): Promise<Res.BoolResponse> => {
     let errors: string[] = [];
-    req.body.permissions.forEach((permission: ManagerNamePermission) => {
+    req.body.permissions.forEach( async(permission: ManagerNamePermission) => {
         const addManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
             body: { storeName: req.body.storeName, managerToChange: permission.managerName, permissions: permission.permissions}};
         const removeManagerPermissionsReq: Req.ChangeManagerPermissionRequest = { token: req.token,
@@ -141,7 +139,6 @@ export const addMultipleManagersPermissions = async (req: Req.ChangeMultipleMana
     return { data: { result: true } }
 }
 
- */
 export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> => {
     return ts.viewManagerPermissions(req);
 }

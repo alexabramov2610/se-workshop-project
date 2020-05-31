@@ -25,6 +25,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
         }, token: req.token
     };
 
+
     const registerRes: Res.BoolResponse = await tradingSystem.register(registerRequest);
     if (registerRes.error)
         return registerRes;
