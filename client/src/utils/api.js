@@ -34,13 +34,13 @@ async function adminInit(firstAdminName, firstAdminPassword) {
     .post(`${baseDomain}/system/init`, {
       body: { firstAdminName, firstAdminPassword },
     })
-    .then(({ data }) => {})
+    .then(({ data }) => { })
     .catch((e) => console.log("cant init system", e));
 }
 
 async function initFromFile() {
   return instance.get(
-      `${baseDomain}/system/initFile`
+    `${baseDomain}/system/initFile`
   );
 }
 
@@ -150,16 +150,16 @@ const addProduct = async (storeName, catalogNumber, name, price, category) => {
   return instance.post(`${baseDomain}/stores/addNewProducts`, req);
 };
 
-const changeProductName = async (storeName,catalogNumber, newName) => {
+const changeProductName = async (storeName, catalogNumber, newName) => {
   const req = {
-    body: { storeName,catalogNumber,newName },
+    body: { storeName, catalogNumber, newName },
   };
   return instance.post(`${baseDomain}/stores/changeProductName`, req);
 };
 
-const changeProductPrice = async (storeName, catalogNumber,newPrice) => {
+const changeProductPrice = async (storeName, catalogNumber, newPrice) => {
   const req = {
-    body: { storeName,catalogNumber,newPrice },
+    body: { storeName, catalogNumber, newPrice },
   };
   return instance.post(`${baseDomain}/stores/changeProductPrice`, req);
 };
@@ -200,7 +200,21 @@ const getStoreBuyingPolicy = async (storeName) => {
 const setStoreBuyingPolicy = async (req) => {
   return instance.post(`${baseDomain}/stores/setPurchasePolicy`, req);
 }
-
+const addItem = async (storeName, catalogNumber, id) => {
+  console.log(storeName)
+  const req = { body: { storeName: storeName, items: [{ catalogNumber, id }] } }
+  return instance.post(`${baseDomain}/stores/addItems`, req);
+}
+// stores/getItemIds/?storeName=alibaba&product=3
+const getProductItems = async (storeName, cn) => {
+  const { data } = await instance.get(`${baseDomain}/stores/getItemIds/?storeName=${storeName}&product=${cn}`);
+  return data && data.data && data.data.items
+};
+const removeItem = async (storeName, catalogNumber, id) => {
+  console.log(storeName)
+  const req = { body: { storeName: storeName, items: [{ catalogNumber, id }] } }
+  return instance.post(`${baseDomain}/stores/removeItems`, req);
+}
 export {
   setStoreBuyingPolicy,
   getStoreBuyingPolicy,
@@ -236,5 +250,7 @@ export {
   getStoreProducts,
   adminInit,
   search,
-  getStoreCategories,
+  getStoreCategories, addItem,
+  getProductItems,
+  removeItem
 };

@@ -52,7 +52,7 @@ class App extends React.Component {
         if (isAdded) {
             await this.cartCountUpdater();
         } else {
-            Modal.warning("",data.error.message)
+            Modal.warning("", data.error.message)
         }
     }
 
@@ -99,7 +99,7 @@ class App extends React.Component {
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />
-                        <Route path="/store/:storename/:catalognumber" render={(props) => <ManageProductItemsContainer />} />
+                        <Route path="/store/:storename/edit-product/:catalognumber" render={(props) => <ManageProductItemsContainer />} />
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />

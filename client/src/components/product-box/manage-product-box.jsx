@@ -48,7 +48,7 @@ export class ManageProductBox extends React.Component {
         </Card.Body>
         <Card.Footer>
 
-          <CustomButton style={{ margin: "auto", marginBottom: 5 }} onClick={() => history.push(`/store/${this.props.store}/${this.props.cn}`)}>
+          <CustomButton style={{ margin: "auto", marginBottom: 5 }} onClick={() => history.push(`/store/${this.props.store}/edit-product/${this.props.cn}`)}>
             Edit
           </CustomButton>
           <CustomButton
