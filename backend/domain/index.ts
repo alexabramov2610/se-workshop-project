@@ -15,7 +15,6 @@ const createInstance = (): TradingSystemManager => {
     tradingSystemInstance = new TradingSystemManager();
     return tradingSystemInstance;
 }
-/*
 const registerReq ={
     body: {username: 'tal', password: '123456'},
     token: "token"};
@@ -24,7 +23,6 @@ const loginReq= {
     token: "token"
 };
 const registerRes = getInstance().register(registerReq).then(data=> console.log(data)).catch(err=> console.log(err))
-*/
 // getInstance().login(loginReq);
 
 

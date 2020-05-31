@@ -33,7 +33,7 @@ export class UserManager {
         this.guests = new Map<string, Guest>();
         this.admins = [];
     }
-/*
+
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         const userName = req.body.username;
         const password = req.body.password;
@@ -43,21 +43,20 @@ export class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_BU}}
         } else {
             // this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
-            const newUser = new UserModel({cart: new Map(), name: userName, password: hashed, loggedIn: false})
-            try{
+            const newUser = new UserModel({cart: new Map(), name: userName, password: hashed})
+            try {
                 const u = await newUser.save()
                 logger.debug(`${userName} has registered to the system `);
-                return new Promise((resolve,reject)=> resolve({data: {result:true}}))
-            }
-            catch (e) {
+                return {data: {result: true}}
+            } catch (e) {
                 logger.info(`fail to register ,${userName} already exist `);
-                if(e.errors.name.kind === 'unique')
-                    return new Promise((resolve,reject)=> resolve({data: {result:false}, error: {message: errorMsg.E_BU}}))
+                if (e.errors.name.kind === 'unique')
+                    return {data: {result: false}, error: {message: errorMsg.E_BU}}
             }
 
         }
     }
-    */
+
 
     /*
         login(req: Req.LoginRequest): Res.BoolResponse {
@@ -89,20 +88,22 @@ export class UserManager {
         }
     */
 
-
-    async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
-        const userName = req.body.username;
-        const password = req.body.password;
-        const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-        if (this.getUserByName(userName)) {
-            logger.debug(`fail to register ,${userName} already exist `);
-            return  {data: {result: false}, error: {message: errorMsg.E_BU}}
-        } else {
-            logger.debug(`${userName} has registered to the system `);
-            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
-            return {data: {result: true}}
+    /*
+        async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
+            const userName = req.body.username;
+            const password = req.body.password;
+            const hashed = this._externalSystems.securitySystem.encryptPassword(password);
+            if (this.getUserByName(userName)) {
+                logger.debug(`fail to register ,${userName} already exist `);
+                return  {data: {result: false}, error: {message: errorMsg.E_BU}}
+            } else {
+                logger.debug(`${userName} has registered to the system `);
+                this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
+                return {data: {result: true}}
+            }
         }
-    }
+
+     */
     async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
         const userName = req.body.username;
         const user = this.getUserByName(userName)
@@ -120,7 +121,8 @@ export class UserManager {
             return {data: {result: true}}
         }
     }
-   async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
+
+    async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         if (this.getLoggedInUserByToken(req.token) && this.loggedInRegisteredUsers.has(this.getLoggedInUserByToken(req.token).name))
             this.loggedInRegisteredUsers.delete(this.getLoggedInUserByToken(req.token).name);
