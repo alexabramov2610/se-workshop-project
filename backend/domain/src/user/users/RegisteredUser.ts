@@ -7,16 +7,16 @@ export class RegisteredUser extends User {
     protected readonly _name: string;
     protected _password: string;
     protected _role: UserRole;
-    private _receipts: Receipt[];
     private _pendingEvents: Event[];
-
-    constructor(name?: string, password?: string) {
+    private _receipts: Receipt[];
+    constructor(name?: string, password?: string,pendingEvents?:Event[], receipts?: Receipt[]) {
         super();
-        this._pendingEvents = [];
         this._name = name;
         this._password = password;
-        this._receipts = [];
+        this._pendingEvents = pendingEvents? pendingEvents : [];
+        this._receipts = receipts? receipts : [];
     }
+
 
     addReceipt(receipt: Receipt) {
         this._receipts.push(receipt);

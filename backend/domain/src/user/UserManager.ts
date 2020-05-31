@@ -20,6 +20,7 @@ const logger = loggerW(__filename)
 export class UserManager {
     private registeredUsers: RegisteredUser[];
     private loggedInUsers: Map<string, RegisteredUser>;                  // token -> user
+    private _loggedInUsers: string[]; // DB loggedin users
     private loggedInRegisteredUsers: Map<string, RegisteredUser>;        // username -> user
     private guests: Map<string, Guest>;
     private admins: Admin[];
@@ -29,6 +30,7 @@ export class UserManager {
         this._externalSystems = externalSystems;
         this.registeredUsers = [];
         this.loggedInUsers = new Map<string, RegisteredUser>();
+        this._loggedInUsers = [];
         this.loggedInRegisteredUsers = new Map<string, RegisteredUser>();
         this.guests = new Map<string, Guest>();
         this.admins = [];
@@ -38,38 +40,36 @@ export class UserManager {
         const userName = req.body.username;
         const password = req.body.password;
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-        if (this.getUserByName(userName)) {
-            logger.debug(`fail to register ,${userName} already exist `);
-            return {data: {result: false}, error: {message: errorMsg.E_BU}}
-        } else {
-            // this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
-            const newUser = new UserModel({cart: new Map(), name: userName, password: hashed})
-            try {
-                const u = await newUser.save()
-                logger.debug(`${userName} has registered to the system `);
-                return {data: {result: true}}
-            } catch (e) {
+        try {
+            await UserModel.create({name: userName, password: hashed})
+            logger.debug(`${userName} has registered to the system `);
+            return {data: {result: true}}
+        } catch (e) {
+            if (e.errors.name.kind === 'unique') {
                 logger.info(`fail to register ,${userName} already exist `);
-                if (e.errors.name.kind === 'unique')
-                    return {data: {result: false}, error: {message: errorMsg.E_BU}}
+                return {data: {result: false}, error: {message: errorMsg.E_BU}}
             }
-
+            return {data: {result: false}, error: {message: e.errors.name}}
         }
     }
 
-
-    /*
-        login(req: Req.LoginRequest): Res.BoolResponse {
+        async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
             const userName = req.body.username;
             // const user = this.getUserByName(userName)
-            const u = UserModel.findOne({name: userName}, (err, registeredUser) => {
-                if (err)
-                    return {data: {result: false}, error: {message: errorMsg.E_AL}}
-                registeredUser.loggedIn = true;
-                registeredUser.save();
-            });
-            return {data: {result: true}};
-            /*
+            if (this.isLoggedIn(userName)) { // already logged in
+                logger.warn(`failed to login ${userName}, user is already logged in `);
+                return {data: {result: false}, error: {message: errorMsg.E_AL}}
+            }
+            try{
+                const u = await UserModel.findOne({name: userName}).lean();
+                this._loggedInUsers.push(userName)
+                return {data: {result: true}};
+            }
+            catch (e) {
+               return {data: {result: false}, error: {message: errorMsg.E_NF}}
+            }
+
+           /*
             if (this.isLoggedIn(userName)) { // already logged in
                 logger.warn(`failed to login ${userName}, user is already logged in `);
                 return {data: {result: false}, error: {message: errorMsg.E_AL}}
@@ -83,10 +83,10 @@ export class UserManager {
                 user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
                 return {data: {result: true}};
             }
+            */
 
 
         }
-    */
 
     /*
         async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
@@ -103,7 +103,6 @@ export class UserManager {
             }
         }
 
-     */
     async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
         const userName = req.body.username;
         const user = this.getUserByName(userName)
@@ -121,7 +120,7 @@ export class UserManager {
             return {data: {result: true}}
         }
     }
-
+*/
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         if (this.getLoggedInUserByToken(req.token) && this.loggedInRegisteredUsers.has(this.getLoggedInUserByToken(req.token).name))
@@ -146,10 +145,20 @@ export class UserManager {
         return this.registeredUsers;
     }
 
+    async getUserByName(name: string): Promise<RegisteredUser> {
+        try{
+            const u = await UserModel.findOne({name});
+            return new RegisteredUser(u.name,u.password, u.pendingEvents, u.receipts);
+        }
+        catch (e) {
+            return undefined
+        }
+    }
+    /*
     getUserByName(name: string): RegisteredUser {
         return this.registeredUsers.filter((u) => u.name === name).pop();
     }
-
+*/
     getLoggedInUserByName(name: string): RegisteredUser {
         return this.loggedInRegisteredUsers.get(name);
     }
@@ -179,7 +188,10 @@ export class UserManager {
         }
         return false;
     }
-
+    isLoggedIn(userToCheck: string): boolean {
+        return this._loggedInUsers.some((name) => name === userToCheck);
+    }
+    /*
     isLoggedIn(userToCheck: string): boolean {
         for (const user of this.loggedInUsers.values()) {
             if (userToCheck === user.name)
@@ -187,14 +199,14 @@ export class UserManager {
         }
         return false;
     }
-
-    setAdmin(req: Req.SetAdminRequest): Res.BoolResponse {
+*/
+    async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const user: RegisteredUser = this.getUserByName(req.body.newAdminUserName)
+        const user: RegisteredUser = await this.getUserByName(req.body.newAdminUserName)
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const isAdmin: boolean = this.isAdmin(user);
@@ -256,12 +268,14 @@ export class UserManager {
         return user.cart;
     }
 
-    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
-        const rUser: RegisteredUser = this.getUserByName(req.body.username)
-        if (!rUser)
+    async verifyCredentials(req: Req.VerifyCredentialsReq): Promise<Res.BoolResponse> {
+        try{
+            const rUser = await UserModel.findOne({name: req.body.username})
+            const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
+            return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
+        }catch (e) {
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
-        const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
-        return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
+        }
     }
 
     isValidUserName(username: string): boolean {

@@ -85,9 +85,10 @@ export class TradingSystemManager {
         if (res.data.result) {
             this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
-            if (this._userManager.getUserByName(req.body.username).pendingEvents.length > 0)
-                logger.info(`sending ${this._userManager.getUserByName(req.body.username).pendingEvents.length} missing notifications..`)
-            this._userManager.getUserByName(req.body.username).pendingEvents.forEach(event => {
+            const user:RegisteredUser = await this._userManager.getUserByName(req.body.username)
+            if (user.pendingEvents.length > 0)
+                logger.info(`sending ${user.pendingEvents.length} missing notifications..`)
+            user.pendingEvents.forEach(event => {
                 event.code = EventCode.USER_EVENTS;
                 this._publisher.notify(event);
             })
@@ -163,7 +164,7 @@ export class TradingSystemManager {
     async assignStoreOwner(req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> {
         logger.info(`assigning user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
+        const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const res: Res.BoolResponse = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
@@ -185,7 +186,7 @@ export class TradingSystemManager {
    async assignStoreManager(req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> {
         logger.info(`assigning user: ${req.body.usernameToAssign} as store manager of store: ${req.body.storeName}`)
         const usernameWhoAssigns: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const usernameToAssign: RegisteredUser = this._userManager.getUserByName(req.body.usernameToAssign)
+        const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         if (req.body.usernameToAssign === usernameWhoAssigns.name)
@@ -197,7 +198,7 @@ export class TradingSystemManager {
         logger.info(`removing user: ${req.body.usernameToRemove} as an owner in store: ${req.body.storeName} `);
 
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
+        const usernameToRemove: RegisteredUser = await this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
 
@@ -217,11 +218,13 @@ export class TradingSystemManager {
                     notification: {type: NotificationsType.GREEN, message: msg}
                 }), []);
 
-            events.forEach(event => {
-                if (this._publisher.notify(event).length !== 0)
-                    this._userManager.getUserByName(event.username).saveNotification(event);
+            for (const event of events) {
+                if (this._publisher.notify(event).length !== 0){
+                    const u = await this._userManager.getUserByName(event.username)
+                    u.saveNotification(event);
+                }
                 this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
-            })
+            }
         }
         return res;
     }
@@ -229,7 +232,7 @@ export class TradingSystemManager {
     async removeStoreManager(req: Req.RemoveStoreManagerRequest): Promise<Res.BoolResponse> {
         logger.info(`removing user: ${req.body.usernameToRemove} as a manager in store: ${req.body.storeName}`)
         const usernameWhoRemoves: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const usernameToRemove: RegisteredUser = this._userManager.getUserByName(req.body.usernameToRemove)
+        const usernameToRemove: RegisteredUser = await this._userManager.getUserByName(req.body.usernameToRemove)
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.removeStoreManager(req.body.storeName, usernameToRemove, usernameWhoRemoves);
@@ -247,9 +250,9 @@ export class TradingSystemManager {
         return res;
     }
 
-    setAdmin(req: Req.SetAdminRequest): Res.BoolResponse {
+    async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         logger.info(`setting ${req.body.newAdminUserName} as an admin`)
-        const res: Res.BoolResponse = this._userManager.setAdmin(req);
+        const res: Res.BoolResponse = await this._userManager.setAdmin(req);
         return res;
     }
 
@@ -432,8 +435,9 @@ export class TradingSystemManager {
                     storeName,
                     notification
                 };
-                this._publisher.notify(event).forEach(userToNotify => { // if didn't send
-                    this._userManager.getUserByName(userToNotify).saveNotification(event);
+                this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
+                    const u =await  this._userManager.getUserByName(userToNotify)
+                    u.saveNotification(event);
                 });
             });
         });
@@ -451,15 +455,15 @@ export class TradingSystemManager {
         return {data: {result: true}};
     }
 
-    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
+    verifyCredentials(req: Req.VerifyCredentialsReq): Promise<Res.BoolResponse>  {
         logger.info(`verifying credentials`)
         return this._userManager.verifyCredentials(req);
     }
 
-    viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
+   async viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
         logger.info(`viewing manager permissions`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const manager: RegisteredUser = this._userManager.getUserByName(req.body.managerToView);
+        const manager: RegisteredUser = await this._userManager.getUserByName(req.body.managerToView);
         return this._storeManager.viewManagerPermissions(user, manager, req);
     }
 
@@ -488,7 +492,7 @@ export class TradingSystemManager {
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = this._userManager.getLoggedInUserByToken(req.token)
-        const userToView: RegisteredUser = (req.body && req.body.userName) ? this._userManager.getUserByName(req.body.userName) : user;
+        const userToView: RegisteredUser = (req.body && req.body.userName) ? await this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
