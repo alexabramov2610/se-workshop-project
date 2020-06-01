@@ -15,15 +15,15 @@ const createInstance = (): TradingSystemManager => {
     tradingSystemInstance = new TradingSystemManager();
     return tradingSystemInstance;
 }
-/*
-const registerReq ={
-    body: {username: 'tal', password: '123456'},
-    token: "token"};
-const loginReq= {
-    body: {username: 'tal', password: '123456'},
-    token: "token"
-};
+// const registerReq ={
+//     body: {username: 'tal', password: '123456'},
+//     token: "token"};
+// const loginReq= {
+//     body: {username: 'tal', password: '123456'},
+//     token: "token"
+// };
 // const registerRes = getInstance().register(registerReq).then(data=> console.log(data)).catch(err=> console.log(err))
-getInstance().login(loginReq).then(data=> console.log(data)).catch(err=> console.log(err))
-*/
+// getInstance().login(loginReq);
+
+
 export {getInstance, createInstance, logoutUserByName};
