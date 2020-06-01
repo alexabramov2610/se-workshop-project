@@ -2,19 +2,21 @@ import {User} from "./User";
 import {UserRole} from "../../api-int/Enums";
 import {Receipt} from "../../trading_system/data/Receipt";
 import {Event} from "se-workshop-20-interfaces/dist/src/Event";
+import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export class RegisteredUser extends User {
     protected readonly _name: string;
     protected _password: string;
     protected _role: UserRole;
-    private _pendingEvents: Event[];
-    private _receipts: Receipt[];
-    constructor(name?: string, password?: string,pendingEvents?:Event[], receipts?: Receipt[]) {
-        super();
+    private readonly _pendingEvents: Event[];
+    private readonly _receipts: Receipt[];
+
+    constructor(name?: string, password?: string, pendingEvents?: Event[], receipts?: Receipt[], cart?: Map<string, BagItem[]>) {
+        super(cart);
         this._name = name;
         this._password = password;
-        this._pendingEvents = pendingEvents? pendingEvents : [];
-        this._receipts = receipts? receipts : [];
+        this._pendingEvents = pendingEvents ? pendingEvents : [];
+        this._receipts = receipts ? receipts : [];
     }
 
 

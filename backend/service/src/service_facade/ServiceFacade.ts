@@ -17,7 +17,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
         }, token: req.token
     })
     if (!isCredentialsOk.data.result)
-        return new Promise((resolve, reject) => resolve(isCredentialsOk));
+        return isCredentialsOk
     const registerRequest: Req.RegisterRequest = {
         body: {
             username: req.body.firstAdminName,
@@ -39,7 +39,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     const loginRes: Res.BoolResponse = await tradingSystem.login(loginReq);
     if (!loginRes.data.result) return loginRes;
     const setAdminReq: Req.SetAdminRequest = {body: {newAdminUserName: req.body.firstAdminName}, token: req.token};
-    const setAdminRes: Res.BoolResponse = tradingSystem.setAdmin(setAdminReq)
+    const setAdminRes: Res.BoolResponse = await tradingSystem.setAdmin(setAdminReq)
     if (setAdminRes.error) return setAdminRes;
     const connectExtReq: Req.Request = {body: {}, token: req.token};
     const connectDeliveryRes: Res.BoolResponse = tradingSystem.connectDeliverySys(connectExtReq);
@@ -203,13 +203,10 @@ UC-4.6
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addManagerPermissions));
 }
-// TODO
-/*
+
 export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addMultipleManagersPermissions));
 }
-
- */
 export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeManagerPermissions));
 }
@@ -278,16 +275,15 @@ export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest)
 }
 export const isSystemUp = async (): Promise<Res.BoolResponse> => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    return { data: { result: await tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
+    return {data: {result: await tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
 }
-export const verifyToken = async (req: Req. Request): Promise<Res.BoolResponse> => {
+export const verifyToken = async (req: Req.Request): Promise<Res.BoolResponse> => {
     return runIfOpen(req, UserService.verifyToken);
 }
 export const isLoggedInUser = (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
     return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
     // return runIfOpen(req, UserService.isLoggedInUser);
 }
-//todo
 export const getAllCategories = (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
 }
@@ -333,9 +329,9 @@ const runIfHaveToken = async (fn: any): Promise<any> => {
 }
 
 const runIfLoggedIn = async (fn: any): Promise<any> => {
-    const f = function (req: Req.Request) {
+    const f = async function (req: Req.Request) {
         const isLoginReq: Req.Request = {body: {}, token: req.token};
-        const isLoginRes: Res.BoolResponse = tradingSystem.verifyUserLoggedIn(isLoginReq);
+        const isLoginRes: Res.BoolResponse = await tradingSystem.verifyUserLoggedIn(isLoginReq);
         if (!isLoginRes.data.result)
             return isLoginRes
         return fn.call(this, req);
@@ -346,23 +342,21 @@ const runIfLoggedIn = async (fn: any): Promise<any> => {
 export {tradingSystem}
 
 
-
-
-
 /** --------------------------------- testing --------------------------------- */
 import {t1, t2, t3, t4, t5} from "../testSocket";
-export const test1 = () : any => {
+
+export const test1 = (): any => {
     return t1();
 }
-export const test2 = () : any => {
+export const test2 = (): any => {
     return t2();
 }
-export const test3 = () : any => {
+export const test3 = (): any => {
     return t3();
 }
-export const test4 = () : any => {
+export const test4 = (): any => {
     return t4();
 }
-export const test5 = () : any => {
+export const test5 = (): any => {
     return t5();
 }

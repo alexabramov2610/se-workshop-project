@@ -8,8 +8,8 @@ export abstract class User {
 
     private _cart: Map<string, BagItem[]>;          // storename -> items
 
-    constructor() {
-        this._cart = new Map();
+    constructor(cart?:Map<string, BagItem[]> ) {
+        this._cart = cart? cart: new Map();
     }
 
 

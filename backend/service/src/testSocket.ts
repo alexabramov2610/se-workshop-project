@@ -46,12 +46,12 @@ export const systemInit = async (): Promise<void> => {
 
 export const initSessionRegisterLogin = async (username: string, password: string): Promise<string> => {
     const token = await getAdminSession();
-   await registerUser(username, password, token, false);
+    await registerUser(username, password, token, false);
     await loginUser(username, password, token, false);
     return token;
 }
 
-export const loginUser = async(username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
+export const loginUser = async (username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
     if (isLoggedInNow) {
         await logout(token);
     }
@@ -69,7 +69,7 @@ export const registerUser = async (username: string, password: string, token, is
 
 export const logout = async (token: string): Promise<void> => {
     const logoutReq: Req.LogoutRequest = {body: {}, token};
-  await  ServiceFacade.logoutUser(logoutReq);
+    await ServiceFacade.logoutUser(logoutReq);
 }
 
 export const createStore = async (storeName: string, token: string): Promise<void> => {
@@ -78,7 +78,7 @@ export const createStore = async (storeName: string, token: string): Promise<voi
 }
 
 export const addNewProducts = async (storeName: string, products: Product[], token: string, expectedRes: boolean): Promise<void> => {
-  await ServiceFacade.addNewProducts({body: {storeName, products}, token});
+    await ServiceFacade.addNewProducts({body: {storeName, products}, token});
 }
 
 export const addNewItems = async (storeName: string, items: IItem[], token: string, expectedRes: boolean): Promise<void> => {
@@ -88,14 +88,14 @@ export const addNewItems = async (storeName: string, items: IItem[], token: stri
 
 /** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export async function t1() {
-    await  systemInit();
+    await systemInit();
 
     storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
     store = new Store(storeName, storeDesc);
     storeOwner = new StoreOwner(storeOwnerName);
 
-    token =await  initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
-    await  createStore(storeName, token);
+    token = await initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
+    await createStore(storeName, token);
 
 
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
@@ -113,14 +113,14 @@ export async function t1() {
         items.push(item);
     }
 
-    await  addNewProducts(storeName, products, token, true);
+    await addNewProducts(storeName, products, token, true);
     await addNewItems(storeName, items, token, true);
     await registerUser(buyer1.name, buyer1.password, token, true);
     await registerUser(buyer2.name, buyer2.password, token, false);
 
 
     // buyer 1 buys
-    await  loginUser(buyer1.name, buyer1.password, token, false);
+    await loginUser(buyer1.name, buyer1.password, token, false);
     // save prod1, prod2
     let saveProductToCartReq: Req.SaveToCartRequest = {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -184,7 +184,7 @@ export async function t1() {
 
 
     // get purchases history
-   await loginUser(storeOwnerName, storeOwnerPassword, token, true);
+    await loginUser(storeOwnerName, storeOwnerPassword, token, true);
     const viewPurchasesHistoryReq: Req.ViewShopPurchasesHistoryRequest = {body: {storeName: storeName}, token: token};
     const viewPurchasesHistoryRes: Res.ViewShopPurchasesHistoryResponse = await ServiceFacade.viewStorePurchasesHistory(viewPurchasesHistoryReq);
     let idsTakes: number[] = [1, 1, 1, 1, 1];
@@ -255,7 +255,7 @@ export async function t2() {
         purchaseReq.token = t;
         saveProductToCartReq.token = t;
 
-        await  registerUser(users[i].name, users[i].password, token, false);
+        await registerUser(users[i].name, users[i].password, token, false);
         await loginUser(users[i].name, users[i].password, t, false);
         // console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
         // console.log(`purchase request ${i}:`)
@@ -303,11 +303,12 @@ export async function t3() {
     const products: Product[] = [prod1, prod2, prod3, prod4];
     const items: IItem[] = [item1, item2, item3, item4];
 
-   await systemInit();
+    await systemInit();
 
 
     // store 1
     token = await initSessionRegisterLogin(buyer1.name, buyer1.password);
+    console.log("creating store...")
     await createStore(storeName1, token);
     await addNewProducts(storeName1, products, token, true);
     await addNewItems(storeName1, items, token, true);
@@ -342,7 +343,7 @@ export async function t3() {
 
     // store 6
     await registerUser(buyer6.name, buyer6.password, token, true);
-    await  loginUser(buyer6.name, buyer6.password, token, false);
+    await loginUser(buyer6.name, buyer6.password, token, false);
     await createStore(storeName6, token);
     await addNewProducts(storeName6, products, token, true);
     await addNewItems(storeName6, items, token, true);
@@ -350,7 +351,7 @@ export async function t3() {
     // store 7
     await registerUser(buyer7.name, buyer7.password, token, true);
     await loginUser(buyer7.name, buyer7.password, token, false);
-    await  createStore(storeName7, token);
+    await createStore(storeName7, token);
     await addNewProducts(storeName7, products, token, true);
     await addNewItems(storeName7, items, token, true);
 
@@ -362,18 +363,18 @@ export async function t3() {
     await addNewItems(storeName8, items, token, true);
 
     // store 9
-    await  registerUser(buyer9.name, buyer9.password, token, true);
+    await registerUser(buyer9.name, buyer9.password, token, true);
     await loginUser(buyer9.name, buyer9.password, token, false);
     await createStore(storeName9, token);
     await addNewProducts(storeName9, products, token, true);
-    await  addNewItems(storeName9, items, token, true);
+    await addNewItems(storeName9, items, token, true);
 
     // store 10
-    await  registerUser(buyer10.name, buyer10.password, token, true);
+    await registerUser(buyer10.name, buyer10.password, token, true);
     await loginUser(buyer10.name, buyer10.password, token, false);
     await createStore(storeName10, token);
-    await  addNewProducts(storeName10, products, token, true);
-    await  addNewItems(storeName10, items, token, true);
+    await addNewProducts(storeName10, products, token, true);
+    await addNewItems(storeName10, items, token, true);
 
     console.log(token)
 }
@@ -420,25 +421,25 @@ export async function t4() {
     token = await NewSessionSession();
 
     // store 1
-    await  registerUser(buyer1.name, buyer1.password, token, false);
+    await registerUser(buyer1.name, buyer1.password, token, false);
     await loginUser(buyer1.name, buyer1.password, token, false);
     await createStore(storeName1, token);
     await addNewProducts(storeName1, products, token, true);
-    await  addNewItems(storeName1, items, token, true);
+    await addNewItems(storeName1, items, token, true);
 
     // store 2
     await registerUser(buyer2.name, buyer2.password, token, true);
     await loginUser(buyer2.name, buyer2.password, token, false);
-    await  createStore(storeName2, token);
-    await  addNewProducts(storeName2, products, token, true);
+    await createStore(storeName2, token);
+    await addNewProducts(storeName2, products, token, true);
     await addNewItems(storeName2, items, token, true);
 
     // store 3
-    await  registerUser(buyer3.name, buyer3.password, token, true);
-    await  loginUser(buyer3.name, buyer3.password, token, false);
+    await registerUser(buyer3.name, buyer3.password, token, true);
+    await loginUser(buyer3.name, buyer3.password, token, false);
     await createStore(storeName3, token);
     await addNewProducts(storeName3, products, token, true);
-    await  addNewItems(storeName3, items, token, true);
+    await addNewItems(storeName3, items, token, true);
 
     // store 4
     await registerUser(buyer4.name, buyer4.password, token, true);
@@ -452,12 +453,12 @@ export async function t4() {
     await loginUser(buyer5.name, buyer5.password, token, false);
     await createStore(storeName5, token);
     await addNewProducts(storeName5, products, token, true);
-    await  addNewItems(storeName5, items, token, true);
+    await addNewItems(storeName5, items, token, true);
 
     // store 6
-    await  registerUser(buyer6.name, buyer6.password, token, true);
-    await  loginUser(buyer6.name, buyer6.password, token, false);
-    await  createStore(storeName6, token);
+    await registerUser(buyer6.name, buyer6.password, token, true);
+    await loginUser(buyer6.name, buyer6.password, token, false);
+    await createStore(storeName6, token);
     await addNewProducts(storeName6, products, token, true);
     await addNewItems(storeName6, items, token, true);
 
@@ -470,23 +471,23 @@ export async function t4() {
 
     // store 8
     await registerUser(buyer8.name, buyer8.password, token, true);
-    await  loginUser(buyer8.name, buyer8.password, token, false);
-    await  createStore(storeName8, token);
+    await loginUser(buyer8.name, buyer8.password, token, false);
+    await createStore(storeName8, token);
     await addNewProducts(storeName8, products, token, true);
-    await  addNewItems(storeName8, items, token, true);
+    await addNewItems(storeName8, items, token, true);
 
     // store 9
-    await  registerUser(buyer9.name, buyer9.password, token, true);
-    await  loginUser(buyer9.name, buyer9.password, token, false);
+    await registerUser(buyer9.name, buyer9.password, token, true);
+    await loginUser(buyer9.name, buyer9.password, token, false);
     await createStore(storeName9, token);
     await addNewProducts(storeName9, products, token, true);
     await addNewItems(storeName9, items, token, true);
 
     // store 10
-    await  registerUser(buyer10.name, buyer10.password, token, true);
-    await  loginUser(buyer10.name, buyer10.password, token, false);
+    await registerUser(buyer10.name, buyer10.password, token, true);
+    await loginUser(buyer10.name, buyer10.password, token, false);
     await createStore(storeName10, token);
-    await  addNewProducts(storeName10, products, token, true);
+    await addNewProducts(storeName10, products, token, true);
     await addNewItems(storeName10, items, token, true);
 
     console.log(token)
@@ -508,8 +509,8 @@ export async function t5() {
 
     token = await getSession();
     await registerUser(buyer1.name, buyer1.password, token, false);
-    await  registerUser(buyer2.name, buyer2.password, token, false);
-    await  registerUser(buyer3.name, buyer3.password, token, false);
+    await registerUser(buyer2.name, buyer2.password, token, false);
+    await registerUser(buyer3.name, buyer3.password, token, false);
 
 
     // buyer 1 buys
@@ -520,7 +521,7 @@ export async function t5() {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
         token: token
     }
-    await  ServiceFacade.saveProductToCart(saveProductToCartReq)
+    await ServiceFacade.saveProductToCart(saveProductToCartReq)
 
     saveProductToCartReq = {
         body: {storeName, catalogNumber: products[1].catalogNumber, amount: 1},
@@ -542,7 +543,7 @@ export async function t5() {
             }
         }, token: token
     }
-    await  ServiceFacade.purchase(purchaseReq);
+    await ServiceFacade.purchase(purchaseReq);
 
 
     // buyer 2 buys
@@ -574,7 +575,7 @@ export async function t5() {
 
 
     // buyer 3 buys
-    await  loginUser(buyer3.name, buyer3.password, token, true);
+    await loginUser(buyer3.name, buyer3.password, token, true);
     // save prod4 -X2
     saveProductToCartReq = {
         body: {storeName, catalogNumber: products[3].catalogNumber, amount: 2},
@@ -596,7 +597,7 @@ export async function t5() {
             }
         }, token: token
     }
-    await  ServiceFacade.purchase(purchaseReq)
+    await ServiceFacade.purchase(purchaseReq)
 
-    await  logout(token);
+    await logout(token);
 }

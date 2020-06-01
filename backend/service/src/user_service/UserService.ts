@@ -20,7 +20,7 @@ export const loginUser = async (req: Req.LoginRequest): Promise<Res.BoolResponse
             password: req.body.password
         }, token: req.token
     }
-    const isValid: Res.BoolResponse = ts.verifyCredentials(verifyCredentialsReq);
+    const isValid: Res.BoolResponse = await ts.verifyCredentials(verifyCredentialsReq);
     if (!isValid.data.result)
         return isValid
     return ts.login(req);
@@ -57,7 +57,7 @@ export const getPersonalDetails = (req: Req.Request): Promise<Res.GetPersonalDet
 }
 
 export const viewCart = async (req: Req.ViewCartReq): Promise<Res.ViewCartRes> => {
-    const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
+    const calcRes: Res.CartFinalPriceRes = await ts.calculateFinalPrices({body: {}, token: req.token});
     if (!calcRes)
         return calcRes
     const viewCartRes: Res.ViewCartRes  = await ts.viewCart(req);

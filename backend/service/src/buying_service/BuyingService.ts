@@ -3,11 +3,11 @@ import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> => {
     const isPolicyOkReq: Req.VerifyPurchasePolicy = {body: {}, token: req.token}
-    const isPolicyOk: Res.BoolResponse = ts.verifyStorePolicy(isPolicyOkReq)
+    const isPolicyOk: Res.BoolResponse = await  ts.verifyStorePolicy(isPolicyOkReq)
     if(!isPolicyOk.data.result){
         return isPolicyOk;
     }
-    const isCartOnStock: Res.BoolResponse = ts.verifyCart({
+    const isCartOnStock: Res.BoolResponse =await  ts.verifyCart({
         body: {},
         token: req.token,
     });
@@ -15,7 +15,7 @@ export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseRe
         return isCartOnStock;
     }
     //calculate price after discount
-    const calcRes: Res.CartFinalPriceRes = ts.calculateFinalPrices({body: {}, token: req.token});
+    const calcRes: Res.CartFinalPriceRes = await  ts.calculateFinalPrices({body: {}, token: req.token});
     if (!calcRes)
         return calcRes
     if(req.body.total && +req.body.total !== calcRes.data.price){
