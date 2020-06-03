@@ -1,5 +1,5 @@
 import {RegisteredUser, User, UserManager} from "../user/internal_api";
-import {Store, StoreManagement} from '../store/internal_api';
+import {StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
@@ -11,13 +11,12 @@ import {
     TradingSystemState
 } from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
-import {Product} from "./data/Product";
-import {ExternalSystems, loggerW, StringTuple, UserRole,} from "../api-int/internal_api";
+import {ExternalSystems, loggerW, StringTuple, UserRole} from "../api-int/internal_api";
 import {
     BagItem,
     IDiscountPolicy,
     IPurchasePolicy, IReceipt,
-    Purchase, StoreInfo
+    Purchase, StoreInfo, IProduct
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
@@ -304,7 +303,7 @@ export class TradingSystemManager {
         const store: Store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (user.cart.has(req.body.storeName)) {
             const storeBags: BagItem[] = user.cart.get(req.body.storeName);
             let currHoldingAmount: number = 0;
@@ -326,7 +325,7 @@ export class TradingSystemManager {
         const store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
@@ -444,7 +443,6 @@ export class TradingSystemManager {
                 });
             });
         }
-
     }
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
@@ -478,7 +476,6 @@ export class TradingSystemManager {
             return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
     }
-
 
     // methods that are available for admin also
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {

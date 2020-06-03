@@ -31,7 +31,7 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}===================== COMPILING DAL ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $dal
-sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  client
 echo -e "${BLUE}==========================================================${NC}"

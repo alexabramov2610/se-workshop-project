@@ -7,7 +7,7 @@ import StoreOwnerModel from "./src/models/user_models/StoreOwnerModel";
 import StoreManagerModel from "./src/models/user_models/StoreManagerModel";
 import ProductModel from "./src/models/common_models/ProductModel";
 import ItemModel from "./src/models/common_models/ItemModel";
-export {UserModel,StoreModel,BagItemModel,ReceiptModel,StoreOwnerModel,StoreManagerModel,ProductModel, ItemModel}
+export {UserModel,StoreModel,BagItemModel,ReceiptModel,StoreOwnerModel,StoreManagerModel, ProductModel, ItemModel}
 /*
 async function register_test() {
     const newUser = new UserModel({name: "tal", password: "password1"})

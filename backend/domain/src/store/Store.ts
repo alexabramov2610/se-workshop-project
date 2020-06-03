@@ -1,14 +1,13 @@
-import {ContactUsMessage, Item, Product, Receipt} from "../trading_system/internal_api";
+import { Item, Receipt} from "../trading_system/internal_api";
 import {Res} from 'se-workshop-20-interfaces'
 import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
-import {v4 as uuid} from 'uuid';
 import {
     BagItem, ICondition, IConditionOfDiscount,
     IDiscount, IDiscountInPolicy,
     IPayment,
-    IProduct as ProductReq, IPurchasePolicyElement, ISimplePurchasePolicy,
+    IProduct, IPurchasePolicyElement, ISimplePurchasePolicy,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
@@ -31,6 +30,7 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
+import { ProductModel } from "dal"
 
 const logger = loggerW(__filename)
 
@@ -42,7 +42,7 @@ interface ProductValidator {
 export class Store {
     storeName: string;
     description: string;
-    products: Map<Product, Item[]>;
+    products: Map<IProduct, Item[]>;
     storeOwners: StoreOwner[];
     storeManagers: StoreManager[];
     receipts: Receipt[];
@@ -51,7 +51,7 @@ export class Store {
     discountPolicy: Discount;
     rating: Rating;
 
-    constructor(storeName: string, description: string, products: Map<Product, Item[]>, storeOwner: StoreOwner[],storeManagers:StoreManager[],receipts: Receipt[],firstOwner: StoreOwner, purchasePolicy:PurchasePolicy, discountPolicy:Discount) {
+    constructor(storeName: string, description: string, products: Map<IProduct, Item[]>, storeOwner: StoreOwner[],storeManagers:StoreManager[],receipts: Receipt[],firstOwner: StoreOwner, purchasePolicy:PurchasePolicy, discountPolicy:Discount) {
         this.storeName = storeName;
         this.description = description;
         this.products = products;
@@ -74,7 +74,7 @@ export class Store {
         for (const item of items) {
             const catalogNumber = item.catalogNumber;
 
-            const product: Product = this.getProductByCatalogNumber(catalogNumber);
+            const product: IProduct = this.getProductByCatalogNumber(catalogNumber);
             if (product && !this.containsItem(product, item)) {
                 this.products.set(product, this.products.get(product).concat([item]));
                 addedItems.push(item);
@@ -97,9 +97,10 @@ export class Store {
         }
     }
 
-    addNewProducts(products: Product[]): Res.ProductAdditionResponse {
+    addNewProducts(products: IProduct[]): Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store`)
-        const invalidProducts: ProductReq[] = [];
+        const invalidProducts: IProduct[] = [];
+        const productsToAdd: ProductModel[] = [];
 
         for (const product of products) {
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
@@ -161,7 +162,7 @@ export class Store {
         for (const item of items) {
             const catalogNumber = item.catalogNumber;
 
-            const productInStore: Product = this.getProductByCatalogNumber(catalogNumber);
+            const productInStore: IProduct = this.getProductByCatalogNumber(catalogNumber);
             if (productInStore) {
                 const productItems: Item[] = this.products.get(productInStore);
                 const itemToRemove: Item = this.getItemById(productItems, item.id);
@@ -194,7 +195,7 @@ export class Store {
         const notRemovedProducts: ProductCatalogNumber[] = [];
         const itemsToReturn: Item[] = [];
         for (const product of products) {
-            const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
+            const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
                 const items: Item[] = this.products.get(productInStore);
 
@@ -236,10 +237,10 @@ export class Store {
 
     async removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
         logger.debug(`removing ${products.length} items from store`)
-        const productsNotRemoved: Product[] = [];
+        const productsNotRemoved: IProduct[] = [];
 
         for (const catalogNumber of products) {
-            const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
+            const product: IProduct = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             if (product) {
                 this.products.delete(product);
             } else {
@@ -305,7 +306,7 @@ export class Store {
 
         for (const product of this.products.keys()) {
             if (this.matchingFilters(product, filters, query)) {
-                const matchingProduct: ProductReq = {
+                const matchingProduct: IProduct = {
                     name: product.name,
                     price: product.price,
                     category: product.category,
@@ -359,7 +360,7 @@ export class Store {
         return false;
     }
 
-    getProductByCatalogNumber(catalogNumber: number): Product {
+    getProductByCatalogNumber(catalogNumber: number): IProduct {
         logger.info(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this.products.keys()) {
             logger.debug(` product: ${JSON.stringify(product)}`);
@@ -386,8 +387,8 @@ export class Store {
         return this.storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
-    getItemsFromStock(product: ProductReq, amount: number): Item[] {
-        const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
+    getItemsFromStock(product: IProduct, amount: number): Item[] {
+        const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
         const items: Item[] = this.products.get(productInStore);
         const itemsToReturn: Item[] = items.slice(0, amount);
         const itemsRemaining: Item[] = items.slice(amount, items.length);
@@ -410,20 +411,6 @@ export class Store {
         }
         return finalPrice
         */
-    }
-
-    addDiscount(discount: IDiscount): string {
-        let newDiscount: Discount;
-        if (!discount.condition && !discount.coupon) {
-            newDiscount = new ShownDiscount(discount.startDate, discount.percentage, discount.duration, discount.products)
-        }
-        return newDiscount.id;
-    }
-
-    removeDiscount(catalogNumber: number, discountID: string): boolean {
-        const product: Product = this.getProductByCatalogNumber(catalogNumber);
-        // return product.removeDiscount(discountID);
-        return true;
     }
 
     setDiscountPolicy(discounts: IDiscountInPolicy[]): string {
@@ -476,7 +463,7 @@ export class Store {
         return undefined;
     }
 
-    private validateProduct(product: Product): ProductValidator {
+    private validateProduct(product: IProduct): ProductValidator {
         logger.debug(`validating product: ${JSON.stringify(product)}`)
 
         if (!product)
@@ -518,11 +505,11 @@ export class Store {
         return undefined;
     }
 
-    private containsItem(product: Product, item: Item): boolean {
+    private containsItem(product: IProduct, item: Item): boolean {
         return this.products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
     }
 
-    private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
+    private matchingFilters(product: IProduct, filters: SearchFilters, query: SearchQuery): boolean {
         if (typeof query.productName !== "undefined" && query.productName.length > 0 && query.productName !== product.name)
             return false;
 
