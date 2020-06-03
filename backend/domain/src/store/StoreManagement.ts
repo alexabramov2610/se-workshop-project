@@ -36,7 +36,7 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-
+import {StoreModel} from 'dal'
 const logger = loggerW(__filename)
 
 export class StoreManagement {
@@ -73,7 +73,7 @@ export class StoreManagement {
     }
 
     isStoreLegal(store: Store): boolean {
-        return store.storeName.length > 0 && store.UUID && store.UUID.length > 0;
+        return store.storeName.length > 0;
     }
 
     getOwnersAssignedBy(storeName: string, user: RegisteredUser): Res.GetOwnersAssignedByResponse {
@@ -465,9 +465,13 @@ export class StoreManagement {
                 data: {result: false, receipts: []},
                 error: {message: errorMsg.E_PERMISSION}
             }
+        /*
         const iReceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
             return {purchases: r.purchases, date: r.date}
         })
+
+         */
+        const iReceipts: IReceipt[] = [];
         return {data: {result: true, receipts: iReceipts}}
     }
 
@@ -493,14 +497,16 @@ export class StoreManagement {
         }
     }
 
+
     async viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Promise<Res.ViewUsersContactUsMessagesResponse> {
+        /*
         const store: Store = this.findStoreByName(storeName);
         if (!store) return {data: {result: false, messages: []}, error: {message: errorMsg.E_NF}}
         if (!store.verifyPermission(user.name, ManagementPermission.WATCH_USER_QUESTIONS) && (user.role !== UserRole.ADMIN)) return {
             data: {result: false, messages: []},
             error: {message: errorMsg.E_PERMISSION}
         }
-        const newMessages: ContactUsMessage[] = store.getContactUsMessages();
+        const newMessages: ContactUsMessage[] = store.concatUs;
         const newMessageI: IContactUsMessage[] = newMessages.map((contactUs) => {
             return {
                 question: contactUs.question, date: contactUs.date, response: contactUs.response,
@@ -508,7 +514,12 @@ export class StoreManagement {
             }
         })
         return {data: {result: true, messages: newMessageI}}
+
+         */
+        return {data: {result: true, messages: []}}
     }
+
+
 
    async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
         if (query.storeName && query.storeName.length > 0) {
@@ -782,6 +793,7 @@ export class StoreManagement {
 
     getStoresInfoOfManagedBy(username: string): StoreInfo[] {
         const stores: StoreInfo[] = [];
+
         this._stores.forEach(store => {
                 if (store.verifyIsStoreManager(username))
                     stores.push(store.viewStoreInfo().data.info);
@@ -804,14 +816,12 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false, permissions: []}, error: { message: errorMsg.E_INVALID_STORE} }
-        let permissions: ManagerNamePermission[] = [];
+        const permissions: ManagerNamePermission[] = [];
 
         store.storeManagers.forEach(storeManager => {
             permissions.push({ managerName: storeManager.name, permissions: storeManager.getPermissions() })
         })
-
-        return { data: {result: true, permissions: permissions} }
-
+        return { data: {result: true, permissions} }
     }
 
     getItemIds(storeName: string, catalogNumber: number): Res.GetItemsIdsResponse {

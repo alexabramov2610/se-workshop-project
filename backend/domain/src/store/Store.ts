@@ -17,7 +17,7 @@ import {
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {BuyingTypes, Operators, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
+import {Operators, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ShownDiscount} from "./discounts/ShownDiscount";
 import {CondDiscount} from "./discounts/CondDiscount";
 import {Discount} from "./discounts/Discount";
@@ -40,83 +40,34 @@ interface ProductValidator {
 }
 
 export class Store {
-    private readonly _UUID: string;
-    private readonly _storeName: string;
-    private _storeManagers: StoreManager[];
-    private _receipts: Receipt[];
-    private _contactUsMessages: ContactUsMessage[];
-    private _firstOwner: StoreOwner;
-    private _purchasePolicy: PurchasePolicy;
-    private _discountPolicy: Discount;
-    private _description: string;
-    private _rating: Rating;
-    private _products: Map<Product, Item[]>;
-    private _storeOwners: StoreOwner[];
+    storeName: string;
+    description: string;
+    products: Map<Product, Item[]>;
+    storeOwners: StoreOwner[];
+    storeManagers: StoreManager[];
+    receipts: Receipt[];
+    firstOwner: StoreOwner;
+    purchasePolicy: PurchasePolicy;
+    discountPolicy: Discount;
+    rating: Rating;
 
-    constructor(storeName: string, description) {
-        this._UUID = uuid();
-        this._storeName = storeName;
-        this._description = description;
-        this._products = new Map();
-        this._storeOwners = [];
-        this._storeManagers = [];
-        this._receipts = [];
-        this._rating = Rating.MEDIUM;
-        this._discountPolicy = new DiscountPolicy();
-        this._purchasePolicy = new PurchasePolicyImpl();
-        this._contactUsMessages = [];
+    constructor(storeName: string, description: string, products: Map<Product, Item[]>, storeOwner: StoreOwner[],storeManagers:StoreManager[],receipts: Receipt[],firstOwner: StoreOwner, purchasePolicy:PurchasePolicy, discountPolicy:Discount) {
+        this.storeName = storeName;
+        this.description = description;
+        this.products = products;
+        this.storeOwners = storeOwner
+        this.storeManagers = storeManagers;
+        this.receipts = receipts;
+        // this.purchasePolicy = new PurchasePolicyImpl();
+        // this.discountPolicy = new DiscountPolicy();
+        this.purchasePolicy = purchasePolicy;
+        this.discountPolicy = discountPolicy;
+        this.rating = Rating.MEDIUM;
     }
 
-    get purchasePolicy(): PurchasePolicy {
-        return this._purchasePolicy;
-    }
-
-    get storeOwners(): StoreOwner[] {
-        return this._storeOwners;
-    }
-
-    get discountPolicy(): Discount {
-        return this._discountPolicy;
-    }
-
-    get description(): string {
-        return this._description;
-    }
-
-    set description(value: string) {
-        this._description = value;
-    }
-
-    get rating(): Rating {
-        return this._rating;
-    }
-
-    get products(): Map<Product, Item[]> {
-        return this._products;
-    }
-
-    get storeName(): string {
-        return this._storeName;
-    }
-
-    get UUID(): string {
-        return this._UUID;
-    }
-
-    get storeManagers(): StoreManager[] {
-        return this._storeManagers;
-    }
-
-    getPurchasesHistory(): Receipt[] {
-        return this._receipts;
-    }
-
-    getContactUsMessages(): ContactUsMessage[] {
-        return this._contactUsMessages;
-    }
 
     addItems(items: Item[]): Res.ItemsAdditionResponse {
-        logger.debug(`adding ${items.length} items to store id: ${this._UUID}`)
+        logger.debug(`adding ${items.length} items to store id: `)
         const addedItems: Item[] = [];
         const notAddedItems: Item[] = [];
 
@@ -125,7 +76,7 @@ export class Store {
 
             const product: Product = this.getProductByCatalogNumber(catalogNumber);
             if (product && !this.containsItem(product, item)) {
-                this._products.set(product, this._products.get(product).concat([item]));
+                this.products.set(product, this.products.get(product).concat([item]));
                 addedItems.push(item);
             } else {
                 notAddedItems.push(item);
@@ -133,13 +84,13 @@ export class Store {
         }
 
         if (addedItems.length === 0) { // failed adding
-            logger.warn(`failed adding all requested ${items.length} items to store id: ${this._UUID}`)
+            logger.warn(`failed adding all requested ${items.length} items to store `)
             return {
                 data: {result: false, itemsNotAdded: items},
                 error: {message: Error.E_ITEMS_ADD}
             }
         } else {
-            logger.debug(`added ${items.length - notAddedItems.length} of ${items.length} request items to store id: ${this._UUID}`)
+            logger.debug(`added ${items.length - notAddedItems.length} of ${items.length} request items to store`)
             return {
                 data: {result: true, itemsNotAdded: notAddedItems}
             }
@@ -147,7 +98,7 @@ export class Store {
     }
 
     addNewProducts(products: Product[]): Res.ProductAdditionResponse {
-        logger.debug(`adding ${products.length} products to store id: ${this._UUID}`)
+        logger.debug(`adding ${products.length} products to store`)
         const invalidProducts: ProductReq[] = [];
 
         for (const product of products) {
@@ -156,19 +107,19 @@ export class Store {
                 invalidProducts.push(product);
             } else {
                 const productValidator: ProductValidator = this.validateProduct(product);
-                productValidator.isValid ? this._products.set(product, []) :
+                productValidator.isValid ? this.products.set(product, []) :
                     invalidProducts.push(product)
             }
         }
 
         if (invalidProducts.length === products.length) { // failed adding
-            logger.warn(`failed adding all requested ${products.length} products to store id: ${this._UUID}`)
+            logger.warn(`failed adding all requested ${products.length} products to store`)
             return {
                 data: {result: false, productsNotAdded: invalidProducts},
                 error: {message: Error.E_PROD_ADD}
             }
         } else {
-            logger.debug(`added ${products.length - invalidProducts.length} of ${products.length} request products to store id: ${this._UUID}`)
+            logger.debug(`added ${products.length - invalidProducts.length} of ${products.length} request products to store `)
             return {
                 data: {result: true, productsNotAdded: invalidProducts}
             }
@@ -178,7 +129,7 @@ export class Store {
     addStoreManager(storeManager: StoreManager): Res.BoolResponse {
         if (!this.verifyIsStoreManager(storeManager.name)) {
             logger.debug(`adding user: ${storeManager.name} as a manager to store: ${this.storeName}`)
-            this._storeManagers.push(storeManager);
+            this.storeManagers.push(storeManager);
             return {data: {result: true}}
         } else {
             logger.warn(`adding user: ${storeManager.name} as a manager to store: ${this.storeName} FAILED!`)
@@ -189,7 +140,7 @@ export class Store {
     addStoreOwner(storeOwner: StoreOwner): Res.BoolResponse {
         if (!this.verifyIsStoreOwner(storeOwner.name)) {
             logger.debug(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName}`)
-            this._storeOwners.push(storeOwner);
+            this.storeOwners.push(storeOwner);
             return {data: {result: true}}
         } else {
             logger.warn(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName} FAILED!`);
@@ -199,12 +150,12 @@ export class Store {
 
     setFirstOwner(user: RegisteredUser): void {
         const firstOwner: StoreOwner = new StoreOwner(user.name);
-        this._storeOwners.push(firstOwner);
-        this._firstOwner = firstOwner;
+        this.storeOwners.push(firstOwner);
+        this.firstOwner = firstOwner;
     }
 
     removeItems(items: Item[]): Res.ItemsRemovalResponse {
-        logger.debug(`removing ${items.length} items from store id: ${this._UUID}`)
+        logger.debug(`removing ${items.length} items from store`)
         const notRemovedItems: Item[] = [];
 
         for (const item of items) {
@@ -212,10 +163,10 @@ export class Store {
 
             const productInStore: Product = this.getProductByCatalogNumber(catalogNumber);
             if (productInStore) {
-                const productItems: Item[] = this._products.get(productInStore);
+                const productItems: Item[] = this.products.get(productInStore);
                 const itemToRemove: Item = this.getItemById(productItems, item.id);
                 if (itemToRemove) {
-                    this._products.set(productInStore, productItems.filter(curr => curr !== itemToRemove));
+                    this.products.set(productInStore, productItems.filter(curr => curr !== itemToRemove));
                 } else {
                     notRemovedItems.push(item);
                 }
@@ -225,27 +176,27 @@ export class Store {
         }
 
         if (notRemovedItems.length === items.length) { // failed removing
-            logger.warn(`failed removing all requested ${items.length} items from store id: ${this._UUID}`)
+            logger.warn(`failed removing all requested ${items.length} items from store`)
             return {
                 data: {result: false, itemsNotRemoved: items},
                 error: {message: Error.E_ITEMS_REM}
             }
         } else {
-            logger.debug(`removed ${items.length - notRemovedItems.length} of ${items.length} request items from store id: ${this._UUID}`)
+            logger.debug(`removed ${items.length - notRemovedItems.length} of ${items.length} request items from store`)
             return {
                 data: {result: true, itemsNotRemoved: notRemovedItems}
             }
         }
     }
 
-    async removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse>  {
-        logger.debug(`removing ${products.length} products with quantities from store id: ${this._UUID}`)
+    async removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {
+        logger.debug(`removing ${products.length} products with quantities from store`)
         const notRemovedProducts: ProductCatalogNumber[] = [];
         const itemsToReturn: Item[] = [];
         for (const product of products) {
             const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
-                const items: Item[] = this._products.get(productInStore);
+                const items: Item[] = this.products.get(productInStore);
 
                 const numOfItemsToRemove: number = product.quantity >= items.length ? items.length : product.quantity;
 
@@ -256,7 +207,7 @@ export class Store {
                 }
                 items.length = items.length - numOfItemsToRemove;
 
-                this._products.set(productInStore, items);
+                this.products.set(productInStore, items);
             } else {
                 const prodCatalogNumber: ProductCatalogNumber = {catalogNumber: product.catalogNumber};
                 notRemovedProducts.push(prodCatalogNumber);
@@ -264,13 +215,13 @@ export class Store {
         }
 
         if (notRemovedProducts.length === products.length) { // failed removing
-            logger.warn(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
+            logger.warn(`failed removing all requested ${products.length} products from store`)
             return {
                 data: {result: false, productsNotRemoved: notRemovedProducts},
                 error: {message: Error.E_PROD_REM}
             }
         } else {
-            logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store id: ${this._UUID}`)
+            logger.debug(`removed ${products.length - notRemovedProducts.length} of ${products.length} request products from store`)
             return isReturnItems ? {
                     data: {
                         result: true,
@@ -284,26 +235,26 @@ export class Store {
     }
 
     async removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
-        logger.debug(`removing ${products.length} items from store id: ${this._UUID}`)
+        logger.debug(`removing ${products.length} items from store`)
         const productsNotRemoved: Product[] = [];
 
         for (const catalogNumber of products) {
             const product: Product = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             if (product) {
-                this._products.delete(product);
+                this.products.delete(product);
             } else {
                 productsNotRemoved.push(product);
             }
         }
 
         if (productsNotRemoved.length === products.length) {
-            logger.warn(`failed removing all requested ${products.length} products from store id: ${this._UUID}`)
+            logger.warn(`failed removing all requested ${products.length} products from store`)
             return {
                 data: {result: false, productsNotRemoved},
                 error: {message: Error.E_PROD_REM}
             };
         } else {
-            logger.debug(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store id: ${this._UUID}`)
+            logger.debug(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store`)
             return {
                 data: {result: true, productsNotRemoved}
             };
@@ -315,7 +266,7 @@ export class Store {
         if (!storeManagerToRemove)
             return {data: {result: false}, error: {message: Error.E_NAL}}
 
-        this._storeOwners = this._storeOwners.filter(currOwner => currOwner.name !== storeManagerToRemove.name);
+        this.storeOwners = this.storeOwners.filter(currOwner => currOwner.name !== storeManagerToRemove.name);
         return {data: {result: true}};
     }
 
@@ -324,7 +275,7 @@ export class Store {
         if (!storeManagerToRemove)
             return {data: {result: false}, error: {message: Error.E_NAL}}
 
-        this._storeManagers = this._storeManagers.filter(currManager => currManager.name !== storeManagerToRemove.name);
+        this.storeManagers = this.storeManagers.filter(currManager => currManager.name !== storeManagerToRemove.name);
         return {data: {result: true}};
     }
 
@@ -334,10 +285,10 @@ export class Store {
                 result: true,
                 info: {
                     storeName: this.storeName,
-                    description: this._description,
+                    description: this.description,
                     storeRating: this.rating,
-                    storeOwnersNames: this._storeOwners.map((owner) => owner.name),
-                    storeManagersNames: this._storeManagers.map((manager) => manager.name),
+                    storeOwnersNames: this.storeOwners.map((owner) => owner.name),
+                    storeManagersNames: this.storeManagers.map((manager) => manager.name),
                     productsNames: Array.from(this.products.keys()).map((p) => p.name)
                 }
             }
@@ -352,7 +303,7 @@ export class Store {
     search(filters: SearchFilters, query: SearchQuery): ProductInStore[] {
         const products: ProductInStore[] = [];
 
-        for (const product of this._products.keys()) {
+        for (const product of this.products.keys()) {
             if (this.matchingFilters(product, filters, query)) {
                 const matchingProduct: ProductReq = {
                     name: product.name,
@@ -375,7 +326,7 @@ export class Store {
 
     verifyIsStoreOwner(userName: string): boolean {
         logger.debug(`verifying if user is owner: ${userName}`)
-        for (const owner of this._storeOwners) {
+        for (const owner of this.storeOwners) {
             if (owner.name === userName) {
                 logger.debug(`user: ${userName} is an owner of store ${this.storeName}`)
                 return true;
@@ -387,7 +338,7 @@ export class Store {
 
     verifyIsStoreManager(userName: string): boolean {
         logger.debug(`verifying if user is manager: ${userName}`)
-        for (const manager of this._storeManagers) {
+        for (const manager of this.storeManagers) {
             if (manager.name === userName) {
                 logger.debug(`user: ${userName} is a manager of store ${this.storeName}`)
                 return true;
@@ -410,7 +361,7 @@ export class Store {
 
     getProductByCatalogNumber(catalogNumber: number): Product {
         logger.info(`searching product with catalog number: ${catalogNumber}`);
-        for (const product of this._products.keys()) {
+        for (const product of this.products.keys()) {
             logger.debug(` product: ${JSON.stringify(product)}`);
             logger.debug(`${product.catalogNumber} === ${catalogNumber}` + (product.catalogNumber === catalogNumber))
             if (product.catalogNumber === +catalogNumber) {
@@ -424,28 +375,28 @@ export class Store {
 
     getProductQuantity(catalogNumber: number): number {
         const product = this.getProductByCatalogNumber(catalogNumber);
-        return product ? this._products.get(product).length : 0;
+        return product ? this.products.get(product).length : 0;
     }
 
     getStoreManager(userName: string): StoreManager {
-        return this._storeManagers.find((manager: StoreManager) => manager.name === userName)
+        return this.storeManagers.find((manager: StoreManager) => manager.name === userName)
     }
 
     getStoreOwner(userName: string): StoreOwner {
-        return this._storeOwners.find((owner: StoreOwner) => owner.name === userName)
+        return this.storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
     getItemsFromStock(product: ProductReq, amount: number): Item[] {
         const productInStore: Product = this.getProductByCatalogNumber(product.catalogNumber);
-        const items: Item[] = this._products.get(productInStore);
+        const items: Item[] = this.products.get(productInStore);
         const itemsToReturn: Item[] = items.slice(0, amount);
         const itemsRemaining: Item[] = items.slice(amount, items.length);
-        this._products.set(productInStore, itemsRemaining)
+        this.products.set(productInStore, itemsRemaining)
         return itemsToReturn;
     }
 
     addReceipt(purchases: Purchase[], payment: IPayment): void {
-        this._receipts.push(new Receipt(purchases, payment))
+        this.receipts.push(new Receipt(purchases, payment))
     }
 
     getProductFinalPrice(catalogNumber: number): number {
@@ -482,12 +433,12 @@ export class Store {
 
             newPolicy.add(newDiscount, discountInPolicy.operator);
         }
-        this._discountPolicy = newPolicy;
+        this.discountPolicy = newPolicy;
         return newPolicy.id;
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-        const bagItemAfterDiscount: BagItem[] = this._discountPolicy.calc(bagItems);
+        const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
         logger.info(`Done calculating for store ${this.storeName}`)
 
         return bagItemAfterDiscount;
@@ -509,7 +460,7 @@ export class Store {
                 return false;
             newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
         }
-        this._purchasePolicy = newPolicy;
+        this.purchasePolicy = newPolicy;
         return true;
     }
 
@@ -552,7 +503,7 @@ export class Store {
     }
 
     private getStoreOwnerByName(username: string): StoreOwner {
-        for (const storeOwner of this._storeOwners) {
+        for (const storeOwner of this.storeOwners) {
             if (storeOwner.name === username)
                 return storeOwner;
         }
@@ -560,7 +511,7 @@ export class Store {
     }
 
     private getStoreManagerByName(username: string): StoreManager {
-        for (const storeManager of this._storeManagers) {
+        for (const storeManager of this.storeManagers) {
             if (storeManager.name === username)
                 return storeManager;
         }
@@ -568,7 +519,7 @@ export class Store {
     }
 
     private containsItem(product: Product, item: Item): boolean {
-        return this._products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
+        return this.products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
     }
 
     private matchingFilters(product: Product, filters: SearchFilters, query: SearchQuery): boolean {
