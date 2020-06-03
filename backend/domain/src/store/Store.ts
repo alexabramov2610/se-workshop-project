@@ -30,7 +30,7 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import ProductModel from "../../../../data-access/src/models/common_models/ProductModel";
+import { ProductModel } from "dal"
 
 const logger = loggerW(__filename)
 
