@@ -4,7 +4,7 @@ export function productsMapperFromDB(products: any) :Map<IProduct, IItem[]>{
     const mappedProducts = new Map<IProduct, IItem[]>();
 
     products.forEach(product => {
-        const retrievedProduct: IProduct = { name: product.name, price: product.price, category: product.category, rating: product.rating };
+        const retrievedProduct: IProduct = { catalogNumber: product.catalogNumber, name: product.name, price: product.price, category: product.category, rating: product.rating };
         const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
             const item: IItem = { id: curr.id, catalogNumber: curr.catalogNumber };
             return acc.concat(item);
@@ -20,6 +20,7 @@ export function productsMapperToDB(products: Map<IProduct, IItem[]>) :any{
 
     products.forEach((product: IProduct, items: IItem) => {
         productsToDB = productsToDB.concat({
+            catalogNumber: product.catalogNumber,
             name: product.name,
             price: product.price,
             category: product.category,
