@@ -1,15 +1,15 @@
-import {IPayment, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IPayment, IReceipt, Purchase} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
-export class Receipt {
+export class Receipt implements IReceipt{
 
     private _purchases: Purchase[];
     private readonly _date: Date;
-    private _payment: IPayment
+    private readonly _payment: IPayment
 
-    constructor(purchases: Purchase[], payment: IPayment) {
+    constructor(purchases: Purchase[], payment: IPayment, date?: Date) {
         this._purchases = purchases
         this._payment = payment;
-        this._date = new Date();
+        this._date = date? date :new Date();
     }
 
     get purchases(): Purchase[] {

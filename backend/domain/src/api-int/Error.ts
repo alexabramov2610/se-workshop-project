@@ -12,6 +12,7 @@ const errorMsg:ErrorMessages = {
     E_NF: "Not found",
     E_CON: "Connection failed",
     E_AL: "Already at this state",
+    E_USER_NOT_VALID: "User name not valid",
     E_BU: "The username is already taken.",
     E_BAD_OPERATION: "This operation is not allowed in this user state.",
     E_NA: "This user is not an Admin.",
