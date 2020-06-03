@@ -36,11 +36,11 @@ const storeSchema = new Schema({
         },
         purchasePolicy: {
             type: String,
-            required: true,
+            //required: true,
         },
         discountPolicy: {
             type: String,
-            required: true,
+            //required: true,
         },
 },
     {timestamps: false,}

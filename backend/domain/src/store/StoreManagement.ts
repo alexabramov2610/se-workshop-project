@@ -15,7 +15,6 @@ import {
     Purchase,
     SearchFilters,
     SearchQuery,
-    IContactUsMessage,
     IDiscountPolicy,
     IDiscountInPolicy,
     IConditionOfDiscount,
@@ -36,7 +35,8 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {StoreModel,StoreOwnerModel} from 'dal'
+import {StoreModel, StoreOwnerModel} from 'dal'
+
 const logger = loggerW(__filename)
 
 export class StoreManagement {
@@ -54,30 +54,23 @@ export class StoreManagement {
         this._storeByStoreName = new Map();
     }
 
-   async addStore(storeName: string, description: string, owner: RegisteredUser): Promise<Res.BoolResponse> {
-        /*
-        const newStore = new Store(storeName, description);
-        newStore.setFirstOwner(owner);
-        this._stores.push(newStore);
-        this._storeByStoreName.set(newStore.storeName, newStore);
-        logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
+    async addStore(storeName: string, description: string, owner: RegisteredUser): Promise<Res.BoolResponse> {
+        const firstOwner = new StoreOwnerModel({name: owner.name})
+        // const purchasePolicy = new PurchasePolicyModel()
+        // const discountPolicy = new DiscountPolicyModel()
+        try {
+            await StoreModel.create({storeName, description, firstOwner})
+            await firstOwner.save();
+            logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
+            return {data: {result: true}}
+        } catch (e) {
+            if (e.errors && e.errors.name && e.errors.name.kind === 'unique') {
+                logger.warn(`fail to open store ,${storeName} already exist `);
+                return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+            }
+            return {data: {result: false}, error: {message: e.errors.name}}
+        }
         return {data: {result: true}}
-
-         */
-       try {
-           const firstOwner = new StoreOwnerModel({name: owner.name})
-           await StoreModel.create({storeName, description, firstOwner})
-           await firstOwner.save();
-           logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
-           return {data: {result: true}}
-       } catch (e) {
-           if (e.errors.name.kind === 'unique') {
-               logger.warn(`fail to open store ,${storeName} already exist `);
-               return {data: {result: false}, error: {message: errorMsg.E_BU}}
-           }
-           return {data: {result: false}, error: {message: e.errors.name}}
-       }
-       return {data: {result: true}}
     }
 
     verifyStoreExists(storeName: string): boolean {
@@ -96,8 +89,13 @@ export class StoreManagement {
     getOwnersAssignedBy(storeName: string, user: RegisteredUser): Res.GetOwnersAssignedByResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
-            return { data: {result: false, owners: []}, error: { message: errorMsg.E_INVALID_STORE } }
-        return { data: {result: true, owners: store.getStoreOwner(user.name).assignedStoreOwners.reduce((acc, curr) => acc.concat(curr.name), []) }};
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}}
+        return {
+            data: {
+                result: true,
+                owners: store.getStoreOwner(user.name).assignedStoreOwners.reduce((acc, curr) => acc.concat(curr.name), [])
+            }
+        };
     }
 
     verifyStoreOwner(storeName: string, user: RegisteredUser): boolean {
@@ -159,7 +157,7 @@ export class StoreManagement {
 
     }
 
-    async removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse>  {
+    async removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {
         const store: Store = this.findStoreByName(storeName);
         return store.removeProductsWithQuantity(productsReq, isReturnItems);
     }
@@ -175,7 +173,7 @@ export class StoreManagement {
         return store.removeProductsByCatalogNumber(products);
     }
 
-   async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
+    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as an owner in store: ${JSON.stringify(storeName)}`)
 
@@ -249,7 +247,7 @@ export class StoreManagement {
         return additionRes;
     }
 
-   async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser, ownersToRemove: StringTuple[]): Promise<Res.BoolResponse> {
+    async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser, ownersToRemove: StringTuple[]): Promise<Res.BoolResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
@@ -320,7 +318,7 @@ export class StoreManagement {
         }, [])
     }
 
-   async removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.BoolResponse> {
+    async removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.BoolResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as a manager in store: ${JSON.stringify(storeName)} `)
         let error: string;
@@ -473,7 +471,7 @@ export class StoreManagement {
         }
     }
 
-    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse>  {
+    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse> {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
@@ -492,7 +490,7 @@ export class StoreManagement {
         return {data: {result: true, receipts: iReceipts}}
     }
 
-   async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
+    async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
         const store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
@@ -537,8 +535,7 @@ export class StoreManagement {
     }
 
 
-
-   async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
+    async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
         if (query.storeName && query.storeName.length > 0) {
             const store: Store = this.findStoreByName(query.storeName);
             if (!store)
@@ -640,7 +637,7 @@ export class StoreManagement {
         return {data: {result: true, discountID}}
     }
 
-   async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy):  Promise<Res.BoolResponse> {
+    async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -730,7 +727,7 @@ export class StoreManagement {
 
     }
 
-    async getStoresWithOffset(limit: number, offset: number):Promise<Res.GetStoresWithOffsetResponse>  {
+    async getStoresWithOffset(limit: number, offset: number): Promise<Res.GetStoresWithOffsetResponse> {
         const storeInfos: StoreInfo[] = [];
         if (limit <= 0 || offset < 0)
             return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
@@ -745,7 +742,7 @@ export class StoreManagement {
         return {data: {stores: storeInfos}};
     }
 
-    async getAllProductsInStore(storeName: string): Promise<Res.GetAllProductsInStoreResponse>{
+    async getAllProductsInStore(storeName: string): Promise<Res.GetAllProductsInStoreResponse> {
         const productInStore: ProductInStore[] = [];
         const store: Store = this._storeByStoreName.get(storeName);
         if (!store)
@@ -772,7 +769,7 @@ export class StoreManagement {
         return {data: {products: productInStore}};
     }
 
-    async getAllCategoriesInStore(storeName: string):  Promise<Res.GetCategoriesResponse> {
+    async getAllCategoriesInStore(storeName: string): Promise<Res.GetCategoriesResponse> {
         const categoriesInStore: ProductCategory[] = [];
         if (!this._storeByStoreName.has(storeName))
             return {data: {categories: []}};
@@ -832,25 +829,25 @@ export class StoreManagement {
     getManagersPermissions(storeName: string): Res.GetAllManagersPermissionsResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
-            return {data: {result: false, permissions: []}, error: { message: errorMsg.E_INVALID_STORE} }
+            return {data: {result: false, permissions: []}, error: {message: errorMsg.E_INVALID_STORE}}
         const permissions: ManagerNamePermission[] = [];
 
         store.storeManagers.forEach(storeManager => {
-            permissions.push({ managerName: storeManager.name, permissions: storeManager.getPermissions() })
+            permissions.push({managerName: storeManager.name, permissions: storeManager.getPermissions()})
         })
-        return { data: {result: true, permissions} }
+        return {data: {result: true, permissions}}
     }
 
     getItemIds(storeName: string, catalogNumber: number): Res.GetItemsIdsResponse {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
-            return { data: { result: false, items: [] }, error: { message: errorMsg.E_INVALID_STORE} }
+            return {data: {result: false, items: []}, error: {message: errorMsg.E_INVALID_STORE}}
 
         const product: Product = store.getProductByCatalogNumber(catalogNumber);
         if (!product)
-            return { data: { result: false, items: [] }, error: { message: errorMsg.E_PROD_DOES_NOT_EXIST} }
+            return {data: {result: false, items: []}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}}
 
-        return { data: { result: true, items: store.products.get(product).reduce((acc, curr) => acc.concat(curr.id) ,[])}}
+        return {data: {result: true, items: store.products.get(product).reduce((acc, curr) => acc.concat(curr.id), [])}}
     }
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {

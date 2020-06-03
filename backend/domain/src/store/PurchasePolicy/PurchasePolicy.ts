@@ -5,15 +5,6 @@ import {RegisteredUser} from "../../user/internal_api";
 
 export abstract class PurchasePolicy {
 
-    constructor() {
-        this._id = uuid();
-    }
-
-    private _id: string;
-
-    get id(): string {
-        return this._id;
-    }
 
     abstract isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean;
 
