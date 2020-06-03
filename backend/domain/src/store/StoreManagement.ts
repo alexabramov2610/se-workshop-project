@@ -36,7 +36,7 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {StoreModel} from 'dal'
+import {StoreModel,StoreOwnerModel} from 'dal'
 const logger = loggerW(__filename)
 
 export class StoreManagement {
@@ -55,12 +55,29 @@ export class StoreManagement {
     }
 
    async addStore(storeName: string, description: string, owner: RegisteredUser): Promise<Res.BoolResponse> {
+        /*
         const newStore = new Store(storeName, description);
         newStore.setFirstOwner(owner);
         this._stores.push(newStore);
         this._storeByStoreName.set(newStore.storeName, newStore);
         logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
         return {data: {result: true}}
+
+         */
+       try {
+           const firstOwner = new StoreOwnerModel({name: owner.name})
+           await StoreModel.create({storeName, description, firstOwner})
+           await firstOwner.save();
+           logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
+           return {data: {result: true}}
+       } catch (e) {
+           if (e.errors.name.kind === 'unique') {
+               logger.warn(`fail to open store ,${storeName} already exist `);
+               return {data: {result: false}, error: {message: errorMsg.E_BU}}
+           }
+           return {data: {result: false}, error: {message: e.errors.name}}
+       }
+       return {data: {result: true}}
     }
 
     verifyStoreExists(storeName: string): boolean {

@@ -1,8 +1,11 @@
 import "./src/config/database"
 import UserModel from "./src/models/user_models/UserModel";
+import StoreModel from "./src/models/store_models/StoreModel";
 import BagItemModel from "./src/models/common_models/BagItemModel";
 import ReceiptModel from "./src/models/common_models/ReceiptModel";
-
+import StoreOwnerModel from "./src/models/user_models/StoreOwnerModel";
+import StoreManagerModel from "./src/models/user_models/StoreManagerModel";
+export {UserModel,StoreModel,BagItemModel,ReceiptModel,StoreOwnerModel,StoreManagerModel}
 /*
 async function register_test() {
     const newUser = new UserModel({name: "tal", password: "password1"})
@@ -53,5 +56,5 @@ async function add_receipt() {
 //get_cart_test().then(res=>console.log("done get cart"))
 
  */
-export {UserModel}
+
 
