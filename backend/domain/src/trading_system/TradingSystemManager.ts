@@ -1,5 +1,5 @@
 import {RegisteredUser, User, UserManager} from "../user/internal_api";
-import {StoreManagement} from '../store/internal_api';
+import {Store, StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
@@ -202,8 +202,8 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
 
         const newTuple: StringTuple[] = [[usernameWhoRemoves.name, usernameToRemove.name]];
-        const ownersToRemove: StringTuple[] = newTuple
-            .concat(this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName));
+        const owners = await this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName)
+        const ownersToRemove: StringTuple[] = newTuple.concat(owners);
 
         const res: Res.BoolResponse = await this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
 
@@ -301,7 +301,7 @@ export class TradingSystemManager {
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
         const user = await this._userManager.getUserByToken(req.token);
-        const store = this._storeManager.findStoreByName(req.body.storeName);
+        const store: Store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
@@ -323,7 +323,7 @@ export class TradingSystemManager {
     async removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse> {
         logger.info(`removing product: ${req.body.catalogNumber} from cart`)
         const user = await this._userManager.getUserByToken(req.token);
-        const store = this._storeManager.findStoreByName(req.body.storeName);
+        const store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
@@ -347,7 +347,7 @@ export class TradingSystemManager {
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let finalPrice: number = 0;
         for (const [storeName, bagItems] of cart.entries()) {
-            const bagItemsWithPrices: BagItem[] = this._storeManager.calculateFinalPrices(storeName, bagItems)
+            const bagItemsWithPrices: BagItem[] = await this._storeManager.calculateFinalPrices(storeName, bagItems)
             finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
             cart.set(storeName, bagItemsWithPrices)
         }
@@ -361,7 +361,7 @@ export class TradingSystemManager {
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         for (const [storeName, bagItems] of cart.entries()) {
             const u: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
-            const isPolicyOk: Res.BoolResponse = this._storeManager.verifyStorePolicy(u, storeName, bagItems)
+            const isPolicyOk: Res.BoolResponse = await this._storeManager.verifyStorePolicy(u, storeName, bagItems)
             if (!isPolicyOk.data.result) {
                 logger.warn(`purchase policy verification failed in store ${storeName} `)
                 return isPolicyOk;
@@ -377,7 +377,7 @@ export class TradingSystemManager {
         if (cart.size === 0)
             return {data: {result: false}, error: {message: errorMsg.E_EMPTY_CART}}
         for (const [storeName, bagItems] of cart.entries()) {
-            const result: Res.BoolResponse = this._storeManager.verifyStoreBag(storeName, bagItems)
+            const result: Res.BoolResponse = await this._storeManager.verifyStoreBag(storeName, bagItems)
             if (!result.data.result) {
                 logger.debug(`product ${JSON.stringify(result.error.options)} not in stock`)
                 return result;
@@ -406,7 +406,8 @@ export class TradingSystemManager {
         let purchases: Purchase[] = [];
         logger.info(`purchase request: purchasing from relevant stores`)
         for (const [storeName, bagItems] of cart.entries()) {
-            purchases = purchases.concat(this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment))
+            const newPurchase = await this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment)
+            purchases = purchases.concat(newPurchase)
         }
         const receipt: Receipt = new Receipt(purchases, req.body.payment);
         if (rUser) {
@@ -421,14 +422,16 @@ export class TradingSystemManager {
         return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
-    notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string) {
+    async notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string): Promise<void> {
         logger.info(`notifying store owners about new purchase`)
-        storeNames.forEach(storeName => {
+        // tslint:disable-next-line:forin
+        for (const storeName in storeNames) {
             const notification: Event.Notification = {
                 message: formatString(notificationMsg.M_NEW_PURCHASE,
                     [storeName, buyer]), type: NotificationsType.GREEN
             };
-            this._storeManager.findStoreByName(storeName).storeOwners.forEach(storeOwner => {
+            const store: Store = await this._storeManager.findStoreByName(storeName);
+            store.storeOwners.forEach(storeOwner => {
                 const event: Event.NewPurchaseEvent = {
                     username: storeOwner.name,
                     code: EventCode.NEW_PURCHASE,
@@ -440,7 +443,8 @@ export class TradingSystemManager {
                     u.saveNotification(event);
                 });
             });
-        });
+        }
+
     }
 
     verifyNewStore(req: Req.VerifyStoreName): Res.BoolResponse {
@@ -475,18 +479,6 @@ export class TradingSystemManager {
         return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
     }
 
-    async addDiscount(req: Req.AddDiscountRequest): Promise<Res.AddDiscountResponse> {
-        logger.info(`adding discount to store ${req.body.storeName}`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addDiscount(user, req.body.storeName, req.body.discount)
-    }
-
-    async removeDiscount(req: Req.RemoveDiscountRequest): Promise<Res.BoolResponse> {
-        logger.info(`removing discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.removeProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discountID)
-        return {data: {result: true}}
-    }
 
     // methods that are available for admin also
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
@@ -524,14 +516,14 @@ export class TradingSystemManager {
     async viewDiscountsPolicy(req: Req.ViewStoreDiscountsPolicyRequest): Promise<Res.ViewStoreDiscountsPolicyResponse> {
         logger.info(`retrieving discount policy of store ${req.body.storeName} `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const policy: IDiscountPolicy = this._storeManager.getStoreDiscountPolicy(user, req.body.storeName)
+        const policy: IDiscountPolicy = await this._storeManager.getStoreDiscountPolicy(user, req.body.storeName)
         return {data: {policy}}
     }
 
     async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse> {
         logger.info(`retrieving purchase policy of store ${req.body.storeName} `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const policy: IPurchasePolicy = this._storeManager.getStorePurchasePolicy(user, req.body.storeName)
+        const policy: IPurchasePolicy = await this._storeManager.getStorePurchasePolicy(user, req.body.storeName)
         return {data: {policy}}
     }
 
@@ -578,7 +570,7 @@ export class TradingSystemManager {
 
     }
 
-    verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
+    verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {
         logger.debug(`checking if products on stock`)
         return this._storeManager.verifyProductOnStock(req);
     }
@@ -678,7 +670,7 @@ export class TradingSystemManager {
 
     }
 
-    getManagersPermissions(req: Req.GetAllManagersPermissionsRequest): Res.GetAllManagersPermissionsResponse {
+    async getManagersPermissions(req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetAllManagersPermissionsResponse> {
         logger.info(`retrieving managers permissions in store: ${req.body.storeName}`);
         return this._storeManager.getManagersPermissions(req.body.storeName);
     }
@@ -692,7 +684,7 @@ export class TradingSystemManager {
 
     }
 
-    getItemIds(req: Req.GetItemsIdsRequest): Res.GetItemsIdsResponse {
+    async getItemIds(req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
     }
 
