@@ -100,7 +100,6 @@ export class Store {
     addNewProducts(products: IProduct[]): Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store`)
         const invalidProducts: IProduct[] = [];
-        const productsToAdd: ProductModel[] = [];
 
         for (const product of products) {
             if (this.getProductByCatalogNumber(product.catalogNumber)) {

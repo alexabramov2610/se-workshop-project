@@ -164,8 +164,17 @@ export class StoreManagement {
     }
 
     async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
-        const store: Store = await this.findStoreByName(storeName);
-        return store.addNewProducts(productsReq);
+        const storeModel = await this.findStoreModelByName(storeName);
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ProductAdditionResponse = storeModel.addNewProducts(productsReq);
+        if (res.data.result) {
+            try {
+                await storeModel.update({ storeName }, { products: store.products });
+            } catch (e) {
+                return { data: { result: false, productsNotAdded: productsReq }, error: { message: errorMsg.E_DB } }
+            }
+        }
+        return res;
     }
 
     async removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
@@ -460,6 +469,18 @@ export class StoreManagement {
             const s = await StoreModel.findOne({storeName});
             const store: Store = StoreMapper.storeMapperFromDB(s);
             return store;
+        } catch (e) {
+            logger.warn(`User ${name} not found`)
+            return undefined
+        }
+        return undefined;
+    }
+
+    async findStoreModelByName(storeName: string): Promise<any> {
+        try {
+            logger.info(`trying to find store ${storeName} in DB`)
+            const s = await StoreModel.findOne({storeName});
+            return s;
         } catch (e) {
             logger.warn(`User ${name} not found`)
             return undefined
