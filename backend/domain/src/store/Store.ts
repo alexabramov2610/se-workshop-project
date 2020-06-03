@@ -4,8 +4,8 @@ import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {
-    BagItem, ICondition, IConditionOfDiscount,
-    IDiscount, IDiscountInPolicy,
+    BagItem, ICondition,
+    IDiscount, IDiscountInPolicy, IItem,
     IPayment,
     IProduct, IPurchasePolicyElement, ISimplePurchasePolicy,
     ProductCatalogNumber,
@@ -42,7 +42,7 @@ interface ProductValidator {
 export class Store {
     storeName: string;
     description: string;
-    products: Map<IProduct, Item[]>;
+    products: Map<IProduct, IItem[]>;
     storeOwners: StoreOwner[];
     storeManagers: StoreManager[];
     receipts: Receipt[];
@@ -51,7 +51,7 @@ export class Store {
     discountPolicy: Discount;
     rating: Rating;
 
-    constructor(storeName: string, description: string, products: Map<IProduct, Item[]>, storeOwner: StoreOwner[],storeManagers:StoreManager[],receipts: Receipt[],firstOwner: StoreOwner, purchasePolicy:PurchasePolicy, discountPolicy:Discount) {
+    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[], storeManagers: StoreManager[], receipts: Receipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
         this.storeName = storeName;
         this.description = description;
         this.products = products;
@@ -163,8 +163,8 @@ export class Store {
 
             const productInStore: IProduct = this.getProductByCatalogNumber(catalogNumber);
             if (productInStore) {
-                const productItems: Item[] = this.products.get(productInStore);
-                const itemToRemove: Item = this.getItemById(productItems, item.id);
+                const productItems: IItem[] = this.products.get(productInStore);
+                const itemToRemove: IItem = this.getItemById(productItems, item.id);
                 if (itemToRemove) {
                     this.products.set(productInStore, productItems.filter(curr => curr !== itemToRemove));
                 } else {
@@ -192,11 +192,11 @@ export class Store {
     async removeProductsWithQuantity(products: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {
         logger.debug(`removing ${products.length} products with quantities from store`)
         const notRemovedProducts: ProductCatalogNumber[] = [];
-        const itemsToReturn: Item[] = [];
+        const itemsToReturn: IItem[] = [];
         for (const product of products) {
             const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
             if (productInStore) {
-                const items: Item[] = this.products.get(productInStore);
+                const items: IItem[] = this.products.get(productInStore);
 
                 const numOfItemsToRemove: number = product.quantity >= items.length ? items.length : product.quantity;
 
@@ -386,11 +386,11 @@ export class Store {
         return this.storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
-    getItemsFromStock(product: IProduct, amount: number): Item[] {
+    getItemsFromStock(product: IProduct, amount: number): IItem[] {
         const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
-        const items: Item[] = this.products.get(productInStore);
-        const itemsToReturn: Item[] = items.slice(0, amount);
-        const itemsRemaining: Item[] = items.slice(amount, items.length);
+        const items: IItem[] = this.products.get(productInStore);
+        const itemsToReturn: IItem[] = items.slice(0, amount);
+        const itemsRemaining: IItem[] = items.slice(amount, items.length);
         this.products.set(productInStore, itemsRemaining)
         return itemsToReturn;
     }
@@ -450,7 +450,7 @@ export class Store {
         return true;
     }
 
-    private getItemById(items: Item[], id: number): Item {
+    private getItemById(items: IItem[], id: number): IItem {
         logger.debug(`searching item with id: ${id}`);
         for (const item of items) {
             if (item.id === id) {

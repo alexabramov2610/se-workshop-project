@@ -11,7 +11,7 @@ const productSchema = new Schema({
     enum: ["GENERAL", "ELECTRONICS", "HOBBIES", "HOME", "CLOTHING"],
   },
   rating: { type: Number, enum: [1, 2, 3, 4, 5] },
-});
+},{autoCreate: true});
 
 productSchema.plugin(uniqueValidator);
 export default productSchema;

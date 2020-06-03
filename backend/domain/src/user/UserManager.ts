@@ -139,7 +139,7 @@ export class UserManager {
 
     async getUserByName(name: string): Promise<RegisteredUser> {
         try {
-            logger.info(`trying to find user ${name} in DB`)
+            logger.debug(`trying to find user ${name} in DB`)
             const u = await UserModel.findOne({name});
             return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, u.cart);
         } catch (e) {

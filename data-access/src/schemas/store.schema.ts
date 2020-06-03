@@ -31,16 +31,15 @@ const storeSchema = new Schema({
             default: []
         },
         firstOwner: {
-            type: String,
+            type: Types.ObjectId,
+            ref: 'storeOwners',
             required: true,
         },
         purchasePolicy: {
             type: String,
-            //required: true,
         },
         discountPolicy: {
             type: String,
-            //required: true,
         },
 },
     {timestamps: false,}

@@ -35,7 +35,7 @@ export const logoutUser = (req: Req.LogoutRequest): Promise<Res.BoolResponse> =>
 }
 
 export const saveProductToCart = async (req: Req.SaveToCartRequest): Promise<Res.BoolResponse> => {
-    const isProductsAvailable: Res.BoolResponse = ts.verifyProductOnStock({
+    const isProductsAvailable: Res.BoolResponse = await ts.verifyProductOnStock({
         body: {
             storeName: req.body.storeName,
             catalogNumber: req.body.catalogNumber,

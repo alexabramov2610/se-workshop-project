@@ -1,5 +1,5 @@
 import {RegisteredUser, User, UserManager} from "../user/internal_api";
-import {StoreManagement} from '../store/internal_api';
+import {Store, StoreManagement} from '../store/internal_api';
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
@@ -684,5 +684,4 @@ export class TradingSystemManager {
     async getItemIds(req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
     }
-
 }

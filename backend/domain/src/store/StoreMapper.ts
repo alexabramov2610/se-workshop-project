@@ -4,7 +4,7 @@ import {Store} from "./Store";
 export function productsMapperFromDB(products: any): Map<IProduct, IItem[]> {
     const mappedProducts = new Map<IProduct, IItem[]>();
 
-    products.forEach(product => {
+    products.forEach( (product) => {
         const retrievedProduct: IProduct = {
             catalogNumber: product.catalogNumber,
             name: product.name,
@@ -41,8 +41,8 @@ export function productsMapperToDB(products: Map<IProduct, IItem[]>): any {
 }
 
 export function storeMapperFromDB(store: any): Store {
-    const {cart, products, storeOwners, storeManagers, receipts, storeName, description, firstOwner, discountPolicy, purchasePolicy} = store;
+    const {storeName, description, products, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy} = store;
     const realProducts: Map<IProduct, IItem[]> = productsMapperFromDB(products);
-    const realStore: Store = new Store(storeName, description, products, products, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy)
+    const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy)
     return realStore
 }

@@ -27,7 +27,7 @@ export const changeProductName = async (req: Req.ChangeProductNameRequest): Prom
     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
         return {data: {result: false}, error: havePermission.error}
-    const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
+    const verifyProductsRes: Res.BoolResponse = await ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
             productsCatalogNumbers: [req.body.catalogNumber]
@@ -40,7 +40,7 @@ export const changeProductName = async (req: Req.ChangeProductNameRequest): Prom
 }
 
 export const changeProductPrice = async (req: Req.ChangeProductPriceRequest): Promise<Res.BoolResponse> => {
-    const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
+    const verifyProductsRes: Res.BoolResponse = await ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
             productsCatalogNumbers: [req.body.catalogNumber]
@@ -74,7 +74,7 @@ export const addNewProducts = async (req: Req.AddProductsRequest): Promise<Res.P
 }
 
 export const viewProductInfo = async (req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> => {
-    const verifyProductsRes: Res.BoolResponse = ts.verifyProducts({
+    const verifyProductsRes: Res.BoolResponse = await ts.verifyProducts({
         body: {
             storeName: req.body.storeName,
             productsCatalogNumbers: [req.body.catalogNumber]

@@ -10,7 +10,7 @@ import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 
 const storeOwnerName: string = "alex";
 const storeOwnerPassword: string = "store-owner-pw";
-const storeName: string = "חנות מטורפת";
+const storeName: string = "Max Stock";
 const storeDesc: string = "store-Description";
 
 let store: Store;
@@ -90,9 +90,9 @@ export const addNewItems = async (storeName: string, items: IItem[], token: stri
 export async function t1() {
     await systemInit();
 
-    storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
-    store = new Store(storeName, storeDesc);
-    storeOwner = new StoreOwner(storeOwnerName);
+   // storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+   // store = new Store(storeName, storeDesc);
+    //storeOwner = new StoreOwner(storeOwnerName);
 
     token = await initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
     await createStore(storeName, token);
@@ -201,9 +201,9 @@ export async function t1() {
 /** creates new store with 1 product and 1 item, and 10 users */
 export async function t2() {
     // prepare
-    storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
-    store = new Store(storeName, storeDesc);
-    storeOwner = new StoreOwner(storeOwnerName);
+  //  storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+   // store = new Store(storeName, storeDesc);
+ //   storeOwner = new StoreOwner(storeOwnerName);
 
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
     const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
@@ -248,20 +248,20 @@ export async function t2() {
     await addNewItems(storeName, items, token, true);
 
     let stringToPrint: string[] = [];
-
-    console.log('generating 10 tokens...')
-    for (let i = 0; i < 10; i++) {
-        const t = await NewSessionSession();
-        purchaseReq.token = t;
-        saveProductToCartReq.token = t;
-
-        await registerUser(users[i].name, users[i].password, token, false);
-        await loginUser(users[i].name, users[i].password, t, false);
-        // console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
-        // console.log(`purchase request ${i}:`)
-
-        // stringToPrint.push(`curl --cacert server.cert -k --header "Content-Type: application/json" "token: ${get}" --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
-    }
+    //
+    // console.log('generating 10 tokens...')
+    // for (let i = 0; i < 10; i++) {
+    //     const t = await NewSessionSession();
+    //     purchaseReq.token = t;
+    //     saveProductToCartReq.token = t;
+    //
+    //     await registerUser(users[i].name, users[i].password, token, false);
+    //     await loginUser(users[i].name, users[i].password, t, false);
+    //     // console.log(`saveProductToCart user: ${users[i].name} result: ${ServiceFacade.saveProductToCart(saveProductToCartReq).data.result}`);
+    //     // console.log(`purchase request ${i}:`)
+    //
+    //     // stringToPrint.push(`curl --cacert server.cert -k --header "Content-Type: application/json" "token: ${get}" --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
+    // }
 }
 
 /** creates 10 stores */
