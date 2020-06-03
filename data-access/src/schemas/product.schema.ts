@@ -4,7 +4,7 @@ import uniqueValidator from "mongoose-unique-validator";
 const productSchema = new Schema({
   items: [{ type: Types.ObjectId, ref: "items" }],
   catalogNumber: { type: Number, required: true },
-  nume: { type: String, required: true },
+  name: { type: String, required: true },
   price: { type: Number, required: true },
   category: {
     type: String,

@@ -1,8 +1,32 @@
 import { IItem, IProduct } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
-export function productsMapper(products: any) :Map<IProduct, IItem[]>{
-    const productsMapper = new Map<IProduct, IItem[]>();
+export function productsMapperFromDB(products: any) :Map<IProduct, IItem[]>{
+    const mappedProducts = new Map<IProduct, IItem[]>();
 
-    
+    products.forEach(product => {
+        const retrievedProduct: IProduct = { name: product.name, price: product.price, category: product.category, rating: product.rating };
+        const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
+            const item: IItem = { id: curr.id, catalogNumber: curr.catalogNumber };
+            return acc.concat(item);
+        } ,[]);
+        mappedProducts.set(retrievedProduct, retrievedItems);
+    });
 
+    return mappedProducts;
+}
+
+export function productsMapperToDB(products: Map<IProduct, IItem[]>) :any{
+    let productsToDB = [];
+
+    products.forEach((product: IProduct, items: IItem) => {
+        productsToDB = productsToDB.concat({
+            name: product.name,
+            price: product.price,
+            category: product.category,
+            rating: product.rating,
+            items: items
+        })
+    });
+
+    return productsToDB;
 }
