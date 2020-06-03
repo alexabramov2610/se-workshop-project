@@ -18,14 +18,14 @@ export function productsMapperFromDB(products: any) :Map<IProduct, IItem[]>{
 export function productsMapperToDB(products: Map<IProduct, IItem[]>) :any{
     let productsToDB = [];
 
-    products.forEach((product: IProduct, items: IItem) => {
+    Array.from(products.keys()).forEach((product: IProduct) => {
         productsToDB = productsToDB.concat({
             catalogNumber: product.catalogNumber,
             name: product.name,
             price: product.price,
             category: product.category,
             rating: product.rating,
-            items: items
+            items: products.get(product)
         })
     });
 
