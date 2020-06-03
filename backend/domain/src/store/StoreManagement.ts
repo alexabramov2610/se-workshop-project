@@ -1,13 +1,13 @@
 import {Store} from './internal_api'
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
-import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
+import {ContactUsMessage, Item} from "../trading_system/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {
     BagItem,
     IDiscount,
     IItem,
     IPayment,
-    IProduct as ProductReq,
+    IProduct,
     IReceipt,
     ProductCatalogNumber,
     ProductInStore,
@@ -124,7 +124,7 @@ export class StoreManagement {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
         product.name = newProductName;
         logger.debug(`changeProductName: successfully changed name`);
         return {data: {result: true}};
@@ -137,7 +137,7 @@ export class StoreManagement {
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
 
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
 
         product.price = newPrice;
         logger.debug(`changeProductName: successfully changed price`);
@@ -162,10 +162,10 @@ export class StoreManagement {
         return store.removeProductsWithQuantity(productsReq, isReturnItems);
     }
 
-    async addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Promise<Res.ProductAdditionResponse> {
+    async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
         const store: Store = this.findStoreByName(storeName);
-        const products: Product[] = this.getProductsFromRequest(productsReq);
-        return store.addNewProducts(products);
+        // const products: IProduct[] = this.getProductsFromRequest(productsReq);
+        return store.addNewProducts(productsReq);
     }
 
     removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
@@ -512,7 +512,6 @@ export class StoreManagement {
         }
     }
 
-
     async viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Promise<Res.ViewUsersContactUsMessagesResponse> {
         /*
         const store: Store = this.findStoreByName(storeName);
@@ -533,7 +532,6 @@ export class StoreManagement {
          */
         return {data: {result: true, messages: []}}
     }
-
 
     async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
         if (query.storeName && query.storeName.length > 0) {
@@ -628,15 +626,6 @@ export class StoreManagement {
         return Object.keys(ManagementPermission).map((key: any) => ManagementPermission[key]);
     }
 
-
-    addDiscount(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addDiscount(discount);
-        return {data: {result: true, discountID}}
-    }
-
     async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
         const store: Store = this.findStoreByName(storeName);
         if (!store)
@@ -673,25 +662,11 @@ export class StoreManagement {
         return policy;
     }
 
-    removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const isRemoved: boolean = store.removeDiscount(catalogNumber, discountID);
-        if (!isRemoved)
-            return {
-                data: {result: false},
-                error: {message: errorMsg.E_MODIFY_DISCOUNT}
-            }
-        return {data: {result: true}}
-
-    }
-
     verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
         const store: Store = this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product) {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         }
@@ -723,8 +698,6 @@ export class StoreManagement {
                 error: {message: errorMsg.E_PROD_DOES_NOT_EXIST, options: {productsNotExists}}
             }
         }
-
-
     }
 
     async getStoresWithOffset(limit: number, offset: number): Promise<Res.GetStoresWithOffsetResponse> {
@@ -749,7 +722,7 @@ export class StoreManagement {
             return {data: {products: []}};
 
         const prodIterator = store.products.keys();
-        let currProd: Product = prodIterator.next().value;
+        let currProd: IProduct = prodIterator.next().value;
         while (currProd) {
             const currProductInStore: ProductInStore = {
                 storeName,
@@ -775,7 +748,7 @@ export class StoreManagement {
             return {data: {categories: []}};
 
         const prodIterator = this._storeByStoreName.get(storeName).products.keys();
-        let currProd: Product = prodIterator.next().value;
+        let currProd: IProduct = prodIterator.next().value;
         while (currProd) {
             categoriesInStore.push(currProd.category);
             currProd = prodIterator.next().value;
@@ -843,7 +816,7 @@ export class StoreManagement {
         if (!store)
             return {data: {result: false, items: []}, error: {message: errorMsg.E_INVALID_STORE}}
 
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
         if (!product)
             return {data: {result: false, items: []}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}}
 
@@ -892,14 +865,14 @@ export class StoreManagement {
 
     }
 
-    private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
-        const products: Product[] = [];
-        for (const productReq of productsReqs) {
-            const product: Product = new Product(productReq.name, +productReq.catalogNumber, productReq.price, productReq.category);
-            products.push(product);
-        }
-        return products;
-    }
+    // private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
+    //     const products: Product[] = [];
+    //     for (const productReq of productsReqs) {
+    //         const product: Product = new Product(productReq.name, +productReq.catalogNumber, productReq.price, productReq.category);
+    //         products.push(product);
+    //     }
+    //     return products;
+    // }
 
     private getItemsFromRequest(itemsReq: IItem[]): Item[] {
         const items: Item[] = [];

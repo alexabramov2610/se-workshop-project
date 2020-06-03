@@ -11,13 +11,12 @@ import {
     TradingSystemState
 } from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
-import {Product} from "./data/Product";
-import {ExternalSystems, loggerW, StringTuple, UserRole,} from "../api-int/internal_api";
+import {ExternalSystems, loggerW, StringTuple, UserRole} from "../api-int/internal_api";
 import {
     BagItem,
     IDiscountPolicy,
     IPurchasePolicy, IReceipt,
-    Purchase, StoreInfo
+    Purchase, StoreInfo, IProduct
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
@@ -304,7 +303,7 @@ export class TradingSystemManager {
         const store = this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (user.cart.has(req.body.storeName)) {
             const storeBags: BagItem[] = user.cart.get(req.body.storeName);
             let currHoldingAmount: number = 0;
@@ -326,7 +325,7 @@ export class TradingSystemManager {
         const store = this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
@@ -473,19 +472,6 @@ export class TradingSystemManager {
         if (!user)
             return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
-    }
-
-    async addDiscount(req: Req.AddDiscountRequest): Promise<Res.AddDiscountResponse> {
-        logger.info(`adding discount to store ${req.body.storeName}`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addDiscount(user, req.body.storeName, req.body.discount)
-    }
-
-    async removeDiscount(req: Req.RemoveDiscountRequest): Promise<Res.BoolResponse> {
-        logger.info(`removing discount id ${req.body.discountID} sat store ${req.body.storeName} to product ${req.body.catalogNumber}`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.removeProductDiscount(user, req.body.storeName, req.body.catalogNumber, req.body.discountID)
-        return {data: {result: true}}
     }
 
     // methods that are available for admin also

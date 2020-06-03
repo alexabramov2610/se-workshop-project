@@ -171,20 +171,6 @@ export const viewUsersContactUsMessages = async (req: Req.ViewUsersContactUsMess
     return ts.viewUsersContactUsMessages(req);
 }
 
-export const addDiscount = async (req: Req.AddDiscountRequest): Promise<Res.AddDiscountResponse> => {
-    const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
-    if (!havePermission.data.result)
-        return {data: {result: false}, error: havePermission.error}
-    return ts.addDiscount(req)
-}
-
-export const removeDiscount = async (req: Req.RemoveDiscountRequest): Promise<Res.BoolResponse> => {
-    const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MODIFY_DISCOUNT, req.token)
-    if (!havePermission.data.result)
-        return {data: {result: false}, error: havePermission.error}
-    return ts.removeDiscount(req)
-}
-
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> => {
     return ts.setPurchasePolicy(req);
 }
