@@ -100,28 +100,33 @@ export class Store {
     addNewProducts(products: IProduct[]): Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store`)
         const invalidProducts: IProduct[] = [];
+        const validProducts: IProduct[] = [];
 
         for (const product of products) {
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
-            } else {
-                const productValidator: ProductValidator = this.validateProduct(product);
-                productValidator.isValid ? this.products.set(product, []) :
-                    invalidProducts.push(product)
+            }
+            else if (!this.validateProduct(product).isValid) {
+                logger.warn(`invalid product: ${product}`)
+                invalidProducts.push(product);
+            }
+            else {
+                this.products.set(product, []);
+                validProducts.push(product);
             }
         }
 
         if (invalidProducts.length === products.length) { // failed adding
             logger.warn(`failed adding all requested ${products.length} products to store`)
             return {
-                data: {result: false, productsNotAdded: invalidProducts},
+                data: {result: false, productsNotAdded: invalidProducts, productsAdded: validProducts},
                 error: {message: Error.E_PROD_ADD}
             }
         } else {
             logger.debug(`added ${products.length - invalidProducts.length} of ${products.length} request products to store `)
             return {
-                data: {result: true, productsNotAdded: invalidProducts}
+                data: {result: true, productsNotAdded: invalidProducts, productsAdded: validProducts}
             }
         }
     }
@@ -234,7 +239,7 @@ export class Store {
 
     }
 
-    async removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
+    removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} items from store`)
         const productsNotRemoved: IProduct[] = [];
 

@@ -31,7 +31,7 @@ interface ItemsRemovalResponse extends Response {
 }
 
 interface ProductAdditionResponse extends Response {
-  data: { result: boolean; productsNotAdded: IProduct[] };
+  data: { result: boolean; productsNotAdded: IProduct[], productsAdded?: IProduct[] };
 }
 
 interface ProductRemovalResponse extends Response {
@@ -39,6 +39,7 @@ interface ProductRemovalResponse extends Response {
     result: boolean;
     productsNotRemoved: ProductCatalogNumber[];
     itemsRemoved?: IItem[];
+    productsRemoved?: IProduct[];
   };
 }
 
