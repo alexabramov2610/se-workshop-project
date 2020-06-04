@@ -1,8 +1,9 @@
 import {Schema, Types} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
+import itemSchema from "./item.schema";
 
 const productSchema = new Schema({
-    items: {type: [{type: Types.ObjectId, ref: "items"}], default: []},
+    items: {type: [itemSchema], default: []},
     catalogNumber: {type: Number, required: true},
     name: {type: String, required: true},
     price: {type: Number, required: true},

@@ -1,4 +1,4 @@
-import { Item, Receipt} from "../trading_system/internal_api";
+import { Receipt} from "../trading_system/internal_api";
 import {Res} from 'se-workshop-20-interfaces'
 import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
@@ -66,10 +66,10 @@ export class Store {
     }
 
 
-    addItems(items: Item[]): Res.ItemsAdditionResponse {
+    addItems(items: IItem[]): Res.ItemsAdditionResponse {
         logger.debug(`adding ${items.length} items to store id: `)
-        const addedItems: Item[] = [];
-        const notAddedItems: Item[] = [];
+        const addedItems: IItem[] = [];
+        const notAddedItems: IItem[] = [];
 
         for (const item of items) {
             const catalogNumber = item.catalogNumber;
@@ -86,13 +86,13 @@ export class Store {
         if (addedItems.length === 0) { // failed adding
             logger.warn(`failed adding all requested ${items.length} items to store `)
             return {
-                data: {result: false, itemsNotAdded: items},
+                data: {result: false, itemsNotAdded: items, itemsAdded: addedItems},
                 error: {message: Error.E_ITEMS_ADD}
             }
         } else {
             logger.debug(`added ${items.length - notAddedItems.length} of ${items.length} request items to store`)
             return {
-                data: {result: true, itemsNotAdded: notAddedItems}
+                data: {result: true, itemsNotAdded: notAddedItems, itemsAdded: addedItems}
             }
         }
     }
@@ -160,9 +160,10 @@ export class Store {
         this.firstOwner = firstOwner;
     }
 
-    removeItems(items: Item[]): Res.ItemsRemovalResponse {
+    removeItems(items: IItem[]): Res.ItemsRemovalResponse {
         logger.debug(`removing ${items.length} items from store`)
-        const notRemovedItems: Item[] = [];
+        const notRemovedItems: IItem[] = [];
+        const itemsRemoved: IItem[] = [];
 
         for (const item of items) {
             const catalogNumber = item.catalogNumber;
@@ -173,6 +174,7 @@ export class Store {
                 const itemToRemove: IItem = this.getItemById(productItems, item.id);
                 if (itemToRemove) {
                     this.products.set(productInStore, productItems.filter(curr => curr !== itemToRemove));
+                    itemsRemoved.push(itemToRemove)
                 } else {
                     notRemovedItems.push(item);
                 }
@@ -190,7 +192,7 @@ export class Store {
         } else {
             logger.debug(`removed ${items.length - notRemovedItems.length} of ${items.length} request items from store`)
             return {
-                data: {result: true, itemsNotRemoved: notRemovedItems}
+                data: {result: true, itemsNotRemoved: notRemovedItems, itemsRemoved}
             }
         }
     }
@@ -512,7 +514,7 @@ export class Store {
         return undefined;
     }
 
-    private containsItem(product: IProduct, item: Item): boolean {
+    private containsItem(product: IProduct, item: IItem): boolean {
         return this.products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
     }
 

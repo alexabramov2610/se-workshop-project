@@ -23,11 +23,11 @@ interface Response {
 }
 
 interface ItemsAdditionResponse extends BoolResponse {
-  data: { result: boolean; itemsNotAdded: IItem[] };
+  data: { result: boolean; itemsNotAdded: IItem[], itemsAdded?: IItem[] };
 }
 
 interface ItemsRemovalResponse extends Response {
-  data: { result: boolean; itemsNotRemoved: IItem[] };
+  data: { result: boolean; itemsNotRemoved: IItem[], itemsRemoved?: IItem[] };
 }
 
 interface ProductAdditionResponse extends Response {

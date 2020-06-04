@@ -4,6 +4,7 @@ export {ProductCategory};
 
 export interface IItem extends ProductCatalogNumber {
     id: number;
+    db_id?: string;
 }
 
 export interface ProductCatalogNumber {

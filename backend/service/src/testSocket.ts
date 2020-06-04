@@ -84,11 +84,13 @@ export const removeProducts = async (storeName: string, products: IProduct[], to
     await ServiceFacade.removeProducts({body: {storeName, products}, token});
 }
 
-
 export const addNewItems = async (storeName: string, items: IItem[], token: string, expectedRes: boolean): Promise<void> => {
     await ServiceFacade.addItems({body: {storeName, items}, token});
 }
 
+export const removeItems = async (storeName: string, items: IItem[], token: string, expectedRes: boolean): Promise<void> => {
+    await ServiceFacade.removeItems({body: {storeName, items}, token});
+}
 
 /** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export async function t1() {
@@ -254,6 +256,7 @@ export async function t2() {
     console.log("added products !");
 
     // await removeProducts(storeName, products, token);
+    await removeItems(storeName, items, token, true);
 
     let stringToPrint: string[] = [];
     //
