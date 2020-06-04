@@ -1,5 +1,6 @@
 import {Schema, Types} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
+import bagItemSchema from "./bagItem.schema";
 
 const userSchema = new Schema({
         name: {
@@ -13,7 +14,7 @@ const userSchema = new Schema({
         },
         cart: {
             type: Map,
-            of: [{type: Types.ObjectId, ref: 'bagItems'}],
+            of: [bagItemSchema],
             required: true,
             default: new Map()
         },

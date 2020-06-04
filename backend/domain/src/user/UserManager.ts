@@ -12,6 +12,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW} from "../api-int/internal_api";
 import {UserModel} from 'dal'
+
 const logger = loggerW(__filename)
 
 export class UserManager {
@@ -176,10 +177,14 @@ export class UserManager {
         const username = this.loggedInUsers.get(token)
         if (username) {
             return this.getUserByName(username)
-        } else{
+        } else {
             return undefined
         }
 
+    }
+
+    getGuestByToken(token: string): User {
+        return this.guests.get(token);
     }
 
     getTokenOfLoggedInUser(username: string): string {
@@ -235,8 +240,23 @@ export class UserManager {
         this.guests.delete(token);
     }
 
-    saveProductToCart(user: User, storeName: string, product: IProduct, amount: number): void {
+    isGuest(token: string): boolean {
+        return this.guests.get(token) !== undefined
+    }
+
+    async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, rUser: RegisteredUser): Promise<boolean> {
         user.saveProductToCart(storeName, product, amount);
+        if (rUser) {
+            try {
+                await UserModel.updateOne({name: rUser.name}, {cart: user.cart})
+                return true;
+            } catch (e) {
+                return false;
+            }
+
+        }
+
+
     }
 
     async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): Promise<Res.BoolResponse> {

@@ -43,7 +43,7 @@ export abstract class User {
         const oldBagItem = storeBag.find((b) => b.product.catalogNumber === product.catalogNumber)
         const newBagItem = oldBagItem ? {product, amount: oldBagItem.amount + amount} : {product, amount}
         const newStoreBag = storeBag.filter((b) => b.product.catalogNumber !== product.catalogNumber).concat([newBagItem]);
-        this.cart.set(storeName, newStoreBag)
+        this.cart.set(storeName, newStoreBag);
     }
 
     resetCart() {

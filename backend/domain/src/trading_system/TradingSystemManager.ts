@@ -299,7 +299,10 @@ export class TradingSystemManager {
         const amount: number = req.body.amount;
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
-        const user = await this._userManager.getUserByToken(req.token);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+
+        const user: User = rUser? rUser : this._userManager.getGuestByToken(req.token);
+
         const store: Store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
@@ -315,7 +318,8 @@ export class TradingSystemManager {
                 return {data: {result: false}, error: {message: errorMsg.E_MAX_AMOUNT_REACHED}}
         }
         logger.debug(`product: ${req.body.catalogNumber} added to cart`)
-        this._userManager.saveProductToCart(user, req.body.storeName, product, amount);
+        const isGuest: boolean = this._userManager.isGuest(req.token);
+       await this._userManager.saveProductToCart(user, req.body.storeName, product, amount, rUser);
         return {data: {result: true}}
     }
 
