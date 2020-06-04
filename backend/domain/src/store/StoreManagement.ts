@@ -170,8 +170,8 @@ export class StoreManagement {
     async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
+        const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq); // TODO this function need to return IPRODUCT
         const products: IProduct[] = StoreMapper.productsMapperToDB(store.products);
-
 
         for (const p of products) {
             const newProd = await ProductModel.create(p);
