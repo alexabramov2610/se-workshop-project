@@ -126,27 +126,39 @@ export class StoreManagement {
     changeProductName = async (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Promise<Res.BoolResponse> => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
-        const store: Store = await this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
-        product.name = newProductName;
-        logger.debug(`changeProductName: successfully changed name`);
-        return {data: {result: true}};
+        // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
+        const productToChange = store.products.find((p) => p.catalogNumber === catalogNumber)
+        productToChange.name = newProductName;
+        try {
+            await productToChange.save()
+            logger.info(`changeProductName: successfully changed name`);
+            return {data: {result: true}};
+        } catch (e) {
+            logger.warn(`changeProductName: error ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+        }
     }
 
     changeProductPrice = async (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Promise<Res.BoolResponse> => {
         logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
-        const store: Store = await this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-
-        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
-
-        product.price = newPrice;
-        logger.debug(`changeProductName: successfully changed price`);
-        return {data: {result: true}};
+        // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
+        const productToChange = store.products.find((p) => p.catalogNumber === catalogNumber)
+        productToChange.price = newPrice;
+        try {
+            await productToChange.save()
+            logger.info(`changeProductPrice: successfully changed price`);
+            return {data: {result: true}};
+        } catch (e) {
+            logger.warn(`changeProductName: error ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+        }
     }
 
     async addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsAdditionResponse> {
@@ -192,7 +204,7 @@ export class StoreManagement {
         const res: Res.ProductRemovalResponse = store.removeProductsByCatalogNumber(productsReq);
         if (res.data.result) {
             try {
-                await ProductModel.deleteMany( { _id: { $in: res.data.productsRemoved.map(p => p.id) } });
+                await ProductModel.deleteMany({_id: {$in: res.data.productsRemoved.map(p => p.id)}});
                 res.data.productsRemoved.forEach(p => storeModel.products.pull({_id: p.id}));
                 storeModel.markModified('products')
                 await storeModel.save();
@@ -507,7 +519,11 @@ export class StoreManagement {
     async findStoreModelByName(storeName: string): Promise<any> {
         try {
             logger.info(`trying to find store ${storeName} in DB`)
-            const s = await StoreModel.findOne({storeName}).populate('products').populate('storeOwners').populate('storeManagers');
+            const s = await StoreModel.findOne({storeName}).populate('products')
+                .populate('storeOwners')
+                .populate('storeManagers')
+                .populate('receipts')
+                .populate('firstOwner')
             return s;
         } catch (e) {
             logger.warn(`Store ${storeName} not found`)
