@@ -170,27 +170,39 @@ export class StoreManagement {
     async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
-        const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq); // TODO this function need to return IPRODUCT
-        const products: IProduct[] = StoreMapper.productsMapperToDB(store.products);
-
+        const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq);
         if (res.data.result) {
             try {
-                const newProductsInserted = await ProductModel.insertMany(products);
+                const newProductsInserted = await ProductModel.insertMany(res.data.productsAdded);
                 newProductsInserted.forEach((p) => storeModel.products.push(p));
                 storeModel.markModified('products')
                 await storeModel.save()
                 logger.info(`new products updated success in DB`);
             } catch (e) {
-                logger.error(`DB ERROR ${errorMsg.E_PROD_ADD}`);
+                logger.error(`DB ERROR: ${e}`);
                 return {data: {result: false, productsNotAdded: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
             }
         }
         return res;
     }
 
-    async removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
-        const store: Store = await this.findStoreByName(storeName);
-        return store.removeProductsByCatalogNumber(products);
+    async removeProducts(user: RegisteredUser, storeName: string, productsReq: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
+        const res: Res.ProductRemovalResponse = store.removeProductsByCatalogNumber(productsReq);
+        if (res.data.result) {
+            try {
+                await ProductModel.deleteMany( { _id: { $in: res.data.productsRemoved.map(p => p.id) } });
+                res.data.productsRemoved.forEach(p => storeModel.products.pull({_id: p.id}));
+                storeModel.markModified('products')
+                await storeModel.save();
+                logger.info(`removed products from store ${storeName}`);
+            } catch (e) {
+                logger.error(`DB ERROR ${e}`);
+                return {data: {result: false, productsNotRemoved: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
+            }
+        }
+        return res;
     }
 
     async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
@@ -477,7 +489,12 @@ export class StoreManagement {
     async findStoreByName(storeName: string): Promise<Store> {
         try {
             logger.debug(`trying to find store ${storeName} in DB`)
-            const s = await StoreModel.findOne({storeName});
+            const s = await StoreModel.findOne({storeName})
+                .populate('products')
+                .populate('storeOwners')
+                .populate('storeManagers')
+                .populate('receipts')
+                .populate('firstOwner')
             const store: Store = StoreMapper.storeMapperFromDB(s);
             return store;
         } catch (e) {

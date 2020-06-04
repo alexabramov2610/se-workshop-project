@@ -1,7 +1,6 @@
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
-import {Product} from "domain_layer/dist/src/trading_system/data/Product";
 import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
-import {IItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Req, Res} from "se-workshop-20-interfaces";
 import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
@@ -77,9 +76,14 @@ export const createStore = async (storeName: string, token: string): Promise<voi
     await ServiceFacade.createStore(req);
 }
 
-export const addNewProducts = async (storeName: string, products: Product[], token: string, expectedRes: boolean): Promise<void> => {
+export const addNewProducts = async (storeName: string, products: IProduct[], token: string, expectedRes: boolean): Promise<void> => {
     await ServiceFacade.addNewProducts({body: {storeName, products}, token});
 }
+
+export const removeProducts = async (storeName: string, products: IProduct[], token: string): Promise<void> => {
+    await ServiceFacade.removeProducts({body: {storeName, products}, token});
+}
+
 
 export const addNewItems = async (storeName: string, items: IItem[], token: string, expectedRes: boolean): Promise<void> => {
     await ServiceFacade.addItems({body: {storeName, items}, token});
@@ -101,12 +105,12 @@ export async function t1() {
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
     const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
 
-    const prod1: Product = new Product("חתול מעופף", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("ביסלי גריל", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("אזני המן", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("שערות סבתא", 4, 400, ProductCategory.HOBBIES);
+    const prod1: IProduct = {name: "חתול מעופף", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = {name: "ביסלי גריל", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = {name: "אזני המן", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
+    const prod4: IProduct = {name: "שערות סבתא", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
-    const products: Product[] = [prod1, prod2, prod3, prod4];
+    const products: IProduct[] = [prod1, prod2, prod3, prod4];
     let items = [];
     for (let i = 0; i < 20; i++) {
         const item: IItem = {id: i + 1, catalogNumber: products[i % products.length].catalogNumber};
@@ -217,9 +221,9 @@ export async function t2() {
     const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
     const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10];
 
-    const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
+    const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
-    const products: Product[] = [prod1];
+    const products: IProduct[] = [prod1];
     const items: IItem[] = [item1];
     let saveProductToCartReq: Req.SaveToCartRequest = {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -246,6 +250,10 @@ export async function t2() {
     await createStore(storeName, token);
     await addNewProducts(storeName, products, token, true);
     await addNewItems(storeName, items, token, true);
+
+    console.log("added products !");
+
+    await removeProducts(storeName, products, token);
 
     let stringToPrint: string[] = [];
     //
@@ -290,17 +298,17 @@ export async function t3() {
     const storeName10: string = "store10";
 
 
-    const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
+    const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL };
+    const prod2: IProduct = {name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS };
+    const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING };
+    const prod4: IProduct = {name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES };
 
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
     const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
     const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
 
-    const products: Product[] = [prod1, prod2, prod3, prod4];
+    const products: IProduct[] = [prod1, prod2, prod3, prod4];
     const items: IItem[] = [item1, item2, item3, item4];
 
     await systemInit();
@@ -405,17 +413,17 @@ export async function t4() {
     const storeName10: string = "store10";
 
 
-    const prod1: Product = new Product("name1", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("name2", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("name3", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("name4", 4, 400, ProductCategory.HOBBIES);
+    const prod1: IProduct = { name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = { name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = { name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
+    const prod4: IProduct = { name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
     const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
     const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
 
-    const products: Product[] = [prod1, prod2, prod3, prod4];
+    const products: IProduct[] = [prod1, prod2, prod3, prod4];
     const items: IItem[] = [item1, item2, item3, item4];
 
     token = await NewSessionSession();
@@ -500,12 +508,12 @@ export async function t5() {
     const buyer2: RegisteredUser = new RegisteredUser("אוהב לקנות הכל", "buyer1password");
     const buyer3: RegisteredUser = new RegisteredUser("love-spending", "buyer1password");
 
-    const prod1: Product = new Product("במבה אסם", 1, 100, ProductCategory.GENERAL);
-    const prod2: Product = new Product("ביסלי גריל", 2, 200, ProductCategory.ELECTRONICS);
-    const prod3: Product = new Product("אזני המן", 3, 300, ProductCategory.CLOTHING);
-    const prod4: Product = new Product("שערות סבתא", 4, 400, ProductCategory.HOBBIES);
+    const prod1: IProduct = {name: "במבה אסם", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = {name: "ביסלי גריל", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = {name: "אזני המן", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
+    const prod4: IProduct = {name: "שערות סבתא", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
-    const products: Product[] = [prod1, prod2, prod3, prod4];
+    const products: IProduct[] = [prod1, prod2, prod3, prod4];
 
     token = await getSession();
     await registerUser(buyer1.name, buyer1.password, token, false);

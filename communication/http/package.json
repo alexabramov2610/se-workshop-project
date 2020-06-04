@@ -12,7 +12,8 @@
     "serve": "node dist/index.js",
     "clean": "sudo rm -rf dist",
     "clean:hard": "sudo rm -rf dist node_modules",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:clean": "../../dropall.sh && sudo rm -r dist logs ; babel src -d dist && chown alex:alex dist && node dist/index.js"
   },
   "author": "",
   "license": "ISC",

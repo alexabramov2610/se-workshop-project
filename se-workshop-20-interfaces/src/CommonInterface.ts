@@ -27,7 +27,8 @@ export interface IProduct extends ProductCatalogNumber {
     name: string;
     price: number;
     category: ProductCategory;
-    rating?: Rating
+    rating?: Rating;
+    id?: string;
 }
 
 export interface Cart {

@@ -14,7 +14,7 @@ exitfn () {
     sudo service mongod stop && echo -e "${GREEN}mongoDB closed!${NC}" || echo -e "${RED}mongoDB close FAILED!${NC}"
     exit                     #   then exit script.
 }
-trap "exitfn" INT            # Set up SIGINT trap to call function.
+#trap "exitfn" INT            # Set up SIGINT trap to call function.
 
 
 sudo service mongod start && echo -e "${GREEN}mongoDB started!${NC}" || echo -e "${RED}mongoDB FAILED!${NC}"

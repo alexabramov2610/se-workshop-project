@@ -100,28 +100,34 @@ export class Store {
     addNewProducts(products: IProduct[]): Res.ProductAdditionResponse {
         logger.debug(`adding ${products.length} products to store`)
         const invalidProducts: IProduct[] = [];
+        const validProducts: IProduct[] = [];
 
         for (const product of products) {
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
-            } else {
-                const productValidator: ProductValidator = this.validateProduct(product);
-                productValidator.isValid ? this.products.set(product, []) :
-                    invalidProducts.push(product)
+            }
+            else if (!this.validateProduct(product).isValid) {
+                logger.warn(`invalid product: ${product}`)
+                invalidProducts.push(product);
+            }
+            else {
+                product.rating = 3;
+                this.products.set(product, []);
+                validProducts.push(product);
             }
         }
 
         if (invalidProducts.length === products.length) { // failed adding
             logger.warn(`failed adding all requested ${products.length} products to store`)
             return {
-                data: {result: false, productsNotAdded: invalidProducts},
+                data: {result: false, productsNotAdded: invalidProducts, productsAdded: validProducts},
                 error: {message: Error.E_PROD_ADD}
             }
         } else {
             logger.debug(`added ${products.length - invalidProducts.length} of ${products.length} request products to store `)
             return {
-                data: {result: true, productsNotAdded: invalidProducts}
+                data: {result: true, productsNotAdded: invalidProducts, productsAdded: validProducts}
             }
         }
     }
@@ -234,13 +240,15 @@ export class Store {
 
     }
 
-    async removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
+    removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} items from store`)
         const productsNotRemoved: IProduct[] = [];
+        const productsRemoved: IProduct[] = [];
 
         for (const catalogNumber of products) {
             const product: IProduct = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             if (product) {
+                productsRemoved.push(product)
                 this.products.delete(product);
             } else {
                 productsNotRemoved.push(product);
@@ -250,13 +258,13 @@ export class Store {
         if (productsNotRemoved.length === products.length) {
             logger.warn(`failed removing all requested ${products.length} products from store`)
             return {
-                data: {result: false, productsNotRemoved},
+                data: {result: false, productsNotRemoved, productsRemoved: []},
                 error: {message: Error.E_PROD_REM}
             };
         } else {
             logger.debug(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store`)
             return {
-                data: {result: true, productsNotRemoved}
+                data: {result: true, productsNotRemoved, productsRemoved}
             };
         }
     }
