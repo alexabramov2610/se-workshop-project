@@ -173,13 +173,11 @@ export class StoreManagement {
         const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq); // TODO this function need to return IPRODUCT
         const products: IProduct[] = StoreMapper.productsMapperToDB(store.products);
 
-        for (const p of products) {
-            const newProd = await ProductModel.create(p);
-            storeModel.products.push(newProd)
-        }
-        storeModel.markModified('products')
         if (res.data.result) {
             try {
+                const newProductsInserted = await ProductModel.insertMany(products);
+                newProductsInserted.forEach((p) => storeModel.products.push(p));
+                storeModel.markModified('products')
                 await storeModel.save()
                 logger.info(`new products updated success in DB`);
             } catch (e) {
