@@ -42,6 +42,8 @@ export function productsMapperToDB(products: Map<IProduct, IItem[]>): any {
 }
 
 export function storeMapperFromDB(store: any): Store {
+    if (!store)
+        return store;
     const {storeName, description, products, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy} = store;
     const realProducts: Map<IProduct, IItem[]> = productsMapperFromDB(products);
     const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy)

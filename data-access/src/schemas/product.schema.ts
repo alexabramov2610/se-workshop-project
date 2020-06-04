@@ -1,6 +1,7 @@
 import {Schema, Types} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 import itemSchema from "./item.schema";
+import {ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 const productSchema = new Schema({
     items: {type: [itemSchema], default: []},
@@ -9,9 +10,9 @@ const productSchema = new Schema({
     price: {type: Number, required: true},
     category: {
         type: String,
-        enum: ["GENERAL", "ELECTRONICS", "HOBBIES", "HOME", "CLOTHING"],
+        enum: Object.values(ProductCategory),
     },
-    rating: {type: Number, enum: [1, 2, 3, 4, 5]},
+    rating: {type: Number, enum: Object.values(Rating)},
 }, {autoCreate: true});
 
 productSchema.plugin(uniqueValidator);

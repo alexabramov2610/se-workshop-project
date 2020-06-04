@@ -92,6 +92,14 @@ export const removeItems = async (storeName: string, items: IItem[], token: stri
     await ServiceFacade.removeItems({body: {storeName, items}, token});
 }
 
+export const assignStoreOwner = async (storeName: string, usernameToAssign: string, token: string): Promise<void> => {
+    await ServiceFacade.assignStoreOwner({body: { storeName, usernameToAssign }, token});
+}
+
+export const assignStoreManager = async (storeName: string, usernameToAssign: string, token: string): Promise<void> => {
+    await ServiceFacade.assignStoreManager({body: { storeName, usernameToAssign }, token});
+}
+
 /** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export async function t1() {
     await systemInit();
@@ -256,7 +264,17 @@ export async function t2() {
     console.log("added products !");
 
     // await removeProducts(storeName, products, token);
-    await removeItems(storeName, items, token, true);
+    // await removeItems(storeName, items, token, true);
+
+
+    await registerUser(buyer1.name, buyer1.password, token, true);
+    await registerUser(buyer2.name, buyer2.password, token, false);
+    await loginUser(storeOwnerName, storeOwnerPassword, token, false);
+
+    // await assignStoreOwner(storeName, buyer1.name, token);
+    await assignStoreManager(storeName, buyer1.name, token);
+
+
 
     let stringToPrint: string[] = [];
     //
