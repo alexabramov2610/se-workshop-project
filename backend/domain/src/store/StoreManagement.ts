@@ -174,18 +174,12 @@ export class StoreManagement {
         const products: IProduct[] = StoreMapper.productsMapperToDB(res.productsAdded);
 
 
-        for (const p of products) {
-            // const newProd = await ProductModel.create(p);
-            storeModel.update({name: "products"}, )
-        }
-        storeModel.markModified('products')
         if (res.data.result) {
             try {
+                const newProductsInserted = await ProductModel.insertMany(products);
+                newProductsInserted.forEach((p) => storeModel.products.push(p));
+                storeModel.markModified('products')
                 await storeModel.save()
-                const s = await StoreModel.findOne({storeName}).populate('products');
-                logger.info(`TEST::::`)
-                logger.info(`${s}`)
-                logger.info(`${s.products}`)
                 logger.info(`new products updated success in DB`);
             } catch (e) {
                 logger.error(`DB ERROR ${errorMsg.E_PROD_ADD}`);
