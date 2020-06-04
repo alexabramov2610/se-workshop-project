@@ -112,6 +112,7 @@ export class Store {
                 invalidProducts.push(product);
             }
             else {
+                product.rating = 3;
                 this.products.set(product, []);
                 validProducts.push(product);
             }
@@ -242,10 +243,12 @@ export class Store {
     removeProductsByCatalogNumber(products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
         logger.debug(`removing ${products.length} items from store`)
         const productsNotRemoved: IProduct[] = [];
+        const productsRemoved: IProduct[] = [];
 
         for (const catalogNumber of products) {
             const product: IProduct = this.getProductByCatalogNumber(catalogNumber.catalogNumber);
             if (product) {
+                productsRemoved.push(product)
                 this.products.delete(product);
             } else {
                 productsNotRemoved.push(product);
@@ -255,13 +258,13 @@ export class Store {
         if (productsNotRemoved.length === products.length) {
             logger.warn(`failed removing all requested ${products.length} products from store`)
             return {
-                data: {result: false, productsNotRemoved},
+                data: {result: false, productsNotRemoved, productsRemoved: []},
                 error: {message: Error.E_PROD_REM}
             };
         } else {
             logger.debug(`removed ${products.length - productsNotRemoved.length} of ${products.length} request products from store`)
             return {
-                data: {result: true, productsNotRemoved}
+                data: {result: true, productsNotRemoved, productsRemoved}
             };
         }
     }

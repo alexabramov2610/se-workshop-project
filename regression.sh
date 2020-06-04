@@ -37,7 +37,7 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}====================== CLEANING CLIENT =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $client
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+#sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  communication
 echo -e "${BLUE}============================================================${NC}"
@@ -141,7 +141,7 @@ echo -e "${BLUE}===========================================================${NC}
 echo -e "${BLUE}=============== INSTALLING ACCEPTANCE TESTS ===============${NC}"
 echo -e "${BLUE}===========================================================${NC}"
 cd $AT
-sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 #################################################################################

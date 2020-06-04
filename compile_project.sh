@@ -66,7 +66,7 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}==================== COMPILING SERVICE ===================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $service
-#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  http
 echo -e "${BLUE}==========================================================${NC}"
