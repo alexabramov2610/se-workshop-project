@@ -1,6 +1,5 @@
 import {Store} from './internal_api'
 import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
-import {Item} from "../trading_system/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {
     BagItem,
@@ -25,7 +24,7 @@ import {
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
+import {errorMsg as Error, errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {CondDiscount} from "./discounts/CondDiscount";
@@ -35,7 +34,7 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ProductModel, StoreModel, StoreOwnerModel} from 'dal'
+import {ItemModel, ProductModel, StoreModel, StoreOwnerModel} from 'dal'
 import * as StoreMapper from './StoreMapper'
 
 const logger = loggerW(__filename)
@@ -150,16 +149,51 @@ export class StoreManagement {
     }
 
     async addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsAdditionResponse> {
-        const store: Store = await this.findStoreByName(storeName);
-        const items: Item[] = this.getItemsFromRequest(itemsReq);
-        return store.addItems(items);
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ItemsAdditionResponse = store.addItems(itemsReq);
+        if (res.data.result) {
+            try {
+                res.data.itemsAdded.forEach(item => {
+                    const product = storeModel.products.find((p) => p.catalogNumber === item.catalogNumber);
+                    product.items.push(item);
+                })
+                for (const product of storeModel.products) {
+                    await product.save()
+                }
+                logger.info(`new items added into store: ${storeName}`)
+            } catch (e) {
+                logger.error(`addItems DB ERROR: ${e}`);
+                return { data: {result: false, itemsNotAdded: itemsReq },
+                error: {message: Error.E_ITEMS_ADD} }
+            }
+        }
+        return res;
     }
 
     async removeItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsRemovalResponse> {
-        const store: Store = await this.findStoreByName(storeName);
-        const items: Item[] = this.getItemsFromRequest(itemsReq);
-        return store.removeItems(items);
-
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ItemsRemovalResponse = store.removeItems(itemsReq);
+        if (res.data.result) {
+            try {
+                res.data.itemsRemoved.forEach(item => {
+                    const product = storeModel.products.find(p => p.catalogNumber === item.catalogNumber);
+                    product.items.pull(item.db_id);
+                })
+                for (const product of storeModel.products) {
+                    await product.save()
+                }
+                logger.info(`removed items from store: ${storeName}`)
+            } catch (e) {
+                logger.error(`removeItems DB ERROR: ${e}`);
+                return {
+                    data: {result: false, itemsNotRemoved: itemsReq},
+                    error: {message: Error.E_ITEMS_REM}
+                }
+            }
+        }
+        return res;
     }
 
     async removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {
@@ -169,7 +203,7 @@ export class StoreManagement {
 
     async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
-        const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq);
         if (res.data.result) {
             try {
@@ -179,7 +213,7 @@ export class StoreManagement {
                 await storeModel.save()
                 logger.info(`new products updated success in DB`);
             } catch (e) {
-                logger.error(`DB ERROR: ${e}`);
+                logger.error(`addNewProducts DB ERROR: ${e}`);
                 return {data: {result: false, productsNotAdded: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
             }
         }
@@ -198,7 +232,7 @@ export class StoreManagement {
                 await storeModel.save();
                 logger.info(`removed products from store ${storeName}`);
             } catch (e) {
-                logger.error(`DB ERROR ${e}`);
+                logger.error(`removeProducts DB ERROR: ${e}`);
                 return {data: {result: false, productsNotRemoved: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
             }
         }
@@ -927,14 +961,14 @@ export class StoreManagement {
     //     return products;
     // }
 
-    private getItemsFromRequest(itemsReq: IItem[]): Item[] {
-        const items: Item[] = [];
-        for (const itemReq of itemsReq) {
-            const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
-            items.push(item);
-        }
-        return items;
-    }
+    // private getItemsFromRequest(itemsReq: IItem[]): Item[] {
+    //     const items: Item[] = [];
+    //     for (const itemReq of itemsReq) {
+    //         const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
+    //         items.push(item);
+    //     }
+    //     return items;
+    // }
 
     private convertPolicyToISimplePurchasePolicy(policy: PurchasePolicy): ISimplePurchasePolicy {
         const tag: string = policy.getPolicyTag();
