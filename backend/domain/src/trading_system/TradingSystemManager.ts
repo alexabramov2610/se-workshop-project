@@ -301,7 +301,7 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
         const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
 
-        const user: User = rUser? rUser : this._userManager.getGuestByToken(req.token);
+        const user: User = rUser ? rUser : this._userManager.getGuestByToken(req.token);
 
         const store: Store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
@@ -318,21 +318,21 @@ export class TradingSystemManager {
                 return {data: {result: false}, error: {message: errorMsg.E_MAX_AMOUNT_REACHED}}
         }
         logger.debug(`product: ${req.body.catalogNumber} added to cart`)
-        const isGuest: boolean = this._userManager.isGuest(req.token);
-       await this._userManager.saveProductToCart(user, req.body.storeName, product, amount, rUser);
+        await this._userManager.saveProductToCart(user, req.body.storeName, product, amount, rUser ? false : true);
         return {data: {result: true}}
     }
 
     async removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse> {
         logger.info(`removing product: ${req.body.catalogNumber} from cart`)
-        const user = await this._userManager.getUserByToken(req.token);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        const user: User = rUser ? rUser : this._userManager.getGuestByToken(req.token);
         const store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product)
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
-        return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount);
+        return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount, rUser);
     }
 
     viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {

@@ -234,8 +234,8 @@ export class StoreManagement {
         const res: Res.ProductRemovalResponse = store.removeProductsByCatalogNumber(productsReq);
         if (res.data.result) {
             try {
-                await ProductModel.deleteMany({_id: {$in: res.data.productsRemoved.map(p => p.id)}});
-                res.data.productsRemoved.forEach(p => storeModel.products.pull({_id: p.id}));
+                await ProductModel.deleteMany({_id: {$in: res.data.productsRemoved.map(p => p.db_id)}});
+                res.data.productsRemoved.forEach(p => storeModel.products.pull(p.db_id));
                 storeModel.markModified('products')
                 await storeModel.save();
                 logger.info(`removed products from store ${storeName}`);

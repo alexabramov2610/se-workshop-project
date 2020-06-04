@@ -275,7 +275,6 @@ export async function t2() {
     await assignStoreManager(storeName, buyer1.name, token);
 
 
-
     let stringToPrint: string[] = [];
     //
     // console.log('generating 10 tokens...')

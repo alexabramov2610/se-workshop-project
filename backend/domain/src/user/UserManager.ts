@@ -12,6 +12,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW} from "../api-int/internal_api";
 import {UserModel} from 'dal'
+import * as UserMapper from './UserMapper'
 
 const logger = loggerW(__filename)
 
@@ -36,7 +37,7 @@ export class UserManager {
         const password = req.body.password;
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
         try {
-            await UserModel.create({name: userName, password: hashed})
+            await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
             logger.info(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
@@ -137,14 +138,15 @@ export class UserManager {
         }
     */
 
-
     async getUserByName(name: string): Promise<RegisteredUser> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
-            const u = await UserModel.findOne({name});
+            const u = await UserModel.findOne({name})
+                .populate('receipts')
+                .populate('pendingEvents');
             return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, u.cart);
         } catch (e) {
-            logger.warn(`User ${name} not found`)
+            logger.warn(`getUserByName DB ERROR: ${e}`)
             return undefined
         }
     }
@@ -244,22 +246,24 @@ export class UserManager {
         return this.guests.get(token) !== undefined
     }
 
-    async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, rUser: RegisteredUser): Promise<boolean> {
+    async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, isGuest: boolean): Promise<boolean> {
         user.saveProductToCart(storeName, product, amount);
-        if (rUser) {
+
+        if (!isGuest) {
+            const rUser = user as RegisteredUser;
+            console.log(rUser.cart)
+            const cart = UserMapper.cartMapperToDB(rUser.cart);
+            console.log(cart)
             try {
-                await UserModel.updateOne({name: rUser.name}, {cart: user.cart})
+                await UserModel.updateOne({name: rUser.name}, {cart})
                 return true;
             } catch (e) {
                 return false;
             }
-
         }
-
-
     }
 
-    async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): Promise<Res.BoolResponse> {
+    async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number, rUser: RegisteredUser): Promise<Res.BoolResponse> {
         const storeBag: BagItem[] = user.cart.get(storeName);
         if (!storeBag) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}
@@ -272,9 +276,16 @@ export class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_BAD_AMOUNT}}
         }
         user.removeProductFromCart(storeName, product, amountToRemove)
-        return {
-            data: {result: true}
+        if (rUser) {
+            try {
+                await UserModel.updateOne({name: rUser.name}, {cart: user.cart})
+                return {data: {result: true}}
+            } catch (e) {
+                logger.error(`removeProductFromCart ${e}`)
+                return {data: {result: false}, error: {message: errorMsg.E_DB}}
+            }
         }
+
     }
 
     async viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {

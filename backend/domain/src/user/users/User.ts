@@ -9,7 +9,7 @@ export abstract class User {
     private _cart: Map<string, BagItem[]>;          // storename -> items
 
     constructor(cart?:Map<string, BagItem[]> ) {
-        this._cart = cart? cart: new Map();
+        this._cart = cart? new Map(cart): new Map();
     }
 
 

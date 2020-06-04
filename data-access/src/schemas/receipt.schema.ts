@@ -6,7 +6,7 @@ const receiptSchema = new Schema({
     date: {type: Date},
     lastCC4: {type: String},
     totalCharged: {type: Number}
-});
+},{autoCreate: true});
 
 receiptSchema.plugin(uniqueValidator);
 
