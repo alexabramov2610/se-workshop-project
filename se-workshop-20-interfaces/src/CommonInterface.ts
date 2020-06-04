@@ -29,7 +29,7 @@ export interface IProduct extends ProductCatalogNumber {
     price: number;
     category: ProductCategory;
     rating?: Rating;
-    id?: string;
+    db_id?: string;
 }
 
 export interface Cart {

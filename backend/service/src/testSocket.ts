@@ -256,7 +256,7 @@ export async function t2() {
     console.log("added products !");
 
     // await removeProducts(storeName, products, token);
-    await removeItems(storeName, items, token, true);
+    // await removeItems(storeName, items, token, true);
 
     let stringToPrint: string[] = [];
     //

@@ -11,7 +11,7 @@ export function productsMapperFromDB(products: any): Map<IProduct, IItem[]> {
             price: product.price,
             category: product.category,
             rating: product.rating,
-            id: product.id
+            db_id: product._id
         };
         const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
             const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
@@ -33,7 +33,7 @@ export function productsMapperToDB(products: Map<IProduct, IItem[]>): any {
             price: product.price,
             category: product.category,
             rating: product.rating,
-            id: product.id,
+            id: product.db_id,
             items: products.get(product)
         })
     });

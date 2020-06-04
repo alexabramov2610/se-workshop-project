@@ -1,9 +1,9 @@
-import { Schema } from "mongoose";
+import {Schema} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
 const bagItemSchema = new Schema({
-    product: {type: Number},
-    amount: {type: Number},
+    product: {type: {type: Schema.Types.ObjectId, ref: 'products', required: true} },
+    amount: {type: Number, required: true},
     finalPrice: {type: Number}
 });
 
