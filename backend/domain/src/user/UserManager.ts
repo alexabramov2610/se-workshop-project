@@ -144,7 +144,8 @@ export class UserManager {
             const u = await UserModel.findOne({name})
                 .populate('receipts')
                 .populate('pendingEvents');
-            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, u.cart);
+            const cart = await UserMapper.cartMapperFromDB(u.cart)
+            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
             logger.warn(`getUserByName DB ERROR: ${e}`)
             return undefined
@@ -251,9 +252,7 @@ export class UserManager {
 
         if (!isGuest) {
             const rUser = user as RegisteredUser;
-            console.log(rUser.cart)
             const cart = UserMapper.cartMapperToDB(rUser.cart);
-            console.log(cart)
             try {
                 await UserModel.updateOne({name: rUser.name}, {cart})
                 return true;
@@ -265,6 +264,7 @@ export class UserManager {
 
     async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number, rUser: RegisteredUser): Promise<Res.BoolResponse> {
         const storeBag: BagItem[] = user.cart.get(storeName);
+
         if (!storeBag) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}
         }
@@ -278,7 +278,8 @@ export class UserManager {
         user.removeProductFromCart(storeName, product, amountToRemove)
         if (rUser) {
             try {
-                await UserModel.updateOne({name: rUser.name}, {cart: user.cart})
+                const cart = UserMapper.cartMapperToDB(rUser.cart);
+                await UserModel.updateOne({name: rUser.name}, {cart})
                 return {data: {result: true}}
             } catch (e) {
                 logger.error(`removeProductFromCart ${e}`)

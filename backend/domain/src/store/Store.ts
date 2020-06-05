@@ -370,7 +370,7 @@ export class Store {
     }
 
     getProductByCatalogNumber(catalogNumber: number): IProduct {
-        logger.info(`searching product with catalog number: ${catalogNumber}`);
+        logger.debug(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this.products.keys()) {
             logger.debug(` product: ${JSON.stringify(product)}`);
             logger.debug(`${product.catalogNumber} === ${catalogNumber}` + (product.catalogNumber === catalogNumber))
