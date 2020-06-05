@@ -155,7 +155,7 @@ export class Store {
     }
 
     setFirstOwner(user: RegisteredUser): void {
-        const firstOwner: StoreOwner = new StoreOwner(user.name);
+        const firstOwner: StoreOwner = { name: user.name, assignedStoreOwners: [], assignedStoreManagers: [] };
         this.storeOwners.push(firstOwner);
         this.firstOwner = firstOwner;
     }
@@ -358,15 +358,16 @@ export class Store {
         return false;
     }
 
-    verifyPermission(userName: string, permission: ManagementPermission): boolean {
-        if (this.verifyIsStoreOwner(userName))
-            return true;
-        if (this.verifyIsStoreManager(userName)) {
-            const isAllowed: boolean = this.getStoreManager(userName).isAllowed(permission);
-            logger.debug(`User ${userName} permission allowed: ${isAllowed}`);
-            return isAllowed;
-        }
-        return false;
+    verifyPermission(userName: string, permission: ManagementPermission): boolean { //todo: move to StoreManagement
+        // if (this.verifyIsStoreOwner(userName))
+        //     return true;
+        // if (this.verifyIsStoreManager(userName)) {
+        //     const isAllowed: boolean = this.getStoreManager(userName).isAllowed(permission);
+        //     logger.debug(`User ${userName} permission allowed: ${isAllowed}`);
+        //     return isAllowed;
+        // }
+        // return false;
+        return true;
     }
 
     getProductByCatalogNumber(catalogNumber: number): IProduct {

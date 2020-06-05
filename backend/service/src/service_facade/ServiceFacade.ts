@@ -148,9 +148,9 @@ export const addItems = (req: Req.ItemsAdditionRequest): Promise<Res.ItemsAdditi
 export const removeItems = (req: Req.ItemsRemovalRequest): Promise<Res.ItemsRemovalResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.removeItems));
 }
-export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.removeProductsWithQuantity));
-}
+// export const removeProductsWithQuantity = (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> => {
+//     return runIfOpen(req, runIfLoggedIn(StoreService.removeProductsWithQuantity));
+// }
 export const addNewProducts = (req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addNewProducts));
 }

@@ -1,5 +1,6 @@
 import {Schema, Types} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
+import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
 
 const storeManagerSchema = new Schema({
         name: {
@@ -7,9 +8,10 @@ const storeManagerSchema = new Schema({
             required: true,
         },
         managerPermissions: {
-            type: [{type: Types.ObjectId, ref: 'permissions'}],
+            type: [String],
             required: true,
-            default: []
+            default: [],
+            enum: Object.values(ManagementPermission)
         },
     },
     {timestamps: false,});

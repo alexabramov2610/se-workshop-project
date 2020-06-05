@@ -141,11 +141,11 @@ export class TradingSystemManager {
         return this._storeManager.removeItems(user, req.body.storeName, req.body.items);
     }
 
-    async removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> {
-        logger.info(`removing items from store: ${req.body.storeName}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
-    }
+    // async removeProductsWithQuantity(req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> {
+    //     logger.info(`removing items from store: ${req.body.storeName}`);
+    //     const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+    //     return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
+    // }
 
     async addNewProducts(req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> {
         logger.info(`adding products to store: ${req.body.storeName}`)

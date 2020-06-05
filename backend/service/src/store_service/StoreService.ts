@@ -59,12 +59,12 @@ export const removeItems = async (req: Req.ItemsRemovalRequest): Promise<Res.Ite
     return ts.removeItems(req);
 }
 
-export const removeProductsWithQuantity = async (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> => {
-    const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-    if (!havePermission.data.result)
-        return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
-    return ts.removeProductsWithQuantity(req);
-}
+// export const removeProductsWithQuantity = async (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> => {
+//     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
+//     if (!havePermission.data.result)
+//         return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
+//     return ts.removeProductsWithQuantity(req);
+// }
 
 export const addNewProducts = async (req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> => {
     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)

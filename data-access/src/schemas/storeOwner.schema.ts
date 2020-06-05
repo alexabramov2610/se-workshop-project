@@ -1,17 +1,18 @@
 import {Schema, Types} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
+import storeManagerSchema from "./storeManager.schema";
 
 const storeOwnerSchema = new Schema({
         name: {
             type: String,
             required: true,
         },
-        managerAssigned: {
-            type: [{type: Types.ObjectId, ref: 'storeManagers'}],
+        managersAssigned: {
+            type: [storeManagerSchema],
             required: true,
             default: []
         },
-        ownerAssigned: {
+        ownersAssigned: {
             type: [{type: Types.ObjectId, ref: 'storeOwners'}],
             required: true,
             default: []
