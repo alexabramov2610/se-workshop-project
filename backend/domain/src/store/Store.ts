@@ -30,7 +30,7 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import { ProductModel } from "dal"
+import {ProductModel} from "dal"
 
 const logger = loggerW(__filename)
 
@@ -102,7 +102,7 @@ export class Store {
         const invalidProducts: IProduct[] = [];
         const validProducts: IProduct[] = [];
 
-        for (let product of products) {
+        for (const product of products) {
             product.storeName = this.storeName;
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
@@ -386,11 +386,17 @@ export class Store {
         return this.storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
-    getItemsFromStock(product: IProduct, amount: number): IItem[] {
+   async getItemsFromStock(product: IProduct, amount: number): Promise<IItem[]> {
         const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
         const items: IItem[] = this.products.get(productInStore);
         const itemsToReturn: IItem[] = items.slice(0, amount);
         const itemsRemaining: IItem[] = items.slice(amount, items.length);
+        try {
+            const res = await ProductModel.updateOne({_id: productInStore.db_id}, {items: itemsRemaining})
+            logger.info(`updated store db`)
+        } catch (e) {
+            logger.error(`DB ERROR ${e}`)
+        }
         this.products.set(productInStore, itemsRemaining)
         return itemsToReturn;
     }

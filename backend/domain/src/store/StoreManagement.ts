@@ -96,8 +96,8 @@ export class StoreManagement {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         if (!storeModel)
             error = errorMsg.E_INVALID_STORE;
-       else if (!this.findStoreOwner(storeModel, user.name) && !this.verifyManagerPermission(storeModel.storeManagers, user.name, permission))
-           error = errorMsg.E_PERMISSION;
+        else if (!this.findStoreOwner(storeModel, user.name) && !this.verifyManagerPermission(storeModel.storeManagers, user.name, permission))
+            error = errorMsg.E_PERMISSION;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
@@ -175,8 +175,10 @@ export class StoreManagement {
                 logger.info(`new items added into store: ${storeName}`)
             } catch (e) {
                 logger.error(`addItems DB ERROR: ${e}`);
-                return { data: {result: false, itemsNotAdded: itemsReq },
-                error: {message: Error.E_ITEMS_ADD} }
+                return {
+                    data: {result: false, itemsNotAdded: itemsReq},
+                    error: {message: Error.E_ITEMS_ADD}
+                }
             }
         }
         return res;
@@ -336,21 +338,28 @@ export class StoreManagement {
             storeModel.markModified('storeOwners')
             storeModel.markModified('storeManagers')
             await StoreOwnerModel.deleteMany({_id: {$in: ownersToRemove.map(owner => owner.id)}});
-            await StoreManagerModel.deleteMany({_id: {$in: ownersToRemove.reduce((acc, currOwner) =>
-                        acc.concat(currOwner.managersAssigned.map(manager => manager._id.toString())), [])}});
+            await StoreManagerModel.deleteMany({
+                _id: {
+                    $in: ownersToRemove.reduce((acc, currOwner) =>
+                        acc.concat(currOwner.managersAssigned.map(manager => manager._id.toString())), [])
+                }
+            });
             await userWhoRemovesDoc.save();
             await storeModel.save();
             logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
         } catch (e) {
             logger.error(`assignStoreOwner DB ERROR: ${e}`);
-            return {data: {result: false, owners: ownersToRemove.map(owner => owner.name) }, error: {message: errorMsg.E_DB}}
+            return {
+                data: {result: false, owners: ownersToRemove.map(owner => owner.name)},
+                error: {message: errorMsg.E_DB}
+            }
         }
-        return {data: {result: true, owners: ownersToRemove.map(owner => owner.name) } }
+        return {data: {result: true, owners: ownersToRemove.map(owner => owner.name)}}
     }
 
     getStoreOwnersToRemove(owner, storeModel): any[] {
         return [owner].concat(owner.ownersAssigned.reduce(
-            (acc, curr) => acc.concat(this.getStoreOwnersToRemove(this.findStoreOwner(storeModel, curr.name), storeModel)) , [])
+            (acc, curr) => acc.concat(this.getStoreOwnersToRemove(this.findStoreOwner(storeModel, curr.name), storeModel)), [])
         );
     }
 
@@ -387,7 +396,8 @@ export class StoreManagement {
         }
 
         try {
-            const managerToAdd: StoreManager = { name: userToAssign.name, managerPermissions:
+            const managerToAdd: StoreManager = {
+                name: userToAssign.name, managerPermissions:
                     [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS]
             };
             const newManagerModel = new StoreManagerModel(managerToAdd);
@@ -462,7 +472,7 @@ export class StoreManagement {
         return userWhoRemoves.managersAssigned.find(manager => manager.name === username);
     }
 
-    async addManagerPermissions (userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse>{
+    async addManagerPermissions(userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to add permissions from user: ${usernameToChange} in store ${storeName}`)
         let error: string;
 
@@ -518,7 +528,7 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
-    async removeManagerPermissions(userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse>{
+    async removeManagerPermissions(userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange} in store ${storeName}`)
         let error: string;
 
@@ -593,7 +603,9 @@ export class StoreManagement {
         try {
             const productsInDB = await ProductModel.find(DBSearchQuery)
             const productsInDomain: IProduct[] = productsMapperFromDB(productsInDB);
-            productsFound = productsInDomain.map(product => { return { product, storeName: product.storeName } })
+            productsFound = productsInDomain.map(product => {
+                return {product, storeName: product.storeName}
+            })
             console.log("HEYA")
         } catch (e) {
             logger.error(`search DB ERROR: ${e}`);
@@ -626,17 +638,16 @@ export class StoreManagement {
     }
 
     mapToJson(map) {
-        return Array.from(map).reduce((acc, [ key, val ]) => Object.assign(acc, { [key]: val }), {});
+        return Array.from(map).reduce((acc, [key, val]) => Object.assign(acc, {[key]: val}), {});
     }
 
 
-
-
-
-    async findStoreByName(storeName: string,populateWith  = ["products","storeOwners","storeManagers","receipts","firstOwner"]): Promise<Store> {
+    async findStoreByName(storeName: string, populateWith = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner"]): Promise<Store> {
         try {
             logger.debug(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field => { return { path: field } });
+            var populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
             const s = await StoreModel.findOne({storeName})
                 .populate(populateQuery)
             const store: Store = StoreMapper.storeMapperFromDB(s);
@@ -648,10 +659,12 @@ export class StoreManagement {
         return undefined;
     }
 
-    async findStoreModelByName(storeName: string,populateWith  = ["storeOwners","storeManagers","receipts","firstOwner"]): Promise<any> {
+    async findStoreModelByName(storeName: string, populateWith = ["storeOwners", "storeManagers", "receipts", "firstOwner"]): Promise<any> {
         try {
             logger.info(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field => { return { path: field } });
+            var populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
             const s = await StoreModel.findOne({storeName}).populate('products')
                 .populate(populateQuery);
             return s;
@@ -665,15 +678,15 @@ export class StoreManagement {
     async viewStoreInfo(storeName: string): Promise<Res.StoreInfoResponse> {
         const store = await this.findStoreModelByName(storeName);
         if (store) {
-            const storeInfo: StoreInfo =  {
+            const storeInfo: StoreInfo = {
                 storeName: store.storeName,
                 description: store.description,
                 storeRating: store.rating,
                 storeOwnersNames: store.storeOwners.map(o => o.name),
                 storeManagersNames: store.storeOwners.map(o => o.name),
-                productsNames: store.products.map(p=>p.name)
+                productsNames: store.products.map(p => p.name)
             }
-            return {data:{ result: true, info: storeInfo }}
+            return {data: {result: true, info: storeInfo}}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
@@ -742,7 +755,7 @@ export class StoreManagement {
         const purchases: Purchase[] = [];
 
         for (const bagItem of bagItems) {
-            const items: IItem[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
+            const items: IItem[] = await store.getItemsFromStock(bagItem.product, bagItem.amount)
             for (const item of items) {
                 const outputItem: IItem = {catalogNumber: item.catalogNumber, id: item.id}
                 purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice / bagItem.amount})
@@ -1048,16 +1061,12 @@ export class StoreManagement {
     }
 
 
-
-
     //region TO BE DELETED
 
     // async verifyStoreManager(storeName: string, user: RegisteredUser): Promise<boolean> {
     //     const store: Store = await this.findStoreByName(storeName);
     //     return store ? store.verifyIsStoreManager(user.name) : false;
     // }
-
-
 
 
     // async removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {

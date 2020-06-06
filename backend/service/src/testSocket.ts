@@ -290,12 +290,12 @@ export async function t2() {
             payment: {
                 cardDetails: {
                     holderName: "tal",
-                    number: "152",
+                    number: "12345678",
                     expYear: "21",
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
-            }
+            },total: 100
         }, token: token
     }
     await createStore(storeName, token);
@@ -308,14 +308,10 @@ export async function t2() {
         token: token
     }
     const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
-    console.log(`saveProductToCart ${res}`);
-    const saveToCart = res;
 
     const viewRes = await ServiceFacade.viewCart({body: {}, token})
-    console.log(viewRes.data.cart.products)
     const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
     const resPurchase = await ServiceFacade.purchase(purchaseReq);
-    console.log(resPurchase)
 
     // region old tests
 
@@ -332,10 +328,6 @@ export async function t2() {
     // const searchRes = await ServiceFacade.search(searchReq)
     // console.log(`search res: ${JSON.stringify(searchRes)}`)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 5ac9d11641375fc340518d7591e9523e6b55edfb
     // const getAllPReq = {
     //     body: {
     //     storeName: "Max Stock"

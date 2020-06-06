@@ -449,27 +449,28 @@ export class TradingSystemManager {
     }
 
     async notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string): Promise<void> {
-        logger.info(`notifying store owners about new purchase`)
-        // tslint:disable-next-line:forin
-        for (const storeName in storeNames) {
-            const notification: Event.Notification = {
-                message: formatString(notificationMsg.M_NEW_PURCHASE,
-                    [storeName, buyer]), type: NotificationsType.GREEN
-            };
-            const store: Store = await this._storeManager.findStoreByName(storeName);
-            store.storeOwners.forEach(storeOwner => {
-                const event: Event.NewPurchaseEvent = {
-                    username: storeOwner.name,
-                    code: EventCode.NEW_PURCHASE,
-                    storeName,
-                    notification
-                };
-                this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
-                    const u = await this._userManager.getUserByName(userToNotify)
-                    u.saveNotification(event);
-                });
-            });
-        }
+        // TODO
+        // logger.info(`notifying store owners about new purchase`)
+        // // tslint:disable-next-line:forin
+        // for (const storeName in storeNames) {
+        //     const notification: Event.Notification = {
+        //         message: formatString(notificationMsg.M_NEW_PURCHASE,
+        //             [storeName, buyer]), type: NotificationsType.GREEN
+        //     };
+        //     const store: Store = await this._storeManager.findStoreByName(storeName);
+        //     store.storeOwners.forEach(storeOwner => {
+        //         const event: Event.NewPurchaseEvent = {
+        //             username: storeOwner.name,
+        //             code: EventCode.NEW_PURCHASE,
+        //             storeName,
+        //             notification
+        //         };
+        //         this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
+        //             const u = await this._userManager.getUserByName(userToNotify)
+        //             u.saveNotification(event);
+        //         });
+        //     });
+        // }
     }
 
     async verifyNewStore(req: Req.VerifyStoreName): Promise<Res.BoolResponse> {
