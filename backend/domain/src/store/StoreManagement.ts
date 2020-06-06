@@ -572,15 +572,20 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
-    async findStoreByName(storeName: string): Promise<Store> {
+
+//     var populateQuery = [{path:'books'}, {path:'movie''}];
+//
+//     Person.find({})
+// .populate(populateQuery)
+// .execPopulate()
+//
+
+    async findStoreByName(storeName: string,populateWith  = ["products","storeOwners","storeManagers","receipts","firstOwner"]): Promise<Store> {
         try {
             logger.debug(`trying to find store ${storeName} in DB`)
+            var populateQuery = populateWith.map(field=>{path:field});
             const s = await StoreModel.findOne({storeName})
-                .populate('products')
-                .populate('storeOwners')
-                .populate('storeManagers')
-                .populate('receipts')
-                .populate('firstOwner')
+                .populate(populateQuery)
             const store: Store = StoreMapper.storeMapperFromDB(s);
             return store;
         } catch (e) {
@@ -590,14 +595,12 @@ export class StoreManagement {
         return undefined;
     }
 
-    async findStoreModelByName(storeName: string): Promise<any> {
+    async findStoreModelByName(storeName: string,populateWith  = ["storeOwners","storeManagers","receipts","firstOwner"]): Promise<any> {
         try {
             logger.info(`trying to find store ${storeName} in DB`)
+            var populateQuery = populateWith.map(field=>{path:field});
             const s = await StoreModel.findOne({storeName}).populate('products')
-                .populate('storeOwners')
-                .populate('storeManagers')
-                .populate('receipts')
-                .populate('firstOwner')
+                .populate(populateQuery);
             return s;
         } catch (e) {
             logger.warn(`Store ${storeName} not found`)
@@ -889,6 +892,7 @@ export class StoreManagement {
     async getAllProductsInStore(storeName: string): Promise<Res.GetAllProductsInStoreResponse> {
         const productInStore: ProductInStore[] = [];
         const store: Store = this._storeByStoreName.get(storeName);
+
         if (!store)
             return {data: {products: []}};
 

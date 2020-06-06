@@ -281,10 +281,19 @@ export async function t2() {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
         token: token
     }
-    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
-    const saveToCart = res;
-    const res2 = await ServiceFacade.viewStoreInfo({body:{storeName:"Max Stock" },token} );
-    const x =res2;
+
+
+    const getAllPReq = {
+        body: {
+        storeName: "Max Stock"
+        },
+        token: token
+    };
+
+
+    const res = await ServiceFacade.getAllProductsInStore(getAllPReq);
+    const debug = res;
+
     //
     // interface ProductInfoRequest extends Request {
     //     body: {
