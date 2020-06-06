@@ -100,6 +100,15 @@ export const assignStoreManager = async (storeName: string, usernameToAssign: st
     await ServiceFacade.assignStoreManager({body: { storeName, usernameToAssign }, token});
 }
 
+export const removeStoreManager = async (storeName: string, usernameToRemove: string, token: string): Promise<void> => {
+    await ServiceFacade.removeStoreManager({body: { storeName, usernameToRemove }, token});
+}
+
+export const removeStoreOwner = async (storeName: string, usernameToRemove: string, token: string): Promise<void> => {
+    await ServiceFacade.removeStoreOwner({body: { storeName, usernameToRemove }, token});
+}
+
+
 /** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export async function t1() {
     await systemInit();
@@ -271,8 +280,11 @@ export async function t2() {
     await registerUser(buyer2.name, buyer2.password, token, false);
     await loginUser(storeOwnerName, storeOwnerPassword, token, false);
 
-    // await assignStoreOwner(storeName, buyer1.name, token);
-    await assignStoreManager(storeName, buyer1.name, token);
+    await assignStoreOwner(storeName, buyer1.name, token);
+    await removeStoreOwner(storeName, buyer2.name, token);
+
+    // await assignStoreManager(storeName, buyer2.name, token);
+    // await removeStoreManager(storeName, buyer2.name, token);
 
 
     let stringToPrint: string[] = [];

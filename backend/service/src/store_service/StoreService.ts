@@ -6,7 +6,7 @@ import {ManagerNamePermission} from "se-workshop-20-interfaces/dist/src/CommonIn
 export const createStore = async (req: Req.OpenStoreRequest
 ): Promise<Res.BoolResponse> => {
     const verifyStoreReq: Req.VerifyStoreName = {body: {storeName: req.body.storeName}, token: req.token}
-    const verifyStoreRes: Res.BoolResponse = ts.verifyNewStore(verifyStoreReq);
+    const verifyStoreRes: Res.BoolResponse = await ts.verifyNewStore(verifyStoreReq);
     if (!verifyStoreRes.data.result)
         return verifyStoreRes
     return ts.createStore(req);

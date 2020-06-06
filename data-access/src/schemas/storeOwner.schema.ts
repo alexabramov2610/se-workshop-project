@@ -8,12 +8,12 @@ const storeOwnerSchema = new Schema({
             required: true,
         },
         managersAssigned: {
-            type: [storeManagerSchema],
+            type: [{type: Schema.Types.Mixed, ref: 'storeManagers'}],
             required: true,
             default: []
         },
         ownersAssigned: {
-            type: [{type: Types.ObjectId, ref: 'storeOwners'}],
+            type: [{type: Schema.Types.Mixed, ref: 'storeOwners'}],
             required: true,
             default: []
         },
