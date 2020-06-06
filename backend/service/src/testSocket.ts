@@ -227,18 +227,23 @@ export async function t2() {
   //  storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
    // store = new Store(storeName, storeDesc);
  //   storeOwner = new StoreOwner(storeOwnerName);
+    const buyerPw: string = "buyerpw";
+    const buyer1: RegisteredUser = new RegisteredUser("buyer1", buyerPw);
+    const buyer2: RegisteredUser = new RegisteredUser("buyer2", buyerPw);
+    const buyer3: RegisteredUser = new RegisteredUser("buyer3", buyerPw);
+    const buyer4: RegisteredUser = new RegisteredUser("buyer4", buyerPw);
+    const buyer5: RegisteredUser = new RegisteredUser("buyer5", buyerPw);
+    const buyer6: RegisteredUser = new RegisteredUser("buyer6", buyerPw);
+    const buyer7: RegisteredUser = new RegisteredUser("buyer7", buyerPw);
+    const buyer8: RegisteredUser = new RegisteredUser("buyer8", buyerPw);
+    const buyer9: RegisteredUser = new RegisteredUser("buyer9", buyerPw);
+    const buyer10: RegisteredUser = new RegisteredUser("buyer10", buyerPw);
+    const buyer11: RegisteredUser = new RegisteredUser("buyer11", buyerPw);
+    const buyer12: RegisteredUser = new RegisteredUser("buyer12", buyerPw);
+    const buyer13: RegisteredUser = new RegisteredUser("buyer13", buyerPw);
+    const buyer14: RegisteredUser = new RegisteredUser("buyer14", buyerPw);
 
-    const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
-    const buyer3: RegisteredUser = new RegisteredUser("buyer3", "buyer2password");
-    const buyer4: RegisteredUser = new RegisteredUser("buyer4", "buyer2password");
-    const buyer5: RegisteredUser = new RegisteredUser("buyer5", "buyer2password");
-    const buyer6: RegisteredUser = new RegisteredUser("buyer6", "buyer2password");
-    const buyer7: RegisteredUser = new RegisteredUser("buyer7", "buyer2password");
-    const buyer8: RegisteredUser = new RegisteredUser("buyer8", "buyer2password");
-    const buyer9: RegisteredUser = new RegisteredUser("buyer9", "buyer2password");
-    const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
-    const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10];
+    const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10, buyer11, buyer12, buyer13, buyer14];
 
     const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
@@ -276,32 +281,33 @@ export async function t2() {
     // await removeItems(storeName, items, token, true);
 
 
-    await registerUser(buyer1.name, buyer1.password, token, true);
-    await registerUser(buyer2.name, buyer2.password, token, false);
-    await registerUser(buyer3.name, buyer3.password, token, false);
-    await registerUser(buyer4.name, buyer4.password, token, false);
-    await registerUser(buyer5.name, buyer5.password, token, false);
-    await registerUser(buyer6.name, buyer6.password, token, false);
-    await registerUser(buyer7.name, buyer7.password, token, false);
-    await registerUser(buyer8.name, buyer8.password, token, false);
+    await registerUser(buyer1.name, buyerPw, token, true);
+    for (let i = 1; i < users.length; i++)
+        await registerUser(users[i].name, buyerPw, token, false);
 
     await loginUser(storeOwnerName, storeOwnerPassword, token, false);
     await assignStoreOwner(storeName, buyer1.name, token);
     await assignStoreOwner(storeName, buyer2.name, token);
+    await assignStoreManager(storeName, buyer13.name, token);
 
     await loginUser(buyer1.name, buyer1.password, token, true);
     await assignStoreOwner(storeName, buyer3.name, token);
     await assignStoreOwner(storeName, buyer4.name, token);
+    await assignStoreManager(storeName, buyer9.name, token);
 
     await loginUser(buyer3.name, buyer3.password, token, true);
     await assignStoreOwner(storeName, buyer5.name, token);
+    await assignStoreManager(storeName, buyer10.name, token);
 
     await loginUser(buyer5.name, buyer5.password, token, true);
     await assignStoreOwner(storeName, buyer6.name, token);
     await assignStoreOwner(storeName, buyer7.name, token);
+    await assignStoreManager(storeName, buyer11.name, token);
+    await assignStoreManager(storeName, buyer12.name, token);
 
     await loginUser(buyer2.name, buyer2.password, token, true);
     await assignStoreOwner(storeName, buyer8.name, token);
+    await assignStoreManager(storeName, buyer14.name, token);
 
     await loginUser(storeOwnerName, storeOwnerPassword, token, true);
     await removeStoreOwner(storeName, buyer1.name, token);

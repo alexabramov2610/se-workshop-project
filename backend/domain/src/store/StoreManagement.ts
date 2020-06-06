@@ -329,10 +329,16 @@ export class StoreManagement {
         const ownersToRemove: any[] = this.getStoreOwnersToRemove(userOwnerToRemoveDoc, storeModel);
 
         try {
-            ownersToRemove.forEach(owner => storeModel.storeOwners.pull({_id: owner.id}))
+            ownersToRemove.forEach(owner => {
+                owner.managersAssigned.forEach(manager => storeModel.storeManagers.pull({_id: manager._id.toString()}))
+                storeModel.storeOwners.pull({_id: owner.id})
+            })
             userWhoRemovesDoc.ownersAssigned = userWhoRemovesDoc.ownersAssigned.filter(owner => owner.name !== userToRemove.name);
             storeModel.markModified('storeOwners')
+            storeModel.markModified('storeManagers')
             await StoreOwnerModel.deleteMany({_id: {$in: ownersToRemove.map(owner => owner.id)}});
+            await StoreManagerModel.deleteMany({_id: {$in: ownersToRemove.reduce((acc, currOwner) =>
+                        acc.concat(currOwner.managersAssigned.map(manager => manager._id.toString())), [])}});
             await userWhoRemovesDoc.save();
             await storeModel.save();
             logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
