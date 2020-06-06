@@ -309,6 +309,19 @@ export class TradingSystemManager {
     }
     //endregion
 
+    //region info
+    async viewStoreInfo(req: Req.StoreInfoRequest): Promise<Res.StoreInfoResponse> {
+        logger.info(`retrieving store: ${req.body.storeName} info`);
+        return this._storeManager.viewStoreInfo(req.body.storeName);
+    }
+
+    async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
+        logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
+        return this._storeManager.viewProductInfo(req);
+    }
+
+    //endregion
+
 
 
 
@@ -340,20 +353,12 @@ export class TradingSystemManager {
 
 
 
-    viewStoreInfo(req: Req.StoreInfoRequest): Promise<Res.StoreInfoResponse> {
-        logger.info(`retrieving store: ${req.body.storeName} info`);
-        return this._storeManager.viewStoreInfo(req.body.storeName);
-    }
 
 
 
 
 
 
-    async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
-        logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
-        return this._storeManager.viewProductInfo(req);
-    }
 
 
 

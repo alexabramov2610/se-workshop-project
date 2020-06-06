@@ -636,13 +636,13 @@ export class StoreManagement {
     async findStoreByName(storeName: string,populateWith  = ["products","storeOwners","storeManagers","receipts","firstOwner"]): Promise<Store> {
         try {
             logger.debug(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field=>{path:field});
+            var populateQuery = populateWith.map(field => { return { path: field } });
             const s = await StoreModel.findOne({storeName})
                 .populate(populateQuery)
             const store: Store = StoreMapper.storeMapperFromDB(s);
             return store;
         } catch (e) {
-            logger.warn(`store ${storeName} not found`)
+            logger.error(`findStoreByName DB ERROR: ${e}`);
             return undefined
         }
         return undefined;
@@ -656,7 +656,7 @@ export class StoreManagement {
                 .populate(populateQuery);
             return s;
         } catch (e) {
-            logger.warn(`Store ${storeName} not found`)
+            logger.error(`findStoreModelByName DB ERROR: ${e}`);
             return undefined
         }
         return undefined;
