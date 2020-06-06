@@ -317,6 +317,7 @@ export async function t2() {
     const resPurchase = await ServiceFacade.purchase(purchaseReq);
     console.log(resPurchase)
 
+    // region old tests
 
     // let saveProductToCartReqFix: Req.SaveToCartRequest = {
     //     body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -331,7 +332,10 @@ export async function t2() {
     // const searchRes = await ServiceFacade.search(searchReq)
     // console.log(`search res: ${JSON.stringify(searchRes)}`)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5ac9d11641375fc340518d7591e9523e6b55edfb
     // const getAllPReq = {
     //     body: {
     //     storeName: "Max Stock"
@@ -406,7 +410,7 @@ export async function t2() {
     // await removeStoreManager(storeName, buyer2.name, token);
 
 
-    let stringToPrint: string[] = [];
+    // let stringToPrint: string[] = [];
     //
     // console.log('generating 10 tokens...')
     // for (let i = 0; i < 10; i++) {
@@ -421,6 +425,8 @@ export async function t2() {
     //
     //     // stringToPrint.push(`curl --cacert server.cert -k --header "Content-Type: application/json" "token: ${get}" --request POST --data  '${JSON.stringify(purchaseReq)}'  https://localhost:4000/stores/purchase`)
     // }
+
+    //endregion
 }
 
 /** creates 10 stores */
