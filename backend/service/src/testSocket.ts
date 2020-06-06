@@ -276,9 +276,14 @@ export async function t2() {
     await addNewItems(storeName, items, token, true);
 
     console.log("added products !");
-    // await ServiceFacade.saveProductToCart(saveProductToCartReq);
-
-
+    let saveProductToCartReqFix: Req.SaveToCartRequest = {
+        body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+        token: token
+    }
+    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    const res2 = await ServiceFacade.viewCart({body:{},token} );
+    const saveToCart =res ;
+    const viewCart =res2;
 
 
 
