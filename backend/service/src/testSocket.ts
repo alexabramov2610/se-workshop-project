@@ -283,8 +283,14 @@ export async function t2() {
     }
     const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
     const saveToCart = res;
+
+    const viewRes = await ServiceFacade.viewCart({body:{},token})
+    console.log(viewRes.data.cart.products)
     const res2 = await ServiceFacade.viewStoreInfo({body:{storeName:"Max Stock" },token} );
-    const x =res2;
+    const x =res2
+    const resPurchase = await ServiceFacade.purchase(purchaseReq);
+    console.log(resPurchase)
+
     //
     // interface ProductInfoRequest extends Request {
     //     body: {

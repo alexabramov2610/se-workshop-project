@@ -10,7 +10,6 @@ import {
     IReceipt,
     ProductCatalogNumber,
     ProductInStore,
-    ProductWithQuantity,
     Purchase,
     SearchFilters,
     SearchQuery,
@@ -20,7 +19,7 @@ import {
     IPurchasePolicy,
     StoreInfo,
     IPurchasePolicyElement,
-    ISimplePurchasePolicy, ManagerNamePermission
+    ISimplePurchasePolicy
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";

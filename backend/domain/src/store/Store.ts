@@ -587,6 +587,8 @@ export class Store {
     }
 
     verifyStorePolicy(user: RegisteredUser, bagItems: BagItem[]): boolean {
-        return this.purchasePolicy.isSatisfied(bagItems, user);
+        return true;
+        // TODO when pruchase policy is valid
+        // return this.purchasePolicy.isSatisfied(bagItems, user);
     }
 }

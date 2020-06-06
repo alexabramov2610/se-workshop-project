@@ -31,7 +31,7 @@ export class UserManager {
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         const userName = req.body.username;
         const password = req.body.password;
-        const hashed = this._externalSystems.securitySystem.encryptPassword(password);
+        const hashed = await this._externalSystems.securitySystem.encryptPassword(password);
         try {
             await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
             logger.debug(`${userName} has registered to the system `);
