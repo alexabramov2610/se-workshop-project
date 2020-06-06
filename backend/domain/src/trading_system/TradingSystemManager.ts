@@ -59,13 +59,10 @@ export class TradingSystemManager {
     // region basic ops
     async startNewSession(): Promise<string> {
         logger.info(`starting new session...`);
-        const newID: string = uuid();
-        /*
-        while (await this._userManager.getUserByToken(newID)) {
+        let newID: string = uuid();
+        while (this._userManager.isTokenTaken(newID)) {
             newID = uuid();
         }
-
-         */
         this._userManager.addGuestToken(newID);
         logger.info(`Generated new token!...`);
         return newID;
@@ -86,7 +83,6 @@ export class TradingSystemManager {
         logger.info(`logging in user: ${req.body.username} `);
         const res: Res.BoolResponse = await this._userManager.login(req);
         if (res.data.result) {
-            this._userManager.removeGuest(req.token);
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
             const user: RegisteredUser = await this._userManager.getUserByName(req.body.username)
             if (user.pendingEvents.length > 0)
@@ -105,8 +101,7 @@ export class TradingSystemManager {
         logger.info(`logging out user... `);
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
         const res: Res.BoolResponse = await this._userManager.logout(req);
-        this._userManager.addGuestToken(req.token);
-        if (user) {
+        if (user && res.data.result) {
             logger.info(`removing websocket client... `);
             this._publisher.removeClient(user.name);
             if (user)

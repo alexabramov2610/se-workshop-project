@@ -1,4 +1,3 @@
-import {UserRole} from "../api-int/Enums";
 import {
     IProduct,
     BagItem,
@@ -17,16 +16,13 @@ import * as UserMapper from './UserMapper'
 const logger = loggerW(__filename)
 
 export class UserManager {
-    private registeredUsers: RegisteredUser[];
     private loggedInUsers: Map<string, string>;                  // token -> username
-
     private guests: Map<string, Guest>;
     private admins: Admin[];
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
-        this.registeredUsers = [];
         this.loggedInUsers = new Map();
         this.guests = new Map<string, Guest>();
         this.admins = [];
@@ -58,69 +54,20 @@ export class UserManager {
         }
         try {
             await UserModel.findOne({name: userName}).lean();
-            this.loggedInUsers = this.loggedInUsers.set(req.token, userName)
+            this.loggedInUsers.set(req.token, userName)
+            this.guests.delete(req.token);
             logger.info(`login ${userName} succeed!`);
             return {data: {result: true}};
         } catch (e) {
             logger.warn(`login ${userName} failed!`);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
-
-        /*
-         if (this.isLoggedIn(userName)) { // already logged in
-             logger.warn(`failed to login ${userName}, user is already logged in `);
-             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-         } else if (req.body.asAdmin && !this.isAdmin(user)) {
-             logger.warn(`failed to login ${userName} as Admin- this user doesn't have admin privileges `);
-             return {data: {result: false}, error: {message: errorMsg.E_NA}}
-         } else {
-             logger.info(`${userName} has logged in  `);
-             this.loggedInUsers = this.loggedInUsers.set(req.token, user);
-             this.loggedInRegisteredUsers = this.loggedInRegisteredUsers.set(req.body.username, user);
-             user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
-             return {data: {result: true}};
-         }
-         */
-
-
     }
 
-    /*
-        async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
-            const userName = req.body.username;
-            const password = req.body.password;
-            const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-            if (this.getUserByName(userName)) {
-                logger.debug(`fail to register ,${userName} already exist `);
-                return  {data: {result: false}, error: {message: errorMsg.E_BU}}
-            } else {
-                logger.debug(`${userName} has registered to the system `);
-                this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
-                return {data: {result: true}}
-            }
-        }
-
-    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
-        const userName = req.body.username;
-        const user = this.getUserByName(userName)
-        if (this.isLoggedIn(userName)) { // already logged in
-            logger.warn(`failed to login ${userName}, user is already logged in `);
-            return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        } else if (req.body.asAdmin && !this.isAdmin(user)) {
-            logger.warn(`failed to login ${userName} as Admin- this user doesn't have admin privileges `);
-            return {data: {result: false}, error: {message: errorMsg.E_NA}}
-        } else {
-            logger.info(`${userName} has logged in  `);
-            this.loggedInUsers = this.loggedInUsers.set(req.token, user);
-            this.loggedInRegisteredUsers = this.loggedInRegisteredUsers.set(req.body.username, user);
-            user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
-            return {data: {result: true}}
-        }
-    }
-*/
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         this.loggedInUsers.delete(req.token)
+        this.guests.set(req.token, new Guest());
         return {data: {result: true}}
     }
 
@@ -131,12 +78,6 @@ export class UserManager {
     isValidPassword(password: string) {
         return password.length >= 6;
     }
-
-    /*
-        getLoggedInUsers(): RegisteredUser[] {
-            return Array.from(this.loggedInUsers.values());
-        }
-    */
 
     async getUserByName(name: string): Promise<RegisteredUser> {
         try {
@@ -158,6 +99,11 @@ export class UserManager {
     }
 */
 
+    isTokenTaken(token: string): boolean {
+        if (this.guests.get(token) || this.loggedInUsers.get(token))
+            return true;
+        return false;
+    }
 
     async getUserByToken(token: string): Promise<User> {
         const user: string = this.loggedInUsers.get(token)
