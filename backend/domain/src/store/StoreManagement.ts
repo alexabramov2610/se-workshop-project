@@ -651,7 +651,7 @@ export class StoreManagement {
     async findStoreModelByName(storeName: string,populateWith  = ["storeOwners","storeManagers","receipts","firstOwner"]): Promise<any> {
         try {
             logger.info(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field=>{path:field});
+            var populateQuery = populateWith.map(field => { return { path: field } });
             const s = await StoreModel.findOne({storeName}).populate('products')
                 .populate(populateQuery);
             return s;
