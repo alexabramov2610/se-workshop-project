@@ -220,12 +220,11 @@ export class TradingSystemManager {
                 notification: {type: NotificationsType.GREEN, message: msg}
             };
             if (this._publisher.notify(event).length !== 0)
-                usernameToAssign.saveNotification(event);
+                usernameToAssign.saveNotification(event);           //todo: store in db
         }
         return res;
     }
 
-    //todo: fix
     async removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> {
         logger.info(`removing user: ${req.body.usernameToRemove} as an owner in store: ${req.body.storeName} `);
 
@@ -234,17 +233,13 @@ export class TradingSystemManager {
         if (!usernameToRemove)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
 
-        const newTuple: StringTuple[] = [[usernameWhoRemoves.name, usernameToRemove.name]];
-        const owners = await this._storeManager.getStoreOwnersToRemove(usernameToRemove.name, req.body.storeName)
-        const ownersToRemove: StringTuple[] = newTuple.concat(owners);
-
-        const res: Res.BoolResponse = await this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves, ownersToRemove);
+        const res: Res.RemoveStoreOwnerResponse = await this._storeManager.removeStoreOwner(req.body.storeName, usernameToRemove, usernameWhoRemoves);
 
         if (res.data.result) {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
             const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [req.body.storeName]);
 
-            const events: Event.StoreOwnerEvent[] = ownersToRemove.reduce((acc, curr) =>
+            const events: Event.StoreOwnerEvent[] = res.data.owners.reduce((acc, curr) =>
                 acc.concat({
                     username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: req.body.storeName,
                     notification: {type: NotificationsType.GREEN, message: msg}
@@ -253,12 +248,12 @@ export class TradingSystemManager {
             for (const event of events) {
                 if (this._publisher.notify(event).length !== 0) {
                     const u = await this._userManager.getUserByName(event.username)
-                    u.saveNotification(event);
+                    u.saveNotification(event);      //todo: store in db
                 }
                 this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
             }
         }
-        return res;
+        return { data: { result: res.data.result }, error: { message: res.error.message ? res.error.message : "" } };
     }
 
     async assignStoreManager(req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> {

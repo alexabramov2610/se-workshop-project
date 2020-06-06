@@ -155,7 +155,12 @@ interface GetItemsIdsResponse extends Response {
   data: {result: boolean, items: number[]}
 }
 
+interface RemoveStoreOwnerResponse extends Response {
+  data: {result: boolean, owners: string[]}
+}
+
 export {
+  RemoveStoreOwnerResponse,
   GetItemsIdsResponse,
   GetOwnersAssignedByResponse,
   GetAllManagersPermissionsResponse,

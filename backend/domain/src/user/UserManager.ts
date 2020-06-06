@@ -71,14 +71,6 @@ export class UserManager {
         return {data: {result: true}}
     }
 
-    verifyPassword(userName: string, password: string, hashed: string): boolean {
-        return this._externalSystems.securitySystem.comparePassword(password, hashed);
-    }
-
-    isValidPassword(password: string) {
-        return password.length >= 6;
-    }
-
     async getUserByName(name: string): Promise<RegisteredUser> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
@@ -92,12 +84,6 @@ export class UserManager {
             return undefined
         }
     }
-
-    /*
-    getUserByName(name: string): RegisteredUser {
-        return this.registeredUsers.filter((u) => u.name === name).pop();
-    }
-*/
 
     isTokenTaken(token: string): boolean {
         if (this.guests.get(token) || this.loggedInUsers.get(token))
@@ -114,13 +100,6 @@ export class UserManager {
             return this.guests.get(token);
         }
     }
-
-    //
-    // getUserByToken(token: string): User {
-    //     const user: User = this.loggedInUsers.get(token);
-    //     return user ? user :
-    //         this.guests.get(token);
-    // }
 
     getLoggedInUserByToken(token: string): Promise<RegisteredUser> {
         const username = this.loggedInUsers.get(token)
@@ -156,15 +135,6 @@ export class UserManager {
         return Array.from(this.loggedInUsers.values()).some((name) => name === userToCheck);
     }
 
-    /*
-    isLoggedIn(userToCheck: string): boolean {
-        for (const user of this.loggedInUsers.values()) {
-            if (userToCheck === user.name)
-                return true;
-        }
-        return false;
-    }
-*/
     async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = await this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
@@ -181,12 +151,13 @@ export class UserManager {
         return {data: {result: true}};
     }
 
-    addGuestToken(token: string): void {
-        this.guests.set(token, new Guest());
+    private async getAdminByToken(token: string): Promise<Admin> {
+        const user: RegisteredUser = await this.getLoggedInUserByToken(token);
+        return !user ? user : this.admins.find((a) => user.name === a.name)
     }
 
-    removeGuest(token: string): void {
-        this.guests.delete(token);
+    addGuestToken(token: string): void {
+        this.guests.set(token, new Guest());
     }
 
     isGuest(token: string): boolean {
@@ -263,8 +234,13 @@ export class UserManager {
             const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
             return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
         } catch (e) {
+            logger.error(`verifyCredentials DB ERROR: ${e}`);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
         }
+    }
+
+    verifyPassword(userName: string, password: string, hashed: string): boolean {
+        return this._externalSystems.securitySystem.comparePassword(password, hashed);
     }
 
     isValidUserName(username: string): boolean {
@@ -281,13 +257,12 @@ export class UserManager {
         return {data: {result: true}}
     }
 
-    verifyToken(token: string): Res.BoolResponse {
-        return {data: {result: this.guests.has(token) || this.loggedInUsers.has(token)}};
+    isValidPassword(password: string) {
+        return password.length >= 6;
     }
 
-    private async getAdminByToken(token: string): Promise<Admin> {
-        const user: RegisteredUser = await this.getLoggedInUserByToken(token);
-        return !user ? user : this.admins.find((a) => user.name === a.name)
+    verifyToken(token: string): Res.BoolResponse {
+        return {data: {result: this.guests.has(token) || this.loggedInUsers.has(token)}};
     }
 
     private transferToCartRes(cart: Map<string, BagItem[]>): Cart {

@@ -278,10 +278,33 @@ export async function t2() {
 
     await registerUser(buyer1.name, buyer1.password, token, true);
     await registerUser(buyer2.name, buyer2.password, token, false);
-    await loginUser(storeOwnerName, storeOwnerPassword, token, false);
+    await registerUser(buyer3.name, buyer3.password, token, false);
+    await registerUser(buyer4.name, buyer4.password, token, false);
+    await registerUser(buyer5.name, buyer5.password, token, false);
+    await registerUser(buyer6.name, buyer6.password, token, false);
+    await registerUser(buyer7.name, buyer7.password, token, false);
+    await registerUser(buyer8.name, buyer8.password, token, false);
 
+    await loginUser(storeOwnerName, storeOwnerPassword, token, false);
     await assignStoreOwner(storeName, buyer1.name, token);
-    await removeStoreOwner(storeName, buyer2.name, token);
+    await assignStoreOwner(storeName, buyer2.name, token);
+
+    await loginUser(buyer1.name, buyer1.password, token, true);
+    await assignStoreOwner(storeName, buyer3.name, token);
+    await assignStoreOwner(storeName, buyer4.name, token);
+
+    await loginUser(buyer3.name, buyer3.password, token, true);
+    await assignStoreOwner(storeName, buyer5.name, token);
+
+    await loginUser(buyer5.name, buyer5.password, token, true);
+    await assignStoreOwner(storeName, buyer6.name, token);
+    await assignStoreOwner(storeName, buyer7.name, token);
+
+    await loginUser(buyer2.name, buyer2.password, token, true);
+    await assignStoreOwner(storeName, buyer8.name, token);
+
+    await loginUser(storeOwnerName, storeOwnerPassword, token, true);
+    await removeStoreOwner(storeName, buyer1.name, token);
 
     // await assignStoreManager(storeName, buyer2.name, token);
     // await removeStoreManager(storeName, buyer2.name, token);

@@ -278,6 +278,7 @@ export class StoreManagement {
             userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
             storeModel.storeOwners.push(ownerToAdd);
             storeModel.markModified('storeOwners')
+            await ownerToAdd.save();
             await userWhoAssignsOwner.save();
             await storeModel.save()
             logger.info(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
@@ -288,8 +289,7 @@ export class StoreManagement {
         return {data: {result: true}}
     }
 
-    //todo: fix
-    async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser, ownersToRemove: StringTuple[]): Promise<Res.BoolResponse> {
+    async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.RemoveStoreOwnerResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
@@ -299,7 +299,7 @@ export class StoreManagement {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
         const userWhoRemovesDoc = this.findStoreOwner(storeModel, userWhoRemoves.name);
@@ -307,7 +307,7 @@ export class StoreManagement {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
         const userOwnerToRemoveDoc = this.findStoreOwner(storeModel, userToRemove.name);
@@ -315,7 +315,7 @@ export class StoreManagement {
             error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
+            return {data: {result: false, owners: []}, error: {message: error}};
         }
 
 
@@ -323,47 +323,30 @@ export class StoreManagement {
             error = errorMsg.E_NOT_ASSIGNER + userToRemove.name;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove owner:
                 ${userToRemove.name}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
+            return {data: {result: false, owners: []}, error: {message: error}};
         }
 
-        // todo: fix
-        // const res: Res.BoolResponse = ownersToRemove.reduce((res: Res.BoolResponse, ownersTuple) => {
-        //     if (!res.data.result)
-        //         return res
-        //     const currRemover: StoreOwner = store.getStoreOwner(ownersTuple[0]);
-        //     const currToRemove: StoreOwner = store.getStoreOwner(ownersTuple[1]);
-        //
-        //     currToRemove.assignedStoreManagers.forEach((manager: StoreManager) => {
-        //         store.removeStoreManager(manager);
-        //     })
-        //
-        //     const additionRes: Res.BoolResponse = store.removeStoreOwner(currToRemove);
-        //     if (additionRes.data.result && currRemover)
-        //         currRemover.removeStoreOwner(currToRemove);
-        //     return additionRes;
-        // }, {data: {result: true}});
+        const ownersToRemove: any[] = this.getStoreOwnersToRemove(userOwnerToRemoveDoc, storeModel);
 
-        // return res;
-
-        // temp
-        return {data: {result: true}};
+        try {
+            ownersToRemove.forEach(owner => storeModel.storeOwners.pull({_id: owner.id}))
+            userWhoRemovesDoc.ownersAssigned = userWhoRemovesDoc.ownersAssigned.filter(owner => owner.name !== userToRemove.name);
+            storeModel.markModified('storeOwners')
+            await StoreOwnerModel.deleteMany({_id: {$in: ownersToRemove.map(owner => owner.id)}});
+            await userWhoRemovesDoc.save();
+            await storeModel.save();
+            logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
+        } catch (e) {
+            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            return {data: {result: false, owners: ownersToRemove.map(owner => owner.name) }, error: {message: errorMsg.E_DB}}
+        }
+        return {data: {result: true, owners: ownersToRemove.map(owner => owner.name) } }
     }
 
-    //todo: fix
-    async getStoreOwnersToRemove(toRemove: string, storeName: string): Promise<StringTuple[]> {
-        const store: Store = await this.findStoreByName(storeName);
-        if (!store)
-            return [];
-        const firstOwner: StoreOwner = store.getStoreOwner(toRemove);
-        return this.concatAllStoreOwnersToRemove(firstOwner);
-    }
-
-    private concatAllStoreOwnersToRemove(firstOwner: StoreOwner): StringTuple[] {
-        return firstOwner.assignedStoreOwners.reduce((acc: StringTuple[], currAssigned: StoreOwner) => {
-            return acc
-                .concat([[firstOwner.name, currAssigned.name]])
-                .concat(this.concatAllStoreOwnersToRemove(currAssigned))
-        }, [])
+    getStoreOwnersToRemove(owner, storeModel): any[] {
+        return [owner].concat(owner.ownersAssigned.reduce(
+            (acc, curr) => acc.concat(this.getStoreOwnersToRemove(this.findStoreOwner(storeModel, curr.name), storeModel)) , [])
+        );
     }
 
     private isAssignerOfOwner(userWhoRemoves, username: string): boolean {
