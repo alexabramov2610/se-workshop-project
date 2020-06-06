@@ -310,6 +310,10 @@ export class TradingSystemManager {
     //endregion
 
     //region info
+    viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {
+        return this._userManager.viewCart(req);
+    }
+
     async viewStoreInfo(req: Req.StoreInfoRequest): Promise<Res.StoreInfoResponse> {
         logger.info(`retrieving store: ${req.body.storeName} info`);
         return this._storeManager.viewStoreInfo(req.body.storeName);
@@ -319,9 +323,30 @@ export class TradingSystemManager {
         logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
         return this._storeManager.viewProductInfo(req);
     }
-
     //endregion
 
+    //region needs testing
+
+    //TODO: test after purchase is working
+    async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
+        logger.info(`retrieving purchases history`)
+        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        const userToView: RegisteredUser = (req.body && req.body.userName) ? await this._userManager.getUserByName(req.body.userName) : user;
+        if (!userToView)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
+        if (userToView.name !== user.name && !isAdminReq)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
+        return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
+    }
+
+    //TODO: test after purchase is working
+    async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
+        logger.info(`retrieving receipts from store: ${req.body.storeName}`);
+        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+    }
+    //endregion
 
 
 
@@ -353,18 +378,6 @@ export class TradingSystemManager {
 
 
 
-
-
-
-
-
-
-
-
-
-    viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {
-        return this._userManager.viewCart(req);
-    }
 
 
     async calculateFinalPrices(req: Req.CalcFinalPriceReq): Promise<Res.CartFinalPriceRes> {
@@ -491,24 +504,8 @@ export class TradingSystemManager {
 
 
     // methods that are available for admin also
-    async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
-        logger.info(`retrieving purchases history`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const userToView: RegisteredUser = (req.body && req.body.userName) ? await this._userManager.getUserByName(req.body.userName) : user;
-        if (!userToView)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
-        if (userToView.name !== user.name && !isAdminReq)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
-    }
 
-    async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
-        logger.info(`retrieving receipts from store: ${req.body.storeName}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
 
-    }
 
 
     async setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> {

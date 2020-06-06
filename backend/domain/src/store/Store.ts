@@ -7,7 +7,7 @@ import {
     BagItem, ICondition,
     IDiscount, IDiscountInPolicy, IItem,
     IPayment,
-    IProduct, IPurchasePolicyElement, ISimplePurchasePolicy,
+    IProduct, IPurchasePolicyElement, IReceipt, ISimplePurchasePolicy,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
@@ -45,7 +45,7 @@ export class Store {
     products: Map<IProduct, IItem[]>;
     storeOwners: StoreOwner[];
     storeManagers: StoreManager[];
-    receipts: Receipt[];
+    receipts: IReceipt[];
     firstOwner: StoreOwner;
     purchasePolicy: PurchasePolicy;
     discountPolicy: Discount;

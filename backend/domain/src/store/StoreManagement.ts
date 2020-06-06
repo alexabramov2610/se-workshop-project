@@ -40,6 +40,7 @@ import {productsMapperFromDB} from "./StoreMapper";
 const logger = loggerW(__filename)
 
 export class StoreManagement {
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner"];
     private readonly _stores: Store[];
     private _storeByStoreName: Map<string, Store>;
     private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
@@ -52,6 +53,35 @@ export class StoreManagement {
         this._storeManagerAssigners = new Map();
         this._storeOwnerAssigners = new Map();
         this._storeByStoreName = new Map();
+    }
+
+    async findStoreByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
+        try {
+            logger.debug(`trying to find store ${storeName} in DB`)
+            var populateQuery = populateWith.map(field => { return { path: field } });
+            const s = await StoreModel.findOne({storeName})
+                .populate(populateQuery)
+            const store: Store = StoreMapper.storeMapperFromDB(s);
+            return store;
+        } catch (e) {
+            logger.error(`findStoreByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
+    async findStoreModelByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
+        try {
+            logger.info(`trying to find store ${storeName} in DB`)
+            var populateQuery = populateWith.map(field => { return { path: field } });
+            const s = await StoreModel.findOne({storeName}).populate('products')
+                .populate(populateQuery);
+            return s;
+        } catch (e) {
+            logger.error(`findStoreModelByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
     }
 
     async addStore(storeName: string, description: string, owner: RegisteredUser): Promise<Res.BoolResponse> {
@@ -91,10 +121,10 @@ export class StoreManagement {
         };
     }
 
-    async verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission): Promise<Res.BoolResponse> {
+    async verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission, storeModel?): Promise<Res.BoolResponse> {
         let error: string;
-        const storeModel = await this.findStoreModelByName(storeName); // Document
-        if (!storeModel)
+        const store = storeModel ? storeModel : await this.findStoreModelByName(storeName); // Document
+        if (!store)
             error = errorMsg.E_INVALID_STORE;
        else if (!this.findStoreOwner(storeModel, user.name) && !this.verifyManagerPermission(storeModel.storeManagers, user.name, permission))
            error = errorMsg.E_PERMISSION;
@@ -348,7 +378,7 @@ export class StoreManagement {
         return {data: {result: true, owners: ownersToRemove.map(owner => owner.name) } }
     }
 
-    getStoreOwnersToRemove(owner, storeModel): any[] {
+    private getStoreOwnersToRemove(owner, storeModel): any[] {
         return [owner].concat(owner.ownersAssigned.reduce(
             (acc, curr) => acc.concat(this.getStoreOwnersToRemove(this.findStoreOwner(storeModel, curr.name), storeModel)) , [])
         );
@@ -497,7 +527,7 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!this.verifyPermissions(permissions)) {
+        if (!this.verifyValidPermissions(permissions)) {
             error = errorMsg.E_INVALID_PERM;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
@@ -553,7 +583,7 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!this.verifyPermissions(permissions)) {
+        if (!this.verifyValidPermissions(permissions)) {
             error = errorMsg.E_INVALID_PERM;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${userWhoChanges}. error: ${error}`);
@@ -574,6 +604,10 @@ export class StoreManagement {
         return {data: {result: true}};
     }
 
+    private verifyValidPermissions(permissions: ManagementPermission[]): boolean {
+        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
+    }
+
     async getManagerPermissions(username: string, storeName: string): Promise<Res.ViewManagerPermissionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         if (!storeModel)
@@ -585,6 +619,10 @@ export class StoreManagement {
         if (!isStoreManager)
             return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
         return {data: {result: true, permissions: isStoreManager.managerPermissions}}
+    }
+
+    private getAllPermissions(): ManagementPermission[] {
+        return Object.values(ManagementPermission);
     }
 
     async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
@@ -629,39 +667,6 @@ export class StoreManagement {
         return Array.from(map).reduce((acc, [ key, val ]) => Object.assign(acc, { [key]: val }), {});
     }
 
-
-
-
-
-    async findStoreByName(storeName: string,populateWith  = ["products","storeOwners","storeManagers","receipts","firstOwner"]): Promise<Store> {
-        try {
-            logger.debug(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field => { return { path: field } });
-            const s = await StoreModel.findOne({storeName})
-                .populate(populateQuery)
-            const store: Store = StoreMapper.storeMapperFromDB(s);
-            return store;
-        } catch (e) {
-            logger.error(`findStoreByName DB ERROR: ${e}`);
-            return undefined
-        }
-        return undefined;
-    }
-
-    async findStoreModelByName(storeName: string,populateWith  = ["storeOwners","storeManagers","receipts","firstOwner"]): Promise<any> {
-        try {
-            logger.info(`trying to find store ${storeName} in DB`)
-            var populateQuery = populateWith.map(field => { return { path: field } });
-            const s = await StoreModel.findOne({storeName}).populate('products')
-                .populate(populateQuery);
-            return s;
-        } catch (e) {
-            logger.error(`findStoreModelByName DB ERROR: ${e}`);
-            return undefined
-        }
-        return undefined;
-    }
-
     async viewStoreInfo(storeName: string): Promise<Res.StoreInfoResponse> {
         const store = await this.findStoreModelByName(storeName);
         if (store) {
@@ -677,26 +682,6 @@ export class StoreManagement {
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
-    }
-
-    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse> {
-        // const store: Store = await this.findStoreByName(storeName);
-        // if (!store)
-        //     return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        // if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN))
-        //     return {
-        //         data: {result: false, receipts: []},
-        //         error: {message: errorMsg.E_PERMISSION}
-        //     }
-        // /*
-        // const iReceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
-        //     return {purchases: r.purchases, date: r.date}
-        // })
-        //
-        //  */
-        // const iReceipts: IReceipt[] = [];
-        // return {data: {result: true, receipts: iReceipts}}
-        return {data: {result: true, receipts: []}}
     }
 
     async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
@@ -721,9 +706,31 @@ export class StoreManagement {
         }
     }
 
-    verifyPermissions(permissions: ManagementPermission[]): boolean {
-        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
+    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse> {
+        const storeModel = await this.findStoreModelByName(storeName);
+        if (!storeModel)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
+        const isPermitted: Res.BoolResponse = await this.verifyStoreOperation(storeName, user, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
+        if (!isPermitted.data.result && user.role !== UserRole.ADMIN)
+            return {
+                data: {result: false, receipts: []},
+                error: {message: errorMsg.E_PERMISSION}
+            }
+
+        const iReceipts: IReceipt[] = storeModel.receipts.map(r => {
+            return {purchases: r.purchases, date: r.date}
+        })
+        // const iReceipts: IReceipt[] = [];
+        return {data: {result: true, receipts: iReceipts}}
     }
+
+
+
+
+
+
+
+
 
     async verifyStoreBag(storeName: string, bagItems: BagItem[]): Promise<Res.BoolResponse> {
         const store: Store = await this.findStoreByName(storeName);
@@ -764,9 +771,6 @@ export class StoreManagement {
     }
 
 
-    getAllPermissions(): ManagementPermission[] {
-        return Object.values(ManagementPermission);
-    }
 
     async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
         const store: Store = await this.findStoreByName(storeName);
