@@ -59,13 +59,6 @@ export const removeItems = async (req: Req.ItemsRemovalRequest): Promise<Res.Ite
     return ts.removeItems(req);
 }
 
-// export const removeProductsWithQuantity = async (req: Req.RemoveProductsWithQuantity): Promise<Res.ProductRemovalResponse> => {
-//     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
-//     if (!havePermission.data.result)
-//         return {data: {result: false, productsNotRemoved: req.body.products}, error: havePermission.error}
-//     return ts.removeProductsWithQuantity(req);
-// }
-
 export const addNewProducts = async (req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> => {
     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.MANAGE_INVENTORY, req.token)
     if (!havePermission.data.result)
@@ -93,19 +86,19 @@ export const removeProducts = async (req: Req.ProductRemovalRequest): Promise<Re
     return ts.removeProducts(req);
 }
 
-export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
+export const assignStoreOwner = async (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.assignStoreOwner(req);
 }
 
-export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> => {
+export const removeStoreOwner = async (req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.removeStoreOwner(req);
 }
 
-export const assignStoreManager = (req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> => {
+export const assignStoreManager = async (req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> => {
     return ts.assignStoreManager(req);
 }
 
-export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Promise<Res.BoolResponse> => {
+export const removeStoreManager = async (req: Req.RemoveStoreManagerRequest): Promise<Res.BoolResponse> => {
     return ts.removeStoreManager(req);
 }
 
@@ -116,11 +109,11 @@ export const viewStorePurchasesHistory = async (req: Req.ViewShopPurchasesHistor
     return ts.viewStorePurchasesHistory(req);
 }
 
-export const removeManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
+export const removeManagerPermissions = async (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return ts.removeManagerPermissions(req);
 }
 
-export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
+export const addManagerPermissions = async (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return ts.addManagerPermissions(req);
 }
 export const addMultipleManagersPermissions = async (req: Req.ChangeMultipleManagerPermissionRequest): Promise<Res.BoolResponse> => {
@@ -152,7 +145,10 @@ export const addMultipleManagersPermissions = async (req: Req.ChangeMultipleMana
     return {data: {result: true}}
 }
 
-export const viewManagerPermissions = (req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> => {
+export const viewManagerPermissions = async (req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> => {
+    const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.VIEW_MANAGER_PERMISSION, req.token)
+    if (!havePermission.data.result)
+        return {data: {result: false, permissions: []}, error: havePermission.error}
     return ts.viewManagerPermissions(req);
 }
 
@@ -164,12 +160,12 @@ export const search = (req: Req.SearchRequest): Promise<Res.SearchResponse> => {
     return ts.search(req);
 }
 
-export const viewUsersContactUsMessages = async (req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> => {
-    const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.WATCH_USER_QUESTIONS, req.token)
-    if (!havePermission.data.result)
-        return {data: {result: false, messages: []}, error: havePermission.error}
-    return ts.viewUsersContactUsMessages(req);
-}
+// export const viewUsersContactUsMessages = async (req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> => {
+//     const havePermission: Res.BoolResponse = await verifyPermission(req.body.storeName, ManagementPermission.WATCH_USER_QUESTIONS, req.token)
+//     if (!havePermission.data.result)
+//         return {data: {result: false, messages: []}, error: havePermission.error}
+//     return ts.viewUsersContactUsMessages(req);
+// }
 
 export const setPurchasePolicy = (req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> => {
     return ts.setPurchasePolicy(req);

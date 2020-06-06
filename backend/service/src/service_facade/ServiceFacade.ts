@@ -194,7 +194,6 @@ UC-4.6
 export const addManagerPermissions = (req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addManagerPermissions));
 }
-
 export const addMultipleManagersPermissions = (req: Req.ChangeMultipleManagerPermissionRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.addMultipleManagersPermissions));
 }
@@ -217,9 +216,9 @@ export const removeStoreManager = (req: Req.RemoveStoreManagerRequest): Promise<
 /*
 UC-4.9
  */
-export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> => {
-    return runIfOpen(req, runIfLoggedIn(StoreService.viewUsersContactUsMessages));
-}
+// export const viewUsersContactUsMessages = (req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> => {
+//     return runIfOpen(req, runIfLoggedIn(StoreService.viewUsersContactUsMessages));
+// }
 /*
 UC-4.10
  */

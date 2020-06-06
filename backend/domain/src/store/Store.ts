@@ -102,7 +102,8 @@ export class Store {
         const invalidProducts: IProduct[] = [];
         const validProducts: IProduct[] = [];
 
-        for (const product of products) {
+        for (let product of products) {
+            product.storeName = this.storeName;
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
@@ -356,18 +357,6 @@ export class Store {
         }
         logger.debug(`user: ${userName} is not a manager of store ${this.storeName}`)
         return false;
-    }
-
-    verifyPermission(userName: string, permission: ManagementPermission): boolean { //todo: move to StoreManagement
-        // if (this.verifyIsStoreOwner(userName))
-        //     return true;
-        // if (this.verifyIsStoreManager(userName)) {
-        //     const isAllowed: boolean = this.getStoreManager(userName).isAllowed(permission);
-        //     logger.debug(`User ${userName} permission allowed: ${isAllowed}`);
-        //     return isAllowed;
-        // }
-        // return false;
-        return true;
     }
 
     getProductByCatalogNumber(catalogNumber: number): IProduct {
