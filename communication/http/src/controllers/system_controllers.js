@@ -15,9 +15,6 @@ export async function initFromFile(req,res) {
 }
 
 
-
-
-
 // get
 
 
@@ -28,13 +25,15 @@ export async function isLoggedIn(req, res) {
 }
 
 export async function startNewSession(req,res) {
-    let token;
-    const verifyTokenRes = await ServiceFacade.verifyToken({ token: req.cookies['token'] });
-    if (req.cookies['token'] && req.cookies['token'].length > 0 &&
-        verifyTokenRes.data.result) {
-        token = req.cookies['token']
+    let token = undefined;
+
+    if (req.cookies['token'] && req.cookies['token'].length > 0) {
+        const verifyTokenRes = await ServiceFacade.verifyToken({token: req.cookies['token']});
+        if (verifyTokenRes.data.result) {
+            token = req.cookies['token']
+        }
     }
-    else
+    if(!token)
         token = await wrapHttp(req, ServiceFacade.startNewSession);
 
     res.cookie('token', token, {

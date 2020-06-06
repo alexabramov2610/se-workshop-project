@@ -60,11 +60,11 @@ export class TradingSystemManager {
     async startNewSession(): Promise<string> {
         logger.info(`starting new session...`);
         let newID: string = uuid();
-        while (this._userManager.isTokenTaken(newID)) {
-            newID = uuid();
-        }
+       // while (this._userManager.isTokenTaken(newID)) {
+          //  newID = uuid();
+       // }
         this._userManager.addGuestToken(newID);
-        logger.info(`Generated new token!...`);
+        logger.debug(`Generated new token!... `);
         return newID;
     }
 
@@ -73,7 +73,7 @@ export class TradingSystemManager {
 
         const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
         if (rUser) {
-            logger.debug(`logged in user, can't register `);
+            logger.debug(`logged in user, can't register`);
             return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
         }
         return this._userManager.register(req)
@@ -117,7 +117,7 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = await this._storeManager.addStore(req.body.storeName, req.body.description, user);
         if (res.data.result) {
             this.subscribeNewStoreOwner(user.name, req.body.storeName);
-            logger.info(`successfully created store: ${req.body.storeName}`)
+            logger.debug(`successfully created store: ${req.body.storeName}`)
         }
         return res;
     }
@@ -566,13 +566,11 @@ export class TradingSystemManager {
         if (u) {
             return {data: {result: true}}
         } else {
-            logger.warn(`verify token exists - FAILED`)
             return {
                 data: {result: false},
                 error: {message: errorMsg.E_BAD_TOKEN}
             }
         }
-
     }
 
     verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {
@@ -586,19 +584,19 @@ export class TradingSystemManager {
     }
 
     async verifyStorePermission(req: Req.VerifyStorePermission): Promise<Res.BoolResponse> {
-        logger.info(`verifying store permissions`)
+        logger.debug(`verifying store permissions`)
         const user = await this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
     }
 
     subscribeNewStoreOwner(username: string, storeName: string) {
-        logger.info(`subscribing new store ${username} owner to store ${storeName}`);
+        logger.debug(`subscribing new store ${username} owner to store ${storeName}`);
         this._publisher.subscribe(username, EventCode.STORE_OWNER_EVENTS, storeName, storeName);
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
     }
 
     terminateSocket() {
-        logger.info(`terminating socket`);
+        logger.debug(`terminating socket`);
         this._publisher.terminateSocket();
     }
 

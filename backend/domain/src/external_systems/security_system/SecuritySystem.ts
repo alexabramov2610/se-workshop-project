@@ -11,7 +11,7 @@ export class SecuritySystem {
     }
 
     encryptPassword(password: string) {
-        const hash = bcrypt.hashSync(password, 10);
+        const hash = bcrypt.hashSync(password,1);
         return hash;
     }
 

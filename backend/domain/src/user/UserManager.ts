@@ -34,7 +34,7 @@ export class UserManager {
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
         try {
             await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
-            logger.info(`${userName} has registered to the system `);
+            logger.debug(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
             if (e.errors.name.kind === 'unique') {
