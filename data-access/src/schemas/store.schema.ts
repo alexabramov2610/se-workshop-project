@@ -1,5 +1,6 @@
 import { Schema,Types } from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
+import {Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 
 const storeSchema = new Schema({
         storeName: {
@@ -41,6 +42,7 @@ const storeSchema = new Schema({
         discountPolicy: {
             type: String,
         },
+        rating: {type: Number, enum: Object.values(Rating), default: 3},
 },
     {timestamps: false,}
 );

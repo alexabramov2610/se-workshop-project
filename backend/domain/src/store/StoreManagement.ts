@@ -22,7 +22,7 @@ import {
     IPurchasePolicyElement,
     ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg as Error, errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
@@ -36,6 +36,7 @@ import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 import {ItemModel, ProductModel, StoreManagerModel, StoreModel, StoreOwnerModel} from 'dal'
 import * as StoreMapper from './StoreMapper'
+import {Response, StoreInfoResponse} from "se-workshop-20-interfaces/dist/src/Response";
 
 const logger = loggerW(__filename)
 
@@ -604,11 +605,32 @@ export class StoreManagement {
         }
         return undefined;
     }
+//     interface StoreInfoResponse extends Response {
+//     data: { result: boolean; info?: StoreInfo };
+// }
+//     export interface StoreInfo {
+//     storeName: string; %
+//     description: string; %
+//     storeRating: Rating; %
+//     storeOwnersNames: string[]; %
+//     storeManagersNames: string[]; %
+//     productsNames: string[];
+// }
+
+
 
     async viewStoreInfo(storeName: string): Promise<Res.StoreInfoResponse> {
-        const store = await this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (store) {
-            return store.viewStoreInfo();
+            const storeInfo: StoreInfo =  {
+                storeName: store.storeName,
+                description: store.description,
+                storeRating: store.rating,
+                storeOwnersNames: store.storeOwners.map(o => o.name),
+                storeManagersNames: store.storeOwners.map(o => o.name),
+                productsNames: store.products.map(p=>p.name)
+            }
+            return {data:{ result: true, info: storeInfo }}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }

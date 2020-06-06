@@ -5,6 +5,7 @@ import {Req, Res} from "se-workshop-20-interfaces";
 import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
+import {Request} from "se-workshop-20-interfaces/dist/src/Request";
 
 
 const storeOwnerName: string = "alex";
@@ -282,10 +283,15 @@ export async function t2() {
     }
     const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
     const saveToCart = res;
-    const res2 = await ServiceFacade.viewCart({body:{},token} );
-    const viewCart = res2;
-
-
+    const res2 = await ServiceFacade.viewStoreInfo({body:{storeName:"Max Stock" },token} );
+    const x =res2;
+    //
+    // interface ProductInfoRequest extends Request {
+    //     body: {
+    //         storeName: string;
+    //         catalogNumber: number;
+    //     };
+    // }
 
 
     // await removeProducts(storeName, products, token);
