@@ -5,6 +5,7 @@ import {Req, Res} from "se-workshop-20-interfaces";
 import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
+import {Request} from "se-workshop-20-interfaces/dist/src/Request";
 
 
 const storeOwnerName: string = "alex";
@@ -295,22 +296,47 @@ export async function t2() {
     await addNewItems(storeName, items, token, true);
 
     console.log("added products !");
-    // await ServiceFacade.saveProductToCart(saveProductToCartReq);
-
-
-    const filters: SearchFilters = { priceRange: { min:101, max: 170}, productCategory: ProductCategory.ELECTRONICS };
-    const searchQuery: SearchQuery = { };
-    const searchReq: Req.SearchRequest = { body: { filters, searchQuery }, token }
-
-    const searchRes = await ServiceFacade.search(searchReq)
-    console.log(`search res: ${JSON.stringify(searchRes)}`)
 
 
 
 
 
 
+    // let saveProductToCartReqFix: Req.SaveToCartRequest = {
+    //     body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+    //     token: token
+    // }
 
+
+    // const filters: SearchFilters = { priceRange: { min:101, max: 170}, productCategory: ProductCategory.ELECTRONICS };
+    // const searchQuery: SearchQuery = { };
+    // const searchReq: Req.SearchRequest = { body: { filters, searchQuery }, token }
+    //
+    // const searchRes = await ServiceFacade.search(searchReq)
+    // console.log(`search res: ${JSON.stringify(searchRes)}`)
+
+
+
+
+
+    // const getAllPReq = {
+    //     body: {
+    //     storeName: "Max Stock"
+    //     },
+    //     token: token
+    // };
+
+
+    // const res = await ServiceFacade.getAllProductsInStore(getAllPReq);
+    // const debug = res;
+
+    //
+    // interface ProductInfoRequest extends Request {
+    //     body: {
+    //         storeName: string;
+    //         catalogNumber: number;
+    //     };
+    // }
 
 
     // const permissions: ManagementPermission[] = [ManagementPermission.REPLY_USER_QUESTIONS, ManagementPermission.MANAGE_INVENTORY, ManagementPermission.MODIFY_BUYING_METHODS];

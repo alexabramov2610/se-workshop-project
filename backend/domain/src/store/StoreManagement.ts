@@ -22,7 +22,7 @@ import {
     IPurchasePolicyElement,
     ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg as Error, errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
@@ -634,15 +634,12 @@ export class StoreManagement {
 
 
 
-    async findStoreByName(storeName: string): Promise<Store> {
+    async findStoreByName(storeName: string,populateWith  = ["products","storeOwners","storeManagers","receipts","firstOwner"]): Promise<Store> {
         try {
             logger.debug(`trying to find store ${storeName} in DB`)
+            var populateQuery = populateWith.map(field=>{path:field});
             const s = await StoreModel.findOne({storeName})
-                .populate('products')
-                .populate('storeOwners')
-                .populate('storeManagers')
-                .populate('receipts')
-                .populate('firstOwner')
+                .populate(populateQuery)
             const store: Store = StoreMapper.storeMapperFromDB(s);
             return store;
         } catch (e) {
@@ -652,32 +649,12 @@ export class StoreManagement {
         return undefined;
     }
 
-    async findAllStores(): Promise<any> {
-        try {
-            logger.debug(`retrieving all stores from DB`)
-            const s = await StoreModel.find()
-                .populate('products')
-                .populate('storeOwners')
-                .populate('storeManagers')
-                .populate('receipts')
-                .populate('firstOwner')
-            return s;
-        } catch (e) {
-            logger.error(`findAllStores DB ERROR: ${e}`)
-            return undefined
-        }
-        return undefined;
-    }
-
-    async findStoreModelByName(storeName: string): Promise<any> {
+    async findStoreModelByName(storeName: string,populateWith  = ["storeOwners","storeManagers","receipts","firstOwner"]): Promise<any> {
         try {
             logger.info(`trying to find store ${storeName} in DB`)
-            const s = await StoreModel.findOne({storeName})
-                .populate('products')
-                .populate('storeOwners')
-                .populate('storeManagers')
-                .populate('receipts')
-                .populate('firstOwner')
+            var populateQuery = populateWith.map(field=>{path:field});
+            const s = await StoreModel.findOne({storeName}).populate('products')
+                .populate(populateQuery);
             return s;
         } catch (e) {
             logger.warn(`Store ${storeName} not found`)
@@ -687,9 +664,17 @@ export class StoreManagement {
     }
 
     async viewStoreInfo(storeName: string): Promise<Res.StoreInfoResponse> {
-        const store = await this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (store) {
-            return store.viewStoreInfo();
+            const storeInfo: StoreInfo =  {
+                storeName: store.storeName,
+                description: store.description,
+                storeRating: store.rating,
+                storeOwnersNames: store.storeOwners.map(o => o.name),
+                storeManagersNames: store.storeOwners.map(o => o.name),
+                productsNames: store.products.map(p=>p.name)
+            }
+            return {data:{ result: true, info: storeInfo }}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
@@ -875,6 +860,7 @@ export class StoreManagement {
     async getAllProductsInStore(storeName: string): Promise<Res.GetAllProductsInStoreResponse> {
         const productInStore: ProductInStore[] = [];
         const store: Store = this._storeByStoreName.get(storeName);
+
         if (!store)
             return {data: {products: []}};
 
@@ -1063,22 +1049,6 @@ export class StoreManagement {
     }
 
 
-
-    //region what the fuck?
-    // async viewManagerPermissions(owner: RegisteredUser, manager: RegisteredUser, req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
-    //     const store: Store = await this.findStoreByName(req.body.storeName);
-    //     if (!store)
-    //         return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-    //     const storeOwner: StoreOwner = store.getStoreOwner(owner.name)
-    //     if (!storeOwner && manager.name !== owner.name)
-    //         return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
-    //     const managerToView: StoreManager = store.getStoreManager(manager.name);
-    //     if (!managerToView)
-    //         return {data: {result: false}, error: {message: errorMsg.E_MANGER_NOT_EXISTS}};
-    //     const permissions = managerToView.getPermissions();
-    //     return {data: {result: true, permissions}}
-    // }
-    //endregion
 
 
     //region TO BE DELETED

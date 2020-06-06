@@ -34,7 +34,7 @@ export class UserManager {
         const hashed = this._externalSystems.securitySystem.encryptPassword(password);
         try {
             await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
-            logger.info(`${userName} has registered to the system `);
+            logger.debug(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
             if (e.errors.name.kind === 'unique') {
@@ -166,7 +166,6 @@ export class UserManager {
 
     async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, isGuest: boolean): Promise<boolean> {
         user.saveProductToCart(storeName, product, amount);
-
         if (!isGuest) {
             const rUser = user as RegisteredUser;
             const cart = UserMapper.cartMapperToDB(rUser.cart);
