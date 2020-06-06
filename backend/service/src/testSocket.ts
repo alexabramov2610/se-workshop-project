@@ -276,6 +276,12 @@ export async function t2() {
     await addNewItems(storeName, items, token, true);
 
     console.log("added products !");
+    // await ServiceFacade.saveProductToCart(saveProductToCartReq);
+
+
+
+
+
 
     // await removeProducts(storeName, products, token);
     // await removeItems(storeName, items, token, true);
