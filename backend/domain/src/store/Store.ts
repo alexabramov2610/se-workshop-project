@@ -102,7 +102,8 @@ export class Store {
         const invalidProducts: IProduct[] = [];
         const validProducts: IProduct[] = [];
 
-        for (const product of products) {
+        for (let product of products) {
+            product.storeName = this.storeName;
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
@@ -358,18 +359,6 @@ export class Store {
         return false;
     }
 
-    verifyPermission(userName: string, permission: ManagementPermission): boolean { //todo: move to StoreManagement
-        // if (this.verifyIsStoreOwner(userName))
-        //     return true;
-        // if (this.verifyIsStoreManager(userName)) {
-        //     const isAllowed: boolean = this.getStoreManager(userName).isAllowed(permission);
-        //     logger.debug(`User ${userName} permission allowed: ${isAllowed}`);
-        //     return isAllowed;
-        // }
-        // return false;
-        return true;
-    }
-
     getProductByCatalogNumber(catalogNumber: number): IProduct {
         logger.debug(`searching product with catalog number: ${catalogNumber}`);
         for (const product of this.products.keys()) {
@@ -435,7 +424,7 @@ export class Store {
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-        //TODO implmenet this.discountPolicy on the Store Model
+        // TODO implmenet this.discountPolicy on the Store Model
         // const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
         // logger.info(`Done calculating for store ${this.storeName}`)
 

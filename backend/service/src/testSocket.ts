@@ -1,6 +1,6 @@
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
-import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
-import {IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {IItem, IProduct, ProductCategory, SearchFilters, SearchQuery} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Req, Res} from "se-workshop-20-interfaces";
 import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
@@ -109,6 +109,23 @@ export const removeStoreOwner = async (storeName: string, usernameToRemove: stri
     await ServiceFacade.removeStoreOwner({body: { storeName, usernameToRemove }, token});
 }
 
+export const addPermissions = async (storeName: string, managerToChange: string, permissions: ManagementPermission[], token: string): Promise<void> => {
+    await ServiceFacade.addManagerPermissions({body: { storeName, managerToChange, permissions }, token});
+}
+
+export const removePermissions = async (storeName: string, managerToChange: string, permissions: ManagementPermission[], token: string): Promise<void> => {
+    await ServiceFacade.removeManagerPermissions({body: { storeName, managerToChange, permissions }, token});
+}
+
+export const getManagerPermissions = async (storeName: string, managerToView: string, token): Promise<Res.ViewManagerPermissionResponse> => {
+    const res = await ServiceFacade.getManagerPermissions({ token, body: { storeName, managerToView}});
+    return res;
+}
+
+export const viewManagerPermissions = async (storeName: string, managerToView: string, token): Promise<Res.ViewManagerPermissionResponse> => {
+    const res = await ServiceFacade.viewManagerPermissions({ token, body: { storeName, managerToView}});
+    return res;
+}
 
 /** creates store -> new buyer -> buyer purchases -> store owner gets notification */
 export async function t1() {
@@ -247,8 +264,10 @@ export async function t2() {
     const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10, buyer11, buyer12, buyer13, buyer14];
 
     const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = {name: "name2", catalogNumber: 2, price: 150, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 120, category: ProductCategory.HOME};
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
-    const products: IProduct[] = [prod1];
+    const products: IProduct[] = [prod1, prod2, prod3];
     const items: IItem[] = [item1];
     let saveProductToCartReq: Req.SaveToCartRequest = {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
@@ -291,6 +310,36 @@ export async function t2() {
     const resPurchase = await ServiceFacade.purchase(purchaseReq);
     console.log(resPurchase)
 
+
+
+    // let saveProductToCartReqFix: Req.SaveToCartRequest = {
+    //     body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
+    //     token: token
+    // }
+
+
+    // const filters: SearchFilters = { priceRange: { min:101, max: 170}, productCategory: ProductCategory.ELECTRONICS };
+    // const searchQuery: SearchQuery = { };
+    // const searchReq: Req.SearchRequest = { body: { filters, searchQuery }, token }
+    //
+    // const searchRes = await ServiceFacade.search(searchReq)
+    // console.log(`search res: ${JSON.stringify(searchRes)}`)
+
+
+
+
+
+    // const getAllPReq = {
+    //     body: {
+    //     storeName: "Max Stock"
+    //     },
+    //     token: token
+    // };
+
+
+    // const res = await ServiceFacade.getAllProductsInStore(getAllPReq);
+    // const debug = res;
+
     //
     // interface ProductInfoRequest extends Request {
     //     body: {
@@ -300,6 +349,23 @@ export async function t2() {
     // }
 
 
+    // const permissions: ManagementPermission[] = [ManagementPermission.REPLY_USER_QUESTIONS, ManagementPermission.MANAGE_INVENTORY, ManagementPermission.MODIFY_BUYING_METHODS];
+    // await registerUser(buyer1.name, buyerPw, token, true);
+    // await loginUser(storeOwnerName, storeOwnerPassword, token, false);
+    // await assignStoreManager(storeName, buyer1.name, token);
+    // await addPermissions(storeName, buyer1.name, permissions, token);
+    // await removePermissions(storeName, buyer1.name, [ManagementPermission.REPLY_USER_QUESTIONS, ManagementPermission.MANAGE_INVENTORY], token);
+
+
+
+
+    // let perms = await getManagerPermissions(storeName, buyer1.name, token);
+    // console.log(`OWNER:
+    //     ${JSON.stringify(perms)}`)
+    //
+    // perms = await viewManagerPermissions(storeName, buyer1.name, token);
+    // console.log(`MANAGER:
+    //     ${JSON.stringify(perms)}`)
     // await removeProducts(storeName, products, token);
     // await removeItems(storeName, items, token, true);
 

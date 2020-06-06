@@ -30,6 +30,7 @@ export interface IProduct extends ProductCatalogNumber {
     category: ProductCategory;
     rating?: Rating;
     db_id?: string;
+    storeName?: string;
 }
 
 export interface Cart {
@@ -160,7 +161,6 @@ export interface SearchFilters {
 export interface SearchQuery {
     productName?: string;
     storeName?: string;
-    // tags: Tag[]
 }
 
 export interface IReceipt {
@@ -186,7 +186,7 @@ export interface StoreInfo {
 export interface ProductInStore {
     product: IProduct;
     storeName: string;
-    storeRating: Rating
+    storeRating?: Rating
 }
 
 export interface ManagerNamePermission {

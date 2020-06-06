@@ -8,6 +8,7 @@ const productSchema = new Schema({
     catalogNumber: {type: Number, required: true},
     name: {type: String, required: true},
     price: {type: Number, required: true},
+    storeName: {type: String, required: true},
     category: {
         type: String,
         enum: Object.values(ProductCategory),

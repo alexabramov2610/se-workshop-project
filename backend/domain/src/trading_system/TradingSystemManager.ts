@@ -162,6 +162,11 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         return this._userManager.removeProductFromCart(user, req.body.storeName, product, req.body.amount, rUser);
     }
+
+    async search(req: Req.SearchRequest): Promise<Res.SearchResponse> {
+        logger.info(`searching products`)
+        return this._storeManager.search(req.body.filters, req.body.searchQuery);
+    }
     // endregion
 
     // region manage inventory
@@ -277,6 +282,32 @@ export class TradingSystemManager {
     }
     // endregion
 
+    //region manage permission
+    async addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
+        logger.info(`adding permissions for user: ${req.body.managerToChange}`);
+        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
+    }
+
+    async removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
+        logger.info(`removing permissions for user: ${req.body.managerToChange}`);
+        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        return this._storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
+    }
+
+    async viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
+        logger.info(`viewing manager permissions`);
+        return this._storeManager.getManagerPermissions(req.body.managerToView, req.body.storeName);
+    }
+
+    async getManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
+        logger.info(`viewing manager permissions`);
+        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        if (!user)
+            return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+        return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
+    }
+    //endregion
 
 
 
@@ -314,23 +345,10 @@ export class TradingSystemManager {
         return this._storeManager.viewStoreInfo(req.body.storeName);
     }
 
-    async removeManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
-        logger.info(`removing permissions for user: ${req.body.managerToChange}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.removeManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
-    }
 
-    async addManagerPermissions(req: Req.ChangeManagerPermissionRequest): Promise<Res.BoolResponse> {
-        logger.info(`adding permissions for user: ${req.body.managerToChange}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addManagerPermissions(user, req.body.storeName, req.body.managerToChange, req.body.permissions);
-    }
 
-    async viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> {
-        logger.info(`retrieving store: ${req.body.storeName} contact us messages`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
-    }
+
+
 
     async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
         logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
@@ -343,10 +361,6 @@ export class TradingSystemManager {
         return this._userManager.viewCart(req);
     }
 
-    search(req: Req.SearchRequest): Promise<Res.SearchResponse> {
-        logger.info(`searching products`)
-        return this._storeManager.search(req.body.filters, req.body.searchQuery);
-    }
 
     async calculateFinalPrices(req: Req.CalcFinalPriceReq): Promise<Res.CartFinalPriceRes> {
         logger.info(`calculating final prices of user cart`)
@@ -470,20 +484,6 @@ export class TradingSystemManager {
         return this._userManager.verifyCredentials(req);
     }
 
-    async viewManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
-        logger.info(`viewing manager permissions`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const manager: RegisteredUser = await this._userManager.getUserByName(req.body.managerToView);
-        return this._storeManager.viewManagerPermissions(user, manager, req);
-    }
-
-    async getManagerPermissions(req: Req.ViewManagerPermissionRequest): Promise<Res.ViewManagerPermissionResponse> {
-        logger.info(`viewing manager permissions`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        if (!user)
-            return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
-        return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
-    }
 
     // methods that are available for admin also
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
@@ -700,6 +700,13 @@ export class TradingSystemManager {
     //     const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
     //     return this._storeManager.removeProductsWithQuantity(user, req.body.storeName, req.body.products, false);
     // }
+
+    // async viewUsersContactUsMessages(req: Req.ViewUsersContactUsMessagesRequest): Promise<Res.ViewUsersContactUsMessagesResponse> {
+    //     logger.info(`retrieving store: ${req.body.storeName} contact us messages`);
+    //     const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+    //     return this._storeManager.viewUsersContactUsMessages(user, req.body.storeName);
+    // }
+
 
     //endregion
 }
