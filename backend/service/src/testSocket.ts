@@ -281,36 +281,36 @@ export async function t2() {
     // await removeItems(storeName, items, token, true);
 
 
-    await registerUser(buyer1.name, buyerPw, token, true);
-    for (let i = 1; i < users.length; i++)
-        await registerUser(users[i].name, buyerPw, token, false);
-
-    await loginUser(storeOwnerName, storeOwnerPassword, token, false);
-    await assignStoreOwner(storeName, buyer1.name, token);
-    await assignStoreOwner(storeName, buyer2.name, token);
-    await assignStoreManager(storeName, buyer13.name, token);
-
-    await loginUser(buyer1.name, buyer1.password, token, true);
-    await assignStoreOwner(storeName, buyer3.name, token);
-    await assignStoreOwner(storeName, buyer4.name, token);
-    await assignStoreManager(storeName, buyer9.name, token);
-
-    await loginUser(buyer3.name, buyer3.password, token, true);
-    await assignStoreOwner(storeName, buyer5.name, token);
-    await assignStoreManager(storeName, buyer10.name, token);
-
-    await loginUser(buyer5.name, buyer5.password, token, true);
-    await assignStoreOwner(storeName, buyer6.name, token);
-    await assignStoreOwner(storeName, buyer7.name, token);
-    await assignStoreManager(storeName, buyer11.name, token);
-    await assignStoreManager(storeName, buyer12.name, token);
-
-    await loginUser(buyer2.name, buyer2.password, token, true);
-    await assignStoreOwner(storeName, buyer8.name, token);
-    await assignStoreManager(storeName, buyer14.name, token);
-
-    await loginUser(storeOwnerName, storeOwnerPassword, token, true);
-    await removeStoreOwner(storeName, buyer1.name, token);
+    // await registerUser(buyer1.name, buyerPw, token, true);
+    // for (let i = 1; i < users.length; i++)
+    //     await registerUser(users[i].name, buyerPw, token, false);
+    //
+    // await loginUser(storeOwnerName, storeOwnerPassword, token, false);
+    // await assignStoreOwner(storeName, buyer1.name, token);
+    // await assignStoreOwner(storeName, buyer2.name, token);
+    // await assignStoreManager(storeName, buyer13.name, token);
+    //
+    // await loginUser(buyer1.name, buyer1.password, token, true);
+    // await assignStoreOwner(storeName, buyer3.name, token);
+    // await assignStoreOwner(storeName, buyer4.name, token);
+    // await assignStoreManager(storeName, buyer9.name, token);
+    //
+    // await loginUser(buyer3.name, buyer3.password, token, true);
+    // await assignStoreOwner(storeName, buyer5.name, token);
+    // await assignStoreManager(storeName, buyer10.name, token);
+    //
+    // await loginUser(buyer5.name, buyer5.password, token, true);
+    // await assignStoreOwner(storeName, buyer6.name, token);
+    // await assignStoreOwner(storeName, buyer7.name, token);
+    // await assignStoreManager(storeName, buyer11.name, token);
+    // await assignStoreManager(storeName, buyer12.name, token);
+    //
+    // await loginUser(buyer2.name, buyer2.password, token, true);
+    // await assignStoreOwner(storeName, buyer8.name, token);
+    // await assignStoreManager(storeName, buyer14.name, token);
+    //
+    // await loginUser(storeOwnerName, storeOwnerPassword, token, true);
+    // await removeStoreOwner(storeName, buyer1.name, token);
 
     // await assignStoreManager(storeName, buyer2.name, token);
     // await removeStoreManager(storeName, buyer2.name, token);

@@ -318,7 +318,6 @@ export class StoreManagement {
             return {data: {result: false, owners: []}, error: {message: error}};
         }
 
-
         if (!this.isAssignerOfOwner(userWhoRemovesDoc, userToRemove.name)) {
             error = errorMsg.E_NOT_ASSIGNER + userToRemove.name;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove owner:
@@ -678,6 +677,9 @@ export class StoreManagement {
     }
 
     async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
+        // create query with $query & $filters
+
+
         if (query.storeName && query.storeName.length > 0) {
             const store: Store = await this.findStoreByName(query.storeName);
             if (!store)

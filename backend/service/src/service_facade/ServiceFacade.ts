@@ -59,19 +59,10 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
 
 /*
 UC-2.2
-
-export const registerUser = (req: Req.RegisterRequest): Promise<Res.BoolResponse> => {
-    return UserService.registerUser(req);
-}
- */
-/*
-UC-2.2
  */
 export const registerUser = (req: Req.RegisterRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfHaveToken(UserService.registerUser));
 }
-
-
 /*
 UC-2.3
  */
