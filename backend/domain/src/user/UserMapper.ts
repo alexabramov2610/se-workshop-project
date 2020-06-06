@@ -19,7 +19,7 @@ export function cartMapperToDB(cart: Map<string, BagItem[]>): any {
     const DBcart = new Map();
     for (const [s, b] of cart) {
         DBcart.set(s, b.map((bag) => {
-            return {amount: bag.amount, finalPrice: bag.finalPrice, product: bag.product.db_id}
+            return {amount: bag.amount, finalPrice: bag.product.price, product: bag.product.db_id}
         }))
     }
     return DBcart;

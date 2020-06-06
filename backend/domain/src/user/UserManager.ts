@@ -166,7 +166,6 @@ export class UserManager {
 
     async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, isGuest: boolean): Promise<boolean> {
         user.saveProductToCart(storeName, product, amount);
-
         if (!isGuest) {
             const rUser = user as RegisteredUser;
             const cart = UserMapper.cartMapperToDB(rUser.cart);

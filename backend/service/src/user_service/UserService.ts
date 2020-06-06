@@ -57,13 +57,14 @@ export const getPersonalDetails = (req: Req.Request): Promise<Res.GetPersonalDet
 }
 
 export const viewCart = async (req: Req.ViewCartReq): Promise<Res.ViewCartRes> => {
-    const calcRes: Res.CartFinalPriceRes = await ts.calculateFinalPrices({body: {}, token: req.token});
-    if (!calcRes)
-        return calcRes
+    //TODO - Adfter this.discountPolicy on Store is implemented proeply
+    // const calcRes: Res.CartFinalPriceRes = await ts.calculateFinalPrices({body: {}, token: req.token});
+    // if (!calcRes)
+    //     return calcRes
     const viewCartRes: Res.ViewCartRes  = await ts.viewCart(req);
     if(!viewCartRes)
         return viewCartRes
-    return {data: { result: true, cart: viewCartRes.data.cart, total: calcRes.data.price}};
+    return {data: { result: true, cart: viewCartRes.data.cart, total: -999}};
     return ts.viewCart(req);
 }
 

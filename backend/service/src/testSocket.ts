@@ -281,9 +281,9 @@ export async function t2() {
         token: token
     }
     const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    const saveToCart = res;
     const res2 = await ServiceFacade.viewCart({body:{},token} );
-    const saveToCart =res ;
-    const viewCart =res2;
+    const viewCart = res2;
 
 
 
