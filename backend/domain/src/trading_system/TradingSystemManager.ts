@@ -18,7 +18,6 @@ import {
     IPurchasePolicy, IReceipt,
     Purchase, StoreInfo, IProduct
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Receipt} from "./internal_api";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
@@ -59,7 +58,7 @@ export class TradingSystemManager {
     // region basic ops
     async startNewSession(): Promise<string> {
         logger.info(`starting new session...`);
-        let newID: string = uuid();
+        const newID: string = uuid();
        // while (this._userManager.isTokenTaken(newID)) {
           //  newID = uuid();
        // }
@@ -225,7 +224,7 @@ export class TradingSystemManager {
                 notification: {type: NotificationsType.GREEN, message: msg}
             };
             if (this._publisher.notify(event).length !== 0)
-                usernameToAssign.saveNotification(event);           //todo: store in db
+                usernameToAssign.saveNotification(event);           // todo: store in db
         }
         return res;
     }
@@ -253,7 +252,7 @@ export class TradingSystemManager {
             for (const event of events) {
                 if (this._publisher.notify(event).length !== 0) {
                     const u = await this._userManager.getUserByName(event.username)
-                    u.saveNotification(event);      //todo: store in db
+                    u.saveNotification(event);      // todo: store in db
                 }
                 this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
             }
@@ -327,7 +326,7 @@ export class TradingSystemManager {
 
     //region needs testing
 
-    //TODO: test after purchase is working
+    // TODO: test after purchase is working
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -340,7 +339,7 @@ export class TradingSystemManager {
         return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
     }
 
-    //TODO: test after purchase is working
+    // TODO: test after purchase is working
     async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
         logger.info(`retrieving receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -448,7 +447,8 @@ export class TradingSystemManager {
             const newPurchase = await this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment)
             purchases = purchases.concat(newPurchase)
         }
-        const receipt: Receipt = new Receipt(purchases, req.body.payment);
+        // TODO const receipt: IReceipt = new Receipt(purchases, req.body.payment);
+        const receipt: IReceipt = {date: undefined, purchases: []}
         if (rUser) {
             rUser.addReceipt(receipt)
         }

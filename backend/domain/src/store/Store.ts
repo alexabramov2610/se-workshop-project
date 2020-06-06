@@ -1,4 +1,3 @@
-import { Receipt} from "../trading_system/internal_api";
 import {Res} from 'se-workshop-20-interfaces'
 import {errorMsg as Error} from "../api-int/Error"
 import {loggerW} from "../api-int/internal_api";
@@ -51,7 +50,7 @@ export class Store {
     discountPolicy: Discount;
     rating: Rating;
 
-    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[], storeManagers: StoreManager[], receipts: Receipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
+    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[], storeManagers: StoreManager[], receipts: IReceipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
         this.storeName = storeName;
         this.description = description;
         this.products = products;
@@ -402,7 +401,8 @@ export class Store {
     }
 
     addReceipt(purchases: Purchase[], payment: IPayment): void {
-        this.receipts.push(new Receipt(purchases, payment))
+       // TODO
+        // this.receipts.push(new Receipt(purchases, payment))
     }
 
     getProductFinalPrice(catalogNumber: number): number {
