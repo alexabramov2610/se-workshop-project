@@ -1,6 +1,12 @@
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
-import {IItem, IProduct, ProductCategory, SearchFilters, SearchQuery} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    IItem,
+    IProduct,
+    ProductCategory,
+    SearchFilters,
+    SearchQuery
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Req, Res} from "se-workshop-20-interfaces";
 import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
@@ -94,36 +100,36 @@ export const removeItems = async (storeName: string, items: IItem[], token: stri
 }
 
 export const assignStoreOwner = async (storeName: string, usernameToAssign: string, token: string): Promise<void> => {
-    await ServiceFacade.assignStoreOwner({body: { storeName, usernameToAssign }, token});
+    await ServiceFacade.assignStoreOwner({body: {storeName, usernameToAssign}, token});
 }
 
 export const assignStoreManager = async (storeName: string, usernameToAssign: string, token: string): Promise<void> => {
-    await ServiceFacade.assignStoreManager({body: { storeName, usernameToAssign }, token});
+    await ServiceFacade.assignStoreManager({body: {storeName, usernameToAssign}, token});
 }
 
 export const removeStoreManager = async (storeName: string, usernameToRemove: string, token: string): Promise<void> => {
-    await ServiceFacade.removeStoreManager({body: { storeName, usernameToRemove }, token});
+    await ServiceFacade.removeStoreManager({body: {storeName, usernameToRemove}, token});
 }
 
 export const removeStoreOwner = async (storeName: string, usernameToRemove: string, token: string): Promise<void> => {
-    await ServiceFacade.removeStoreOwner({body: { storeName, usernameToRemove }, token});
+    await ServiceFacade.removeStoreOwner({body: {storeName, usernameToRemove}, token});
 }
 
 export const addPermissions = async (storeName: string, managerToChange: string, permissions: ManagementPermission[], token: string): Promise<void> => {
-    await ServiceFacade.addManagerPermissions({body: { storeName, managerToChange, permissions }, token});
+    await ServiceFacade.addManagerPermissions({body: {storeName, managerToChange, permissions}, token});
 }
 
 export const removePermissions = async (storeName: string, managerToChange: string, permissions: ManagementPermission[], token: string): Promise<void> => {
-    await ServiceFacade.removeManagerPermissions({body: { storeName, managerToChange, permissions }, token});
+    await ServiceFacade.removeManagerPermissions({body: {storeName, managerToChange, permissions}, token});
 }
 
 export const getManagerPermissions = async (storeName: string, managerToView: string, token): Promise<Res.ViewManagerPermissionResponse> => {
-    const res = await ServiceFacade.getManagerPermissions({ token, body: { storeName, managerToView}});
+    const res = await ServiceFacade.getManagerPermissions({token, body: {storeName, managerToView}});
     return res;
 }
 
 export const viewManagerPermissions = async (storeName: string, managerToView: string, token): Promise<Res.ViewManagerPermissionResponse> => {
-    const res = await ServiceFacade.viewManagerPermissions({ token, body: { storeName, managerToView}});
+    const res = await ServiceFacade.viewManagerPermissions({token, body: {storeName, managerToView}});
     return res;
 }
 
@@ -131,8 +137,8 @@ export const viewManagerPermissions = async (storeName: string, managerToView: s
 export async function t1() {
     await systemInit();
 
-   // storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
-   // store = new Store(storeName, storeDesc);
+    // storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+    // store = new Store(storeName, storeDesc);
     //storeOwner = new StoreOwner(storeOwnerName);
 
     token = await initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
@@ -242,9 +248,9 @@ export async function t1() {
 /** creates new store with 1 product and 1 item, and 10 users */
 export async function t2() {
     // prepare
-  //  storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
-   // store = new Store(storeName, storeDesc);
- //   storeOwner = new StoreOwner(storeOwnerName);
+    //  storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+    // store = new Store(storeName, storeDesc);
+    //   storeOwner = new StoreOwner(storeOwnerName);
     const buyerPw: string = "buyerpw";
     const buyer1: RegisteredUser = new RegisteredUser("buyer1", buyerPw);
     const buyer2: RegisteredUser = new RegisteredUser("buyer2", buyerPw);
@@ -273,6 +279,12 @@ export async function t2() {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
         token: token
     }
+
+
+    await systemInit();
+
+    // owner
+    token = await initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
     let purchaseReq: Req.PurchaseRequest = {
         body: {
             payment: {
@@ -286,11 +298,6 @@ export async function t2() {
             }
         }, token: token
     }
-
-    await systemInit();
-
-    // owner
-    token = await initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
     await createStore(storeName, token);
     await addNewProducts(storeName, products, token, true);
     await addNewItems(storeName, items, token, true);
@@ -301,15 +308,14 @@ export async function t2() {
         token: token
     }
     const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    console.log(`saveProductToCart ${res}`);
     const saveToCart = res;
 
-    const viewRes = await ServiceFacade.viewCart({body:{},token})
+    const viewRes = await ServiceFacade.viewCart({body: {}, token})
     console.log(viewRes.data.cart.products)
-    const res2 = await ServiceFacade.viewStoreInfo({body:{storeName:"Max Stock" },token} );
-    const x =res2
+    const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
     const resPurchase = await ServiceFacade.purchase(purchaseReq);
     console.log(resPurchase)
-
 
 
     // let saveProductToCartReqFix: Req.SaveToCartRequest = {
@@ -324,9 +330,6 @@ export async function t2() {
     //
     // const searchRes = await ServiceFacade.search(searchReq)
     // console.log(`search res: ${JSON.stringify(searchRes)}`)
-
-
-
 
 
     // const getAllPReq = {
@@ -355,8 +358,6 @@ export async function t2() {
     // await assignStoreManager(storeName, buyer1.name, token);
     // await addPermissions(storeName, buyer1.name, permissions, token);
     // await removePermissions(storeName, buyer1.name, [ManagementPermission.REPLY_USER_QUESTIONS, ManagementPermission.MANAGE_INVENTORY], token);
-
-
 
 
     // let perms = await getManagerPermissions(storeName, buyer1.name, token);
@@ -448,10 +449,10 @@ export async function t3() {
     const storeName10: string = "store10";
 
 
-    const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL };
-    const prod2: IProduct = {name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS };
-    const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING };
-    const prod4: IProduct = {name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES };
+    const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = {name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
+    const prod4: IProduct = {name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
@@ -563,10 +564,10 @@ export async function t4() {
     const storeName10: string = "store10";
 
 
-    const prod1: IProduct = { name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
-    const prod2: IProduct = { name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
-    const prod3: IProduct = { name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
-    const prod4: IProduct = { name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
+    const prod1: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2: IProduct = {name: "name2", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
+    const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
+    const prod4: IProduct = {name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
