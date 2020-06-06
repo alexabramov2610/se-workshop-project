@@ -3,7 +3,7 @@ import {Req, Res, Enums, CommonInterface, Event} from "se-workshop-20-interfaces
 import * as UserService from '../user_service/UserService';
 import * as StoreService from '../store_service/StoreService';
 import * as BuyingService from '../buying_service/BuyingService';
-// import * as YamlInitializer from './YamlInitializer';
+import * as YamlInitializer from './YamlInitializer';
 
 let tradingSystem = getInstance();
 /*
@@ -52,10 +52,10 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     return {data: {result: true}}
 }
 
-// export const initFromFile = (req: Req.Request): Res.BoolResponse => {
-//     const fn = runIfHaveToken(YamlInitializer.initSystemFromFile);
-//     return fn.call(this, req);
-// }
+export const initFromFile = async (req: Req.Request): Promise<Res.BoolResponse> => {
+    const fn = await runIfHaveToken(YamlInitializer.initSystemFromFile);
+    return fn.call(this, req);
+}
 
 /*
 UC-2.2
