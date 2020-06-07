@@ -11,19 +11,21 @@ import {
     TradingSystemState
 } from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
-import {ExternalSystems, loggerW, StringTuple, UserRole} from "../api-int/internal_api";
+import {ExternalSystems, loggerW, UserRole} from "../api-int/internal_api";
 import {
     BagItem,
     IDiscountPolicy,
-    IPurchasePolicy, IReceipt,
-    Purchase, StoreInfo, IProduct
+    IProduct,
+    IPurchasePolicy,
+    IReceipt,
+    Purchase,
+    StoreInfo
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel} from "dal";
-import * as UserMapper from "../user/UserMapper"
+import {ReceiptModel, UserModel,SystemModel} from "dal";
 
 const logger = loggerW(__filename)
 
@@ -49,11 +51,19 @@ export class TradingSystemManager {
         return res;
     }
 
-    openTradeSystem(req: Req.Request): Res.BoolResponse {
+    async openTradeSystem(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info(`opening trading system...`);
-        this.state = TradingSystemState.OPEN;
-        logger.info(`trading system has been successfully opened`);
-        return {data: {result: true}};
+        try{
+            const ans = await SystemModel.findOneAndUpdate({}, {isSystemUp: true}, {new: true});
+            if(!null){
+                const res =  await SystemModel.create( {isSystemUp: true})
+            }
+            return {data: {result: true}};
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+            return {data: {result: false}};
+        }
     }
 
     //endregion
@@ -355,8 +365,19 @@ export class TradingSystemManager {
     //endregion
 
 
-    getTradeSystemState(): Res.TradingSystemStateResponse {
-        return {data: {state: this.state}};
+   async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
+        try{
+            const ans = await SystemModel.findOne({})
+            if(ans.isSystemUp){
+                return {data: {state: TradingSystemState.OPEN}};
+            }
+        else{
+                return {data: {state: TradingSystemState.CLOSED}};
+            }
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+        }
     }
 
     forceLogout(username: string): void {

@@ -10,12 +10,13 @@ export class RegisteredUser extends User {
     private readonly _pendingEvents: Event[];
     private readonly _receipts: IReceipt[];
 
-    constructor(name?: string, password?: string, pendingEvents?: Event[], receipts?: IReceipt[], cart?: Map<string, BagItem[]>) {
+    constructor(name?: string, password?: string, pendingEvents?: Event[], receipts?: IReceipt[], cart?: Map<string, BagItem[]>, role?: UserRole) {
         super(cart);
         this._name = name;
         this._password = password;
         this._pendingEvents = pendingEvents ? pendingEvents : [];
         this._receipts = receipts ? receipts : [];
+        this._role = role ? role : UserRole.BUYER
     }
 
 
