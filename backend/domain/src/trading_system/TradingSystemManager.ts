@@ -334,7 +334,6 @@ export class TradingSystemManager {
 
     //region needs testing
 
-    // TODO: test after purchase is working
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
         logger.info(`retrieving purchases history`)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -347,7 +346,6 @@ export class TradingSystemManager {
         return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
     }
 
-    // TODO: test after purchase is working
     async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
         logger.info(`retrieving receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -450,6 +448,7 @@ export class TradingSystemManager {
             const newPurchase = await this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment)
             purchases = purchases.concat(newPurchase)
         }
+
         try {
             const receipt = await ReceiptModel.create({
                 date: new Date(),

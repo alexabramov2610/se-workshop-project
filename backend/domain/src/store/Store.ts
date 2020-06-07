@@ -392,7 +392,7 @@ export class Store {
         const itemsRemaining: IItem[] = items.slice(amount, items.length);
         try {
             const res = await ProductModel.updateOne({_id: productInStore.db_id}, {items: itemsRemaining})
-            logger.info(`updated store db`)
+            logger.debug(`updated products db ${res}`)
         } catch (e) {
             logger.error(`DB ERROR ${e}`)
         }

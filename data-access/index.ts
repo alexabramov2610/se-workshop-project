@@ -5,7 +5,7 @@ import BagItemModel from "./src/models/common_models/BagItemModel";
 import ReceiptModel from "./src/models/common_models/ReceiptModel";
 import StoreOwnerModel from "./src/models/user_models/StoreOwnerModel";
 import StoreManagerModel from "./src/models/user_models/StoreManagerModel";
-import ProductModel from "./src/models/common_models/ProductModel";
+import ProductModel from "./src/models/store_models/ProductModel";
 import ItemModel from "./src/models/common_models/ItemModel";
 import EventModel from "./src/models/common_models/EventModel";
 export {UserModel,StoreModel,BagItemModel,ReceiptModel,StoreOwnerModel,StoreManagerModel, ProductModel, ItemModel,EventModel}
