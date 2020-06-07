@@ -25,6 +25,8 @@ import StorePageContainer from "./pages/store-page/store-page-container";
 import { CheckoutPage } from './pages/checkout-page/checkout.component'
 import * as wssClient from "./utils/wss.client";
 import ManageManagersPageContainer from "./pages/manage-managers-page/manage-managers-page-container";
+import AdminViewStoresPurchaseHistoryContainer
+    from "./pages/admin-view-stores-purchase-history-page/admin-view-stores-purchase-history-container";
 
 
 
@@ -104,6 +106,7 @@ class App extends React.Component {
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
+                        <Route exact path="/adminViewStores" component={AdminViewStoresPurchaseHistoryContainer} />
                     </Switch>
                 </Router>
             </CartCtx.Provider>

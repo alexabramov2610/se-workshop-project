@@ -209,16 +209,23 @@ const getProductItems = async (storeName, cn) => {
   const { data } = await instance.get(`${baseDomain}/stores/getItemIds/?storeName=${storeName}&product=${cn}`);
   return data && data.data && data.data.items
 };
+
 const removeItem = async (storeName, catalogNumber, id) => {
   const req = { body: { storeName: storeName, items: [{ catalogNumber, id }] } }
   return instance.post(`${baseDomain}/stores/removeItems`, req);
-}
+};
+
 const removeProduct = async (storeName, catalogNumber) => {
   const req = { body: { storeName: storeName, products: [{ catalogNumber }] } }
   return instance.post(`${baseDomain}/stores/removeProducts`, req);
-}
+};
+
+const viewStorePurchaseHistory = async (storeName) => {
+    return instance.get(`${baseDomain}/stores/viewStorePurchasesHistory/?storeName=${storeName}`);
+};
 
 export {
+  viewStorePurchaseHistory,
   setStoreBuyingPolicy,
   getStoreBuyingPolicy,
   initFromFile,
