@@ -140,7 +140,8 @@ interface GetAllCategoriesResponse extends Response {
 }
 
 interface GetPersonalDetailsResponse extends Response {
-  data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+  // data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+  data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[] }
 }
 
 interface GetAllManagersPermissionsResponse extends Response {

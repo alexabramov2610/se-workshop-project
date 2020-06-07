@@ -252,17 +252,14 @@ export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Pro
 /*
 Additional req from FE
  */
-export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> => {
+export const getStoresWithOffset = async (req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    // return runIfOpen(req, StoreService.getStoresWithOffset);
 }
-export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> => {
+export const getAllProductsInStore = async (req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
-    // return runIfOpen(req, StoreService.getAllProductsInStore);
 }
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Promise<Res.GetCategoriesResponse> => {
+export const getAllCategoriesInStore = async (req: Req.GetAllCategoriesInStoreRequest): Promise<Res.GetCategoriesResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    // return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
 export const isSystemUp = async (): Promise<Res.BoolResponse> => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
@@ -272,23 +269,22 @@ export const isSystemUp = async (): Promise<Res.BoolResponse> => {
 export const verifyToken = async (req: Req.Request): Promise<Res.BoolResponse> => {
     return runIfOpen(req, UserService.verifyToken);
 }
-export const isLoggedInUser = (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
-    return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
-    // return runIfOpen(req, UserService.isLoggedInUser);
+export const isLoggedInUser = async (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
+    return runIfOpen(req, UserService.isLoggedInUser);
 }
-export const getAllCategories = (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
+export const getAllCategories = async (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
 }
-export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetAllManagersPermissionsResponse> => {
+export const getManagersPermissions = async (req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetAllManagersPermissionsResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getManagersPermissions))
 }
-export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Promise<Res.GetOwnersAssignedByResponse> => {
+export const getOwnersAssignedBy = async (req: Req.GetOwnersAssignedByRequest): Promise<Res.GetOwnersAssignedByResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getOwnersAssignedBy))
 }
-export const getPersonalDetails = (req: Req.Request): Promise<Res.GetPersonalDetailsResponse> => {
+export const getPersonalDetails = async (req: Req.Request): Promise<Res.GetPersonalDetailsResponse> => {
     return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
 }
-export const getItemIds = (req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> => {
+export const getItemIds = async (req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getItemIds))
 }
 
