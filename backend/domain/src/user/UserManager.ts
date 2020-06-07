@@ -108,7 +108,10 @@ export class UserManager {
         } else {
             return undefined
         }
+    }
 
+    getLoggedInUsernameByToken(token: string): string {
+        return this.loggedInUsers.get(token)
     }
 
     getGuestByToken(token: string): User {
