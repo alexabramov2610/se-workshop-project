@@ -4,26 +4,15 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {
-    EventCode,
-    NotificationsType,
-    ProductCategory,
-    TradingSystemState
-} from "se-workshop-20-interfaces/dist/src/Enums";
+import {EventCode, NotificationsType, ProductCategory, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
-import {ExternalSystems, loggerW, StringTuple, UserRole} from "../api-int/internal_api";
-import {
-    BagItem,
-    IDiscountPolicy,
-    IPurchasePolicy, IReceipt,
-    Purchase, StoreInfo, IProduct, Cart, CartProduct
-} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {ExternalSystems, loggerW, UserRole} from "../api-int/internal_api";
+import {BagItem, IDiscountPolicy, IPurchasePolicy, Purchase, IProduct, Cart, CartProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
 import {ReceiptModel, UserModel} from "dal";
-import * as UserMapper from "../user/UserMapper"
 
 const logger = loggerW(__filename)
 
@@ -528,7 +517,7 @@ export class TradingSystemManager {
 
     //endregion
 
-
+    //region needs fixing
     forceLogout(username: string): void {
         logger.info(`socket disconnected (user: ${username})`);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);
@@ -685,6 +674,7 @@ export class TradingSystemManager {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
     }
 
+    //endregion
 
     //region to be deleted
 

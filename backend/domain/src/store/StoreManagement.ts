@@ -1,25 +1,9 @@
 import {Store} from './internal_api'
-import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
+import {RegisteredUser, StoreManager} from "../user/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import {
-    BagItem,
-    IDiscount,
-    IItem,
-    IPayment,
-    IProduct,
-    IReceipt,
-    ProductCatalogNumber,
-    ProductInStore,
-    Purchase,
-    SearchFilters,
-    SearchQuery,
-    IDiscountPolicy,
-    IDiscountInPolicy,
-    IConditionOfDiscount,
-    IPurchasePolicy,
-    StoreInfo,
-    IPurchasePolicyElement,
-    ISimplePurchasePolicy, ManagerNamePermission
+import {BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
+    Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
+    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -33,11 +17,10 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ItemModel, ProductModel, ReceiptModel, StoreManagerModel, StoreModel, StoreOwnerModel, UserModel} from 'dal'
+import {ProductModel, ReceiptModel, StoreManagerModel, StoreModel, StoreOwnerModel, UserModel} from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
-
 const logger = loggerW(__filename)
 
 export class StoreManagement {
