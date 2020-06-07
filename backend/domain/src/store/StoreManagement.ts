@@ -112,12 +112,12 @@ export class StoreManagement {
         };
     }
 
-    async verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission, storeModel?): Promise<Res.BoolResponse> {
+    async verifyStoreOperation(storeName: string, username: string, permission: ManagementPermission, storeModel?): Promise<Res.BoolResponse> {
         let error: string;
         const store = storeModel ? storeModel : await this.findStoreModelByName(storeName); // Document
         if (!store)
             error = errorMsg.E_INVALID_STORE;
-        else if (!this.findStoreOwner(storeModel, user.name) && !this.verifyManagerPermission(storeModel.storeManagers, user.name, permission))
+        else if (!this.findStoreOwner(store, username) && !this.verifyManagerPermission(storeModel.storeManagers, username, permission))
             error = errorMsg.E_PERMISSION;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
@@ -709,7 +709,7 @@ export class StoreManagement {
         const storeModel = await this.findStoreModelByName(storeName);
         if (!storeModel)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        const isPermitted: Res.BoolResponse = await this.verifyStoreOperation(storeName, user, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
+        const isPermitted: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
         if (!isPermitted.data.result && user.role !== UserRole.ADMIN)
             return {
                 data: {result: false, receipts: []},

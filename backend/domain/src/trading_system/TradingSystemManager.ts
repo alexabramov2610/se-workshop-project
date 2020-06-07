@@ -412,10 +412,11 @@ export class TradingSystemManager {
         return {data: {username: this._userManager.getLoggedInUsernameByToken(req.token)}}
     }
 
-    async verifyStorePermission(req: Req.VerifyStorePermission): Promise<Res.BoolResponse> {
+    async verifyStorePermission(req: Req.VerifyStorePermission, storeModel?): Promise<Res.BoolResponse> {
         logger.debug(`verifying store permissions`)
-        const user = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.verifyStoreOperation(req.body.storeName, user, req.body.permission)
+        const username = this._userManager.getLoggedInUsernameByToken(req.token)
+        return username ? this._storeManager.verifyStoreOperation(req.body.storeName, username, req.body.permission, storeModel) :
+            { data: { result: false}, error: { message: errorMsg.E_BAD_OPERATION } }
     }
 
     verifyProducts(req: Req.VerifyProducts) {
