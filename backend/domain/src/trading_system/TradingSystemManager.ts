@@ -12,7 +12,7 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel} from "dal";
+import {ReceiptModel, UserModel,SystemModel} from "dal";
 
 const logger = loggerW(__filename)
 
@@ -38,11 +38,19 @@ export class TradingSystemManager {
         return res;
     }
 
-    openTradeSystem(req: Req.Request): Res.BoolResponse {
+    async openTradeSystem(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info(`opening trading system...`);
-        this.state = TradingSystemState.OPEN;
-        logger.info(`trading system has been successfully opened`);
-        return {data: {result: true}};
+        try{
+            const ans = await SystemModel.findOneAndUpdate({}, {isSystemUp: true}, {new: true});
+            if(!null){
+                const res =  await SystemModel.create( {isSystemUp: true})
+            }
+            return {data: {result: true}};
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+            return {data: {result: false}};
+        }
     }
 
     //endregion
@@ -351,10 +359,6 @@ export class TradingSystemManager {
         return this._storeManager.getAllCategoriesInStore(storeName);
     }
 
-    getTradeSystemState(): Res.TradingSystemStateResponse {
-        return {data: {state: this.state}};
-    }
-
     async getAllCategories(): Promise<Res.GetAllCategoriesResponse> {
         return {data: {categories: Object.keys(ProductCategory)}}
     }
@@ -385,7 +389,7 @@ export class TradingSystemManager {
                 }, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}
             };
 
-        let storeNames: string[] = [...user.cart.keys()];
+        const storeNames: string[] = [...user.cart.keys()];
         const usersCart: Cart = { products: storeNames.reduce((acc: CartProduct[], curr: string) =>
                 acc.concat({ storeName: curr, bagItems: user.cart.get(curr) }), []) }
         return {
@@ -516,7 +520,22 @@ export class TradingSystemManager {
 
     //endregion
 
-    //region needs fixing
+
+   async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
+        try{
+            const ans = await SystemModel.findOne({})
+            if(ans.isSystemUp){
+                return {data: {state: TradingSystemState.OPEN}};
+            }
+        else{
+                return {data: {state: TradingSystemState.CLOSED}};
+            }
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+        }
+    }
+
     forceLogout(username: string): void {
         logger.info(`socket disconnected (user: ${username})`);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);

@@ -6,4 +6,5 @@ db.storemanagers.drop()
 db.products.drop()
 db.events.drop()
 db.receipts.drop()
+db.admins.drop()
 EOF

@@ -6,6 +6,7 @@ import * as BuyingService from '../buying_service/BuyingService';
 import * as YamlInitializer from './YamlInitializer';
 
 let tradingSystem = getInstance();
+
 /*
 UC-1.1
  */
@@ -46,7 +47,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     if (connectDeliveryRes.error) return connectDeliveryRes;
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
-    tradingSystem.openTradeSystem({body: {}, token: req.token})
+    await tradingSystem.openTradeSystem({body: {}, token: req.token})
     const logout: Res.BoolResponse = await tradingSystem.logout({body: {}, token: req.token});
     if (!logout.data.result) return logout;
     return {data: {result: true}}
@@ -261,7 +262,9 @@ export const getAllCategoriesInStore = async (req: Req.GetAllCategoriesInStoreRe
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
 }
 export const isSystemUp = async (): Promise<Res.BoolResponse> => {
-    return {data: {result: await tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
+    // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    const res = await tradingSystem.getTradeSystemState()
+    return {data: {result: res.data.state === Enums.TradingSystemState.OPEN}}
 }
 export const verifyToken = async (req: Req.Request): Promise<Res.BoolResponse> => {
     return runIfOpen(req, UserService.verifyToken);
@@ -296,7 +299,8 @@ export const startNewSession = (): Promise<string> => {
 }
 const runIfOpen = async (req: Req.Request, fn: any): Promise<any> => {
     const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.getTradeSystemState().data.state !== Enums.TradingSystemState.OPEN)
+    const res = await tradingSystem.getTradeSystemState()
+    if (res.data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
     const func = await fn
     return func.call(this, req);

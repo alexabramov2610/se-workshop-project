@@ -1,21 +1,17 @@
-import {
-    IProduct,
-    BagItem,
-    Cart,
-    CartProduct
-} from "se-workshop-20-interfaces/src/CommonInterface"
+import {BagItem, Cart, CartProduct, IProduct} from "se-workshop-20-interfaces/src/CommonInterface"
 import {Admin, RegisteredUser} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW} from "../api-int/internal_api";
-import {UserModel} from 'dal'
+import {errorMsg, loggerW, UserRole} from "../api-int/internal_api";
+import {AdminModel, StoreModel, UserModel} from 'dal'
 import * as UserMapper from './UserMapper'
 
 const logger = loggerW(__filename)
 
 export class UserManager {
+    private readonly DEFAULT_USER_POPULATION: string[] = ["receipts","pendingEvents"];
     private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
     private admins: Admin[];
@@ -138,25 +134,58 @@ export class UserManager {
         return Array.from(this.loggedInUsers.values()).some((name) => name === userToCheck);
     }
 
+    async findUserModelByName(name: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
+        try {
+            const populateQuery = populateWith.map(field => { return { path: field } });
+            const s = await UserModel.findOne({name}).populate(populateQuery);
+            return s;
+        } catch (e) {
+            logger.error(`findUserModelByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
     async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = await this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const user: RegisteredUser = await this.getUserByName(req.body.newAdminUserName)
+        try{
+        const user: RegisteredUser = await this.findUserModelByName(req.body.newAdminUserName);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const isAdmin: boolean = this.isAdmin(user);
         if (isAdmin)
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        this.admins = this.admins.concat([user]);
+
+        await AdminModel.create({user})
+
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+        }
+
         return {data: {result: true}};
+    }
+
+
+    private async getAdminByName(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const u = await AdminModel.findOne({name}).populate('user')
+            const cart = await UserMapper.cartMapperFromDB(u.cart)
+            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart, UserRole.ADMIN);
+        } catch (e) {
+            logger.warn(`getUserByName DB ERROR: ${e}`)
+            return undefined
+        }
     }
 
     private async getAdminByToken(token: string): Promise<Admin> {
         const user: RegisteredUser = await this.getLoggedInUserByToken(token);
-        return !user ? user : this.admins.find((a) => user.name === a.name)
+        return !user ? user : this.getAdminByName(user.name)
     }
 
     addGuestToken(token: string): void {
