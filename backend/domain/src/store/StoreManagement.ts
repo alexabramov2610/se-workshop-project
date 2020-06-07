@@ -33,7 +33,7 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ItemModel, ProductModel, StoreManagerModel, StoreModel, StoreOwnerModel} from 'dal'
+import {ItemModel, ProductModel, ReceiptModel, StoreManagerModel, StoreModel, StoreOwnerModel, UserModel} from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
@@ -873,8 +873,21 @@ export class StoreManagement {
                 purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice / bagItem.amount})
             }
         }
+        try {
+            const receipt = await ReceiptModel.create({
+                date: new Date(),
+                lastCC4: payment.lastCC4,
+                totalCharged: payment.totalCharged,
+                purchases
+            });
+            store.addReceipt(receipt);
+            await StoreModel.updateOne({storeName: store.storeName}, {receipt: store.receipts})
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`);
+            return [];
+        }
 
-        store.addReceipt(purchases, payment)
         return purchases
     }
 

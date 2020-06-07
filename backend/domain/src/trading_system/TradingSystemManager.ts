@@ -22,6 +22,8 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
+import {ReceiptModel, UserModel} from "dal";
+import * as UserMapper from "../user/UserMapper"
 
 const logger = loggerW(__filename)
 
@@ -53,15 +55,16 @@ export class TradingSystemManager {
         logger.info(`trading system has been successfully opened`);
         return {data: {result: true}};
     }
+
     //endregion
 
     // region basic ops
     async startNewSession(): Promise<string> {
         logger.info(`starting new session...`);
         const newID: string = uuid();
-       // while (this._userManager.isTokenTaken(newID)) {
-          //  newID = uuid();
-       // }
+        // while (this._userManager.isTokenTaken(newID)) {
+        //  newID = uuid();
+        // }
         this._userManager.addGuestToken(newID);
         logger.debug(`Generated new token!... `);
         return newID;
@@ -178,6 +181,7 @@ export class TradingSystemManager {
         logger.info(`searching products`)
         return this._storeManager.search(req.body.filters, req.body.searchQuery);
     }
+
     // endregion
 
     // region manage inventory
@@ -216,6 +220,7 @@ export class TradingSystemManager {
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.removeProducts(user, req.body.storeName, req.body.products);
     }
+
     // endregion
 
     //region manage managers & owners
@@ -269,7 +274,7 @@ export class TradingSystemManager {
                 this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
             }
         }
-        return { data: { result: res.data.result }, error: { message: res.error.message ? res.error.message : "" } };
+        return {data: {result: res.data.result}, error: {message: res.error.message ? res.error.message : ""}};
     }
 
     async assignStoreManager(req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> {
@@ -291,6 +296,7 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         return this._storeManager.removeStoreManager(req.body.storeName, usernameToRemove, usernameWhoRemoves);
     }
+
     // endregion
 
     //region manage permission
@@ -318,6 +324,7 @@ export class TradingSystemManager {
             return {data: {result: false, permissions: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         return this._storeManager.getManagerPermissions(user.name, req.body.storeName);
     }
+
     //endregion
 
     //region info
@@ -334,6 +341,7 @@ export class TradingSystemManager {
         logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
         return this._storeManager.viewProductInfo(req);
     }
+
 
     async getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> {
         logger.info(`getting stores by offset`);
@@ -517,8 +525,8 @@ export class TradingSystemManager {
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
     }
-    //endregion
 
+    //endregion
 
 
     forceLogout(username: string): void {
@@ -608,18 +616,34 @@ export class TradingSystemManager {
             const newPurchase = await this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment)
             purchases = purchases.concat(newPurchase)
         }
-        // TODO const receipt: IReceipt = new Receipt(purchases, req.body.payment);
-        const receipt: IReceipt = {date: undefined, purchases: []}
-        if (rUser) {
-            rUser.addReceipt(receipt)
+        try {
+            const receipt = await ReceiptModel.create({
+                date: new Date(),
+                lastCC4: req.body.payment.lastCC4,
+                totalCharged: req.body.payment.totalCharged,
+                purchases
+            });
+            user.resetCart();
+            if (rUser) {
+                rUser.addReceipt(receipt)
+                // const res = await UserModel.updateOne({name: rUser.name}, {cart: UserMapper.cartMapperToDB(rUser.cart), receipts: rUser.receipts});
+                const uModel = await UserModel.findOne({name: rUser.name});
+                uModel.cart.clear();
+                uModel.receipts = rUser.receipts;
+                await uModel.save();
+                logger.debug(`user saved after reset the cart and added receipt `);
+            }
+            logger.info(`purchase request: successfully purchased`)
+            const username: string = rUser ? rUser.name : 'guest';
+            this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
+
+
+            return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
+        } catch (e) {
+            logger.error(`DB ERROR ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
         }
-        user.resetCart();
 
-        logger.info(`purchase request: succesfully purchased`)
-        const username: string = rUser ? rUser.name : 'guest';
-        this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
-
-        return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
     }
 
     async setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> {

@@ -400,9 +400,8 @@ export class Store {
         return itemsToReturn;
     }
 
-    addReceipt(purchases: Purchase[], payment: IPayment): void {
-       // TODO
-        // this.receipts.push(new Receipt(purchases, payment))
+    addReceipt(receipt: IReceipt): void {
+       this.receipts.push(receipt);
     }
 
     getProductFinalPrice(catalogNumber: number): number {
