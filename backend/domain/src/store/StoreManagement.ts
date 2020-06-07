@@ -142,14 +142,14 @@ export class StoreManagement {
         return false;
     }
 
-    async changeProductName(user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Promise<Res.BoolResponse> {
-        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
+    async changeProductName(username: string, catalogNumber: number, storeName: string, newProductName: string): Promise<Res.BoolResponse> {
+        logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
         const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
-        const productToChange = store.products.find((p) => p.catalogNumber === catalogNumber)
+        const productToChange = store.products.find(p => p.catalogNumber === +catalogNumber)
         productToChange.name = newProductName;
         try {
             await productToChange.save()
@@ -161,14 +161,14 @@ export class StoreManagement {
         }
     }
 
-    async changeProductPrice(user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Promise<Res.BoolResponse> {
-        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
+    async changeProductPrice(username: string, catalogNumber: number, storeName: string, newPrice: number): Promise<Res.BoolResponse> {
+        logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
         const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
-        const productToChange = store.products.find((p) => p.catalogNumber === catalogNumber)
+        const productToChange = store.products.find((p) => p.catalogNumber === +catalogNumber)
         productToChange.price = newPrice;
         try {
             await productToChange.save()
@@ -180,7 +180,7 @@ export class StoreManagement {
         }
     }
 
-    async addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsAdditionResponse> {
+    async addItems(username: string, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsAdditionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         const res: Res.ItemsAdditionResponse = store.addItems(itemsReq);
@@ -230,7 +230,7 @@ export class StoreManagement {
         return res;
     }
 
-    async addNewProducts(user: RegisteredUser, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
+    async addNewProducts(username: string, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq);
@@ -249,7 +249,7 @@ export class StoreManagement {
         return res;
     }
 
-    async removeProducts(user: RegisteredUser, storeName: string, productsReq: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
+    async removeProducts(username: string, storeName: string, productsReq: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
         const res: Res.ProductRemovalResponse = store.removeProductsByCatalogNumber(productsReq);
@@ -593,7 +593,7 @@ export class StoreManagement {
 
         try {
             userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(permission =>
-                permissions.find(p => p === permission))
+                permissions.find(p => p === permission) ? true : false)
             storeModel.markModified('storeManagers')
             await userManagerToAddDoc.save();
             await storeModel.save();
@@ -635,7 +635,6 @@ export class StoreManagement {
             productsFound = productsInDomain.map(product => {
                 return {product, storeName: product.storeName}
             })
-            console.log("HEYA")
         } catch (e) {
             logger.error(`search DB ERROR: ${e}`);
         }
@@ -644,7 +643,7 @@ export class StoreManagement {
 
     private createSearchQuery(filters: SearchFilters, query: SearchQuery) {
         const searchQuery: Map<string, any> = new Map();
-        // if (filters.storeRating && filters.storeRating as string !== "")
+        // if (filters.storeRating && filters.storeRating as unknown !== "")
         //     searchQuery.set("rating", +filters.storeRating);
         if (filters.productRating && filters.productRating as unknown !== "")
             searchQuery.set("rating", +filters.productRating);
@@ -656,7 +655,8 @@ export class StoreManagement {
                 priceRange.set("$gte", +filters.priceRange.min);
             if (filters.priceRange.max && filters.priceRange.max as unknown !== "")
                 priceRange.set("$lte", +filters.priceRange.max);
-            searchQuery.set("price", mapToJson(priceRange));
+            if (priceRange.size > 0)
+                searchQuery.set("price", mapToJson(priceRange));
         }
         if (query.productName && query.productName as unknown !== "")
             searchQuery.set("name", query.productName);
@@ -824,7 +824,7 @@ export class StoreManagement {
         const permissions: ManagerNamePermission[] = [];
 
         storeModel.storeManagers.forEach(storeManager => {
-            permissions.push({managerName: storeManager.name, permissions: storeManager.getPermissions()})
+            permissions.push({managerName: storeManager.name, permissions: storeManager.managerPermissions})
         })
         return {data: {result: true, permissions}}
     }

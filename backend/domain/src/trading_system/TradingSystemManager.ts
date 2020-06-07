@@ -176,20 +176,20 @@ export class TradingSystemManager {
     // region manage inventory
     async changeProductName(req: Req.ChangeProductNameRequest): Promise<Res.BoolResponse> {
         logger.info(`changing product ${req.body.catalogNumber} name in store: ${req.body.storeName} to ${req.body.newName}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.changeProductName(user, req.body.catalogNumber, req.body.storeName, req.body.newName);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token)
+        return this._storeManager.changeProductName(username, req.body.catalogNumber, req.body.storeName, req.body.newName);
     }
 
     async changeProductPrice(req: Req.ChangeProductPriceRequest): Promise<Res.BoolResponse> {
         logger.info(`changing product ${req.body.catalogNumber} price in store: ${req.body.storeName} to ${req.body.newPrice}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.changeProductPrice(user, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token)
+        return this._storeManager.changeProductPrice(username, req.body.catalogNumber, req.body.storeName, req.body.newPrice);
     }
 
     async addItems(req: Req.ItemsAdditionRequest): Promise<Res.ItemsAdditionResponse> {
         logger.info(`adding items to store: ${req.body.storeName}`);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addItems(user, req.body.storeName, req.body.items);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token)
+        return this._storeManager.addItems(username, req.body.storeName, req.body.items);
     }
 
     async removeItems(req: Req.ItemsRemovalRequest): Promise<Res.ItemsRemovalResponse> {
@@ -200,14 +200,14 @@ export class TradingSystemManager {
 
     async addNewProducts(req: Req.AddProductsRequest): Promise<Res.ProductAdditionResponse> {
         logger.info(`adding products to store: ${req.body.storeName}`)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.addNewProducts(user, req.body.storeName, req.body.products);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token)
+        return this._storeManager.addNewProducts(username, req.body.storeName, req.body.products);
     }
 
     async removeProducts(req: Req.ProductRemovalRequest): Promise<Res.ProductRemovalResponse> {
         logger.info(`removing products from store: ${req.body.storeName} `);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.removeProducts(user, req.body.storeName, req.body.products);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token)
+        return this._storeManager.removeProducts(username, req.body.storeName, req.body.products);
     }
 
     // endregion
