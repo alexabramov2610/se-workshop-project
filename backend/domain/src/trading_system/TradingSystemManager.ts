@@ -48,7 +48,7 @@ export class TradingSystemManager {
             return {data: {result: true}};
         }
         catch (e) {
-            logger.error(`DB ERROR ${e}`)
+            logger.error(`openTradeSystem: DB ERROR ${e}`)
             return {data: {result: false}};
         }
     }
@@ -532,7 +532,7 @@ export class TradingSystemManager {
             }
         }
         catch (e) {
-            logger.error(`DB ERROR ${e}`)
+            logger.error(`getTradeSystemState: DB ERROR ${e}`)
         }
     }
 
@@ -648,7 +648,7 @@ export class TradingSystemManager {
 
             return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
         } catch (e) {
-            logger.error(`DB ERROR ${e}`);
+            logger.error(`purchase: DB ERROR ${e}`);
             return {data: {result: false}, error: {message: errorMsg.E_DB}}
         }
 
