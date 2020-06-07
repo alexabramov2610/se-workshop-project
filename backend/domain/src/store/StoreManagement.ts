@@ -716,7 +716,7 @@ export class StoreManagement {
                 error: {message: errorMsg.E_PERMISSION}
             }
 
-        const iReceipts: IReceipt[] = storeModel.receipts.map(r => {
+        const iReceipts: IReceipt[] = storeModel.receipts.map( (r) => {
             return {purchases: r.purchases, date: r.date}
         })
         // const iReceipts: IReceipt[] = [];
@@ -864,7 +864,8 @@ export class StoreManagement {
                 purchases
             });
             store.addReceipt(receipt);
-            await StoreModel.updateOne({storeName: store.storeName}, {receipt: store.receipts})
+           const res=  await StoreModel.updateOne({storeName: store.storeName}, {receipts: store.receipts})
+
         }
         catch (e) {
             logger.error(`DB ERROR ${e}`);
