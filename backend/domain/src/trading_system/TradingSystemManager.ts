@@ -63,7 +63,7 @@ export class TradingSystemManager {
         //  newID = uuid();
         // }
         this._userManager.addGuestToken(newID);
-        logger.debug(`Generated new token!... `);
+        logger.debug(`Generated new token!... ${newID} `);
         return newID;
     }
 
@@ -423,9 +423,9 @@ export class TradingSystemManager {
 
     //region verifications
     async verifyTokenExists(req: Req.Request): Promise<Res.BoolResponse> {
-        logger.debug(`checking if token exists`)
+        logger.info(`checking if token exists ${req.token}`)
         return this._userManager.isTokenTaken(req.token) ? { data: { result: true } } :
-            { data: { result: true }, error: {message: errorMsg.E_BAD_TOKEN} }
+            { data: { result: false }, error: {message: errorMsg.E_BAD_TOKEN} }
     }
 
     async isLoggedInUserByToken(req: Req.Request): Promise<Res.GetLoggedInUserResponse> {

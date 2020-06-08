@@ -52,7 +52,8 @@ export class UserManager {
             await UserModel.findOne({name: userName}).lean();
             this.loggedInUsers.set(req.token, userName)
             this.guests.delete(req.token);
-            logger.info(`login ${userName} succeed!`);
+            logger.info(`login ${userName} succeed! `);
+            logger.info(`remove guest token ${req.token} `);
             return {data: {result: true}};
         } catch (e) {
             logger.error(`login ${userName} failed!`);

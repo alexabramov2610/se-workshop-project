@@ -309,9 +309,9 @@ export async function t2() {
     }
    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
 
-   const viewRes = await ServiceFacade.viewCart({body: {}, token})
-   const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
-    const resPurchase = await ServiceFacade.purchase(purchaseReq);
+   //const viewRes = await ServiceFacade.viewCart({body: {}, token})
+   //const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
+    //const resPurchase = await ServiceFacade.purchase(purchaseReq);
 
     // region old tests
 
