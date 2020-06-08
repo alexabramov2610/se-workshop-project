@@ -19,6 +19,7 @@ import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 import {
+    BagItemModel,
     DiscountPolicyModel,
     ProductModel,
     ReceiptModel,
@@ -34,7 +35,7 @@ import {mapToJson} from "../api-int/utils";
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner"];
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy"];
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
@@ -893,6 +894,7 @@ export class StoreManagement {
         for (const bagItem of bagItems) {
             bagItem.finalPrice = bagItem.product.price * bagItem.amount;
         }
+
         return store.calculateFinalPrices(bagItems)
     }
 

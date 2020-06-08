@@ -309,7 +309,8 @@ export async function t2() {
         token: token
     }
    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
-
+    await logout(token);
+    //await registerUser(buyer1.name, "buyer1password", token, false);
    //const viewRes = await ServiceFacade.viewCart({body: {}, token})
    //const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
     //const resPurchase = await ServiceFacade.purchase(purchaseReq);

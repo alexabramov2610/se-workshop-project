@@ -6,7 +6,7 @@ const discountPolicySchema = new Schema({
         children: {
             type: [discountSchema],
         },
-        storeName: {type: String}
+        storeName: {type: String, unique:true}
     },
     {timestamps: false,})
 

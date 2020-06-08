@@ -7,7 +7,7 @@ const discountSchema = new Schema({
             type: String,
             required: true
         },
-        date: {
+        startDate: {
             type: Date,
         },
         duration: {

@@ -8,15 +8,12 @@ const conditionSchema = new Schema({
         },
         minPay: {
             type: Number,
-            required: true
         },
         minAmount: {
             type: Number,
-            required: true
         },
         catalogNumber: {
             type: Number,
-            required: true
         },
     },
     {timestamps: false,})

@@ -29,7 +29,7 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ProductModel, DiscountPolicyModel, DiscountModel,ConditionModel } from "dal"
+import {ProductModel, DiscountPolicyModel, DiscountModel, ConditionModel} from "dal"
 
 const logger = loggerW(__filename)
 
@@ -418,33 +418,36 @@ export class Store {
     async setDiscountPolicy(discounts: IDiscountInPolicy[]): Promise<boolean> {
         const newPolicy: Discount = new DiscountPolicy();
         try {
-            await DiscountModel.remove({storeName: this.storeName})
+            await DiscountModel.deleteMany({storeName: this.storeName})
         } catch (e) {
             return false;
-
         }
         const newDocs = [];
         for (const discountInPolicy of discounts) {
             const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
             newPolicy.add(newDiscount, discountInPolicy.operator);
-            const conditions = newPolicy.getConditions();
-            let conditionDocs= [];
-            if(!conditions){
+            const conditions = newDiscount.getConditions();
+            let conditionDocs = [];
+            if (conditions) {
                 const newCondDocs = [];
-                for (const [c, o] of conditions){
-                    newCondDocs.push({operator: o, minPay: c.getMinPay(), minAmount: c.getMinAmount(), catalogNumber: c.getCatalogNumber()})
+                for (const [c, o] of conditions) {
+                    newCondDocs.push({
+                        operator: o,
+                        minPay: c.getMinPay(),
+                        minAmount: c.getMinAmount(),
+                        catalogNumber: c.getCatalogNumber()
+                    })
                 }
-                try{
+                try {
                     conditionDocs = await ConditionModel.create(newCondDocs)
-                }
-                catch (e) {
+                } catch (e) {
                     logger.error(`setDiscountPolicy conditions ERROR DB ${e} `)
                 }
 
             }
             newDocs.push({
                 operator: discountInPolicy.operator,
-                date: newDiscount.startDate,
+                startDate: newDiscount.startDate,
                 duration: newDiscount.duration,
                 percentage: newDiscount.percentage,
                 productsInDiscount: newDiscount.productsInDiscount,
@@ -453,11 +456,10 @@ export class Store {
             })
         }
 
-        try{
+        try {
             const discountsDocs = await DiscountModel.create(newDocs);
             const discountPolicy = await DiscountPolicyModel.findOneAndUpdate({storeName: this.storeName}, {children: discountsDocs});
-        }
-        catch (e) {
+        } catch (e) {
             logger.error(`setDiscountPolicy discounts ERROR DB ${e} `)
 
         }
@@ -466,11 +468,9 @@ export class Store {
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-        // TODO implmenet this.discountPolicy on the Store Model
-        // const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
-        // logger.info(`Done calculating for store ${this.storeName}`)
-
-        return bagItems;
+        const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
+        logger.info(`Done calculating for store ${this.storeName}`)
+        return bagItemAfterDiscount;
     }
 
     getBagPrice(bagItems: BagItem[]): number {
