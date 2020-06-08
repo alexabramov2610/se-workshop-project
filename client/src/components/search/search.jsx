@@ -57,9 +57,9 @@ class Search extends React.Component {
         filters: {
           priceRange: { min, max },
           productRating:
-            productRating !== "" ? Number.parseInt(productRating) - 1 : "",
+            productRating !== "" ? Number.parseInt(productRating) : "",
           storeRating:
-            storeRating !== "" ? Number.parseInt(storeRating) - 1 : "",
+            storeRating !== "" ? Number.parseInt(storeRating) : "",
           productCategory,
         },
       },
