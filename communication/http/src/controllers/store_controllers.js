@@ -116,11 +116,6 @@ export async function viewUsersContactUsMessages(req, res) {
     return res.send(result)
 }
 
-export async function viewStorePurchasesHistory(req, res) {
-    const result = wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
-    return res.send(result)
-}
-
 export async function setPurchasePolicy(req, res) {
     const result = wrapHttp(req, ServiceFacade.setPurchasePolicy);
     return res.send(result)
@@ -128,6 +123,17 @@ export async function setPurchasePolicy(req, res) {
 
 
 // get
+
+export async function viewStorePurchasesHistory(req, res) {
+    try {
+        const getStorePurchasesHistory = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
+        req.body = getStorePurchasesHistory;
+        const result = wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
 
 export async function getDiscountsPolicy(req, res) {
     try {

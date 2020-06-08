@@ -4,7 +4,7 @@ import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
 
 const {Option} = Select;
 
-const SearchSelect = ({isMultiple, bordered, placeholder, options, onChangeCallback, initialValue, value, width}) => {
+const SearchSelect = ({size, isMultiple, bordered, placeholder, options, onChangeCallback, initialValue, value, width, isLoading}) => {
 
     function onBlur() {
         console.log('blur');
@@ -22,6 +22,8 @@ const SearchSelect = ({isMultiple, bordered, placeholder, options, onChangeCallb
         <DiscountPageCtx.Consumer>
             {
                 props => <Select
+                    size={size}
+                    loading={isLoading}
                     mode={isMultiple ? "multiple": undefined}
                     showArrow
                     bordered={bordered}

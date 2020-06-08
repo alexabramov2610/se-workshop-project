@@ -9,10 +9,11 @@ const AdminViewStoresPurchaseHistoryContainer = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const storesRes = await api.getStores(0, 100);
+            // const storesRes = await api.getStores(0, 100);
             const purchasesHistoryRes = await api.viewStorePurchaseHistory("store1");
 
-            console.log("storesRes: ", storesRes, "purchasesHistoryRes: ", purchasesHistoryRes);
+            // console.log("storesRes: ", storesRes, "purchasesHistoryRes: ", purchasesHistoryRes);
+            console.log("purchasesHistoryRes: ", purchasesHistoryRes);
         }
 
         fetchData();
