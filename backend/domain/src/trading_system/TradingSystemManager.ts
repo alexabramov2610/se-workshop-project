@@ -42,7 +42,7 @@ export class TradingSystemManager {
         logger.info(`opening trading system...`);
         try{
             const ans = await SystemModel.findOneAndUpdate({}, {isSystemUp: true}, {new: true});
-            if(!null){
+            if(!ans){
                 const res =  await SystemModel.create( {isSystemUp: true})
             }
             return {data: {result: true}};
@@ -408,7 +408,8 @@ export class TradingSystemManager {
     //region verifications
     async verifyTokenExists(req: Req.Request): Promise<Res.BoolResponse> {
         logger.debug(`checking if token exists`)
-        return { data: { result: this._userManager.isTokenTaken(req.token)} }
+        return this._userManager.isTokenTaken(req.token) ? { data: { result: true } } :
+            { data: { result: true }, error: {message: errorMsg.E_BAD_TOKEN} }
     }
 
     async isLoggedInUserByToken(req: Req.Request): Promise<Res.GetLoggedInUserResponse> {
@@ -522,16 +523,14 @@ export class TradingSystemManager {
 
 
    async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
-        try{
+        try {
             const ans = await SystemModel.findOne({})
-            if(ans.isSystemUp){
-                return {data: {state: TradingSystemState.OPEN}};
+            if (ans) {
+                const isOpen: boolean = ans.isSystemUp;
+                return {data: {state: isOpen ? TradingSystemState.OPEN : TradingSystemState.CLOSED}};
             }
-        else{
-                return {data: {state: TradingSystemState.CLOSED}};
-            }
-        }
-        catch (e) {
+            return {data: {state: TradingSystemState.CLOSED}};
+        } catch (e) {
             logger.error(`getTradeSystemState: DB ERROR ${e}`)
         }
     }

@@ -102,7 +102,6 @@ export class Store {
         const validProducts: IProduct[] = [];
 
         for (const product of products) {
-            product.storeName = this.storeName;
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
@@ -112,6 +111,7 @@ export class Store {
                 invalidProducts.push(product);
             }
             else {
+                product.storeName = this.storeName;
                 product.rating = 3;
                 this.products.set(product, []);
                 validProducts.push(product);

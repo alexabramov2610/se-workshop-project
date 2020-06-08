@@ -71,7 +71,7 @@ const registerUser = async (username: string, password: string, token, isLoggedI
 
 const registerUsers = async (users: any[]): Promise<void> => {
     for (const user of users) {
-        await registerUser(user.username, user.password, getSession(), false)
+        await registerUser(user.username, user.password, await getSession(), false)
         usersMap.set(user.username, user.password);
     }
 }
@@ -102,7 +102,7 @@ const createStore = async (storeName: string, token: string): Promise<void> => {
 
 const addNewProducts = async (storeName: string, products: IProduct[], token: string): Promise<void> => {
     const res: Res.BoolResponse = await ServiceFacade.addNewProducts({body: {storeName, products}, token})
-    if (res.data.result)
+    if (!res.data.result)
         return LogoutAndThrowError(`Add new products failed. {storeName: ${storeName}}`, token)
     products.forEach(product => {
         if (!itemIds.has(product.catalogNumber))

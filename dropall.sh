@@ -7,4 +7,5 @@ db.products.drop()
 db.events.drop()
 db.receipts.drop()
 db.admins.drop()
+db.systems.drop()
 EOF

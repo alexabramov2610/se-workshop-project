@@ -1,4 +1,4 @@
-import {Req, Res, Enums, CommonInterface} from "se-workshop-20-interfaces"
+import {Req, Res} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 export const registerUser = async (req: Req.RegisterRequest): Promise<Res.BoolResponse> => {

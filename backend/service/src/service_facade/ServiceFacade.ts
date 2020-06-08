@@ -298,7 +298,6 @@ export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();
 }
 const runIfOpen = async (req: Req.Request, fn: any): Promise<any> => {
-    const isOpenReq: Req.Request = {body: {}, token: req.token};
     const res = await tradingSystem.getTradeSystemState()
     if (res.data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
