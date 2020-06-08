@@ -12,7 +12,7 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel,SystemModel} from "dal";
+import {ReceiptModel, UserModel,SystemModel, NotificationModel, EventModel} from "dal";
 
 const logger = loggerW(__filename)
 
@@ -83,13 +83,31 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = await this._userManager.login(req);
         if (res.data.result) {
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
-            const user: RegisteredUser = await this._userManager.getUserByName(req.body.username)
-            if (user.pendingEvents.length > 0)
-                logger.info(`sending ${user.pendingEvents.length} missing notifications..`)
-            user.pendingEvents.forEach(event => {
+            const userModel = await this._userManager.getUserModelByName(req.body.username)
+
+            if (!userModel) {
+                logger.error(`login: DB ERROR: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
+                return;
+            }
+            if (userModel.pendingEvents.length > 0)
+                logger.info(`sending ${userModel.pendingEvents.length} missing notifications..`)
+
+            let eventToResend = [];
+            userModel.pendingEvents.forEach(event => {
                 event.code = EventCode.USER_EVENTS;
-                this._publisher.notify(event);
+                if (this._publisher.notify(event).length > 0)
+                    eventToResend.push(event);
             })
+            try {
+                for (const pendingEvent of eventToResend) {
+                    await NotificationModel.deleteMany({_id: {$in: userModel.pendingEvents.map(currEvent => currEvent.notification.id)}})
+                    await EventModel.deleteMany({_id: {$in: userModel.pendingEvents.map(currEvent => currEvent.id)}})
+                }
+                userModel.pendingEvents = eventToResend;
+                await userModel.save();
+            } catch (e) {
+                logger.error(`login: DB ERROR: ${e}`)
+            }
         } else {
             this._publisher.removeClient(req.body.username);
         }
@@ -103,8 +121,7 @@ export class TradingSystemManager {
         if (user && res.data.result) {
             logger.info(`removing websocket client... `);
             this._publisher.removeClient(user.name);
-            if (user)
-                logger.info(`logged out user: ${user.name}`);
+            logger.info(`logged out user: ${user.name}`);
         }
         return res;
     }
@@ -238,7 +255,7 @@ export class TradingSystemManager {
                 notification: {type: NotificationsType.GREEN, message: msg}
             };
             if (this._publisher.notify(event).length !== 0)
-                usernameToAssign.saveNotification(event);           // todo: store in db
+                await this._userManager.saveNotification(event.username, event)
         }
         return res;
     }
@@ -265,8 +282,7 @@ export class TradingSystemManager {
 
             for (const event of events) {
                 if (this._publisher.notify(event).length !== 0) {
-                    const u = await this._userManager.getUserByName(event.username)
-                    u.saveNotification(event);      // todo: store in db
+                    await this._userManager.saveNotification(event.username, event)
                 }
                 this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
             }
@@ -467,28 +483,25 @@ export class TradingSystemManager {
     }
 
     async notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string): Promise<void> {
-        // TODO
-        // logger.info(`notifying store owners about new purchase`)
-        // // tslint:disable-next-line:forin
-        // for (const storeName in storeNames) {
-        //     const notification: Event.Notification = {
-        //         message: formatString(notificationMsg.M_NEW_PURCHASE,
-        //             [storeName, buyer]), type: NotificationsType.GREEN
-        //     };
-        //     const store: Store = await this._storeManager.findStoreByName(storeName);
-        //     store.storeOwners.forEach(storeOwner => {
-        //         const event: Event.NewPurchaseEvent = {
-        //             username: storeOwner.name,
-        //             code: EventCode.NEW_PURCHASE,
-        //             storeName,
-        //             notification
-        //         };
-        //         this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
-        //             const u = await this._userManager.getUserByName(userToNotify)
-        //             u.saveNotification(event);
-        //         });
-        //     });
-        // }
+        logger.info(`notifying store owners about new purchase`)
+        for (const storeName in storeNames) {
+            const notification: Event.Notification = {
+                message: formatString(notificationMsg.M_NEW_PURCHASE,
+                    [storeName, buyer]), type: NotificationsType.GREEN
+            };
+            const storeModel = await this._storeManager.findStoreModelByName(storeName);
+            storeModel.storeOwners.forEach(storeOwner => {
+                const event: Event.NewPurchaseEvent = {
+                    username: storeOwner.name,
+                    code: EventCode.NEW_PURCHASE,
+                    storeName,
+                    notification
+                };
+                this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
+                    await this._userManager.saveNotification(event.username, event)
+                });
+            });
+        }
     }
 
     terminateSocket() {
@@ -522,7 +535,7 @@ export class TradingSystemManager {
     //endregion
 
 
-   async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
+    async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
         try {
             const ans = await SystemModel.findOne({})
             if (ans) {
@@ -642,9 +655,7 @@ export class TradingSystemManager {
             }
             logger.info(`purchase request: successfully purchased`)
             const username: string = rUser ? rUser.name : 'guest';
-            this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
-
-
+            await this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
             return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
         } catch (e) {
             logger.error(`purchase: DB ERROR ${e}`);

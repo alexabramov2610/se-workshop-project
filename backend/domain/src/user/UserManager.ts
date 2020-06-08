@@ -33,7 +33,7 @@ export class UserManager {
             logger.debug(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
-            if (e.errors.name.kind === 'unique') {
+            if (e.errors && e.errors.name && e.errors.name.kind && e.errors.name.kind === 'unique') {
                 logger.warn(`fail to register ,${userName} already exist `);
                 return {data: {result: false}, error: {message: errorMsg.E_BU}}
             }
@@ -55,7 +55,7 @@ export class UserManager {
             logger.info(`login ${userName} succeed!`);
             return {data: {result: true}};
         } catch (e) {
-            logger.warn(`login ${userName} failed!`);
+            logger.error(`login ${userName} failed!`);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
     }
@@ -76,9 +76,38 @@ export class UserManager {
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
-            logger.warn(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getUserByName DB ERROR: ${e}`)
             return undefined
         }
+    }
+
+    async getUserModelByName(name: string): Promise<any> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const u = await UserModel.findOne({name})
+                .populate('receipts')
+                .populate('pendingEvents');
+            return u;
+        } catch (e) {
+            logger.error(`getUserByName DB ERROR: ${e}`)
+            return undefined
+        }
+    }
+
+    async saveNotification(username: string, event): Promise<void> {
+        const u = await this.getUserModelByName(username);
+        try {
+            u.pendingEvents.push(event);
+            if (u) {
+                await u.save();
+                logger.debug(`saveNotification: successfully save event to user: ${username} in DB`)
+            }
+            else
+                logger.error(`saveNotification: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
+        } catch (e) {
+            logger.error(`saveNotification DB ERROR: ${e}`)
+        }
+
     }
 
     isTokenTaken(token: string): boolean {
@@ -178,7 +207,7 @@ export class UserManager {
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart, UserRole.ADMIN);
         } catch (e) {
-            logger.warn(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getUserByName DB ERROR: ${e}`)
             return undefined
         }
     }

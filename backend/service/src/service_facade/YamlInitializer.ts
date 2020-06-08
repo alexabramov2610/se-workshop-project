@@ -117,7 +117,7 @@ const addNewItems = async (storeName: string, items: IItem[], token: string): Pr
 }
 
 const assignStoreManager = async (storeName: string, assigner: string, assignee: string, token: string): Promise<void> => {
-    let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {
+    let assignStoreManagerRequest: Req.AssignStoreManagerRequest = {
         body: {
             storeName,
             usernameToAssign: assignee
@@ -126,6 +126,18 @@ const assignStoreManager = async (storeName: string, assigner: string, assignee:
     const res: Res.BoolResponse = await ServiceFacade.assignStoreManager(assignStoreManagerRequest);
     if (!res.data.result)
         return LogoutAndThrowError(`Assign store manager failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
+}
+
+const assignStoreOwner = async (storeName: string, assigner: string, assignee: string, token: string): Promise<void> => {
+    let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {
+        body: {
+            storeName,
+            usernameToAssign: assignee
+        }, token
+    };
+    const res: Res.BoolResponse = await ServiceFacade.assignStoreOwner(assignStoreManagerRequest);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Assign store owner failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
 }
 
 const addPermissions = async (manager: string, storeName: string, permissions: ManagementPermission[], token: string): Promise<void> => {
@@ -167,6 +179,12 @@ const createStores = async (stores: any[]): Promise<void> => {
             await assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
             if (currAssign.permissions && currAssign.permissions.length > 0)
                 await addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
+            await logout(token);
+        }
+
+        for (const currAssign of store.owners) {
+            await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
+            await assignStoreOwner(store.storeName, currAssign.assigner, currAssign.assignee, token);
             await logout(token);
         }
     }

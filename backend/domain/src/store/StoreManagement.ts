@@ -369,7 +369,7 @@ export class StoreManagement {
             await storeModel.save();
             logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
         } catch (e) {
-            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            logger.error(`removeStoreOwner DB ERROR: ${e}`);
             return {
                 data: {result: false, owners: ownersToRemove.map(owner => owner.name)},
                 error: {message: errorMsg.E_DB}
