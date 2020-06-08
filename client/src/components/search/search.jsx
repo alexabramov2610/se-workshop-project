@@ -16,11 +16,11 @@ import {
 } from "./search.styles";
 
 const Category = {
-  GENERAL: 0,
-  ELECTRONICS: 1,
-  HOBBIES: 2,
-  HOME: 3,
-  CLOTHING: 4,
+  GENERAL: "GENERAL",
+  ELECTRONICS: "ELECTRONICS",
+  HOBBIES: "HOBBIES",
+  HOME: "HOME",
+  CLOTHING: "CLOTHING",
 };
 Object.freeze(Category);
 class Search extends React.Component {

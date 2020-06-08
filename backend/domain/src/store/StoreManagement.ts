@@ -117,7 +117,7 @@ export class StoreManagement {
         const store = storeModel ? storeModel : await this.findStoreModelByName(storeName); // Document
         if (!store)
             error = errorMsg.E_INVALID_STORE;
-        else if (!this.findStoreOwner(store, username) && !this.verifyManagerPermission(storeModel.storeManagers, username, permission))
+        else if (!this.findStoreOwner(store, username) && !this.verifyManagerPermission(store.storeManagers, username, permission))
             error = errorMsg.E_PERMISSION;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }

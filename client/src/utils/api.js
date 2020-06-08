@@ -71,6 +71,12 @@ async function logout() {
   return instance.post(`${baseDomain}/users/logout`, {});
 }
 
+async function getAllCategories() {
+  return instance.get(
+      `${baseDomain}/stores/getAllCategories`
+  );
+}
+
 const getStores = async (offset = 0, limit = 4) => {
   return instance.get(
     `${baseDomain}/stores/getStores/?offset=${offset}&limit=${limit}`
@@ -227,4 +233,5 @@ export {
   adminInit,
   search,
   getStoreCategories,
+  getAllCategories,
 };

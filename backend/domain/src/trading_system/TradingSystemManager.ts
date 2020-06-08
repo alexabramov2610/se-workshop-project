@@ -539,17 +539,18 @@ export class TradingSystemManager {
                     [storeName, buyer]), type: NotificationsType.GREEN
             };
             const storeModel = await this._storeManager.findStoreModelByName(storeName);
-            storeModel.storeOwners.forEach(storeOwner => {
+            for (const storeOwner of storeModel.storeOwners) {
                 const event: Event.NewPurchaseEvent = {
                     username: storeOwner.name,
                     code: EventCode.NEW_PURCHASE,
                     storeName,
                     notification
                 };
-                this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
-                    await this._userManager.saveNotification(userToNotify, event)
-                });
-            });
+                const usersNotSend: string[] = this._publisher.notify(event);
+                for (const userToSave of usersNotSend) {
+                    await this._userManager.saveNotification(userToSave, event)
+                }
+            }
         }
     }
 
