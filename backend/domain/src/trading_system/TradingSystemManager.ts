@@ -463,7 +463,7 @@ export class TradingSystemManager {
         };
 
         if (this._publisher.notify(event).length !== 0)
-            await this._userManager.saveNotification(event.username, event)
+            await this._userManager.saveNotification(username, event)
 
         try {
             let subscriptions = await SubscriberModel.findOne({})
@@ -529,7 +529,7 @@ export class TradingSystemManager {
                     notification
                 };
                 this._publisher.notify(event).forEach(async (userToNotify) => { // if didn't send
-                    await this._userManager.saveNotification(event.username, event)
+                    await this._userManager.saveNotification(userToNotify, event)
                 });
             });
         }
