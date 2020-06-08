@@ -1,76 +1,79 @@
-import {Driver, Bridge, Credentials} from '../..';
-import * as utils from "../../utils"
-
+import { Driver, Bridge, Credentials } from "../..";
+import * as utils from "../../utils";
 
 describe("Guest Registration, UC: 2.2", () => {
-    let _serviceBridge: Bridge;
-    let _credentials: Credentials;
-    let _driver = new Driver();
+  let _serviceBridge: Partial<Bridge>;
+  let _credentials: Credentials;
+  let _driver = new Driver();
 
-    beforeEach(() => {
-        _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
-        _credentials = {userName: "test-username", password: "test-password"};
-    });
+  beforeEach(async () => {
+    // _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
 
-    afterAll(() => {
-        utils.terminateSocket();
-    });
+    await _driver.startSession();
+    await _driver.initWithDefaults();
 
-    test("Valid Details", () => {
-        _credentials.userName = "validUsername";
-        _credentials.password = "validPassword123";
+    _serviceBridge = await _driver.getBridge();
+    _credentials = {userName: "test-username", password: "test-password"};
+  });
 
-        const {data, error} = _serviceBridge.register(_credentials);
-        expect(error).toBeUndefined();
-        expect(data).toBeDefined();
-    });
+  // afterAll(() => {
+  //     utils.terminateSocket();
+  // });
 
-    test("Invalid Password - Short", () => {
-        _credentials.userName = "validUsername";
-        _credentials.password = "sP1"; // Short password
+  test("Valid Details", async () => {
+    _credentials.userName = "validUsername";
+    _credentials.password = "validPassword123";
+    const { data, error } = await _serviceBridge.register(_credentials);
+    expect(error).toBeUndefined();
+    expect(data).toBeDefined();
+  });
 
-        const {data, error} = _serviceBridge.register(_credentials);
-        expect(error).toBeDefined();
-        expect(data).toBeUndefined();
-    });
+  test("Invalid Password - Short", async () => {
+      _credentials.userName = "validUsername";
+      _credentials.password = "sP1"; // Short password
 
-    test("Invalid Username - Already Taken", () => {
-        _credentials.userName = "validUsername";
-        _credentials.password = "nonDigitsPass";
+      const {data, error} = await _serviceBridge.register(_credentials);
+      expect(error).toBeDefined();
+      expect(data).toBeUndefined();
+  });
 
-        const response = _serviceBridge.register(_credentials);
-        expect(response.error).toBeUndefined();
-        expect(response.data).toBeDefined();
+  test("Invalid Username - Already Taken", async () => {
+      _credentials.userName = "validUsername";
+      _credentials.password = "nonDigitsPass";
 
-        const {data, error} = _serviceBridge.register(_credentials);
-        expect(error).toBeDefined();
-        expect(data).toBeUndefined();
-    });
+      const response = await _serviceBridge.register(_credentials);
+      expect(response.error).toBeUndefined();
+      expect(response.data).toBeDefined();
 
-    // test("Invalid Password - Non Capital", () => {
-    //     _credentials.userName = "validUsername";
-    //     _credentials.password = "noncapitalpass123"; // Short password
-    //
-    //     const {data, error} = _serviceBridge.register(_credentials);
-    //     expect(error).toBeDefined();
-    //     expect(data).toBeUndefined();
-    // });
+      const {data, error} = await _serviceBridge.register(_credentials);
+      expect(error).toBeDefined();
+      expect(data).toBeUndefined();
+  });
 
-    // test("Invalid Password - Non Digit", () => {
-    //     _credentials.userName = "validUsername";
-    //     _credentials.password = "nonDigitsPass"; // Short password
-    //
-    //     const {data, error} = _serviceBridge.register(_credentials);
-    //     expect(error).toBeDefined();
-    //     expect(data).toBeUndefined();
-    // });
+  test("Invalid Password - Non Capital", async() => {
+      _credentials.userName = "validUsername";
+      _credentials.password = "noncapitalpass123"; // Short password
 
-    // test("Invalid Username - Empty Username", () => {
-    //     _credentials.userName = "";
-    //     _credentials.password = "nonDigitsPass"; // Short password
-    //
-    //     const {data, error} = _serviceBridge.register(_credentials);
-    //     expect(error).toBeDefined();
-    //     expect(data).toBeUndefined();
-    // });
+      const {data, error} = await _serviceBridge.register(_credentials);
+      expect(error).toBeDefined();
+      expect(data).toBeUndefined();
+  });
+
+  test("Invalid Password - Non Digit", async() => {
+      _credentials.userName = "validUsername";
+      _credentials.password = "nonDigitsPass"; // Short password
+
+      const {data, error} = await _serviceBridge.register(_credentials);
+      expect(error).toBeDefined();
+      expect(data).toBeUndefined();
+  });
+
+  test("Invalid Username - Empty Username", async() => {
+      _credentials.userName = "";
+      _credentials.password = "nonDigitsPass"; // Short password
+
+      const {data, error} = await _serviceBridge.register(_credentials);
+      expect(error).toBeDefined();
+      expect(data).toBeUndefined();
+  });
 });

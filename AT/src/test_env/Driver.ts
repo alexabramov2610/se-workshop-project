@@ -1,4 +1,5 @@
-import { Bridge, Proxy } from "../..";
+import { Bridge, Proxy, Adapter } from "../..";
+
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
 
@@ -13,7 +14,7 @@ class Driver {
     password: "admin123",
   };
   constructor() {
-    this.bridge = Proxy;
+    this.bridge = Adapter;
     this.refMe = this.given;
     this._pi = {
       payment: {  
@@ -36,9 +37,9 @@ class Driver {
     password: "avishay",
   };
   private sessionToken: string;
-  private bridge: Bridge;
+  private bridge: Partial<Bridge>;
 
-  getBridge(): Bridge {
+  getBridge(): Partial<Bridge> {
     return this.bridge;
   }
 
@@ -58,39 +59,41 @@ class Driver {
     return this._pi;
   }
 
-  initWithDefaults(): Driver {
-    this.bridge.init(this.initDefCredentials);
+  async initWithDefaults(): Promise<Driver> {
+    await this.bridge.init(this.initDefCredentials);
     return this;
   }
 
-  initWith(cred: Credentials): Driver {
-    this.bridge.init(cred);
+  async initWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.init(cred);
     return this;
   }
 
-  startSession(): Driver {
-    this.sessionToken = this.bridge.startSession().data.token;
+  async startSession(): Promise<Driver> {
+    const res = await this.bridge.startSession();
+    const x = res.data
+    // this.sessionToken =  res.data.token
     this.bridge.setToken(this.sessionToken);
     return this;
   }
 
-  loginWith(cred: Credentials): Driver {
-    this.bridge.login(cred);
+  async loginWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.login(cred);
     return this;
   }
 
-  loginWithDefaults(): Driver {
-    this.bridge.login(this.loginDefCredentials);
+  async loginWithDefaults(): Promise<Driver> {
+    await this.bridge.login(this.loginDefCredentials);
     return this;
   }
 
-  registerWith(cred: Credentials): Driver {
-    this.bridge.register(cred);
+  async registerWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.register(cred);
     return this;
   }
 
-  registerWithDefaults(): Driver {
-    this.bridge.register(this.loginDefCredentials);
+  async registerWithDefaults(): Promise<Driver> {
+    await this.bridge.register(this.loginDefCredentials);
     return this;
   }
 
@@ -109,24 +112,24 @@ class Driver {
     },
   };
 
-  makeABuy(amount: number = 1): Res.PurchaseResponse {
-    this.mutant.p.map((p) =>
-      this.bridge.saveProductToCart({
-        body: {
-          storeName: this.mutant.s.name,
-          catalogNumber: p.catalogNumber,
-          amount,
-        },
-      })
-    );
+  // makeABuy(amount: number = 1): Res.PurchaseResponse {
+  //   this.mutant.p.map((p) =>
+  //     this.bridge.saveProductToCart({
+  //       body: {
+  //         storeName: this.mutant.s.name,
+  //         catalogNumber: p.catalogNumber,
+  //         amount,
+  //       },
+  //     })
+  //   );
 
-    return this.bridge.purchase({ body: this._pi });
-  }
+    // return this.bridge.purchase({ body: this._pi });
+  // }
 
-  resetState() {
-    this.bridge.reset();
-    return this;
-  }
+  // resetState() {
+  //   this.bridge.reset();
+  //   return this;
+  // }
 }
 interface IGiven {
   shopper: (u: User) => IGiven;
