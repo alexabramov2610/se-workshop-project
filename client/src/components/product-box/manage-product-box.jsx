@@ -20,6 +20,11 @@ export class ManageProductBox extends React.Component {
     const info = data.data.info;
     this.setState({ info });
   }
+  handleRemove = async () => {
+    await api.removeProduct(this.props.store, this.props.cn);
+    window.location.reload();
+  };
+
   render() {
     return (
       <Card classsName="text-center grid-item">
@@ -47,17 +52,19 @@ export class ManageProductBox extends React.Component {
           </ProductDetails>
         </Card.Body>
         <Card.Footer>
-
-          <CustomButton style={{ margin: "auto", marginBottom: 5 }} onClick={() => history.push(`/store/${this.props.store}/${this.props.cn}`)}>
+          <CustomButton
+            style={{ margin: "auto", marginBottom: 5 }}
+            onClick={() =>
+              history.push(
+                `/store/${this.props.store}/edit-product/${this.props.cn}`
+              )
+            }
+          >
             Edit
           </CustomButton>
-          <CustomButton
-            style={{ margin: "auto" }}
-            onClick={(ev) => ev}
-          >
+          <CustomButton style={{ margin: "auto" }} onClick={this.handleRemove}>
             Remove
           </CustomButton>
-
         </Card.Footer>
       </Card>
     );

@@ -7,133 +7,139 @@ curl --header "Content-Type: application/json" --request POST --data '{"body": {
 
 
 export async function search(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.search);
+    const result = wrapHttp(req, ServiceFacade.search);
     return res.send(result)
 }
 
 export async function purchase(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.purchase);
+    const result = wrapHttp(req, ServiceFacade.purchase);
     return res.send(result)
 }
 
 export async function createStore(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.createStore);
+    const result = wrapHttp(req, ServiceFacade.createStore);
     return res.send(result)
 }
 
 export async function changeProductName(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.changeProductName);
+    const result = wrapHttp(req, ServiceFacade.changeProductName);
     return res.send(result)
 }
 
 export async function changeProductPrice(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.changeProductPrice);
+    const result = wrapHttp(req, ServiceFacade.changeProductPrice);
     return res.send(result)
 }
 
 export async function addItems(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.addItems);
+    const result = wrapHttp(req, ServiceFacade.addItems);
     return res.send(result)
 }
 
 export async function removeItems(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeItems);
+    const result = wrapHttp(req, ServiceFacade.removeItems);
     return res.send(result)
 }
 
 export async function removeProductsWithQuantity(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeProductsWithQuantity);
+    const result = wrapHttp(req, ServiceFacade.removeProductsWithQuantity);
     return res.send(result)
 }
 
 export async function addNewProducts(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.addNewProducts);
+    const result = wrapHttp(req, ServiceFacade.addNewProducts);
     return res.send(result)
 }
 
 export async function removeProducts(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeProducts);
+    const result = wrapHttp(req, ServiceFacade.removeProducts);
     return res.send(result)
 }
 
 export async function setDiscountsPolicy(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.setDiscountsPolicy);
+    const result = wrapHttp(req, ServiceFacade.setDiscountsPolicy);
     return res.send(result)
 }
 
 export async function addDiscount(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.addDiscount);
+    const result = wrapHttp(req, ServiceFacade.addDiscount);
     return res.send(result)
 }
 
 export async function removeProductDiscount(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeProductDiscount);
+    const result = wrapHttp(req, ServiceFacade.removeProductDiscount);
     return res.send(result)
 }
 
 export async function assignStoreOwner(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.assignStoreOwner);
+    const result = wrapHttp(req, ServiceFacade.assignStoreOwner);
     return res.send(result)
 }
 
 export async function removeStoreOwner(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeStoreOwner);
+    const result = wrapHttp(req, ServiceFacade.removeStoreOwner);
     return res.send(result)
 }
 
 export async function assignStoreManager(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.assignStoreManager);
+    const result = wrapHttp(req, ServiceFacade.assignStoreManager);
     return res.send(result)
 }
 
 export async function addManagerPermissions(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.addManagerPermissions);
+    const result = wrapHttp(req, ServiceFacade.addManagerPermissions);
     return res.send(result)
 }
 
 export async function addMultipleManagersPermissions(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.addMultipleManagersPermissions);
+    const result = wrapHttp(req, ServiceFacade.addMultipleManagersPermissions);
     return res.send(result)
 }
 
 export async function removeManagerPermissions(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeManagerPermissions);
+    const result = wrapHttp(req, ServiceFacade.removeManagerPermissions);
     return res.send(result)
 }
 
 export async function viewManagerPermissions(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.viewManagerPermissions);
+    const result = wrapHttp(req, ServiceFacade.viewManagerPermissions);
     return res.send(result)
 }
 
 export async function removeStoreManager(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.removeStoreManager);
+    const result = wrapHttp(req, ServiceFacade.removeStoreManager);
     return res.send(result)
 }
 
 export async function viewUsersContactUsMessages(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.viewUsersContactUsMessages);
-    return res.send(result)
-}
-
-export async function viewStorePurchasesHistory(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
+    const result = wrapHttp(req, ServiceFacade.viewUsersContactUsMessages);
     return res.send(result)
 }
 
 export async function setPurchasePolicy(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.setPurchasePolicy);
+    const result = wrapHttp(req, ServiceFacade.setPurchasePolicy);
     return res.send(result)
 }
 
 
 // get
 
+export async function viewStorePurchasesHistory(req, res) {
+    try {
+        const getStorePurchasesHistory = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
+        req.body = getStorePurchasesHistory;
+        const result = wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
+
 export async function getDiscountsPolicy(req, res) {
     try {
         const getDiscountsPolicyReq = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
         req.body = getDiscountsPolicyReq;
-        const result = await wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
+        const result = wrapHttp(req, ServiceFacade.viewDiscountsPolicy);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -145,7 +151,7 @@ export async function getPurchasePolicy(req, res) {
     try {
         const getPurchasePolicyReq = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
         req.body = getPurchasePolicyReq;
-        const result = await wrapHttp(req, ServiceFacade.viewPurchasePolicy);
+        const result = wrapHttp(req, ServiceFacade.viewPurchasePolicy);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -158,7 +164,7 @@ export async function getManagerPermissions(req, res) {
             token: req.cookies['token']
         };
         req.body = getStoresWithLimitReq;
-        const result = await wrapHttp(req, ServiceFacade.getManagerPermissions);
+        const result = wrapHttp(req, ServiceFacade.getManagerPermissions);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -172,7 +178,7 @@ export async function getStoresWithLimit(req, res) {
             token: req.cookies['token']
         };
         req.body = getStoresWithLimitReq;
-        const result = await wrapHttp(req, ServiceFacade.getStoresWithOffset);
+        const result = wrapHttp(req, ServiceFacade.getStoresWithOffset);
         // console.log('ressss : ' +JSON.stringify(result));
         return res.send(result);
     } catch (err) {
@@ -184,7 +190,7 @@ export async function getAllProductsInStore(req, res) {
     try {
         const getAllProductsReq = {body: {storeName: req.query.storeName}};
         req.body = getAllProductsReq;
-        const result = await wrapHttp(req, ServiceFacade.getAllProductsInStore);
+        const result = wrapHttp(req, ServiceFacade.getAllProductsInStore);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -195,7 +201,7 @@ export async function getAllCategoriesInStore(req, res) {
     try {
         const getAllCategoriesReq = {body: {storeName: req.query.storeName}};
         req.body = getAllCategoriesReq;
-        const result = await wrapHttp(req, ServiceFacade.getAllCategoriesInStore);
+        const result = wrapHttp(req, ServiceFacade.getAllCategoriesInStore);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -203,7 +209,7 @@ export async function getAllCategoriesInStore(req, res) {
 }
 
 export async function getAllCategories(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.getAllCategories);
+    const result = wrapHttp(req, ServiceFacade.getAllCategories);
     return res.send(result);
 }
 
@@ -211,7 +217,7 @@ export async function viewStoreInfo(req, res) {
     try {
         const getAllCategoriesReq = {body: {storeName: req.query.storeName}};
         req.body = getAllCategoriesReq;
-        const result = await wrapHttp(req, ServiceFacade.viewStoreInfo);
+        const result = wrapHttp(req, ServiceFacade.viewStoreInfo);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -222,7 +228,7 @@ export async function viewProductInfo(req, res) {
     try {
         const viewProductInfoReq = {body: {storeName: req.query.storeName, catalogNumber: +req.query.catalogNumber}};
         req.body = viewProductInfoReq;
-        const result = await wrapHttp(req, ServiceFacade.viewProductInfo);
+        const result = wrapHttp(req, ServiceFacade.viewProductInfo);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -233,7 +239,7 @@ export async function getManagersPermissions(req, res) {
     try {
         const viewProductInfoReq = {body: {storeName: req.query.storeName}};
         req.body = viewProductInfoReq;
-        const result = await wrapHttp(req, ServiceFacade.getManagersPermissions);
+        const result = wrapHttp(req, ServiceFacade.getManagersPermissions);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -244,7 +250,7 @@ export async function getOwnersAssignedBy(req, res) {
     try {
         const viewProductInfoReq = {body: {storeName: req.query.storeName}};
         req.body = viewProductInfoReq;
-        const result = await wrapHttp(req, ServiceFacade.getOwnersAssignedBy);
+        const result = wrapHttp(req, ServiceFacade.getOwnersAssignedBy);
         return res.send(result);
     } catch (err) {
         return res.send(invalidRes);
@@ -258,7 +264,7 @@ export async function getItemIds(req, res) {
             token: req.cookies['token']
         };
         req.body = getStoresWithLimitReq;
-        const result = await wrapHttp(req, ServiceFacade.getItemIds);
+        const result = wrapHttp(req, ServiceFacade.getItemIds);
         // console.log('ressss : ' +JSON.stringify(result));
         return res.send(result);
     } catch (err) {

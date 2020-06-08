@@ -5,9 +5,10 @@ import {StorePageCtx} from "./store-page-ctx";
 import ManageProductsContainer from "../manage-products-page/manage-products-page-container";
 import DiscountPageContainer from "../discount-page/discount-page-container";
 import StoreOverview from "../../components/store-overview/store-overview.component";
-import * as utils from "./store-page-utils";
 import ManageManagersPageContainer from "../manage-managers-page/manage-managers-page-container";
 import ManageOwnersPageContainer from "../manage-owners-page/manage-owners-page-container";
+import BuyingPolicyPageContainer from "../buying-policy-page/buying-policy-page.container";
+import * as utils from "./store-page-utils";
 
 
 const {Sider, Content} = Layout;
@@ -16,7 +17,7 @@ const screens = [
     <div>EDIT STORE INFO</div>,
     <ManageProductsContainer/>,
     <DiscountPageContainer/>,
-    <div>MANAGE BUYING POLICY</div>,
+    <BuyingPolicyPageContainer/>,
     <ManageManagersPageContainer/>,
     <ManageOwnersPageContainer/>
 ];
