@@ -102,4 +102,7 @@ export class CondDiscount extends Discount {
         }
         return false;
     }
+    public getConditions(): Map<Condition, Operators>{
+        return this._conditions;
+    }
 }

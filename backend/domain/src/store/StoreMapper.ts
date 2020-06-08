@@ -1,5 +1,13 @@
-import {IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {ICondition, IDiscount, IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Store} from "./Store";
+import {Discount} from "./discounts/Discount";
+import {DiscountPolicy} from "./discounts/DiscountPolicy";
+import {Condition} from "./discounts/conditions/Condition";
+import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {CondDiscount} from "./discounts/CondDiscount";
+import {ShownDiscount} from "./discounts/ShownDiscount";
+import {MinPayCondition} from "./discounts/conditions/MinPayCondition";
+import {MinAmountCondition} from "./discounts/conditions/MinAmountCondition";
 
 
 export function productFromDbToDomain(product): IProduct {
@@ -60,6 +68,43 @@ export function storeMapperFromDB(store: any): Store {
         return store;
     const {storeName, description, products, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy} = store;
     const realProducts: Map<IProduct, IItem[]> = productsAndItemsMapperFromDB(products);
-    const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy)
+    const realDiscountPolicy = discountFromDB(discountPolicy);
+    const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, realDiscountPolicy)
     return realStore
+}
+
+export function discountFromDB(discountPolicy) : Discount{
+    const newPolicy: Discount = new DiscountPolicy();
+    const children = discountPolicy.children;
+    for(const c of children){
+        const newDiscount: Discount = parseDiscount(c);
+        newPolicy.add(newDiscount, c.operator);
+    }
+    return newPolicy;
+}
+
+function parseDiscount(iDiscount): Discount {
+    let newDiscount: Discount;
+    if (iDiscount.conditions && iDiscount.conditions.length > 0) {
+        const conditions: Map<Condition, Operators> = new Map();
+        for (const iCondition of iDiscount.conditions) {
+            const nextCondition: Condition = parseCondition(iCondition);
+            if (nextCondition) {
+                conditions.set(nextCondition, iCondition.operator);
+            }
+        }
+        newDiscount = new CondDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.productsInDiscount, conditions, iDiscount.category)
+        return newDiscount
+    }
+    newDiscount = new ShownDiscount(iDiscount.startDate, iDiscount.duration, iDiscount.percentage, iDiscount.productsInDiscount, iDiscount.category)
+    return newDiscount;
+}
+
+function parseCondition(ifCondition): Condition {
+    if (ifCondition.minPay || +ifCondition.minPay === 0) {
+        return new MinPayCondition(ifCondition.minPay);
+    } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
+        return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
+    }
+    return undefined;
 }

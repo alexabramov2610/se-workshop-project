@@ -29,7 +29,7 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ProductModel} from "dal"
+import {ProductModel, DiscountPolicyModel, DiscountModel, ConditionModel} from "dal"
 
 const logger = loggerW(__filename)
 
@@ -105,12 +105,10 @@ export class Store {
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
-            }
-            else if (!this.validateProduct(product).isValid) {
+            } else if (!this.validateProduct(product).isValid) {
                 logger.warn(`invalid product: ${product}`)
                 invalidProducts.push(product);
-            }
-            else {
+            } else {
                 product.storeName = this.storeName;
                 product.rating = 3;
                 this.products.set(product, []);
@@ -155,7 +153,7 @@ export class Store {
     }
 
     setFirstOwner(user: RegisteredUser): void {
-        const firstOwner: StoreOwner = { name: user.name, assignedStoreOwners: [], assignedStoreManagers: [] };
+        const firstOwner: StoreOwner = {name: user.name, assignedStoreOwners: [], assignedStoreManagers: []};
         this.storeOwners.push(firstOwner);
         this.firstOwner = firstOwner;
     }
@@ -385,7 +383,7 @@ export class Store {
         return this.storeOwners.find((owner: StoreOwner) => owner.name === userName)
     }
 
-   async getItemsFromStock(product: IProduct, amount: number): Promise<IItem[]> {
+    async getItemsFromStock(product: IProduct, amount: number): Promise<IItem[]> {
         const productInStore: IProduct = this.getProductByCatalogNumber(product.catalogNumber);
         const items: IItem[] = this.products.get(productInStore);
         const itemsToReturn: IItem[] = items.slice(0, amount);
@@ -401,7 +399,7 @@ export class Store {
     }
 
     addReceipt(receipt: IReceipt): void {
-       this.receipts.push(receipt);
+        this.receipts.push(receipt);
     }
 
     getProductFinalPrice(catalogNumber: number): number {
@@ -417,23 +415,62 @@ export class Store {
         */
     }
 
-    setDiscountPolicy(discounts: IDiscountInPolicy[]): string {
+    async setDiscountPolicy(discounts: IDiscountInPolicy[]): Promise<boolean> {
         const newPolicy: Discount = new DiscountPolicy();
+        try {
+            await DiscountModel.deleteMany({storeName: this.storeName})
+        } catch (e) {
+            return false;
+        }
+        const newDocs = [];
         for (const discountInPolicy of discounts) {
             const newDiscount: Discount = this.parseIDiscount(discountInPolicy.discount);
-
             newPolicy.add(newDiscount, discountInPolicy.operator);
+            const conditions = newDiscount.getConditions();
+            let conditionDocs = [];
+            if (conditions) {
+                const newCondDocs = [];
+                for (const [c, o] of conditions) {
+                    newCondDocs.push({
+                        operator: o,
+                        minPay: c.getMinPay(),
+                        minAmount: c.getMinAmount(),
+                        catalogNumber: c.getCatalogNumber()
+                    })
+                }
+                try {
+                    conditionDocs = await ConditionModel.create(newCondDocs)
+                } catch (e) {
+                    logger.error(`setDiscountPolicy conditions ERROR DB ${e} `)
+                }
+
+            }
+            newDocs.push({
+                operator: discountInPolicy.operator,
+                startDate: newDiscount.startDate,
+                duration: newDiscount.duration,
+                percentage: newDiscount.percentage,
+                productsInDiscount: newDiscount.productsInDiscount,
+                category: newDiscount.category,
+                conditions: conditionDocs
+            })
+        }
+
+        try {
+            const discountsDocs = await DiscountModel.create(newDocs);
+            const discountPolicy = await DiscountPolicyModel.findOneAndUpdate({storeName: this.storeName}, {children: discountsDocs});
+        } catch (e) {
+            logger.error(`setDiscountPolicy discounts ERROR DB ${e} `)
+
         }
         this.discountPolicy = newPolicy;
-        return newPolicy.id;
+        return true;
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-        // TODO implmenet this.discountPolicy on the Store Model
-        // const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
-        // logger.info(`Done calculating for store ${this.storeName}`)
-
-        return bagItems;
+        const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
+        logger.info(`Done calculating for store ${this.storeName}`)
+        return bagItemAfterDiscount;
     }
 
     getBagPrice(bagItems: BagItem[]): number {

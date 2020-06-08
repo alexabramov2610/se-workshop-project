@@ -70,12 +70,12 @@ export const Adapter: any = {
       : { data: data, error: undefined };
   },
 
-  // createStore(store: Types.Store): DummyTypes.IStoreResponse {
-  //   const req = wrapWithToken({ storeName: store.name,description:'blabla' });
-  //   const { error, data } = ServiceFacade.createStore(req);
-  //   if (error || !data.result) return { data: undefined, error: error.message };
-  //   else if (data.result) return { data: { name: store.name } };
-  // },
+  async createStore(store: Types.Store): Promise<DummyTypes.IStoreResponse> {
+    const req = wrapWithToken({ storeName: store.name,description:'blabla' });
+    const { error, data } = await  ServiceFacade.createStore(req);
+    if (error || !data.result) return { data: undefined, error: error.message };
+    else if (data.result) return { data: { name: store.name } };
+  },
 
   // addItemsToStore(store: Store, items: Item[]): DummyTypes.IResponse {
   //   const req = { storeName: store.name, items };
@@ -165,17 +165,17 @@ export const Adapter: any = {
   //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   // },
 
-  // addToCart(store: Store, product: Product, quantity: number) {
-  //   const req = {
-  //     storeName: store.name,
-  //     catalogNumber: product.catalogNumber,
-  //     amount: quantity,
-  //   };
-  //   const { data, error } = ServiceFacade.saveProductToCart(wrapWithToken(req));
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async saveProductToCart(store: Store, product: Product, quantity: number) {
+    const req = {
+      storeName: store.name,
+      catalogNumber: product.catalogNumber,
+      amount: quantity,
+    };
+    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // removeStoreManager(
   //   req: Partial<Req.RemoveStoreManagerRequest>
@@ -215,9 +215,9 @@ export const Adapter: any = {
   //     : { data: data, error: undefined };
   // },
 
-  // purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
-  //   return ServiceFacade.purchase(wrapWithToken(req.body));
-  // },
+  async purchase(req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> {
+    return await ServiceFacade.purchase(wrapWithToken(req.body));
+  },
   // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse{
   //   return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
 

@@ -1,6 +1,7 @@
 import {BagItem, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {loggerW} from "../../api-int/Logger";
+import {Condition} from "./conditions/Condition";
 const logger = loggerW(__filename)
 export abstract class Discount {
     protected _category: ProductCategory;
@@ -82,6 +83,10 @@ export abstract class Discount {
     protected addMinutes(date, minutes): Date {
 
         return new Date(date.getTime() + minutes * 60000);
+    }
+
+    public getConditions(): Map<Condition, Operators>{
+        return undefined
     }
 
 

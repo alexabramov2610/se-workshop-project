@@ -20,7 +20,7 @@ export interface Bridge {
   init(cred: Credentials): Promise<DummyTypes.IBoolResponse>;
   // removeItem(item: Item): DummyTypes.IResponse;
   // removeStore(store: Store): DummyTypes.IResponse;
-  // createStore(store: Store): DummyTypes.IStoreResponse;
+  createStore(store: Store): Promise<DummyTypes.IStoreResponse>;
   // addItemsToStore(store: Store, item: Item[]): DummyTypes.IResponse;
   // addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
   // removeProductsFromStore(
@@ -78,8 +78,8 @@ export interface Bridge {
   // viewUserPurchasesHistory(
   //   req: Partial<Req.ViewRUserPurchasesHistoryReq>
   // ): Res.ViewRUserPurchasesHistoryRes;
-  // purchase(req: Partial<Req.PurchaseRequest>): Res.PurchaseResponse;
-  // saveProductToCart(req: Partial<Req.SaveToCartRequest>): Res.BoolResponse;
+  purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
+  saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
   // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
   // viewManagerPermissions(
   //   req: Partial<Req.ViewManagerPermissionRequest>
