@@ -461,7 +461,8 @@ export class TradingSystemManager {
 
     async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
         logger.debug(`verifying products`)
-        return this._storeManager.verifyProducts(req);
+        const res: Res.BoolResponse = await this._storeManager.verifyProducts(req);
+        return res;
     }
 
     verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {

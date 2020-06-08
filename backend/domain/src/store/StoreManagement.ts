@@ -762,7 +762,8 @@ export class StoreManagement {
     }
 
     async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(req.body.storeName);
+        const storeModel = await this.findStoreModelByName(req.body.storeName);
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const productsNotExists = [];
