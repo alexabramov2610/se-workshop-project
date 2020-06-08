@@ -1,4 +1,4 @@
-import {Schema, Types} from "mongoose";
+import {Schema} from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 import itemSchema from "./item.schema";
 import {ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";

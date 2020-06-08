@@ -1,5 +1,4 @@
 import {Schema} from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
 
 const notificationSchema = new Schema({
     message: {type: String, required: true},

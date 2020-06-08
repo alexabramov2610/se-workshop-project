@@ -25,7 +25,7 @@ const userSchema = new Schema({
             default: []
         },
         pendingEvents: {
-            type: [eventSchema], //[{type: Types.ObjectId, ref: 'events'}],
+            type: [eventSchema],
             required: true,
             default: []
         },

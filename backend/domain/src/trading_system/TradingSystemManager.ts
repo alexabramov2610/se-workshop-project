@@ -12,7 +12,7 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel,SystemModel, NotificationModel, EventModel} from "dal";
+import {ReceiptModel, UserModel,SystemModel, SubscriberModel} from "dal";
 
 const logger = loggerW(__filename)
 
@@ -69,7 +69,6 @@ export class TradingSystemManager {
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         logger.info(`trying to register new user: ${req.body.username} `);
-
         const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
         if (rUser) {
             logger.debug(`logged in user, can't register`);
@@ -83,35 +82,36 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = await this._userManager.login(req);
         if (res.data.result) {
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
-            const userModel = await this._userManager.getUserModelByName(req.body.username)
-
-            if (!userModel) {
-                logger.error(`login: DB ERROR: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
-                return;
-            }
-            if (userModel.pendingEvents.length > 0)
-                logger.info(`sending ${userModel.pendingEvents.length} missing notifications..`)
-
-            let eventToResend = [];
-            userModel.pendingEvents.forEach(event => {
-                event.code = EventCode.USER_EVENTS;
-                if (this._publisher.notify(event).length > 0)
-                    eventToResend.push(event);
-            })
-            try {
-                for (const pendingEvent of eventToResend) {
-                    await NotificationModel.deleteMany({_id: {$in: userModel.pendingEvents.map(currEvent => currEvent.notification.id)}})
-                    await EventModel.deleteMany({_id: {$in: userModel.pendingEvents.map(currEvent => currEvent.id)}})
-                }
-                userModel.pendingEvents = eventToResend;
-                await userModel.save();
-            } catch (e) {
-                logger.error(`login: DB ERROR: ${e}`)
-            }
+            await this.sendPendingEvents(req.body.username);
         } else {
             this._publisher.removeClient(req.body.username);
         }
         return res;
+    }
+
+    async sendPendingEvents(username: string): Promise<void> {
+        const userModel = await this._userManager.getUserModelByName(username)
+
+        if (!userModel) {
+            logger.error(`login: DB ERROR: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
+            return;
+        }
+        else if (userModel.pendingEvents.length === 0)
+            return;
+
+        logger.info(`sending ${userModel.pendingEvents.length} missing notifications..`)
+        let eventToResend = [];
+        userModel.pendingEvents.forEach(event => {
+            event.code = EventCode.USER_EVENTS;
+            if (this._publisher.notify(event).length > 0)
+                eventToResend.push(event);
+        })
+        try {
+            userModel.pendingEvents = eventToResend;
+            await userModel.save();
+        } catch (e) {
+            logger.error(`login: DB ERROR: ${e}`)
+        }
     }
 
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
@@ -144,7 +144,7 @@ export class TradingSystemManager {
 
         const res: Res.BoolResponse = await this._storeManager.addStore(req.body.storeName, req.body.description, user);
         if (res.data.result) {
-            this.subscribeNewStoreOwner(user.name, req.body.storeName);
+            this.subscribeStoreOwner(user.name, req.body.storeName);
             logger.debug(`successfully created store: ${req.body.storeName}`)
         }
         return res;
@@ -247,15 +247,7 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
         if (res.data.result) {
             logger.info(`successfully assigned user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
-            this.subscribeNewStoreOwner(req.body.usernameToAssign, req.body.storeName);
-            const storeName: string = req.body.storeName;
-            const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
-            const event: Event.StoreOwnerEvent = {
-                username: req.body.usernameToAssign, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
-                notification: {type: NotificationsType.GREEN, message: msg}
-            };
-            if (this._publisher.notify(event).length !== 0)
-                await this._userManager.saveNotification(event.username, event)
+            await this.subscribeStoreOwner(req.body.usernameToAssign, req.body.storeName)
         }
         return res;
     }
@@ -272,20 +264,7 @@ export class TradingSystemManager {
 
         if (res.data.result) {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
-            const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [req.body.storeName]);
-
-            const events: Event.StoreOwnerEvent[] = res.data.owners.reduce((acc, curr) =>
-                acc.concat({
-                    username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: req.body.storeName,
-                    notification: {type: NotificationsType.GREEN, message: msg}
-                }), []);
-
-            for (const event of events) {
-                if (this._publisher.notify(event).length !== 0) {
-                    await this._userManager.saveNotification(event.username, event)
-                }
-                this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, req.body.storeName);
-            }
+            await this.unsubscribeStoreOwner(req.body.usernameToRemove, req.body.storeName, res.data.owners)
         }
         return {data: {result: res.data.result}, error: {message: res.error.message ? res.error.message : ""}};
     }
@@ -354,7 +333,6 @@ export class TradingSystemManager {
         logger.info(`viewing product number: ${req.body.catalogNumber} info in store ${req.body.storeName}`)
         return this._storeManager.viewProductInfo(req);
     }
-
 
     async getStoresWithOffset(req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> {
         logger.info(`getting stores by offset`);
@@ -476,15 +454,68 @@ export class TradingSystemManager {
     //endregion
 
     //region notifications
+    async subscribeStoreOwner(username: string, storeName: string): Promise<void> {
+        this.subscribeNewStoreOwner(username, storeName);
+        const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
+        const event: Event.StoreOwnerEvent = {
+            username: username, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
+            notification: {type: NotificationsType.GREEN, message: msg}
+        };
+
+        if (this._publisher.notify(event).length !== 0)
+            await this._userManager.saveNotification(event.username, event)
+
+        try {
+            let subscriptions = await SubscriberModel.findOne({})
+            if (!subscriptions)
+                subscriptions = await SubscriberModel.create({storeOwners: []})
+            subscriptions.storeOwners.push({storeName, username});
+            subscriptions.markModified('storeOwners');
+            await subscriptions.save();
+        } catch (e) {
+            logger.error(`subscribeStoreOwner DB ERROR: ${e}`)
+        }
+    }
+
     subscribeNewStoreOwner(username: string, storeName: string) {
         logger.debug(`subscribing new store ${username} owner to store ${storeName}`);
         this._publisher.subscribe(username, EventCode.STORE_OWNER_EVENTS, storeName, storeName);
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
     }
 
+    async unsubscribeStoreOwner(username: string, storeName: string, owners: string[]): Promise<void> {
+        const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
+        const toRemoveMap: Map<string, string> = new Map<string, string>();
+        const events: Event.StoreOwnerEvent[] = owners.reduce((acc, curr) =>
+            acc.concat({
+                username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
+                notification: {type: NotificationsType.GREEN, message: msg}
+            }), []);
+
+        for (const event of events) {
+            if (this._publisher.notify(event).length !== 0) {
+                await this._userManager.saveNotification(event.username, event)
+            }
+            this._publisher.unsubscribe(event.username, EventCode.REMOVED_AS_STORE_OWNER, storeName);
+            toRemoveMap.set(event.username, "junk");
+        }
+
+        try {
+            let subscriptions = await SubscriberModel.findOne({})
+            if (!subscriptions)
+                return;
+            subscriptions.storeOwners = subscriptions.storeOwners.filter(owner => !toRemoveMap.has(owner));
+            subscriptions.markModified('storeOwners');
+            await subscriptions.save();
+
+        } catch (e) {
+            logger.error(`unsubscribeStoreOwner DB ERROR: ${e}`)
+        }
+    }
+
     async notifyStoreOwnerOfNewPurchases(storeNames: string[], buyer: string): Promise<void> {
         logger.info(`notifying store owners about new purchase`)
-        for (const storeName in storeNames) {
+        for (const storeName of storeNames) {
             const notification: Event.Notification = {
                 message: formatString(notificationMsg.M_NEW_PURCHASE,
                     [storeName, buyer]), type: NotificationsType.GREEN
