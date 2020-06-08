@@ -4,7 +4,13 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {EventCode, NotificationsType, ProductCategory, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {
+    EventCode,
+    ManagementPermission,
+    NotificationsType,
+    ProductCategory,
+    TradingSystemState
+} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {ExternalSystems, loggerW, UserRole} from "../api-int/internal_api";
 import {BagItem, IDiscountPolicy, IPurchasePolicy, Purchase, IProduct, Cart, CartProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
@@ -437,6 +443,9 @@ export class TradingSystemManager {
     async verifyStorePermission(req: Req.VerifyStorePermission, storeModel?): Promise<Res.BoolResponse> {
         logger.debug(`verifying store permissions`)
         const username = this._userManager.getLoggedInUsernameByToken(req.token)
+        const isAdminWatchesHistories: boolean = req.body.permission === ManagementPermission.WATCH_PURCHASES_HISTORY && this._userManager.checkIsAdminByToken(req.token)
+        if (isAdminWatchesHistories)
+            return {data: {result: true}};
         return username ? this._storeManager.verifyStoreOperation(req.body.storeName, username, req.body.permission, storeModel) :
             { data: { result: false}, error: { message: errorMsg.E_BAD_OPERATION } }
     }
