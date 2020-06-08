@@ -459,7 +459,7 @@ export class TradingSystemManager {
             {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
     }
 
-    verifyProducts(req: Req.VerifyProducts) {
+    async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
         logger.debug(`verifying products`)
         return this._storeManager.verifyProducts(req);
     }

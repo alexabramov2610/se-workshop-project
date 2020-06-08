@@ -43,20 +43,22 @@ export class StoreManagement {
     }
 
     async findStoreByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
-        try {
-            logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
-            const populateQuery = populateWith.map(field => {
-                return {path: field}
-            });
-            const s = await StoreModel.findOne({storeName})
-                .populate(populateQuery)
-            const store: Store = StoreMapper.storeMapperFromDB(s);
-            return store;
-        } catch (e) {
-            logger.error(`findStoreByName DB ERROR: ${e}`);
-            return undefined
-        }
-        return undefined;
+        const storeModel = await this.findStoreModelByName(storeName, populateWith);
+        return StoreMapper.storeMapperFromDB(storeModel);
+        // try {
+        //     logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
+        //     const populateQuery = populateWith.map(field => {
+        //         return {path: field}
+        //     });
+        //     const s = await StoreModel.findOne({storeName}).populate(populateQuery)
+        //         .populate(populateQuery);
+        //     const store: Store = StoreMapper.storeMapperFromDB(s);
+        //     return store;
+        // } catch (e) {
+        //     logger.error(`findStoreByName DB ERROR: ${e}`);
+        //     return undefined
+        // }
+        // return undefined;
     }
 
     async findStoreModelByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
