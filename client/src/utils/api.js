@@ -62,9 +62,9 @@ function startConnection(cb) {
     openSocket("wss://localhost:8000/?name=alex");
 }
 
-async function login(username, password) {
+async function login(username, password, asAdmin) {
     return instance.post(`${baseDomain}/users/login`, {
-        body: {username, password},
+        body: {username, password, asAdmin},
     });
 }
 

@@ -36,6 +36,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isAdmin: false,
             isLoggedIn: false,
             systemIsClose: false,
             cartItemsCounter: 0
@@ -45,8 +46,8 @@ class App extends React.Component {
         this.cartCountUpdater = this.cartCountUpdater.bind(this);
     }
 
-    onLogin = async (username) => {
-        this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
+    onLogin = async (username, asAdmin) => {
+        this.setState({ isLoggedIn: true, systemIsClose: false, isAdmin: asAdmin }, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }
 
@@ -93,7 +94,7 @@ class App extends React.Component {
         return (!this.state.systemIsClose) ? (
             <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
-                    <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
+                    <Header isLoggedIn={this.state.isLoggedIn} isAdmin={this.state.asAdmin} onLogout={this.onLogout} />
                     <Switch>
                         <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route path="/category" component={CategoryPage} />
