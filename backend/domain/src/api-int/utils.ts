@@ -18,3 +18,8 @@ export function formatString(str: string, placeholders: string[]) {
     }
     return string2;
 }
+
+
+export function mapToJson(map) {
+    return Array.from(map).reduce((acc, [key, val]) => Object.assign(acc, {[key]: val}), {});
+}

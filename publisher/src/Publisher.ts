@@ -14,12 +14,12 @@ export class Publisher {
     // private readonly _socket;
 
     /**
-     STORE_OWNER_EVENTS                 | map<store name, subscriber[]>     |   STORE_OWNER_EVENTS
-     NEW_PURCHASE                       |              "                    |   STORE_OWNER_EVENTS
+     STORE_OWNER_EVENTS                 | map<store name, subscriber[]>     |   STORE_OWNER_EVENTS          //in use
+     NEW_PURCHASE                       |              "                    |   STORE_OWNER_EVENTS          //in use
      STORE_CLOSED                       |              "                    |   STORE_OWNER_EVENTS
      STORE_OPENED                       |              "                    |   STORE_OWNER_EVENTS
-     ASSIGNED_AS_STORE_OWNER            | map<username, subscriber>         |   USER_EVENTS
-     REMOVED_AS_STORE_OWNER             |              "                    |   USER_EVENTS
+     ASSIGNED_AS_STORE_OWNER            | map<username, subscriber>         |   USER_EVENTS                 //in use
+     REMOVED_AS_STORE_OWNER             |              "                    |   USER_EVENTS                 //in use
      ----------------------------------------------------------------------------
      AUCTION_EVENTS                     | map<auction id, subscriber[]>     |   AUCTION_EVENTS
      HIGHER_AUCTION_OFFER               |              "                    |   AUCTION_EVENTS

@@ -35,11 +35,10 @@ stores:
         permissions:
           -
             "MANAGE_INVENTORY"
+    owners:
       -
-        assigner: "username3"
+        assigner: "username2"
         assignee: "username5"
-        permissions:
       -
         assigner: "username5"
         assignee: "username6"
-        permissions:

@@ -1,21 +1,17 @@
-import {
-    IProduct,
-    BagItem,
-    Cart,
-    CartProduct
-} from "se-workshop-20-interfaces/src/CommonInterface"
+import {BagItem, Cart, CartProduct, IProduct} from "se-workshop-20-interfaces/src/CommonInterface"
 import {Admin, RegisteredUser} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW} from "../api-int/internal_api";
-import {UserModel} from 'dal'
+import {errorMsg, loggerW, UserRole} from "../api-int/internal_api";
+import {AdminModel, StoreModel, UserModel} from 'dal'
 import * as UserMapper from './UserMapper'
 
 const logger = loggerW(__filename)
 
 export class UserManager {
+    private readonly DEFAULT_USER_POPULATION: string[] = ["receipts","pendingEvents"];
     private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
     private admins: Admin[];
@@ -37,7 +33,7 @@ export class UserManager {
             logger.debug(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
-            if (e.errors.name.kind === 'unique') {
+            if (e.errors && e.errors.name && e.errors.name.kind && e.errors.name.kind === 'unique') {
                 logger.warn(`fail to register ,${userName} already exist `);
                 return {data: {result: false}, error: {message: errorMsg.E_BU}}
             }
@@ -56,10 +52,11 @@ export class UserManager {
             await UserModel.findOne({name: userName}).lean();
             this.loggedInUsers.set(req.token, userName)
             this.guests.delete(req.token);
-            logger.info(`login ${userName} succeed!`);
+            logger.info(`login ${userName} succeed! `);
+            logger.info(`remove guest token ${req.token} `);
             return {data: {result: true}};
         } catch (e) {
-            logger.warn(`login ${userName} failed!`);
+            logger.error(`login ${userName} failed!`);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
     }
@@ -80,9 +77,38 @@ export class UserManager {
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
-            logger.warn(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getUserByName DB ERROR: ${e}`)
             return undefined
         }
+    }
+
+    async getUserModelByName(name: string): Promise<any> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const u = await UserModel.findOne({name})
+                .populate('receipts')
+                .populate('pendingEvents');
+            return u;
+        } catch (e) {
+            logger.error(`getUserByName DB ERROR: ${e}`)
+            return undefined
+        }
+    }
+
+    async saveNotification(username: string, event): Promise<void> {
+        const u = await this.getUserModelByName(username);
+        try {
+            u.pendingEvents.push(event);
+            if (u) {
+                await u.save();
+                logger.debug(`saveNotification: successfully save event to user: ${username} in DB`)
+            }
+            else
+                logger.error(`saveNotification: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
+        } catch (e) {
+            logger.error(`saveNotification DB ERROR: ${e}`)
+        }
+
     }
 
     isTokenTaken(token: string): boolean {
@@ -108,7 +134,10 @@ export class UserManager {
         } else {
             return undefined
         }
+    }
 
+    getLoggedInUsernameByToken(token: string): string {
+        return this.loggedInUsers.get(token)
     }
 
     getGuestByToken(token: string): User {
@@ -135,25 +164,58 @@ export class UserManager {
         return Array.from(this.loggedInUsers.values()).some((name) => name === userToCheck);
     }
 
+    async findUserModelByName(name: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
+        try {
+            const populateQuery = populateWith.map(field => { return { path: field } });
+            const s = await UserModel.findOne({name}).populate(populateQuery);
+            return s;
+        } catch (e) {
+            logger.error(`findUserModelByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
     async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = await this.getAdminByToken(req.token);
         if (this.admins.length !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const user: RegisteredUser = await this.getUserByName(req.body.newAdminUserName)
+        try{
+        const user: RegisteredUser = await this.findUserModelByName(req.body.newAdminUserName);
         if (!user)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const isAdmin: boolean = this.isAdmin(user);
         if (isAdmin)
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        this.admins = this.admins.concat([user]);
+
+        await AdminModel.create({user})
+
+        }
+        catch (e) {
+            logger.error(`DB ERROR ${e}`)
+        }
+
         return {data: {result: true}};
+    }
+
+
+    private async getAdminByName(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const u = await AdminModel.findOne({name}).populate('user')
+            const cart = await UserMapper.cartMapperFromDB(u.cart)
+            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart, UserRole.ADMIN);
+        } catch (e) {
+            logger.error(`getUserByName DB ERROR: ${e}`)
+            return undefined
+        }
     }
 
     private async getAdminByToken(token: string): Promise<Admin> {
         const user: RegisteredUser = await this.getLoggedInUserByToken(token);
-        return !user ? user : this.admins.find((a) => user.name === a.name)
+        return !user ? user : this.getAdminByName(user.name)
     }
 
     addGuestToken(token: string): void {

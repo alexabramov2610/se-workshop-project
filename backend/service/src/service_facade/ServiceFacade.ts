@@ -6,6 +6,7 @@ import * as BuyingService from '../buying_service/BuyingService';
 import * as YamlInitializer from './YamlInitializer';
 
 let tradingSystem = getInstance();
+
 /*
 UC-1.1
  */
@@ -46,7 +47,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     if (connectDeliveryRes.error) return connectDeliveryRes;
     const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
-    tradingSystem.openTradeSystem({body: {}, token: req.token})
+    await tradingSystem.openTradeSystem({body: {}, token: req.token})
     const logout: Res.BoolResponse = await tradingSystem.logout({body: {}, token: req.token});
     if (!logout.data.result) return logout;
     return {data: {result: true}}
@@ -251,42 +252,39 @@ export const viewPurchasePolicy = (req: Req.ViewStorePurchasePolicyRequest): Pro
 /*
 Additional req from FE
  */
-export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> => {
+export const getStoresWithOffset = async (req: Req.GetStoresWithOffsetRequest): Promise<Res.GetStoresWithOffsetResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    // return runIfOpen(req, StoreService.getStoresWithOffset);
 }
-export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> => {
+export const getAllProductsInStore = async (req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllProductsInStore));
-    // return runIfOpen(req, StoreService.getAllProductsInStore);
 }
-export const getAllCategoriesInStore = (req: Req.GetAllCategoriesInStoreRequest): Promise<Res.GetCategoriesResponse> => {
+export const getAllCategoriesInStore = async (req: Req.GetAllCategoriesInStoreRequest): Promise<Res.GetCategoriesResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategoriesInStore));
-    // return runIfOpen(req, StoreService.getAllCategoriesInStore);
 }
 export const isSystemUp = async (): Promise<Res.BoolResponse> => {
     // return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
-    return {data: {result: await tradingSystem.getTradeSystemState().data.state === Enums.TradingSystemState.OPEN}}
+    const res = await tradingSystem.getTradeSystemState()
+    return {data: {result: res.data.state === Enums.TradingSystemState.OPEN}}
 }
 export const verifyToken = async (req: Req.Request): Promise<Res.BoolResponse> => {
     return runIfOpen(req, UserService.verifyToken);
 }
-export const isLoggedInUser = (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
-    return runIfOpen(req, runIfHaveToken(UserService.isLoggedInUser));
-    // return runIfOpen(req, UserService.isLoggedInUser);
+export const isLoggedInUser = async (req: Req.Request): Promise<Res.GetLoggedInUserResponse> => {
+    return runIfOpen(req, UserService.isLoggedInUser);
 }
-export const getAllCategories = (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
+export const getAllCategories = async (req: Req.Request): Promise<Res.GetAllCategoriesResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getAllCategories))
 }
-export const getManagersPermissions = (req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetAllManagersPermissionsResponse> => {
+export const getManagersPermissions = async (req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetAllManagersPermissionsResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getManagersPermissions))
 }
-export const getOwnersAssignedBy = (req: Req.GetOwnersAssignedByRequest): Promise<Res.GetOwnersAssignedByResponse> => {
+export const getOwnersAssignedBy = async (req: Req.GetOwnersAssignedByRequest): Promise<Res.GetOwnersAssignedByResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getOwnersAssignedBy))
 }
-export const getPersonalDetails = (req: Req.Request): Promise<Res.GetPersonalDetailsResponse> => {
+export const getPersonalDetails = async (req: Req.Request): Promise<Res.GetPersonalDetailsResponse> => {
     return runIfOpen(req, runIfHaveToken(UserService.getPersonalDetails))
 }
-export const getItemIds = (req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> => {
+export const getItemIds = async (req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getItemIds))
 }
 
@@ -300,8 +298,8 @@ export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();
 }
 const runIfOpen = async (req: Req.Request, fn: any): Promise<any> => {
-    const isOpenReq: Req.Request = {body: {}, token: req.token};
-    if (tradingSystem.getTradeSystemState().data.state !== Enums.TradingSystemState.OPEN)
+    const res = await tradingSystem.getTradeSystemState()
+    if (res.data.state !== Enums.TradingSystemState.OPEN)
         return {data: {}, error: {message: "Trading system is closed!"}}
     const func = await fn
     return func.call(this, req);

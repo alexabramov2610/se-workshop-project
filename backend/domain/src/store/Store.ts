@@ -102,7 +102,6 @@ export class Store {
         const validProducts: IProduct[] = [];
 
         for (const product of products) {
-            product.storeName = this.storeName;
             if (this.getProductByCatalogNumber(product.catalogNumber)) {
                 logger.warn(`product: ${product.catalogNumber} already exists in store`)
                 invalidProducts.push(product);
@@ -112,6 +111,7 @@ export class Store {
                 invalidProducts.push(product);
             }
             else {
+                product.storeName = this.storeName;
                 product.rating = 3;
                 this.products.set(product, []);
                 validProducts.push(product);
@@ -392,7 +392,7 @@ export class Store {
         const itemsRemaining: IItem[] = items.slice(amount, items.length);
         try {
             const res = await ProductModel.updateOne({_id: productInStore.db_id}, {items: itemsRemaining})
-            logger.info(`updated store db`)
+            logger.debug(`updated products db ${res}`)
         } catch (e) {
             logger.error(`DB ERROR ${e}`)
         }
@@ -400,9 +400,8 @@ export class Store {
         return itemsToReturn;
     }
 
-    addReceipt(purchases: Purchase[], payment: IPayment): void {
-       // TODO
-        // this.receipts.push(new Receipt(purchases, payment))
+    addReceipt(receipt: IReceipt): void {
+       this.receipts.push(receipt);
     }
 
     getProductFinalPrice(catalogNumber: number): number {

@@ -1,12 +1,10 @@
-import { Schema } from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
+import {Schema, Types} from "mongoose";
+import notificationSchema from "./notification.schema";
 
 const eventSchema = new Schema({
-    notification: {type: Number},
-    amount: {type: Number},
-    finalPrice: {type: Number}
-},{autoCreate: true});
-
-eventSchema.plugin(uniqueValidator);
+    notification: {type: notificationSchema, required: true},
+    code: {type: Number, required: true},
+    username: {type: String, required: true}
+});
 
 export default eventSchema;
