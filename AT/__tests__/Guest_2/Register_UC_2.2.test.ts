@@ -1,5 +1,6 @@
 import { Driver, Bridge, Credentials } from "../..";
 import * as utils from "../../utils";
+import {exec} from "child_process";
 
 describe("Guest Registration, UC: 2.2", () => {
   let _serviceBridge: Partial<Bridge>;
@@ -8,17 +9,15 @@ describe("Guest Registration, UC: 2.2", () => {
 
   beforeEach(async () => {
     // _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
-
     await _driver.startSession();
     await _driver.initWithDefaults();
-
-    _serviceBridge = await _driver.getBridge();
+    // await _driver.dropDB();
+    await _driver.dropDB();
+      _serviceBridge = await _driver.getBridge();
     _credentials = {userName: "test-username", password: "test-password"};
   });
 
-  // afterAll(() => {
-  //     utils.terminateSocket();
-  // });
+  afterAll(async () => {  await _driver.dropDB(); });
 
   test("Valid Details", async () => {
     _credentials.userName = "validUsername";
@@ -64,6 +63,7 @@ describe("Guest Registration, UC: 2.2", () => {
       _credentials.password = "nonDigitsPass"; // Short password
 
       const {data, error} = await _serviceBridge.register(_credentials);
+    const err = data
       expect(error).toBeDefined();
       expect(data).toBeUndefined();
   });

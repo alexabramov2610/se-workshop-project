@@ -63,7 +63,7 @@ const Stages = ({stage}) => {
                                 stage === config.steps.REVIEW_SUBMIT
                                 && <Button onClick={() => handleSubmit(props)}
                                            type="primary"
-                                           style={{backgroundColor: "#0fa432", border: "none"}}
+                                           style={{backgroundColor: "#16a085", border: "none"}}
                                            loading={props.isLoading}
                                 >
                                     Submit
