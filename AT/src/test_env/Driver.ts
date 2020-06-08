@@ -1,7 +1,9 @@
-import { Bridge, Proxy, Adapter } from "../..";
-
+import { Bridge, Adapter } from "../..";
+import mongoose from "mongoose";
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
+
+/* Connect to the DB */
 
 
 
@@ -97,6 +99,13 @@ class Driver {
     return this;
   }
 
+  async dropDB() {
+    mongoose.connect('mongodb://localhost:27017/trading-system-db?readPreference=primary&appname=MongoDB%20Compass&ssl=false',function(){
+      /* Drop the DB */
+      mongoose.connection.db.dropDatabase();
+    });
+  }
+
   given: IGiven = {
     shopper: (u: User) => {
       this.mutant = { ...this.mutant, u: u };
@@ -112,24 +121,20 @@ class Driver {
     },
   };
 
-  // makeABuy(amount: number = 1): Res.PurchaseResponse {
-  //   this.mutant.p.map((p) =>
-  //     this.bridge.saveProductToCart({
-  //       body: {
-  //         storeName: this.mutant.s.name,
-  //         catalogNumber: p.catalogNumber,
-  //         amount,
-  //       },
-  //     })
-  //   );
+  async makeABuy(amount: number = 1): Promise<Res.PurchaseResponse> {
+    this.mutant.p.map(async (p) =>
+      await this.bridge.saveProductToCart({
+        body: {
+          storeName: this.mutant.s.name,
+          catalogNumber: p.catalogNumber,
+          amount,
+        },
+      })
+    );
+    const res = await this.bridge.purchase({ body: this._pi });
+    return res;
+  }
 
-    // return this.bridge.purchase({ body: this._pi });
-  // }
-
-  // resetState() {
-  //   this.bridge.reset();
-  //   return this;
-  // }
 }
 interface IGiven {
   shopper: (u: User) => IGiven;
