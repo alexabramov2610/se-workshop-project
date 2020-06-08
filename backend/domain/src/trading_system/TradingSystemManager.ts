@@ -29,6 +29,24 @@ export class TradingSystemManager {
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
         this.state = TradingSystemState.CLOSED;
+        this.initSubscribers()
+            .then(() => logger.info("publisher has been successfully initialized"))
+            .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
+    }
+
+    async initSubscribers(): Promise<string> {
+        try {
+            let subscriptions = await SubscriberModel.findOne({})
+            if (!subscriptions)
+                return;
+            subscriptions.storeOwners.forEach(owner => {
+                this._publisher.subscribe(owner.username, EventCode.STORE_OWNER_EVENTS, owner.storeName, owner.storeName);
+            })
+        } catch (e) {
+            logger.error(`unsubscribeStoreOwner DB ERROR: ${e}`)
+            throw new Error(e);
+        }
+        return "ok";
     }
 
     //region admin ops
@@ -266,7 +284,7 @@ export class TradingSystemManager {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
             await this.unsubscribeStoreOwner(req.body.usernameToRemove, req.body.storeName, res.data.owners)
         }
-        return {data: {result: res.data.result}, error: {message: res.error.message ? res.error.message : ""}};
+        return res;
     }
 
     async assignStoreManager(req: Req.AssignStoreManagerRequest): Promise<Res.BoolResponse> {
@@ -488,7 +506,7 @@ export class TradingSystemManager {
         const toRemoveMap: Map<string, string> = new Map<string, string>();
         const events: Event.StoreOwnerEvent[] = owners.reduce((acc, curr) =>
             acc.concat({
-                username: curr[1], code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
+                username: curr, code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
                 notification: {type: NotificationsType.GREEN, message: msg}
             }), []);
 
@@ -504,7 +522,7 @@ export class TradingSystemManager {
             let subscriptions = await SubscriberModel.findOne({})
             if (!subscriptions)
                 return;
-            subscriptions.storeOwners = subscriptions.storeOwners.filter(owner => !toRemoveMap.has(owner));
+            subscriptions.storeOwners = subscriptions.storeOwners.filter(owner => !toRemoveMap.has(owner.username));
             subscriptions.markModified('storeOwners');
             await subscriptions.save();
 
