@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/",
+    "comp": "tsc && cp server.cert ./dist/ && cp server.key ./dist/ && cp dropall.sh ./dist/ ",
     "start": "tsc && node dist/index.js",
     "start:silent": "tsc && SILENT=1 node dist/index.js",
     "debug": "tsc && DEBUG=1 node dist/index.js ",
@@ -35,6 +35,7 @@
     "winston-daily-rotate-file": "^4.4.2",
     "se-workshop-20-interfaces": "file:../../se-workshop-20-interfaces",
     "publisher": "file:../../publisher",
-    "dal": "file:../../data-access"
+    "dal": "file:../../data-access",
+    "shelljs": "0.8.4"
   }
 }

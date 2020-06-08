@@ -34,6 +34,11 @@ export class TradingSystemManager {
             .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
     }
 
+    dropAllDB() {
+        const shell = require('shelljs')
+        shell.exec('../../dropall.sh')
+    }
+
     async initSubscribers(): Promise<string> {
         try {
             const subscriptions = await SubscriberModel.findOne({})
