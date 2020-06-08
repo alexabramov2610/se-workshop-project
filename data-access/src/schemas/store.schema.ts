@@ -40,7 +40,7 @@ const storeSchema = new Schema({
             type: String,
         },
         discountPolicy: {
-            type: String,
+            type: Types.ObjectId, ref: 'discountPolicies',
         },
         rating: {type: Number, enum: Object.values(Rating), default: 3},
 },
