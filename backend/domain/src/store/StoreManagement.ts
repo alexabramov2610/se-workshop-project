@@ -705,21 +705,25 @@ export class StoreManagement {
         }
     }
 
-    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse> {
+    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string, isAdmin?: boolean): Promise<Res.ViewShopPurchasesHistoryResponse> {
         const storeModel = await this.findStoreModelByName(storeName);
         if (!storeModel)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        const isPermitted: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
-        if (!isPermitted.data.result && user.role !== UserRole.ADMIN)
+
+        let isPermitted: boolean = isAdmin;
+        if (!isPermitted) {
+            const permissionsVerification: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
+            isPermitted = permissionsVerification.data.result;
+        }
+
+        if (!isPermitted)
             return {
                 data: {result: false, receipts: []},
                 error: {message: errorMsg.E_PERMISSION}
             }
 
-        const iReceipts: IReceipt[] = storeModel.receipts.map( (r) => {
-            return {purchases: r.purchases, date: r.date}
-        })
-        // const iReceipts: IReceipt[] = [];
+        const iReceipts: IReceipt[] = storeModel.receipts.map( (r) =>
+            { return {purchases: r.purchases, date: r.date} })
         return {data: {result: true, receipts: iReceipts}}
     }
 
