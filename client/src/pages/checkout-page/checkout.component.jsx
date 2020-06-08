@@ -85,9 +85,9 @@ const mapCartToItems = (items) => {
       console.log(bi);
       return {
         store: p.storeName,
-        name: bi.product._name,
-        price: bi.product._price,
-        cn: bi.product._catalogNumber,
+        name: bi.product.name,
+        price: bi.product.price,
+        cn: bi.product.catalogNumber,
         quantity: bi.amount,
         finalPrice: bi.finalPrice,
       };

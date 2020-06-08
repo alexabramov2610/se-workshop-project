@@ -12,7 +12,7 @@ import {createAdmin, createGuest, createRegisteredUser} from "../api-int/utils";
 const logger = loggerW(__filename)
 
 export class UserManager {
-    private readonly DEFAULT_USER_POPULATION: string[] = ["receipts","pendingEvents"];
+    private readonly DEFAULT_USER_POPULATION: string[] = ["receipts", "pendingEvents"];
     private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
     private admins: Admin[];
@@ -103,8 +103,7 @@ export class UserManager {
             if (u) {
                 await u.save();
                 logger.debug(`saveNotification: successfully save event to user: ${username} in DB`)
-            }
-            else
+            } else
                 logger.error(`saveNotification: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
         } catch (e) {
             logger.error(`saveNotification DB ERROR: ${e}`)
@@ -165,9 +164,11 @@ export class UserManager {
         return Array.from(this.loggedInUsers.values()).some((name) => name === userToCheck);
     }
 
-    async findUserModelByName(name: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
+    async findUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
         try {
-            const populateQuery = populateWith.map(field => { return { path: field } });
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
             const s = await UserModel.findOne({name}).populate(populateQuery);
             return s;
         } catch (e) {
@@ -183,18 +184,17 @@ export class UserManager {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        try{
-        const user: RegisteredUser = await this.findUserModelByName(req.body.newAdminUserName);
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NF}}
-        const isAdmin: boolean = this.isAdmin(user);
-        if (isAdmin)
-            return {data: {result: false}, error: {message: errorMsg.E_AL}}
+        try {
+            const user: RegisteredUser = await this.findUserModelByName(req.body.newAdminUserName);
+            if (!user)
+                return {data: {result: false}, error: {message: errorMsg.E_NF}}
+            const isAdmin: boolean = this.isAdmin(user);
+            if (isAdmin)
+                return {data: {result: false}, error: {message: errorMsg.E_AL}}
 
-        await AdminModel.create({user})
+            await AdminModel.create({user})
 
-        }
-        catch (e) {
+        } catch (e) {
             logger.error(`DB ERROR ${e}`)
         }
 
@@ -202,7 +202,7 @@ export class UserManager {
     }
 
 
-    private async getAdminByName(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
+    private async getAdminByName(token: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
             const u = await AdminModel.findOne({name}).populate('user')
@@ -363,6 +363,7 @@ export class UserManager {
     private transferToCartRes(cart: Map<string, BagItem[]>): Cart {
         const cartProducts: CartProduct[] = [];
         for (const [storeName, bagItems] of cart) {
+
             cartProducts.push({storeName, bagItems})
         }
         const cartRes: Cart = {products: cartProducts}
