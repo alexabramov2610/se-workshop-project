@@ -33,7 +33,7 @@ export class StoreManagement {
 
     async findStoreByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
         try {
-            logger.debug(`trying to find store ${storeName} in DB`)
+            logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
             const populateQuery = populateWith.map(field => { return { path: field } });
             const s = await StoreModel.findOne({storeName})
                 .populate(populateQuery)
@@ -48,9 +48,9 @@ export class StoreManagement {
 
     async findStoreModelByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
         try {
-            logger.info(`trying to find store ${storeName} in DB`)
+            logger.debug(`findStoreModelByName trying to find store ${storeName} in DB`)
             const populateQuery = populateWith.map(field => { return { path: field } });
-            const s = await StoreModel.findOne({storeName}).populate('products')
+            const s = await StoreModel.findOne({storeName}).populate(populateQuery)
                 .populate(populateQuery);
             return s;
         } catch (e) {
@@ -62,7 +62,7 @@ export class StoreManagement {
 
     async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
         try {
-            logger.info(`trying to find all stores in DB`)
+            logger.debug(`trying to find all stores in DB`)
             const populateQuery = populateWith.map(field => { return { path: field } });
             const s = await StoreModel.find().populate('products')
                 .populate(populateQuery);
