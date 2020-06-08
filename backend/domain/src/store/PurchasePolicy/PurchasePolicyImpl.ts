@@ -5,7 +5,6 @@ import {RegisteredUser} from "../../user/users/RegisteredUser";
 
 export class PurchasePolicyImpl extends PurchasePolicy {
 
-
     public constructor(children?:Map<PurchasePolicy, Operators>) {
         super()
         this._children = children? children : new Map();

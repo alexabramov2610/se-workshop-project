@@ -36,7 +36,7 @@ export class TradingSystemManager {
 
     async initSubscribers(): Promise<string> {
         try {
-            let subscriptions = await SubscriberModel.findOne({})
+            const subscriptions = await SubscriberModel.findOne({})
             if (!subscriptions)
                 return;
             subscriptions.storeOwners.forEach(owner => {
@@ -118,7 +118,7 @@ export class TradingSystemManager {
             return;
 
         logger.info(`sending ${userModel.pendingEvents.length} missing notifications..`)
-        let eventToResend = [];
+        const eventToResend = [];
         userModel.pendingEvents.forEach(event => {
             event.code = EventCode.USER_EVENTS;
             if (this._publisher.notify(event).length > 0)
@@ -476,7 +476,7 @@ export class TradingSystemManager {
         this.subscribeNewStoreOwner(username, storeName);
         const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
         const event: Event.StoreOwnerEvent = {
-            username: username, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
+            username, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
             notification: {type: NotificationsType.GREEN, message: msg}
         };
 
@@ -506,7 +506,7 @@ export class TradingSystemManager {
         const toRemoveMap: Map<string, string> = new Map<string, string>();
         const events: Event.StoreOwnerEvent[] = owners.reduce((acc, curr) =>
             acc.concat({
-                username: curr, code: EventCode.REMOVED_AS_STORE_OWNER, storeName: storeName,
+                username: curr, code: EventCode.REMOVED_AS_STORE_OWNER, storeName,
                 notification: {type: NotificationsType.GREEN, message: msg}
             }), []);
 
@@ -519,7 +519,7 @@ export class TradingSystemManager {
         }
 
         try {
-            let subscriptions = await SubscriberModel.findOne({})
+            const subscriptions = await SubscriberModel.findOne({})
             if (!subscriptions)
                 return;
             subscriptions.storeOwners = subscriptions.storeOwners.filter(owner => !toRemoveMap.has(owner.username));

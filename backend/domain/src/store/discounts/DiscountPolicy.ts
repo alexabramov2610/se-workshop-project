@@ -6,7 +6,7 @@ import {loggerW} from "../../api-int/Logger";
 const logger = loggerW(__filename)
 
 export class DiscountPolicy extends Discount {
-    private _children: Map<Discount, Operators>;// storename -> items
+    private _children: Map<Discount, Operators>;
 
     public constructor() {
         super(new Date(), 0, 0, [])
