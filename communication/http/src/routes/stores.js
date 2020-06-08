@@ -3,6 +3,8 @@ import * as StoreController from "../controllers/store_controllers";
 
 const router = express.Router();
 
+
+
 router.post("/search", StoreController.search);
 router.post("/purchase", StoreController.purchase);
 router.post("/createStore", StoreController.createStore);
