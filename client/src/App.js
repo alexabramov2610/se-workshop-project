@@ -25,6 +25,10 @@ import StorePageContainer from "./pages/store-page/store-page-container";
 import { CheckoutPage } from './pages/checkout-page/checkout.component'
 import * as wssClient from "./utils/wss.client";
 import ManageManagersPageContainer from "./pages/manage-managers-page/manage-managers-page-container";
+import AdminViewStoresPurchaseHistoryContainer
+    from "./pages/admin-view-stores-purchase-history-page/admin-view-stores-purchase-history-container";
+import AdminViewUsersPurchaseHistoryContainer
+    from "./pages/admin-view-user-purchase-history-page/admin-view-user-purcheses-history-container";
 
 
 
@@ -52,7 +56,7 @@ class App extends React.Component {
         if (isAdded) {
             await this.cartCountUpdater();
         } else {
-            Modal.warning("",data.error.message)
+            Modal.warning("", data.error.message)
         }
     }
 
@@ -99,11 +103,13 @@ class App extends React.Component {
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />
-                        <Route path="/store/:storename/:catalognumber" render={(props) => <ManageProductItemsContainer />} />
+                        <Route path="/store/:storename/edit-product/:catalognumber" render={(props) => <ManageProductItemsContainer />} />
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
+                        <Route exact path="/adminViewStores" component={AdminViewStoresPurchaseHistoryContainer} />
+                        <Route exact path="/adminViewUsers" component={AdminViewUsersPurchaseHistoryContainer} />
                     </Switch>
                 </Router>
             </CartCtx.Provider>

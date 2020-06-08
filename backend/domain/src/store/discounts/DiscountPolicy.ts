@@ -1,7 +1,6 @@
 import {Discount} from "./Discount";
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
-import {loggers} from "winston";
 import {loggerW} from "../../api-int/Logger";
 const logger = loggerW(__filename)
 
