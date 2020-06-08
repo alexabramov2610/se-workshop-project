@@ -7,6 +7,7 @@ import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager
 import {errorMsg, loggerW, UserRole} from "../api-int/internal_api";
 import {AdminModel, StoreModel, UserModel} from 'dal'
 import * as UserMapper from './UserMapper'
+import {createAdmin, createGuest, createRegisteredUser} from "../api-int/utils";
 
 const logger = loggerW(__filename)
 
@@ -64,7 +65,7 @@ export class UserManager {
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         this.loggedInUsers.delete(req.token)
-        this.guests.set(req.token, new Guest());
+        this.guests.set(req.token, createGuest());
         return {data: {result: true}}
     }
 
@@ -75,7 +76,7 @@ export class UserManager {
                 .populate('receipts')
                 .populate('pendingEvents');
             const cart = await UserMapper.cartMapperFromDB(u.cart)
-            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
+            return createRegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
             logger.error(`getUserByName DB ERROR: ${e}`)
             return undefined
@@ -206,7 +207,7 @@ export class UserManager {
             logger.debug(`trying to find user ${name} in DB`)
             const u = await AdminModel.findOne({name}).populate('user')
             const cart = await UserMapper.cartMapperFromDB(u.cart)
-            return new RegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart, UserRole.ADMIN);
+            return createAdmin(u.name, u.password, u.receipts, u.cart, u.pendingEvents)
         } catch (e) {
             logger.error(`getUserByName DB ERROR: ${e}`)
             return undefined
@@ -219,7 +220,7 @@ export class UserManager {
     }
 
     addGuestToken(token: string): void {
-        this.guests.set(token, new Guest());
+        this.guests.set(token, createGuest());
     }
 
     isGuest(token: string): boolean {
@@ -227,7 +228,7 @@ export class UserManager {
     }
 
     async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, isGuest: boolean): Promise<boolean> {
-        user.saveProductToCart(storeName, product, amount);
+        this.saveProductToUserCart(storeName, product, amount, user);
         if (!isGuest) {
             const rUser = user as RegisteredUser;
             const cart = UserMapper.cartMapperToDB(rUser.cart);
@@ -238,6 +239,22 @@ export class UserManager {
                 return false;
             }
         }
+    }
+
+    saveProductToUserCart(storeName: string, product: IProduct, amount: number, user: User): void {
+        logger.debug(`saving ${amount} of product ${product.name} to cart`)
+        const storeBag: BagItem[] = user.cart.get(storeName);
+        if (!storeBag) {
+            logger.debug(`new bag for store ${storeName}`)
+            const newBag: BagItem = {product, amount};
+            user.cart.set(storeName, [newBag]);
+            return
+        }
+        logger.debug(`add bag item to existing bag in store ${storeName}`)
+        const oldBagItem = storeBag.find((b) => b.product.catalogNumber === product.catalogNumber)
+        const newBagItem = oldBagItem ? {product, amount: oldBagItem.amount + amount} : {product, amount}
+        const newStoreBag = storeBag.filter((b) => b.product.catalogNumber !== product.catalogNumber).concat([newBagItem]);
+        user.cart.set(storeName, newStoreBag);
     }
 
     async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number, rUser: RegisteredUser): Promise<Res.BoolResponse> {
@@ -253,7 +270,7 @@ export class UserManager {
         if (oldBagItem.amount - amountToRemove < 0) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_BAD_AMOUNT}}
         }
-        user.removeProductFromCart(storeName, product, amountToRemove)
+        this.removeProductFromUserCart(storeName, product, amountToRemove, user)
         if (rUser) {
             try {
                 const cart = UserMapper.cartMapperToDB(rUser.cart);
@@ -265,6 +282,19 @@ export class UserManager {
             }
         }
 
+    }
+
+    removeProductFromUserCart(storeName: string, product: IProduct, amount: number, user: User): void {
+        const storeCart: BagItem[] = user.cart.get(storeName);
+        const oldBagItem: BagItem = storeCart.find((b) => b.product.catalogNumber === product.catalogNumber);
+        const newBagItem = {product: oldBagItem.product, amount: oldBagItem.amount - amount}
+
+        const filteredBag = storeCart.filter((b) => b.product.catalogNumber !== product.catalogNumber)
+        if (newBagItem.amount > 0) {
+            user.cart.set(storeName, filteredBag.concat([newBagItem]))
+        } else {
+            user.cart.set(storeName, filteredBag)
+        }
     }
 
     async viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {
@@ -287,6 +317,10 @@ export class UserManager {
 
     getUserCart(user: User) {
         return user.cart;
+    }
+
+    resetUserCart(user: User) {
+        user.cart = new Map();
     }
 
     async verifyCredentials(req: Req.VerifyCredentialsReq): Promise<Res.BoolResponse> {
@@ -334,5 +368,11 @@ export class UserManager {
         const cartRes: Cart = {products: cartProducts}
         return cartRes
     }
+
+
+
+
+
+
 
 }

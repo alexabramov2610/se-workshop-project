@@ -760,8 +760,6 @@ export class StoreManagement {
         }
     }
 
-
-    //region needs testing
     async getStoresWithOffset(limit: number, offset: number): Promise<Res.GetStoresWithOffsetResponse> {
         const storeInfos: StoreInfo[] = [];
         if (limit <= 0 || offset < 0)
@@ -828,7 +826,6 @@ export class StoreManagement {
         })
         return {data: {result: true, permissions}}
     }
-    //endregion
 
 
 

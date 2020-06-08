@@ -82,7 +82,7 @@ export class PaymentSystem {
         } else {
             const today: Date = new Date();
             let expOk: boolean = creditCard.expYear.length === 2 && ((parseInt('20' + creditCard.expYear, 10) > today.getFullYear() ||
-                (parseInt(creditCard.expYear, 10) === today.getFullYear() && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1)))
+                (parseInt(creditCard.expYear, 10) === today.getFullYear() % 100 && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1)))
             expOk = expOk && creditCard.holderName && creditCard.holderName.length > 0 &&
                 creditCard.number && creditCard.number.length > 0 &&
                 creditCard.cvv && creditCard.cvv.length > 0;

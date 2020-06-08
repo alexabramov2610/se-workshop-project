@@ -12,6 +12,7 @@ import * as ServiceFacade from "./service_facade/ServiceFacade";
 import {Store} from "domain_layer/dist/src/store/Store";
 import {StoreOwner} from "domain_layer/dist/src/user/users/StoreOwner";
 import {Request} from "se-workshop-20-interfaces/dist/src/Request";
+import {createRegisteredUser} from "domain_layer/dist/src/api-int/utils";
 
 
 const storeOwnerName: string = "alex";
@@ -137,7 +138,7 @@ export const viewManagerPermissions = async (storeName: string, managerToView: s
 export async function t1() {
     await systemInit();
 
-    // storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+    // storeOwnerRegisteredUser = createRegisteredUser(storeOwnerName, storeOwnerPassword);
     // store = new Store(storeName, storeDesc);
     //storeOwner = new StoreOwner(storeOwnerName);
 
@@ -145,8 +146,8 @@ export async function t1() {
     await createStore(storeName, token);
 
 
-    const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
+    const buyer1: RegisteredUser = createRegisteredUser("buyer1", "buyer1password");
+    const buyer2: RegisteredUser = createRegisteredUser("buyer2", "buyer2password");
 
     const prod1: IProduct = {name: "חתול מעופף", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
     const prod2: IProduct = {name: "ביסלי גריל", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};
@@ -248,24 +249,24 @@ export async function t1() {
 /** creates new store with 1 product and 1 item, and 10 users */
 export async function t2() {
     // prepare
-    //  storeOwnerRegisteredUser = new RegisteredUser(storeOwnerName, storeOwnerPassword);
+    //  storeOwnerRegisteredUser = createRegisteredUser(storeOwnerName, storeOwnerPassword);
     // store = new Store(storeName, storeDesc);
     //   storeOwner = new StoreOwner(storeOwnerName);
     const buyerPw: string = "buyerpw";
-    const buyer1: RegisteredUser = new RegisteredUser("buyer1", buyerPw);
-    const buyer2: RegisteredUser = new RegisteredUser("buyer2", buyerPw);
-    const buyer3: RegisteredUser = new RegisteredUser("buyer3", buyerPw);
-    const buyer4: RegisteredUser = new RegisteredUser("buyer4", buyerPw);
-    const buyer5: RegisteredUser = new RegisteredUser("buyer5", buyerPw);
-    const buyer6: RegisteredUser = new RegisteredUser("buyer6", buyerPw);
-    const buyer7: RegisteredUser = new RegisteredUser("buyer7", buyerPw);
-    const buyer8: RegisteredUser = new RegisteredUser("buyer8", buyerPw);
-    const buyer9: RegisteredUser = new RegisteredUser("buyer9", buyerPw);
-    const buyer10: RegisteredUser = new RegisteredUser("buyer10", buyerPw);
-    const buyer11: RegisteredUser = new RegisteredUser("buyer11", buyerPw);
-    const buyer12: RegisteredUser = new RegisteredUser("buyer12", buyerPw);
-    const buyer13: RegisteredUser = new RegisteredUser("buyer13", buyerPw);
-    const buyer14: RegisteredUser = new RegisteredUser("buyer14", buyerPw);
+    const buyer1: RegisteredUser = createRegisteredUser("buyer1", buyerPw);
+    const buyer2: RegisteredUser = createRegisteredUser("buyer2", buyerPw);
+    const buyer3: RegisteredUser = createRegisteredUser("buyer3", buyerPw);
+    const buyer4: RegisteredUser = createRegisteredUser("buyer4", buyerPw);
+    const buyer5: RegisteredUser = createRegisteredUser("buyer5", buyerPw);
+    const buyer6: RegisteredUser = createRegisteredUser("buyer6", buyerPw);
+    const buyer7: RegisteredUser = createRegisteredUser("buyer7", buyerPw);
+    const buyer8: RegisteredUser = createRegisteredUser("buyer8", buyerPw);
+    const buyer9: RegisteredUser = createRegisteredUser("buyer9", buyerPw);
+    const buyer10: RegisteredUser = createRegisteredUser("buyer10", buyerPw);
+    const buyer11: RegisteredUser = createRegisteredUser("buyer11", buyerPw);
+    const buyer12: RegisteredUser = createRegisteredUser("buyer12", buyerPw);
+    const buyer13: RegisteredUser = createRegisteredUser("buyer13", buyerPw);
+    const buyer14: RegisteredUser = createRegisteredUser("buyer14", buyerPw);
 
     const users = [buyer1, buyer2, buyer3, buyer4, buyer5, buyer6, buyer7, buyer8, buyer9, buyer10, buyer11, buyer12, buyer13, buyer14];
 
@@ -424,16 +425,16 @@ export async function t2() {
 /** creates 10 stores */
 export async function t3() {
     // prepare
-    const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
-    const buyer3: RegisteredUser = new RegisteredUser("buyer3", "buyer2password");
-    const buyer4: RegisteredUser = new RegisteredUser("buyer4", "buyer2password");
-    const buyer5: RegisteredUser = new RegisteredUser("buyer5", "buyer2password");
-    const buyer6: RegisteredUser = new RegisteredUser("buyer6", "buyer2password");
-    const buyer7: RegisteredUser = new RegisteredUser("buyer7", "buyer2password");
-    const buyer8: RegisteredUser = new RegisteredUser("buyer8", "buyer2password");
-    const buyer9: RegisteredUser = new RegisteredUser("buyer9", "buyer2password");
-    const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
+    const buyer1: RegisteredUser = createRegisteredUser("buyer1", "buyer1password");
+    const buyer2: RegisteredUser = createRegisteredUser("buyer2", "buyer2password");
+    const buyer3: RegisteredUser = createRegisteredUser("buyer3", "buyer2password");
+    const buyer4: RegisteredUser = createRegisteredUser("buyer4", "buyer2password");
+    const buyer5: RegisteredUser = createRegisteredUser("buyer5", "buyer2password");
+    const buyer6: RegisteredUser = createRegisteredUser("buyer6", "buyer2password");
+    const buyer7: RegisteredUser = createRegisteredUser("buyer7", "buyer2password");
+    const buyer8: RegisteredUser = createRegisteredUser("buyer8", "buyer2password");
+    const buyer9: RegisteredUser = createRegisteredUser("buyer9", "buyer2password");
+    const buyer10: RegisteredUser = createRegisteredUser("buyer10", "buyer2password");
 
     const storeName1: string = "store1";
     const storeName2: string = "store2";
@@ -539,16 +540,16 @@ export async function t3() {
 /** creates 10 stores without init */
 export async function t4() {
     // prepare
-    const buyer1: RegisteredUser = new RegisteredUser("buyer1", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("buyer2", "buyer2password");
-    const buyer3: RegisteredUser = new RegisteredUser("buyer3", "buyer2password");
-    const buyer4: RegisteredUser = new RegisteredUser("buyer4", "buyer2password");
-    const buyer5: RegisteredUser = new RegisteredUser("buyer5", "buyer2password");
-    const buyer6: RegisteredUser = new RegisteredUser("buyer6", "buyer2password");
-    const buyer7: RegisteredUser = new RegisteredUser("buyer7", "buyer2password");
-    const buyer8: RegisteredUser = new RegisteredUser("buyer8", "buyer2password");
-    const buyer9: RegisteredUser = new RegisteredUser("buyer9", "buyer2password");
-    const buyer10: RegisteredUser = new RegisteredUser("buyer10", "buyer2password");
+    const buyer1: RegisteredUser = createRegisteredUser("buyer1", "buyer1password");
+    const buyer2: RegisteredUser = createRegisteredUser("buyer2", "buyer2password");
+    const buyer3: RegisteredUser = createRegisteredUser("buyer3", "buyer2password");
+    const buyer4: RegisteredUser = createRegisteredUser("buyer4", "buyer2password");
+    const buyer5: RegisteredUser = createRegisteredUser("buyer5", "buyer2password");
+    const buyer6: RegisteredUser = createRegisteredUser("buyer6", "buyer2password");
+    const buyer7: RegisteredUser = createRegisteredUser("buyer7", "buyer2password");
+    const buyer8: RegisteredUser = createRegisteredUser("buyer8", "buyer2password");
+    const buyer9: RegisteredUser = createRegisteredUser("buyer9", "buyer2password");
+    const buyer10: RegisteredUser = createRegisteredUser("buyer10", "buyer2password");
 
     const storeName1: string = "store1";
     const storeName2: string = "store2";
@@ -653,9 +654,9 @@ export async function t4() {
 /** 3 users buy from store: Best-Store! */
 export async function t5() {
     // prepare
-    const buyer1: RegisteredUser = new RegisteredUser("בזבזן גדול", "buyer1password");
-    const buyer2: RegisteredUser = new RegisteredUser("אוהב לקנות הכל", "buyer1password");
-    const buyer3: RegisteredUser = new RegisteredUser("love-spending", "buyer1password");
+    const buyer1: RegisteredUser = createRegisteredUser("בזבזן גדול", "buyer1password");
+    const buyer2: RegisteredUser = createRegisteredUser("אוהב לקנות הכל", "buyer1password");
+    const buyer3: RegisteredUser = createRegisteredUser("love-spending", "buyer1password");
 
     const prod1: IProduct = {name: "במבה אסם", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
     const prod2: IProduct = {name: "ביסלי גריל", catalogNumber: 2, price: 200, category: ProductCategory.ELECTRONICS};

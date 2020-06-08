@@ -1,6 +1,2 @@
 import {User} from "./User";
-
-export class Guest extends User{
-
-    
-}
+export interface Guest extends User {}

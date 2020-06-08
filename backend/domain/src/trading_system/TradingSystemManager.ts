@@ -693,9 +693,9 @@ export class TradingSystemManager {
                 totalCharged: req.body.payment.totalCharged,
                 purchases
             });
-            user.resetCart();
+            this._userManager.resetUserCart(user);
             if (rUser) {
-                rUser.addReceipt(receipt)
+                rUser.receipts.push(receipt)
                 // const res = await UserModel.updateOne({name: rUser.name}, {cart: UserMapper.cartMapperToDB(rUser.cart), receipts: rUser.receipts});
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();

@@ -4,7 +4,7 @@ export interface StoreOwner {
     assignedStoreManagers: StoreManager[];
     assignedStoreOwners: StoreOwner[];
     name: string;
-
+}
     // assignStoreOwner(storeOwner: StoreOwner) : void {
     //     this._assignedStoreOwners = this._assignedStoreOwners.concat(storeOwner);
     // }
@@ -44,4 +44,4 @@ export interface StoreOwner {
     // get assignedStoreManagers(): RegisteredUser[] {
     //     return this._assignedStoreManagers;
     // }
-}
+// }
