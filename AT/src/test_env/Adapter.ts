@@ -194,11 +194,14 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
  //      : { data: data, error: undefined };
  //  },
 
-  // removeStoreManager(
-  //   req: Partial<Req.RemoveStoreManagerRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
-  // },
+  async removeStoreManager(
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Promise<Res.BoolResponse> {
+      const yx = 2;
+      const x = await ServiceFacade.removeStoreManager(wrapWithToken(req.body));
+      const y= req;
+      return x;
+  },
 
   // removeManagerPermissions(
   //   req: Req.ChangeManagerPermissionRequest

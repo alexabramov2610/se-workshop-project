@@ -62,9 +62,9 @@ export interface Bridge {
   //   store: Store,
   //   credentials: Credentials
   // ): DummyTypes.IPermissionsResponse;
-  // removeStoreManager(
-  //   req: Partial<Req.RemoveStoreManagerRequest>
-  // ): Res.BoolResponse;
+  removeStoreManager(
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Promise<Res.BoolResponse>;
   // removeManagerPermissions(
   //   req: Partial<Req.ChangeManagerPermissionRequest>
   // ): Res.BoolResponse;
