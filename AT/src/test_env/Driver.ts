@@ -33,6 +33,7 @@ class Driver {
         country: "CatZone",
       },
     };
+    this.makeABuy = this.makeABuy.bind(this)
   }
 
   private loginDefCredentials: Credentials = {
@@ -137,13 +138,15 @@ async initWith(cred: Credentials): Promise<Driver> {
 
   async makeABuy(amount: number = 1): Promise<Res.PurchaseResponse> {
     for (let i = 0; i <this.mutant.p.length; i++){
-      await this.bridge.saveProductToCart({
-        body: {
-          storeName: this.mutant.s.name,
-          catalogNumber: this.mutant.p[i].catalogNumber,
-          amount,
-        },
-      })
+     const req = {
+       body: {
+         storeName: this.mutant.s.name,
+         catalogNumber: this.mutant.p[i].catalogNumber,
+         amount,
+       },
+     }
+      const res = await this.bridge.saveProductToCart(req)
+      const res2 = res;
     }
 
 
