@@ -51,21 +51,21 @@ describe("Perform authorized operations, UC: 5.1", () => {
     });
 
 
-    test("Act, no permissions", () => {
-        _serviceBridge.logout() // Owner signs out
-        _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
+    test("Act, no permissions", async () => {
+        await _serviceBridge.logout() // Owner signs out
+        await _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
 
-        const {data, error} = _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
+        const {data, error} = await _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
     });
 
-    test("Act, with permissions", () => {
-        _serviceBridge.grantPermissions(_storeManagerCredentials, _testStore, [PERMISSION.MANAGE_INVENTORY]);
-        _serviceBridge.logout() // Owner signs out
-        _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
+    test("Act, with permissions", async () => {
+       await _serviceBridge.grantPermissions(_storeManagerCredentials, _testStore, [PERMISSION.MANAGE_INVENTORY]);
+       await _serviceBridge.logout() // Owner signs out
+       await _serviceBridge.login(_storeManagerCredentials); // Manager is logged in
 
-        const {data, error} = _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
+        const {data, error} = await _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
     });

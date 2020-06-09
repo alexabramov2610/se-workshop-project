@@ -156,23 +156,23 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // grantPermissions(
-  //   credentials: Credentials,
-  //   store: Store,
-  //   permissions: PERMISSION[]
-  // ): DummyTypes.IResponse {
-  //   const req = {
-  //     managerToChange: credentials.userName,
-  //     storeName: store.name,
-  //     permissions: permissions,
-  //   };
-  //   const { data, error } = ServiceFacade.addManagerPermissions(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): Promise<DummyTypes.IResponse> {
+    const req = {
+      managerToChange: credentials.userName,
+      storeName: store.name,
+      permissions: permissions,
+    };
+    const { data, error } = await ServiceFacade.addManagerPermissions(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // changeProductName(
   //   req: Partial<Req.ChangeProductNameRequest>

@@ -45,11 +45,11 @@ export interface Bridge {
   // ): DummyTypes.IResponse;
   
   assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse>;
-  // grantPermissions(
-  //   credentials: Credentials,
-  //   store: Store,
-  //   permissions: PERMISSION[]
-  // ): DummyTypes.IResponse;
+  grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): Promise<DummyTypes.IResponse>;
   // reset(): void;
   assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
   // changeProductName(
