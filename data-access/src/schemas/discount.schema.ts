@@ -1,12 +1,13 @@
 import {Schema} from "mongoose";
 import {ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import conditionSchema from "./condition.schema";
 
 const discountSchema = new Schema({
         operator: {
             type: String,
             required: true
         },
-        date: {
+        startDate: {
             type: Date,
         },
         duration: {
@@ -17,11 +18,6 @@ const discountSchema = new Schema({
             type: Number,
             required: true
         },
-        children: {
-            type: Map,
-            of: [String],
-            default: new Map()
-        },
         productsInDiscount: {
             type: [Number],
             default: []
@@ -31,10 +27,9 @@ const discountSchema = new Schema({
             enum: Object.values(ProductCategory),
         },
         conditions: {
-            type: Map,
-            of: [String],
-            default: new Map()
+            type: [conditionSchema],
         },
+        storeName: {type: String}
     },
     {timestamps: false,})
 

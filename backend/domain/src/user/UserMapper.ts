@@ -15,11 +15,11 @@ export async function cartMapperFromDB(cart: any): Promise<Map<string, BagItem[]
     return mappedCart;
 }
 
-export function cartMapperToDB(cart: Map<string, BagItem[]>): any {
+export function cartMapperToDB(cart): any {
     const DBcart = new Map();
     for (const [s, b] of cart) {
         DBcart.set(s, b.map((bag) => {
-            return {amount: bag.amount, finalPrice: bag.product.price, product: bag.product.db_id}
+            return {amount: bag.amount, finalPrice: bag.finalPrice, product: bag.product.db_id? bag.product.db_id : bag.product._id}
         }))
     }
     return DBcart;

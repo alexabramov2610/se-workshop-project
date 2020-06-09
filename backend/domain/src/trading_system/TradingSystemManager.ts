@@ -4,15 +4,30 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {errorMsg} from "../api-int/Error";
 import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
-import {EventCode, NotificationsType, ProductCategory, TradingSystemState} from "se-workshop-20-interfaces/dist/src/Enums";
+import {
+    EventCode,
+    ManagementPermission,
+    NotificationsType,
+    ProductCategory,
+    TradingSystemState
+} from "se-workshop-20-interfaces/dist/src/Enums";
 import {v4 as uuid} from 'uuid';
 import {ExternalSystems, loggerW, UserRole} from "../api-int/internal_api";
-import {BagItem, IDiscountPolicy, IPurchasePolicy, Purchase, IProduct, Cart, CartProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    BagItem,
+    IDiscountPolicy,
+    IPurchasePolicy,
+    Purchase,
+    IProduct,
+    Cart,
+    CartProduct
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel,SystemModel, SubscriberModel} from "dal";
+import {ReceiptModel, UserModel, SystemModel, SubscriberModel} from "dal";
+import * as UserMapper from '../user/UserMapper'
 
 const logger = loggerW(__filename)
 
@@ -34,9 +49,9 @@ export class TradingSystemManager {
             .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
     }
 
-    dropAllDB() {
+    async dropAllDB() {
         const shell = require('shelljs')
-        shell.exec('../../dropall.sh')
+        await shell.exec('../../dropall.sh', {async: true})
     }
 
     async initSubscribers(): Promise<string> {
@@ -63,14 +78,13 @@ export class TradingSystemManager {
 
     async openTradeSystem(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info(`opening trading system...`);
-        try{
+        try {
             const ans = await SystemModel.findOneAndUpdate({}, {isSystemUp: true}, {new: true});
-            if(!ans){
-                const res =  await SystemModel.create( {isSystemUp: true})
+            if (!ans) {
+                const res = await SystemModel.create({isSystemUp: true})
             }
             return {data: {result: true}};
-        }
-        catch (e) {
+        } catch (e) {
             logger.error(`openTradeSystem: DB ERROR ${e}`)
             return {data: {result: false}};
         }
@@ -118,8 +132,7 @@ export class TradingSystemManager {
         if (!userModel) {
             logger.error(`login: DB ERROR: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
             return;
-        }
-        else if (userModel.pendingEvents.length === 0)
+        } else if (userModel.pendingEvents.length === 0)
             return;
 
         logger.info(`sending ${userModel.pendingEvents.length} missing notifications..`)
@@ -407,8 +420,10 @@ export class TradingSystemManager {
             };
 
         const storeNames: string[] = [...user.cart.keys()];
-        const usersCart: Cart = { products: storeNames.reduce((acc: CartProduct[], curr: string) =>
-                acc.concat({ storeName: curr, bagItems: user.cart.get(curr) }), []) }
+        const usersCart: Cart = {
+            products: storeNames.reduce((acc: CartProduct[], curr: string) =>
+                acc.concat({storeName: curr, bagItems: user.cart.get(curr)}), [])
+        }
         return {
             data: {
                 result: true,
@@ -425,8 +440,8 @@ export class TradingSystemManager {
     //region verifications
     async verifyTokenExists(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info(`checking if token exists ${req.token}`)
-        return this._userManager.isTokenTaken(req.token) ? { data: { result: true } } :
-            { data: { result: false }, error: {message: errorMsg.E_BAD_TOKEN} }
+        return this._userManager.isTokenTaken(req.token) ? {data: {result: true}} :
+            {data: {result: false}, error: {message: errorMsg.E_BAD_TOKEN}}
     }
 
     async isLoggedInUserByToken(req: Req.Request): Promise<Res.GetLoggedInUserResponse> {
@@ -437,13 +452,17 @@ export class TradingSystemManager {
     async verifyStorePermission(req: Req.VerifyStorePermission, storeModel?): Promise<Res.BoolResponse> {
         logger.debug(`verifying store permissions`)
         const username = this._userManager.getLoggedInUsernameByToken(req.token)
+        const isAdminWatchesHistories: boolean = req.body.permission === ManagementPermission.WATCH_PURCHASES_HISTORY && this._userManager.checkIsAdminByToken(req.token)
+        if (isAdminWatchesHistories)
+            return {data: {result: true}};
         return username ? this._storeManager.verifyStoreOperation(req.body.storeName, username, req.body.permission, storeModel) :
-            { data: { result: false}, error: { message: errorMsg.E_BAD_OPERATION } }
+            {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
     }
 
-    verifyProducts(req: Req.VerifyProducts) {
+    async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
         logger.debug(`verifying products`)
-        return this._storeManager.verifyProducts(req);
+        const res: Res.BoolResponse = await this._storeManager.verifyProducts(req);
+        return res;
     }
 
     verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {
@@ -574,8 +593,8 @@ export class TradingSystemManager {
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         const userToView: RegisteredUser = (req.body && req.body.userName) ? await this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}}
+        const isAdminReq: boolean = req.body && req.body.userName && this._userManager.checkIsAdminByToken(req.token);
         if (userToView.name !== user.name && !isAdminReq)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
@@ -584,7 +603,8 @@ export class TradingSystemManager {
     async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
         logger.info(`retrieving receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+        const isAdmin: boolean = this._userManager.checkIsAdminByToken(req.token)
+        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName, isAdmin);
     }
 
     //endregion
@@ -627,10 +647,21 @@ export class TradingSystemManager {
         const user = await this._userManager.getUserByToken(req.token);
         const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
         let finalPrice: number = 0;
+
         for (const [storeName, bagItems] of cart.entries()) {
+
             const bagItemsWithPrices: BagItem[] = await this._storeManager.calculateFinalPrices(storeName, bagItems)
+
             finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
             cart.set(storeName, bagItemsWithPrices)
+        }
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        if (rUser) {
+            try {
+                await UserModel.updateOne({name: rUser.name}, {cart: UserMapper.cartMapperToDB(cart)})
+            } catch (e) {
+                logger.error(`calculateFinalPrices DB ERROR ${e}`)
+            }
         }
         return {data: {result: true, price: finalPrice}}
     }
@@ -705,7 +736,8 @@ export class TradingSystemManager {
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();
                 uModel.receipts = rUser.receipts;
-                await uModel.save();
+                await UserModel.update({name: rUser.name}, {cart: uModel.cart, receipts: uModel.receipts})
+                // await uModel.save();
                 logger.debug(`user saved after reset the cart and added receipt `);
             }
             logger.info(`purchase request: successfully purchased`)
@@ -757,8 +789,6 @@ export class TradingSystemManager {
     async getItemIds(req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
     }
-
-    //endregion
 
     //region to be deleted
 

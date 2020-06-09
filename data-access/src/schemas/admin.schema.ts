@@ -3,11 +3,9 @@ import uniqueValidator from "mongoose-unique-validator";
 import bagItemSchema from "./bagItem.schema";
 
 const adminSchema = new Schema({
-        user: {
-            type: Types.ObjectId, ref: 'users'
-        },
+        user: { type: Types.ObjectId, ref: 'users', required: true},
     },
-    {timestamps: false,});
+    {timestamps: false,}, {autoCreate: true});
 
 adminSchema.plugin(uniqueValidator);
 

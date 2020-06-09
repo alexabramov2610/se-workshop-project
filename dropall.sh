@@ -10,5 +10,7 @@ db.admins.drop()
 db.systems.drop()
 db.notifications.drop()
 db.subscribers.drop()
-
+db.discountpolicies.drop()
+db.discounts.drop()
+db.conditions.drop()
 EOF

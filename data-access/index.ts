@@ -13,8 +13,29 @@ import SystemModel from "./src/models/common_models/SystemModel";
 import NotificationModel from "./src/models/common_models/NotificationModel";
 import SubscriberModel from "./src/models/common_models/SubscriberModel";
 import StoreOwnerSubscriptionModel from "./src/models/common_models/StoreOwnerSubscriptionModel"
+import DiscountPolicyModel from "./src/models/store_models/DiscountPolicyModel";
+import DiscountModel from "./src/models/store_models/DiscountModel";
+import ConditionModel from "./src/models/store_models/ConditionModel";
 
-export {SubscriberModel, StoreOwnerSubscriptionModel, NotificationModel, AdminModel,UserModel,StoreModel,BagItemModel,ReceiptModel,StoreOwnerModel,StoreManagerModel, ProductModel, ItemModel,EventModel,SystemModel}
+export {
+    ConditionModel,
+    DiscountPolicyModel,
+    DiscountModel,
+    SubscriberModel,
+    StoreOwnerSubscriptionModel,
+    NotificationModel,
+    AdminModel,
+    UserModel,
+    StoreModel,
+    BagItemModel,
+    ReceiptModel,
+    StoreOwnerModel,
+    StoreManagerModel,
+    ProductModel,
+    ItemModel,
+    EventModel,
+    SystemModel,
+}
 /*
 async function register_test() {
     const newUser = new UserModel({name: "tal", password: "password1"})

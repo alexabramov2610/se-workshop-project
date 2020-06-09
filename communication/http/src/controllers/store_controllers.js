@@ -117,8 +117,14 @@ export async function viewUsersContactUsMessages(req, res) {
 }
 
 export async function viewStorePurchasesHistory(req, res) {
-    const result = await wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
-    return res.send(result)
+    try {
+        const request = {body: {storeName: req.query.storeName}, token: req.cookies['token']};
+        req.body = request;
+        const result = await wrapHttp(req, ServiceFacade.viewStorePurchasesHistory);
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
 }
 
 export async function setPurchasePolicy(req, res) {

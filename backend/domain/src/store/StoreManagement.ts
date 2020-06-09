@@ -1,7 +1,8 @@
 import {Store} from './internal_api'
 import {RegisteredUser, StoreManager} from "../user/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
-import {BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
+import {
+    BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
     Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
     IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
@@ -17,39 +18,55 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ProductModel, ReceiptModel, StoreManagerModel, StoreModel, StoreOwnerModel, UserModel} from 'dal'
+import {
+    BagItemModel,
+    DiscountPolicyModel,
+    ProductModel,
+    ReceiptModel,
+    StoreManagerModel,
+    StoreModel,
+    StoreOwnerModel,
+    UserModel
+} from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
+
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner"];
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy"];
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
     }
 
-    async findStoreByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
-        try {
-            logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
-            const populateQuery = populateWith.map(field => { return { path: field } });
-            const s = await StoreModel.findOne({storeName})
-                .populate(populateQuery)
-            const store: Store = StoreMapper.storeMapperFromDB(s);
-            return store;
-        } catch (e) {
-            logger.error(`findStoreByName DB ERROR: ${e}`);
-            return undefined
-        }
-        return undefined;
+    async findStoreByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
+        const storeModel = await this.findStoreModelByName(storeName, populateWith);
+        return StoreMapper.storeMapperFromDB(storeModel);
+        // try {
+        //     logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
+        //     const populateQuery = populateWith.map(field => {
+        //         return {path: field}
+        //     });
+        //     const s = await StoreModel.findOne({storeName}).populate(populateQuery)
+        //         .populate(populateQuery);
+        //     const store: Store = StoreMapper.storeMapperFromDB(s);
+        //     return store;
+        // } catch (e) {
+        //     logger.error(`findStoreByName DB ERROR: ${e}`);
+        //     return undefined
+        // }
+        // return undefined;
     }
 
-    async findStoreModelByName(storeName: string,populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
+    async findStoreModelByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
         try {
             logger.debug(`findStoreModelByName trying to find store ${storeName} in DB`)
-            const populateQuery = populateWith.map(field => { return { path: field } });
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
             const s = await StoreModel.findOne({storeName}).populate(populateQuery)
                 .populate(populateQuery);
             return s;
@@ -63,7 +80,9 @@ export class StoreManagement {
     async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
         try {
             logger.debug(`trying to find all stores in DB`)
-            const populateQuery = populateWith.map(field => { return { path: field } });
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
             const s = await StoreModel.find().populate('products')
                 .populate(populateQuery);
             return s.map(currStore => StoreMapper.storeMapperFromDB(currStore));
@@ -80,7 +99,8 @@ export class StoreManagement {
         // const discountPolicy = new DiscountPolicyModel()
         try {
             const storeOwners = [firstOwner]
-            await StoreModel.create({storeName, description, firstOwner, storeOwners})
+            const discountPolicy = await DiscountPolicyModel.create({children: [], storeName})
+            await StoreModel.create({storeName, description, firstOwner, storeOwners,discountPolicy})
             await firstOwner.save();
             logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
             return {data: {result: true}}
@@ -705,21 +725,25 @@ export class StoreManagement {
         }
     }
 
-    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Promise<Res.ViewShopPurchasesHistoryResponse> {
+    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string, isAdmin?: boolean): Promise<Res.ViewShopPurchasesHistoryResponse> {
         const storeModel = await this.findStoreModelByName(storeName);
         if (!storeModel)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        const isPermitted: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
-        if (!isPermitted.data.result && user.role !== UserRole.ADMIN)
+
+        let isPermitted: boolean = isAdmin;
+        if (!isPermitted) {
+            const permissionsVerification: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
+            isPermitted = permissionsVerification.data.result;
+        }
+
+        if (!isPermitted)
             return {
                 data: {result: false, receipts: []},
                 error: {message: errorMsg.E_PERMISSION}
             }
 
-        const iReceipts: IReceipt[] = storeModel.receipts.map( (r) => {
-            return {purchases: r.purchases, date: r.date}
-        })
-        // const iReceipts: IReceipt[] = [];
+        const iReceipts: IReceipt[] = storeModel.receipts.map((r) =>
+            { return {purchases: r.purchases, date: r.date} })
         return {data: {result: true, receipts: iReceipts}}
     }
 
@@ -738,7 +762,8 @@ export class StoreManagement {
     }
 
     async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(req.body.storeName);
+        const storeModel = await this.findStoreModelByName(req.body.storeName);
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const productsNotExists = [];
@@ -828,8 +853,6 @@ export class StoreManagement {
     }
 
 
-
-
     async verifyStoreBag(storeName: string, bagItems: BagItem[]): Promise<Res.BoolResponse> {
         const store: Store = await this.findStoreByName(storeName);
         if (!store)
@@ -861,10 +884,9 @@ export class StoreManagement {
                 purchases
             });
             store.addReceipt(receipt);
-           const res=  await StoreModel.updateOne({storeName: store.storeName}, {receipts: store.receipts})
+            const res = await StoreModel.updateOne({storeName: store.storeName}, {receipts: store.receipts})
 
-        }
-        catch (e) {
+        } catch (e) {
             logger.error(`DB ERROR ${e}`);
             return [];
         }
@@ -877,8 +899,13 @@ export class StoreManagement {
         const store: Store = await this.findStoreByName(storeName);
         // reset prices from last check
         for (const bagItem of bagItems) {
+            const lastPrice : number = bagItem.finalPrice
             bagItem.finalPrice = bagItem.product.price * bagItem.amount;
+            if(bagItem.finalPrice !== lastPrice){
+                logger.info(`final price changed! new final price ${bagItem.finalPrice}`)
+            }
         }
+
         return store.calculateFinalPrices(bagItems)
     }
 
@@ -886,8 +913,8 @@ export class StoreManagement {
         const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        store.setDiscountPolicy(discounts.discounts);
-        return {data: {result: true}}
+        const isSuccsess: boolean = await store.setDiscountPolicy(discounts.discounts);
+        return isSuccsess ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_DB}}
     }
 
     async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
