@@ -153,12 +153,12 @@ export class TradingSystemManager {
 
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.info(`logging out user... `);
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        const username: string = this._userManager.getLoggedInUsernameByToken(req.token);
         const res: Res.BoolResponse = await this._userManager.logout(req);
-        if (user && res.data.result) {
+        if (username && res.data.result) {
             logger.info(`removing websocket client... `);
-            this._publisher.removeClient(user.name);
-            logger.info(`logged out user: ${user.name}`);
+            this._publisher.removeClient(username);
+            logger.info(`logged out user: ${username}`);
         }
         return res;
     }
@@ -624,11 +624,11 @@ export class TradingSystemManager {
         }
     }
 
-    forceLogout(username: string): void {
+    async forceLogout(username: string): Promise<void> {
         logger.info(`socket disconnected (user: ${username})`);
         const token: string = this._userManager.getTokenOfLoggedInUser(username);
         const req: Req.LogoutRequest = {body: {}, token};
-        this.logout(req);
+        await this.logout(req);
     }
 
     connectDeliverySys(req: Req.Request): Res.BoolResponse {

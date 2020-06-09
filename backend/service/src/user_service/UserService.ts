@@ -26,7 +26,7 @@ export const loginUser = async (req: Req.LoginRequest): Promise<Res.BoolResponse
     return ts.login(req);
 }
 
-export const forceLogout = (username: string): void => {
+export const forceLogout = (username: string): Promise<void> => {
     return ts.forceLogout(username);
 }
 

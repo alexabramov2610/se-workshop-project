@@ -81,6 +81,10 @@ export class UserManager {
 
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
+        if (!this.loggedInUsers.has(req.token)) {
+            logger.warn("user is not logged in!")
+            return { data: { result: false }, error: { message: errorMsg.E_NOT_LOGGED_IN } }
+        }
         this.loggedInUsers.delete(req.token)
         if (this.admins.has(req.token))
             this.admins.delete(req.token)
@@ -296,6 +300,8 @@ export class UserManager {
                 return {data: {result: false}, error: {message: errorMsg.E_DB}}
             }
         }
+        else //guest
+            return {data: {result: true}};
 
     }
 

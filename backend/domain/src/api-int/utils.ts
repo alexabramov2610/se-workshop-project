@@ -1,6 +1,5 @@
 import {Guest} from "../user/users/Guest";
 import {Admin, RegisteredUser} from "../user/internal_api";
-import {UserRole} from "./Enums";
 import {Event} from "se-workshop-20-interfaces/dist/src/Event";
 import {BagItem, IReceipt} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
@@ -35,11 +34,11 @@ export function createUser(): Guest {
 }
 
 export function createRegisteredUser(name: string, password: string, pendingEvents?: Event[], receipts?: IReceipt[], cart?: Map<string, BagItem[]>): RegisteredUser {
-    return {name, password, pendingEvents: pendingEvents ? pendingEvents : [], receipts: receipts ? receipts : [], cart: cart ? cart : cart, role: UserRole.BUYER}
+    return {name, password, pendingEvents: pendingEvents ? pendingEvents : [], receipts: receipts ? receipts : [], cart: cart ? cart : cart}
 }
 
 export function createAdmin(name: string, password: string, receipts: IReceipt[], cart?: Map<string, BagItem[]>, pendingEvents?: Event[]): Admin {
-    return {name, password, pendingEvents: pendingEvents ? pendingEvents : [], receipts : receipts ? receipts : [], cart : cart ? cart : new Map(), role: UserRole.ADMIN}
+    return {name, password, pendingEvents: pendingEvents ? pendingEvents : [], receipts : receipts ? receipts : [], cart : cart ? cart : new Map()}
 }
 
 export function createGuest(): Guest {

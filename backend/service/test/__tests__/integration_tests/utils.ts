@@ -95,7 +95,7 @@ export const makeStoreWithProduct = async (catalogNumber: number, itemsNumber: n
     if (!ownerToken)
         ownerToken = await initSessionRegisterLogin(username, password);
     await createStore(storeName, ownerToken);
-    const products: IProduct[] = [{name: "bamba", catalogNumber,price: 20, category: ProductCategory.GENERAL}]
+    const products: IProduct[] = [{name: "bamba", catalogNumber,price: 20, category: ProductCategory.GENERAL, db_id: "0"}]
     await addNewProducts(storeName, products, ownerToken, true)
     let items: IItem[] = [];
 

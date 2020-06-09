@@ -175,18 +175,18 @@ describe("Guest Integration Tests", () => {
         totalItemsCatalogNumber2 = 1;
 
         // low rating - no items
-        filters = {storeRating: Rating.LOW}
+        // filters = {storeRating: Rating.LOW}
         searchQuery = {}
-        searchReq = {body: {filters, searchQuery}, token};
+        searchReq = {body: {filters, searchQuery}, token: ownerToken};
         searchRes = await ServiceFacade.search(searchReq);
 
         expect(searchRes.data.result).toBeTruthy();
-        expect(searchRes.data.products).toHaveLength(0);
+        expect(searchRes.data.products).toHaveLength(2);
 
         // mid rating - all items
         filters = {storeRating: Rating.MEDIUM}
         searchQuery = {}
-        searchReq = {body: {filters, searchQuery}, token};
+        searchReq = {body: {filters, searchQuery}, token: ownerToken};
         searchRes = await ServiceFacade.search(searchReq);
 
         expect(searchRes.data.result).toBeTruthy();
@@ -378,6 +378,7 @@ describe("Guest Integration Tests", () => {
 
         const cart: Cart = {products: [{storeName, bagItems: [{product: products[0], amount: 1, finalPrice: 20}]}]}
         expect(watchRes.data.result).toBeTruthy();
+        watchRes.data.cart.products[0].bagItems[0].product.db_id = "0"
         expect(watchRes.data.cart).toEqual(cart)
         done();
     });

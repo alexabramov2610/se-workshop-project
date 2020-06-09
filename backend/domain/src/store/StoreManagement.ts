@@ -611,8 +611,7 @@ export class StoreManagement {
         }
 
         try {
-            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(permission =>
-                permissions.find(p => p === permission) ? true : false)
+            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(p => permissions.indexOf(p) === - 1)
             storeModel.markModified('storeManagers')
             await userManagerToAddDoc.save();
             await storeModel.save();

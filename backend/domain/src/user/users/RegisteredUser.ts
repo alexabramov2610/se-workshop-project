@@ -8,7 +8,6 @@ export interface RegisteredUser extends User {
     password: string;
     pendingEvents: Event[];
     receipts: IReceipt[];
-    role: UserRole;
 }
     // constructor(name?: string, password?: string, pendingEvents?: Event[], receipts?: IReceipt[], cart?: Map<string, BagItem[]>, role?: UserRole) {
     //     super(cart);
