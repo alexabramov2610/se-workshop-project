@@ -75,7 +75,7 @@ class Driver {
   }
 
   dropDBDor(){
-    shell.exec('/home/dorbiren/Desktop/sadna/se-workshop-project/AT/dropalldor.sh', {async: false})
+    this.dropDB()
  }
 
 async initWith(cred: Credentials): Promise<Driver> {

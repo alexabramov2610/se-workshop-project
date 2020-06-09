@@ -21,6 +21,6 @@ sudo service mongod start && echo -e "${GREEN}mongoDB started!${NC}" || echo -e 
 
 cd $http
 #sudo npm run comp
-sudo npm run start:prod
+sudo npm run start:dev
 
 
