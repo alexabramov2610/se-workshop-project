@@ -6,6 +6,7 @@ import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
+import {SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -168,12 +169,7 @@ export const Adapter: any = {
   //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   // },
 
- async saveProductToCart(store: Store, product: Product, quantity: number) {
-    const req = {
-      storeName: store.name,
-      catalogNumber: product.catalogNumber,
-      amount: quantity,
-    };
+ async saveProductToCart(req : SaveToCartRequest) {
     const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
     return error
       ? { data: undefined, error: error.message }
