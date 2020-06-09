@@ -55,9 +55,9 @@ export interface Bridge {
   changeProductName(
     req: Partial<Req.ChangeProductNameRequest>
   ): Promise<Res.BoolResponse>;
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse;
+  changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse>;
   // watchPermissions(
   //   store: Store,
   //   credentials: Credentials

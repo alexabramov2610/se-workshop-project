@@ -180,11 +180,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
     return await ServiceFacade.changeProductName(wrapWithToken(req.body));
   },
 
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
-  // },
+  async changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse> {
+    return  await ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  },
 
  // async saveProductToCart(req : SaveToCartRequest) {
  //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
