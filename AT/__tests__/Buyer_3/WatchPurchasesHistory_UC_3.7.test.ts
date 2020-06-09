@@ -31,7 +31,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     });
 
     afterAll(() => {
-        utils.terminateSocket();
+        _driver.dropDB();
     });
 
     test("logged in, with history",async () => {
@@ -51,41 +51,41 @@ describe("Watch Purchases History, UC: 3.7", () => {
 
         expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
     });
-    //
-    // test("logged in, no history",async () => {
-    //     await _serviceBridge.login(_shopoholic);
-    //     const res =await _serviceBridge.viewUserPurchasesHistory({
-    //         body: {userName: _shopoholic.userName},
-    //     });
-    //     const itemCatalogNumber: any[] = [].concat
-    //         .apply(
-    //             [],
-    //             res.data.receipts.map((r) => r.purchases)
-    //         )
-    //         .filter((i) => i.catalogNumber === _prodct.catalogNumber);
-    //
-    //     expect(itemCatalogNumber[0]).toBeUndefined();
-    // });
-    //
-    // test("logged out, with history",async () => {
-    //    await _serviceBridge.login(_shopoholic);
-    //   await  _driver.given.store(_store).products([_prodct]).makeABuy();
-    //     await  _serviceBridge.logout();
-    //     const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
-    //         body: {userName: _shopoholic.userName},
-    //     });
-    //
-    //     expect(error.message).toBeDefined();
-    // });
-    //
-    // test("logged out, no history",async () => {
-    //     _serviceBridge.logout();
-    //     const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
-    //         body: {userName: _shopoholic.userName},
-    //     });
-    //
-    //     expect(error.message).toBeDefined();
-    // });
+
+    test("logged in, no history",async () => {
+        await _serviceBridge.login(_shopoholic);
+        const res =await _serviceBridge.viewUserPurchasesHistory({
+            body: {userName: _shopoholic.userName},
+        });
+        const itemCatalogNumber: any[] = [].concat
+            .apply(
+                [],
+                res.data.receipts.map((r) => r.purchases)
+            )
+            .filter((i) => i.catalogNumber === _prodct.catalogNumber);
+
+        expect(itemCatalogNumber[0]).toBeUndefined();
+    });
+
+    test("logged out, with history",async () => {
+       await _serviceBridge.login(_shopoholic);
+      await  _driver.given.store(_store).products([_prodct]).makeABuy();
+        await  _serviceBridge.logout();
+        const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
+            body: {userName: _shopoholic.userName},
+        });
+
+        expect(error.message).toBeDefined();
+    });
+
+    test("logged out, no history",async () => {
+        _serviceBridge.logout();
+        const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
+            body: {userName: _shopoholic.userName},
+        });
+
+        expect(error.message).toBeDefined();
+    });
 
 
 });
