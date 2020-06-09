@@ -1043,12 +1043,12 @@ export class StoreManagement {
             }
             case "system": {
                 const systemP: SystemPolicy = policy as SystemPolicy;
-                return {systemPolicy: {notForSellDays: systemP.notForSellDays}}
+                return {systemPolicy: {notForSellDays: Array.from(systemP.notForSellDays)}}
                 break;
             }
             case "user": {
                 const userP: UserPolicy = policy as UserPolicy;
-                return {userPolicy: {countries: userP.countries}}
+                return {userPolicy: {countries: Array.from(userP.countries)}}
                 break;
             }
             default: {
