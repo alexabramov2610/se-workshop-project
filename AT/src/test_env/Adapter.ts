@@ -169,12 +169,12 @@ export const Adapter: any = {
   //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   // },
 
- async saveProductToCart(req : SaveToCartRequest) {
-    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
-    return error
-      ? { data: undefined, error: error.message }
-      : { data: data, error: undefined };
-  },
+ // async saveProductToCart(req : SaveToCartRequest) {
+ //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
+ //    return error
+ //      ? { data: undefined, error: error.message }
+ //      : { data: data, error: undefined };
+ //  },
 
   // removeStoreManager(
   //   req: Partial<Req.RemoveStoreManagerRequest>
@@ -232,9 +232,9 @@ export const Adapter: any = {
 
 
 
-  // saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
-  //   return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
-  // },
+  async saveProductToCart(req: Req.SaveToCartRequest): Promise<Res.BoolResponse> {
+    return await  ServiceFacade.saveProductToCart(wrapWithToken(req.body));
+  },
 
   async search(searchData: Req.SearchRequest): Promise<ISearchResponse> {
     const { data, error } = await ServiceFacade.search(
