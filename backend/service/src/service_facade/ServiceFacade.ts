@@ -291,9 +291,14 @@ export const getItemIds = async (req: Req.GetItemsIdsRequest): Promise<Res.GetIt
 /*
 Utils
  */
-export const reset = (): void => {
+export const reset = async (): Promise<void> => {
     tradingSystem = createInstance();
 }
+export const safeShutdown = async (): Promise<void> => {
+    await tradingSystem.terminateSocket();
+    await tradingSystem.dropAllDB();
+}
+
 export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();
 }
