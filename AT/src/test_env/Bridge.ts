@@ -44,14 +44,14 @@ export interface Bridge {
   //   discount: Discount
   // ): DummyTypes.IResponse;
   
-  // assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse;
+  assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse>;
   // grantPermissions(
   //   credentials: Credentials,
   //   store: Store,
   //   permissions: PERMISSION[]
   // ): DummyTypes.IResponse;
   // reset(): void;
-  // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
+  assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
   // changeProductName(
   //   req: Partial<Req.ChangeProductNameRequest>
   // ): Res.BoolResponse;

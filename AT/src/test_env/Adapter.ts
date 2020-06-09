@@ -134,27 +134,27 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data.info, error: undefined };
   },
 
-  // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
-  //   const { data, error } = ServiceFacade.assignStoreOwner(
-  //     wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse> {
+    const { data, error } = await ServiceFacade.assignStoreOwner(
+      wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
-  //   const req = {
-  //     storeName: store.name,
-  //     usernameToAssign: credentials.userName,
-  //   };
-  //   const { data, error } = ServiceFacade.assignStoreManager(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse> {
+    const req = {
+      storeName: store.name,
+      usernameToAssign: credentials.userName,
+    };
+    const { data, error } = await ServiceFacade.assignStoreManager(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // grantPermissions(
   //   credentials: Credentials,
