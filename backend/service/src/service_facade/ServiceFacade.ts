@@ -287,6 +287,9 @@ export const getPersonalDetails = async (req: Req.Request): Promise<Res.GetPerso
 export const getItemIds = async (req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> => {
     return runIfOpen(req, runIfHaveToken(StoreService.getItemIds))
 }
+export const getAllUsers = async (req: Req.Request): Promise<Res.GetAllUsersResponse> => {
+    return runIfOpen(req, runIfHaveToken(UserService.getAllUsers))
+}
 
 /*
 Utils

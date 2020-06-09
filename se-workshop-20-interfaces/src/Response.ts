@@ -160,6 +160,10 @@ interface RemoveStoreOwnerResponse extends Response {
   data: {result: boolean, owners: string[]}
 }
 
+interface GetAllUsersResponse extends Response {
+  data: {result: boolean, users: string[]}
+}
+
 export {
   RemoveStoreOwnerResponse,
   GetItemsIdsResponse,
@@ -192,5 +196,6 @@ export {
   ViewRUserPurchasesHistoryRes,
   ViewCartRes,
   ViewStoreDiscountsPolicyResponse,
-  ViewStorePurchasePolicyResponse
+  ViewStorePurchasePolicyResponse,
+  GetAllUsersResponse
 };
