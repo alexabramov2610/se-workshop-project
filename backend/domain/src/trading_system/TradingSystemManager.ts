@@ -736,7 +736,8 @@ export class TradingSystemManager {
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();
                 uModel.receipts = rUser.receipts;
-                await uModel.save();
+                await UserModel.update({name: rUser.name}, {cart: uModel.cart, receipts: uModel.receipts})
+                // await uModel.save();
                 logger.debug(`user saved after reset the cart and added receipt `);
             }
             logger.info(`purchase request: successfully purchased`)

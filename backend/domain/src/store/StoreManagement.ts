@@ -899,7 +899,11 @@ export class StoreManagement {
         const store: Store = await this.findStoreByName(storeName);
         // reset prices from last check
         for (const bagItem of bagItems) {
+            const lastPrice : number = bagItem.finalPrice
             bagItem.finalPrice = bagItem.product.price * bagItem.amount;
+            if(bagItem.finalPrice !== lastPrice){
+                logger.info(`final price changed! new final price ${bagItem.finalPrice}`)
+            }
         }
 
         return store.calculateFinalPrices(bagItems)

@@ -468,11 +468,9 @@ export class Store {
     }
 
     calculateFinalPrices(bagItems: BagItem[]): BagItem[] {
-        // TODO
-        // const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
-        // logger.info(`Done calculating for store ${this.storeName}`)
-        // return bagItemAfterDiscount;
-        return bagItems;
+        const bagItemAfterDiscount: BagItem[] = this.discountPolicy.calc(bagItems);
+        logger.info(`Done calculating for store ${this.storeName}`)
+        return bagItemAfterDiscount;
     }
 
     getBagPrice(bagItems: BagItem[]): number {

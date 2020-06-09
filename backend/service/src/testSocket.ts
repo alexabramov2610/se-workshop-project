@@ -308,7 +308,8 @@ export async function t2() {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
         token: token
     }
-   const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    const res2 = await ServiceFacade.viewCart({body: {},token})
     await logout(token);
     //await registerUser(buyer1.name, "buyer1password", token, false);
    //const viewRes = await ServiceFacade.viewCart({body: {}, token})
