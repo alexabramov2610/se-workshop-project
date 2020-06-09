@@ -34,8 +34,14 @@ describe("Store Owner Integration Tests", () => {
     beforeEach(async (done) => {
         await utils.systemReset();
         await utils.systemInit();
-        storeOwnerRegisteredUser = {name: storeOwnerName, password: storeOwnerPassword, pendingEvents: [], receipts: [], cart: new Map() };
-        storeOwner = {name: storeOwnerName, assignedStoreOwners: [], assignedStoreManagers: [] };
+        storeOwnerRegisteredUser = {
+            name: storeOwnerName,
+            password: storeOwnerPassword,
+            pendingEvents: [],
+            receipts: [],
+            cart: new Map()
+        };
+        storeOwner = {name: storeOwnerName, assignedStoreOwners: [], assignedStoreManagers: []};
         token = await utils.initSessionRegisterLogin(storeOwnerName, storeOwnerPassword);
         expect(token).toBeDefined();
         await utils.createStore(storeName, token);
@@ -48,15 +54,15 @@ describe("Store Owner Integration Tests", () => {
     });
 
     function createProduct(name: string, catalogNumber: number, price: number, category: ProductCategory): IProduct {
-        return { name, category, catalogNumber, price}
+        return {name, category, catalogNumber, price}
     }
 
     function createRegisteredUser(name: string, password: string): RegisteredUser {
-        return { name, password, cart: new Map(), receipts: [], pendingEvents: []}
+        return {name, password, cart: new Map(), receipts: [], pendingEvents: []}
     }
 
     function createStoreOwner(name): StoreOwner {
-        return { name, assignedStoreOwners: [], assignedStoreManagers: [] }
+        return {name, assignedStoreOwners: [], assignedStoreManagers: []}
     }
 
     it("add new products", async (done) => {
@@ -424,7 +430,6 @@ describe("Store Owner Integration Tests", () => {
         const items: IItem[] = [item1, item2, item3, item4, item5, item6, item7, item8];
 
 
-
         const addItemsReq: Req.ItemsAdditionRequest = {body: {storeName, items}, token};
         const itemsAdditionRes: Res.ItemsAdditionResponse = await ServiceFacade.addItems(addItemsReq);
         expect(itemsAdditionRes.data.result).toBeTruthy();
@@ -611,7 +616,7 @@ describe("Store Owner Integration Tests", () => {
         let assignStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
-        assignStoreOwnerRequest = { body: {storeName, usernameToAssign: owners[1].name}, token };
+        assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[1].name}, token};
         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
         expect(assignStoreOwnerResponse.data.result).toBe(true);
 
@@ -645,12 +650,17 @@ describe("Store Owner Integration Tests", () => {
 
         // storeOwnerRegisteredUser removes owner1: 4,5,6 should be removed
         await utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
-        const removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {body: {storeName, usernameToRemove: owners[1].name}, token};
+        const removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {
+            body: {
+                storeName,
+                usernameToRemove: owners[1].name
+            }, token
+        };
         const removeStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
 
         expect(removeStoreOwnerResponse.data.result).toBe(true);
 
-        const storeInfoReq: Req.StoreInfoRequest = { body: { storeName }, token };
+        const storeInfoReq: Req.StoreInfoRequest = {body: {storeName}, token};
         const storeInfoRes: Res.StoreInfoResponse = await ServiceFacade.viewStoreInfo(storeInfoReq);
 
         const expectedOwners: string[] = [storeOwnerRegisteredUser.name, owners[0].name, owners[2].name, owners[3].name]
@@ -685,7 +695,12 @@ describe("Store Owner Integration Tests", () => {
         expect(assignStoreManagerResponse.data.result).toBe(true);
 
         // verify basic permissions
-        let managerPermissionReq: Req.ViewManagerPermissionRequest = { body:{ managerToView: newUser1.name, storeName: storeName }, token: token };
+        let managerPermissionReq: Req.ViewManagerPermissionRequest = {
+            body: {
+                managerToView: newUser1.name,
+                storeName: storeName
+            }, token: token
+        };
         let managerPermissionRes: Res.ViewManagerPermissionResponse = await ServiceFacade.viewManagerPermissions(managerPermissionReq);
 
         expect(managerPermissionRes.data.result).toBe(true);
@@ -695,7 +710,7 @@ describe("Store Owner Integration Tests", () => {
         expect(managerPermissionRes.data.permissions).toContainEqual(basicPermissions[2]);
 
         // not yet assigned (store manager 2)
-        managerPermissionReq = { body:{ managerToView: newUser2.name, storeName: storeName }, token: token };
+        managerPermissionReq = {body: {managerToView: newUser2.name, storeName: storeName}, token: token};
         managerPermissionRes = await ServiceFacade.viewManagerPermissions(managerPermissionReq);
 
         expect(managerPermissionRes.data.result).toBe(false);
@@ -736,7 +751,7 @@ describe("Store Owner Integration Tests", () => {
         expect(changeManagerPermissionRes.data.result).toBe(true);
 
         // verify permissions were removed
-        managerPermissionReq = { body:{ managerToView: newUser2.name, storeName: storeName }, token: token };
+        managerPermissionReq = {body: {managerToView: newUser2.name, storeName: storeName}, token: token};
         managerPermissionRes = await ServiceFacade.viewManagerPermissions(managerPermissionReq);
 
         expect(managerPermissionRes.data.result).toBe(true);
@@ -861,7 +876,10 @@ describe("Store Owner Integration Tests", () => {
 
         // get purchases history
         await utils.loginUser(storeOwnerName, storeOwnerPassword, token, true);
-        const viewPurchasesHistoryReq: Req.ViewShopPurchasesHistoryRequest = { body: { storeName: storeName }, token: token };
+        const viewPurchasesHistoryReq: Req.ViewShopPurchasesHistoryRequest = {
+            body: {storeName: storeName},
+            token: token
+        };
         const viewPurchasesHistoryRes: Res.ViewShopPurchasesHistoryResponse = await ServiceFacade.viewStorePurchasesHistory(viewPurchasesHistoryReq);
         let idsTakes: number[] = [1, 1, 1, 1, 1];
         let prodCatalogsTaken: number[] = [1, 1, 1, 1, 1];
@@ -881,7 +899,7 @@ describe("Store Owner Integration Tests", () => {
             expect(prodCatalogsTaken[productCatalog]).toBe(1);
             prodCatalogsTaken[productCatalog] = 0;
 
-            expect(receipt.purchases[0].price).toBe(products[productCatalog-1].price);
+            expect(receipt.purchases[0].price).toBe(products[productCatalog - 1].price);
             expect(receipt.purchases[0].userName).toBe(productCatalog <= 2 ? buyer1.name : buyer2.name);
 
             itemId = receipt.purchases[1].item.id;
@@ -892,7 +910,7 @@ describe("Store Owner Integration Tests", () => {
             expect(prodCatalogsTaken[productCatalog]).toBe(1);
             prodCatalogsTaken[productCatalog] = 0;
 
-            expect(receipt.purchases[1].price).toBe(products[productCatalog-1].price);
+            expect(receipt.purchases[1].price).toBe(products[productCatalog - 1].price);
             expect(receipt.purchases[1].userName).toBe(productCatalog <= 2 ? buyer1.name : buyer2.name);
 
             // expect(receipt.payment.totalCharged).toBe(productCatalog >= 1 ? prod1.price + prod2.price : prod3.price + prod4.price);
@@ -903,10 +921,10 @@ describe("Store Owner Integration Tests", () => {
 
     it("set and view discount policy ", async (done) => {
         const products: IProduct[] = [createProduct("bamba", 1, 20, ProductCategory.GENERAL)]
-        await utils.addNewProducts(storeName,products,token,true);
+        await utils.addNewProducts(storeName, products, token, true);
         let items: IItem[] = [];
-        for (let i = 0; i < 5; i++ )
-            items = items.concat({catalogNumber: 1, id: i+1});
+        for (let i = 0; i < 5; i++)
+            items = items.concat({catalogNumber: 1, id: i + 1});
         await utils.addNewItems(storeName, items, token, true);
 
         const startDate: Date = new Date()
@@ -920,12 +938,17 @@ describe("Store Owner Integration Tests", () => {
         const condDiscount: IDiscount = {
             startDate,
             duration,
-            products: [1,2],
+            products: [1, 2],
             percentage: 5,
             condition: [{condition: {minPay: 200}, operator: Operators.AND}]
         }
 
-        const policy: IDiscountPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}, {discount: simpleDiscount, operator: Operators.AND}]}
+        const policy: IDiscountPolicy = {
+            discounts: [{
+                discount: condDiscount,
+                operator: Operators.OR
+            }, {discount: simpleDiscount, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: token
@@ -933,7 +956,7 @@ describe("Store Owner Integration Tests", () => {
         const makeDiscountRes: Res.AddDiscountResponse = await ServiceFacade.setDiscountsPolicy(setPolicyReq);
         expect(makeDiscountRes.data.result)
 
-        const req : Req.ViewStoreDiscountsPolicyRequest = {body: {storeName}, token:token};
+        const req: Req.ViewStoreDiscountsPolicyRequest = {body: {storeName}, token: token};
         const res: Res.ViewStoreDiscountsPolicyResponse = await ServiceFacade.viewDiscountsPolicy(req);
         expect(res.data.policy).toEqual(policy);
         done();
@@ -941,26 +964,34 @@ describe("Store Owner Integration Tests", () => {
 
     it("set and view purchase policy ", async (done) => {
         const products: IProduct[] = [createProduct("bamba", 1, 20, ProductCategory.GENERAL)]
-        await utils.addNewProducts(storeName,products,token,true);
+        await utils.addNewProducts(storeName, products, token, true);
         let items: IItem[] = [];
-        for (let i = 0; i < 5; i++ )
-            items = items.concat({catalogNumber: 1, id: i+1});
+        for (let i = 0; i < 5; i++)
+            items = items.concat({catalogNumber: 1, id: i + 1});
         await utils.addNewItems(storeName, items, token, true);
 
         const simplePolicy1: ISimplePurchasePolicy = {
-            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+            productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}
         }
         const simplePolicy2: ISimplePurchasePolicy = {
-            bagPolicy:{minAmount: 2, maxAmount:3}
+            bagPolicy: {minAmount: 2, maxAmount: 3}
         }
         const simplePolicy3: ISimplePurchasePolicy = {
-            systemPolicy:{notForSellDays:[WeekDays.FRIDAY]}
+            systemPolicy: {notForSellDays: [WeekDays.FRIDAY]}
         }
         const simplePolicy4: ISimplePurchasePolicy = {
-            userPolicy:{countries: ["israel"]}
+            userPolicy: {countries: ["israel"]}
         }
 
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.OR}, {policy: simplePolicy2, operator: Operators.AND},{policy: simplePolicy3, operator: Operators.XOR}, {policy: simplePolicy4, operator: Operators.AND}]}
+        const policy: IPurchasePolicy = {
+            policy: [{
+                policy: simplePolicy1,
+                operator: Operators.OR
+            }, {policy: simplePolicy2, operator: Operators.AND}, {
+                policy: simplePolicy3,
+                operator: Operators.XOR
+            }, {policy: simplePolicy4, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: token
@@ -968,7 +999,7 @@ describe("Store Owner Integration Tests", () => {
         const makeDiscountRes: Res.BoolResponse = await ServiceFacade.setPurchasePolicy(setPolicyReq);
         expect(makeDiscountRes.data.result).toBe(true);
 
-        const req : Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token:token};
+        const req: Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token: token};
         const res: Res.ViewStorePurchasePolicyResponse = await ServiceFacade.viewPurchasePolicy(req);
         expect(res.data.policy).toEqual(policy);
         done();
