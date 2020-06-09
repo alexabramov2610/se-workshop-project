@@ -209,11 +209,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //   return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   // },
 
-  // viewStorePurchasesHistory(
-  //   req: Req.ViewShopPurchasesHistoryRequest
-  // ): Res.ViewShopPurchasesHistoryResponse {
-  //   return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
-  // },
+ async viewStorePurchasesHistory(
+    req: Req.ViewShopPurchasesHistoryRequest
+  ): Promise<Res.ViewShopPurchasesHistoryResponse> {
+    return await ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
+  },
 
   async viewUserPurchasesHistory(
     req: Req.ViewRUserPurchasesHistoryReq

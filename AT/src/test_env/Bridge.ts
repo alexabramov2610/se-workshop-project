@@ -68,9 +68,9 @@ export interface Bridge {
   // removeManagerPermissions(
   //   req: Partial<Req.ChangeManagerPermissionRequest>
   // ): Res.BoolResponse;
-  // viewStorePurchasesHistory(
-  //   req: Partial<Req.ViewShopPurchasesHistoryRequest>
-  // ): Res.ViewShopPurchasesHistoryResponse;
+  viewStorePurchasesHistory(
+    req: Partial<Req.ViewShopPurchasesHistoryRequest>
+  ): Promise<Res.ViewShopPurchasesHistoryResponse>;
   viewUserPurchasesHistory(
     req: Partial<Req.ViewRUserPurchasesHistoryReq>
   ): Promise<Res.ViewRUserPurchasesHistoryRes>;
