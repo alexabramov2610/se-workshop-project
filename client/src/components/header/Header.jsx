@@ -17,14 +17,14 @@ import {Dropdown, Menu} from "antd";
 const menu = (<Menu>
         <Menu.Item>
             <Link
-                to="/adminViewStores"
+                to="/viewStoresPurchasesHistory"
             >
                 View stores purchases history
             </Link>
         </Menu.Item>
         <Menu.Item>
             <Link
-                to="/adminViewUsers"
+                to="/viewUsersPurchasesHistory"
             >
                 View users purchases history
             </Link>
@@ -75,7 +75,7 @@ export class Header extends React.Component {
                         >
                             SEARCH
                         </Link>
-                        {this.props.isAdmin && this.adminOptions()}
+                        {this.props.isAdmin ? this.adminOptions() : null}
                         <Link
                             style={linkStyle}
                             className="hvr-underline-from-center"

@@ -73,9 +73,9 @@ async function logout() {
 }
 
 async function getAllCategories() {
-  return instance.get(
-      `${baseDomain}/stores/getAllCategories`
-  );
+    return instance.get(
+        `${baseDomain}/stores/getAllCategories`
+    );
 }
 
 const getStores = async (offset = 0, limit = 4) => {
@@ -232,50 +232,51 @@ const viewStorePurchaseHistory = async (storeName) => {
 };
 
 const viewUserPurchaseHistory = async (username) => {
-    return instance.get(`${baseDomain}/users/viewRegisteredUserPurchasesHistory/?username=${username}`);
+    const req = {"body": {"userName": username}};
+    return instance.post(`${baseDomain}/users/viewRegisteredUserPurchasesHistory`, req);
 };
 
 export {
-  viewUserPurchaseHistory,
-  viewStorePurchaseHistory,
-  setStoreBuyingPolicy,
-  getStoreBuyingPolicy,
-  initFromFile,
-  removeStoreOwner,
-  assignStoreOwner,
-  getOwnersAssignedByMe,
-  removeStoreManager,
-  assignStoreManager,
-  updateManagersPermissions,
-  getManagersPermissions,
-  changeProductName,
-  changeProductPrice,
-  addProduct,
-  getPermissions,
-  purchase,
-  viewProductInfo,
-  removeItemFromCart,
-  viewStoreInfo,
-  viewPersonalPurchasesHistory,
-  getPersonalInfo,
-  viewCart,
-  addToCart,
-  setDiscountPolicy,
-  getDiscountPolicy,
-  startConnection,
-  login,
-  init,
-  register,
-  logout,
-  getStores,
-  createStore,
-  getStoreProducts,
-  adminInit,
-  search,
-  getStoreCategories,
-  addItem,
-  getProductItems,
-  removeItem,
-  removeProduct,
-  getAllCategories,
+    viewUserPurchaseHistory,
+    viewStorePurchaseHistory,
+    setStoreBuyingPolicy,
+    getStoreBuyingPolicy,
+    initFromFile,
+    removeStoreOwner,
+    assignStoreOwner,
+    getOwnersAssignedByMe,
+    removeStoreManager,
+    assignStoreManager,
+    updateManagersPermissions,
+    getManagersPermissions,
+    changeProductName,
+    changeProductPrice,
+    addProduct,
+    getPermissions,
+    purchase,
+    viewProductInfo,
+    removeItemFromCart,
+    viewStoreInfo,
+    viewPersonalPurchasesHistory,
+    getPersonalInfo,
+    viewCart,
+    addToCart,
+    setDiscountPolicy,
+    getDiscountPolicy,
+    startConnection,
+    login,
+    init,
+    register,
+    logout,
+    getStores,
+    createStore,
+    getStoreProducts,
+    adminInit,
+    search,
+    getStoreCategories,
+    addItem,
+    getProductItems,
+    removeItem,
+    removeProduct,
+    getAllCategories,
 };

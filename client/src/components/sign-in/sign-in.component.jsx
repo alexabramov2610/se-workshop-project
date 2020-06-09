@@ -13,6 +13,7 @@ import * as wssClient from "../../utils/wss.client";
 import {Space, Switch} from "antd";
 import {BsCheck} from "react-icons/bs";
 import {AiOutlineClose} from "react-icons/ai";
+import * as Message from "../custom-alert/custom-alert";
 
 class SignIn extends React.Component {
     constructor(props) {
@@ -50,6 +51,7 @@ class SignIn extends React.Component {
             login(userName, password, asAdmin).then(({data}) => {
                 if (!data.error) {
                     this.props.onLogin(userName, asAdmin);
+                    Message.success("Welcome back!")
                     config.history.push("/");
                 } else {
                     Modal.warning(data.error.message);

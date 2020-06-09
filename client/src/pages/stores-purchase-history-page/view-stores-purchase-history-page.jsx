@@ -1,20 +1,25 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Descriptions, Divider, Space, Table} from "antd";
 import SearchSelect from "../../components/search-select/search-select.component";
-import {AiOutlineUser} from "react-icons/ai";
 import moment from "moment";
+import {useParams} from "react-router-dom";
+import * as generalUtils from "../../utils/utils";
+import {FaStore} from "react-icons/fa";
+import {BsThreeDots} from "react-icons/bs";
 
 const itemStyle = {borderBottom: "1px solid lightskyblue"};
 
 const getExtended = (record) => {
     console.log(record);
     return (
-        <Descriptions bordered size={"small"}>
+        <Descriptions bordered size={"small"} column={4} style={{backgroundColor: "#B6E7FF"}}>
             {record.purchases.map(purchase => {
                 return (
                     <React.Fragment>
-                        <Descriptions.Item style={itemStyle} label="Store:">{purchase.storeName}</Descriptions.Item>
-                        <Descriptions.Item style={itemStyle} label="Product:">{purchase.item.catalogNumber}</Descriptions.Item>
+                        <Descriptions.Item style={itemStyle} label={<BsThreeDots/>}></Descriptions.Item>
+                        <Descriptions.Item style={itemStyle} label="User: ">{purchase.userName}</Descriptions.Item>
+                        <Descriptions.Item style={itemStyle}
+                                           label="Product:">{purchase.item.catalogNumber}</Descriptions.Item>
                         <Descriptions.Item style={itemStyle} label="Price:">{purchase.price + "$"}</Descriptions.Item>
                     </React.Fragment>
                 )
@@ -27,12 +32,15 @@ const getTotalPrice = (p) => {
     return p.purchases.reduce((acc, curr) => acc += curr.price, 0);
 }
 
-const AdminViewUsersPurchaseHistoryPage = (props) => {
+const getValue = (props, storename) => {
+    return !props.isAdmin ? storename : props.data.storeName;
+}
+
+const ViewStoresPurchaseHistoryPage = (props) => {
 
     const {data} = props;
-    const users = data.users.map(user => {
-        return {value: user};
-    });
+    const {storename} = useParams();
+    const stores = generalUtils.addValueKey(data.stores);
     const tableData = data.purchasesHistory.map(p => {
         const currDate = moment(p.date);
         const pDate = currDate.format('DD/MM/YYYY');
@@ -46,20 +54,26 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
         };
     });
 
+    useEffect(() => {
+        !props.isAdmin && props.data.selectStore(storename);
+    });
+
     return (
         <React.Fragment>
-            <Divider style={{fontSize: "25px"}} orientation={"left"}>View Users Purchases History</Divider>
+            <Divider style={{fontSize: "25px"}} orientation={"left"}>View Store Purchases History</Divider>
             <Space style={{paddingBottom: "20px"}}>
-                <AiOutlineUser/>
-                <SearchSelect
-                    size={"large"}
-                    isLoading={data.isLoading}
-                    value={data.username}
-                    onChangeCallback={e => data.selectUser(e)}
-                    bordered={false}
-                    placeholder={"select a user"}
-                    options={users}
-                />
+                <FaStore/>
+                {!props.isAdmin
+                    ? `${storename}`
+                    : <SearchSelect
+                        size={"large"}
+                        isLoading={data.isLoading}
+                        value={getValue(props, storename)}
+                        onChangeCallback={e => data.selectStore(e)}
+                        bordered={false}
+                        placeholder={"select a store"}
+                        options={stores}
+                    />}
             </Space>
             <Table
                 expandable={{
@@ -93,4 +107,4 @@ const columns = [
     },
 ];
 
-export default AdminViewUsersPurchaseHistoryPage;
+export default ViewStoresPurchaseHistoryPage;
