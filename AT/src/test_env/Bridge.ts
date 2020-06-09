@@ -34,12 +34,8 @@ export interface Bridge {
   // getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
    search(input: Req.SearchRequest): Promise<DummyTypes.ISearchResponse>;
   // // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
-  // addToCart(
-  //   store: Store,
-  //   product: Product,
-  //   quantity: number
-  // ): DummyTypes.IResponse;
-  // watchCart(): Res.ViewCartRes;
+  addToCart(store: Store,product: Product,quantity: number): Promise<DummyTypes.IResponse>;
+  watchCart(): Res.ViewCartRes;
   
   // setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   // setDiscountToItem(

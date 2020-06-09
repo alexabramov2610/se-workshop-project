@@ -1,68 +1,70 @@
-// import {
-//     Bridge,
-//     Driver,
-//     Item,
-//     Store, Product,
-// } from "../../";
-// import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
-// import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
-// import * as utils from "../../utils"
+import {
+    Bridge,
+    Driver,
+    Item,
+    Store, Product,
+} from "../../";
+import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
+import {ItemBuilder} from "../../src/test_env/mocks/builders/item-builder";
+import * as utils from "../../utils"
 
 
-// describe("Guest watch cart, UC: 2.7", () => {
-//     let _driver = new Driver();
-//     let _serviceBridge: Bridge;
-//     let _testStore1: Store;
-//     let _testProduct1: Product;
-//     let _testItem1: Item;
-//     let _testItem2: Item;
+describe("Guest watch cart, UC: 2.7", () => {
+    let _driver = new Driver();
+    let _serviceBridge: Partial<Bridge>;
+    let _testStore1: Store;
+    let _testProduct1: Product;
+    let _testItem1: Item;
+    let _testItem2: Item;
 
-//     beforeEach(() => {
-//         _serviceBridge = _driver
-//             .resetState()
-//             .startSession()
-//             .initWithDefaults()
-//             .registerWithDefaults()
-//             .loginWithDefaults()
-//             .getBridge();
+    beforeEach(async() => {
+        _driver.dropDBDor();
 
-//         _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
-//         _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
-//         _testItem2 = new ItemBuilder().withId(2).withCatalogNumber(_testProduct1.catalogNumber).getItem();
-//         _testStore1 = {name: "testStore1Name"};
+        _serviceBridge =await _driver.getBridge()
+        await _driver.startSession()
+        await _driver.initWithDefaults()
+        await _driver.registerWithDefaults()
+        await _driver.loginWithDefaults()
 
-//         _serviceBridge.createStore(_testStore1);
-//         _serviceBridge.addProductsToStore(_testStore1, [_testProduct1]);
-//         _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
+        _testProduct1 = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).getProduct();
+        _testItem1 = new ItemBuilder().withId(1).withCatalogNumber(_testProduct1.catalogNumber).getItem();
+        _testItem2 = new ItemBuilder().withId(2).withCatalogNumber(_testProduct1.catalogNumber).getItem();
+        _testStore1 = {name: "testStore1Name"};
 
-//         _serviceBridge.logout();
-//     });
+        await _serviceBridge.createStore(_testStore1);
+        await _serviceBridge.addProductsToStore(_testStore1, [_testProduct1]);
+        await _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
 
-//     afterAll(() => {
-//         utils.terminateSocket();
-//     });
+        await _serviceBridge.logout();
+    });
 
-//     test("Non empty cart", () => {
-//         _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
+    afterAll(() => {
+        utils.terminateSocket();
+        _driver.dropDB();
 
-//         const {data, error} = _serviceBridge.watchCart();
-//         expect(error).toBeUndefined();
-//         expect(data).toBeDefined();
+    });
 
-//         const {cart: {products}} = data;
-//         expect(products.length).toEqual(1);
+    test("Non empty cart", async() => {
+       await _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
 
-//         const stores = products.map(p => p.storeName);
-//         expect(stores.length).toEqual(1);
-//         expect(stores[0]).toEqual(_testStore1.name);
+        const {data, error} =await _serviceBridge.watchCart();
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
 
-//         const bags = products.map(p => p.bagItems);
-//         expect(bags.length).toEqual(1);
+        const {cart: {products}} = data;
+        expect(products.length).toEqual(1);
 
-//         const bag = bags[0];
-//         expect(bag[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
-//         expect(bag[0].amount).toEqual(1);
-//     });
+        const stores = products.map(p => p.storeName);
+        expect(stores.length).toEqual(1);
+        expect(stores[0]).toEqual(_testStore1.name);
+
+        const bags = products.map(p => p.bagItems);
+        expect(bags.length).toEqual(1);
+
+        const bag = bags[0];
+        expect(bag[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
+        expect(bag[0].amount).toEqual(1);
+    });
 
 //     test("Non empty cart, adding same product", () => {
 //         const amountBefore = 1;
@@ -107,5 +109,5 @@
 //         const {cart: {products}} = data;
 //         expect(products.length).toEqual(0);
 //     });
-// });
+ });
 
