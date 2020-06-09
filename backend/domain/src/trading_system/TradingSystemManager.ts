@@ -49,10 +49,10 @@ export class TradingSystemManager {
             .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
     }
 
-    async dropAllDB() {
-        logger.warn("drpping database...")
+    async dropAllDB(path?: string) {
+        logger.warn("dropping database... ")
         const shell = require('shelljs')
-        await shell.exec('../../dropall.sh', {async: true})
+        shell.exec(path ? path : '../../dropall.sh')
     }
 
     async initSubscribers(): Promise<string> {

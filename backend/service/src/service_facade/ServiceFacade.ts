@@ -298,6 +298,9 @@ export const safeShutdown = async (): Promise<void> => {
     await tradingSystem.terminateSocket();
     await tradingSystem.dropAllDB();
 }
+export const dropDB = async (path?: string): Promise<void> => {
+    await tradingSystem.dropAllDB(path);
+}
 
 export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();

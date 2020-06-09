@@ -18,6 +18,7 @@ describe("Guest watch cart, UC: 2.7", () => {
     let _testItem2: Item;
 
     beforeEach(async() => {
+        _driver = new Driver();
         _driver.dropDBDor();
 
         _serviceBridge =await _driver.getBridge()
@@ -34,20 +35,28 @@ describe("Guest watch cart, UC: 2.7", () => {
         await _serviceBridge.createStore(_testStore1);
         await _serviceBridge.addProductsToStore(_testStore1, [_testProduct1]);
         await _serviceBridge.addItemsToStore(_testStore1, [_testItem1]);
-
+        await _serviceBridge.addItemsToStore(_testStore1, [_testItem2]);
         await _serviceBridge.logout();
     });
 
     afterAll(() => {
+        _driver.dropDBDor();
         utils.terminateSocket();
-        _driver.dropDB();
+
 
     });
 
     test("Non empty cart", async() => {
-       await _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
+        const req = {
+            body: {
+              storeName: _testStore1.name,
+              catalogNumber: _testProduct1.catalogNumber,
+              amount:1,
+            },
+          } 
+        await _serviceBridge.saveProductToCart(req);
 
-        const {data, error} =await _serviceBridge.watchCart();
+        const {data, error} = await _serviceBridge.watchCart();
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -66,48 +75,55 @@ describe("Guest watch cart, UC: 2.7", () => {
         expect(bag[0].amount).toEqual(1);
     });
 
-//     test("Non empty cart, adding same product", () => {
-//         const amountBefore = 1;
-//         const amountAfter = amountBefore + 1;
+    test("Non empty cart, adding same product", async () => {
+        const amountBefore = 1;
+        const amountAfter = amountBefore + 1;
 
-//         _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
-//         const res = _serviceBridge.watchCart();
-//         const productsBefore = res.data.cart.products;
+        const req = {
+            body: {
+              storeName: _testStore1.name,
+              catalogNumber: _testProduct1.catalogNumber,
+              amount:1,
+            },
+          } 
+        await _serviceBridge.saveProductToCart(req);        
+        const res = await _serviceBridge.watchCart();
+        const productsBefore = res.data.cart.products;
 
-//         const bagsBefore = productsBefore.map(p => p.bagItems);
-//         expect(bagsBefore.length).toEqual(1);
+        const bagsBefore = productsBefore.map(p => p.bagItems);
+        expect(bagsBefore.length).toEqual(1);
 
-//         const bagBefore = bagsBefore[0];
-//         expect(bagBefore[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
-//         expect(bagBefore[0].amount).toEqual(amountBefore);
+        const bagBefore = bagsBefore[0];
+        expect(bagBefore[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
+        expect(bagBefore[0].amount).toEqual(amountBefore);
 
-//         _serviceBridge.addToCart(_testStore1, _testProduct1, 1);
+      
+        await _serviceBridge.saveProductToCart(req);
+        const {data, error} = await _serviceBridge.watchCart();
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
 
-//         const {data, error} = _serviceBridge.watchCart();
-//         expect(error).toBeUndefined();
-//         expect(data).toBeDefined();
+        const {cart: {products}} = data;
 
-//         const {cart: {products}} = data;
+        const stores = products.map(p => p.storeName);
+        expect(stores.length).toEqual(1);
+        expect(stores[0]).toEqual(_testStore1.name);
 
-//         const stores = products.map(p => p.storeName);
-//         expect(stores.length).toEqual(1);
-//         expect(stores[0]).toEqual(_testStore1.name);
+        const bags = products.map(p => p.bagItems);
+        expect(bags.length).toEqual(1);
 
-//         const bags = products.map(p => p.bagItems);
-//         expect(bags.length).toEqual(1);
+        const bag = bags[0];
+        expect(bag[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
+        expect(bag[0].amount).toEqual(amountAfter);
+    });
 
-//         const bag = bags[0];
-//         expect(bag[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
-//         expect(bag[0].amount).toEqual(amountAfter);
-//     });
+    test("Empty cart", async() => {
+        const {data, error} = await _serviceBridge.watchCart();
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
 
-//     test("Empty cart", () => {
-//         const {data, error} = _serviceBridge.watchCart();
-//         expect(error).toBeUndefined();
-//         expect(data).toBeDefined();
-
-//         const {cart: {products}} = data;
-//         expect(products.length).toEqual(0);
-//     });
+        const {cart: {products}} = data;
+        expect(products.length).toEqual(0);
+    });
  });
 

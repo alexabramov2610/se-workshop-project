@@ -35,7 +35,7 @@ export interface Bridge {
    search(input: Req.SearchRequest): Promise<DummyTypes.ISearchResponse>;
   // // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
   addToCart(store: Store,product: Product,quantity: number): Promise<DummyTypes.IResponse>;
-  watchCart(): Res.ViewCartRes;
+  watchCart(): Promise<Res.ViewCartRes>;
   
   // setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   // setDiscountToItem(
@@ -44,14 +44,14 @@ export interface Bridge {
   //   discount: Discount
   // ): DummyTypes.IResponse;
   
-  // assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse;
-  // grantPermissions(
-  //   credentials: Credentials,
-  //   store: Store,
-  //   permissions: PERMISSION[]
-  // ): DummyTypes.IResponse;
+  assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse>;
+  grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): Promise<DummyTypes.IResponse>;
   // reset(): void;
-  // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse;
+  assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
   // changeProductName(
   //   req: Partial<Req.ChangeProductNameRequest>
   // ): Res.BoolResponse;
@@ -76,17 +76,18 @@ export interface Bridge {
   ): Promise<Res.ViewRUserPurchasesHistoryRes>;
   purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
-  // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
+  removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse>;
   // viewManagerPermissions(
   //   req: Partial<Req.ViewManagerPermissionRequest>
   // ): Res.ViewManagerPermissionResponse;
   // addDiscount(req: Req.AddDiscountRequest);
+  pay(req: Req.PayRequest): Promise<Res.PaymentResponse>;
   // pay(req: Req.PayRequest): Res.PaymentResponse;
-  // deliver(req: Req.DeliveryRequest): Res.DeliveryResponse;
-  // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
+  deliver(req: Req.DeliveryRequest): Promise<Res.DeliveryResponse>;
+   setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Promise<Res.BoolResponse>;
   //  addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
   // removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
-  // setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse
-  // viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse
+  setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse>;
+  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse>;
 
 }

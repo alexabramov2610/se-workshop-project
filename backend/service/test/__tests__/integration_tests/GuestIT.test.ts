@@ -22,19 +22,23 @@ describe("Guest Integration Tests", () => {
     const storeName: string = "store name";
     let token: string;
 
-    beforeAll(async () => {
-        await utils.systemInit();
+    beforeAll(async (done) => {
         await utils.clearDB();
+        await utils.systemInit();
+        done();
     });
 
-    beforeEach(async () => {
+    beforeEach(async (done) => {
         await utils.systemReset();
+        await utils.systemInit();
         token = await utils.getGuestSession();
         expect(token).toBeDefined();
+        done();
     });
 
-    afterAll(async () => {
-        await utils.safeShutdown();
+    afterAll((done) => {
+        utils.safeShutdown();
+        done();
     });
 
     it("Register IT test", async (done) => {

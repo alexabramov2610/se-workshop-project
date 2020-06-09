@@ -6,7 +6,7 @@ import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
-import {SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
+import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -97,6 +97,23 @@ export const Adapter: any = {
       : { data: data, error: undefined };
   },
 
+//   interface SaveToCartRequest extends Request {
+// //   body: {
+// //     storeName: string;
+// //     catalogNumber: number;
+// //     amount: number;
+// //   };
+// // }
+
+
+  async addToCart(
+      store: Store,
+      product: Product,
+      quantity: number
+  ): Promise<DummyTypes.IResponse> {
+return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
+
+  },
   // removeProductsFromStore(store: Store, products: Product[]) {
   //   const catalogNumbers = products.map((p) => {
   //     return { catalogNumber: p.catalogNumber };
@@ -117,45 +134,45 @@ export const Adapter: any = {
       : { data: data.info, error: undefined };
   },
 
-  // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
-  //   const { data, error } = ServiceFacade.assignStoreOwner(
-  //     wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse> {
+    const { data, error } = await ServiceFacade.assignStoreOwner(
+      wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
-  //   const req = {
-  //     storeName: store.name,
-  //     usernameToAssign: credentials.userName,
-  //   };
-  //   const { data, error } = ServiceFacade.assignStoreManager(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse> {
+    const req = {
+      storeName: store.name,
+      usernameToAssign: credentials.userName,
+    };
+    const { data, error } = await ServiceFacade.assignStoreManager(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // grantPermissions(
-  //   credentials: Credentials,
-  //   store: Store,
-  //   permissions: PERMISSION[]
-  // ): DummyTypes.IResponse {
-  //   const req = {
-  //     managerToChange: credentials.userName,
-  //     storeName: store.name,
-  //     permissions: permissions,
-  //   };
-  //   const { data, error } = ServiceFacade.addManagerPermissions(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): Promise<DummyTypes.IResponse> {
+    const req = {
+      managerToChange: credentials.userName,
+      storeName: store.name,
+      permissions: permissions,
+    };
+    const { data, error } = await ServiceFacade.addManagerPermissions(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // changeProductName(
   //   req: Partial<Req.ChangeProductNameRequest>
@@ -223,12 +240,12 @@ export const Adapter: any = {
   // },
 
 
-  // watchCart(): Res.ViewCartRes {
-  //   const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async watchCart(): Promise<Res.ViewCartRes> {
+    const { data, error } = await ServiceFacade.viewCart(wrapWithToken({}));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
 
 
@@ -260,26 +277,26 @@ export const Adapter: any = {
   //     : { data: data, error: undefined };
   // },
 
-  // pay(req: Req.PayRequest) {
-  //   const { data, error } = ServiceFacade.pay(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async pay(req: Req.PayRequest) {
+    const { data, error } = await ServiceFacade.pay(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // deliver(req: Req.DeliveryRequest) {
-  //   const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async deliver(req: Req.DeliveryRequest) {
+    const { data, error } = await ServiceFacade.deliver(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
-  //   const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
+    const { data, error } =await ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   // removeProductDiscount(req: Req.RemoveDiscountRequest){
   //   const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
@@ -288,19 +305,19 @@ export const Adapter: any = {
   //     : { data: data, error: undefined }; 
   // },
 
-  // setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+    async  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // }
+  async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  }
 
 
 };
