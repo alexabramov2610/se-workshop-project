@@ -50,7 +50,7 @@ export interface Bridge {
     store: Store,
     permissions: PERMISSION[]
   ): Promise<DummyTypes.IResponse>;
-  // reset(): void;
+  reset(): Promise<void>;
   assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
   changeProductName(
     req: Partial<Req.ChangeProductNameRequest>
@@ -62,24 +62,24 @@ export interface Bridge {
   //   store: Store,
   //   credentials: Credentials
   // ): DummyTypes.IPermissionsResponse;
-  // removeStoreManager(
-  //   req: Partial<Req.RemoveStoreManagerRequest>
-  // ): Res.BoolResponse;
+  removeStoreManager(
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Promise<Res.BoolResponse>;
   // removeManagerPermissions(
   //   req: Partial<Req.ChangeManagerPermissionRequest>
   // ): Res.BoolResponse;
-  // viewStorePurchasesHistory(
-  //   req: Partial<Req.ViewShopPurchasesHistoryRequest>
-  // ): Res.ViewShopPurchasesHistoryResponse;
+  viewStorePurchasesHistory(
+    req: Partial<Req.ViewShopPurchasesHistoryRequest>
+  ): Promise<Res.ViewShopPurchasesHistoryResponse>;
   viewUserPurchasesHistory(
     req: Partial<Req.ViewRUserPurchasesHistoryReq>
   ): Promise<Res.ViewRUserPurchasesHistoryRes>;
   purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
   removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse>;
-  // viewManagerPermissions(
-  //   req: Partial<Req.ViewManagerPermissionRequest>
-  // ): Res.ViewManagerPermissionResponse;
+  viewManagerPermissions(
+    req: Partial<Req.ViewManagerPermissionRequest>
+  ): Promise<Res.ViewManagerPermissionResponse>;
   // addDiscount(req: Req.AddDiscountRequest);
   pay(req: Req.PayRequest): Promise<Res.PaymentResponse>;
   // pay(req: Req.PayRequest): Res.PaymentResponse;

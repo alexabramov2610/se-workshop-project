@@ -37,9 +37,9 @@ export const Adapter: any = {
       : { data: data, error: undefined };
   },
 
-  // reset() {
-  //   ServiceFacade.reset();
-  // },
+   async reset() {
+    await ServiceFacade.reset();
+   },
 
   async register(credentials: Types.Credentials): Promise<DummyTypes.IResponse> {
     const reqCred = {
@@ -194,11 +194,14 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
  //      : { data: data, error: undefined };
  //  },
 
-  // removeStoreManager(
-  //   req: Partial<Req.RemoveStoreManagerRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
-  // },
+  async removeStoreManager(
+    req: Partial<Req.RemoveStoreManagerRequest>
+  ): Promise<Res.BoolResponse> {
+      const yx = 2;
+      const x = await ServiceFacade.removeStoreManager(wrapWithToken(req.body));
+      const y= req;
+      return x;
+  },
 
   // removeManagerPermissions(
   //   req: Req.ChangeManagerPermissionRequest
@@ -206,11 +209,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //   return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
   // },
 
-  // viewStorePurchasesHistory(
-  //   req: Req.ViewShopPurchasesHistoryRequest
-  // ): Res.ViewShopPurchasesHistoryResponse {
-  //   return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
-  // },
+ async viewStorePurchasesHistory(
+    req: Req.ViewShopPurchasesHistoryRequest
+  ): Promise<Res.ViewShopPurchasesHistoryResponse> {
+    return await ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
+  },
 
   async viewUserPurchasesHistory(
     req: Req.ViewRUserPurchasesHistoryReq
@@ -263,11 +266,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // viewManagerPermissions(
-  //   req: Req.ViewManagerPermissionRequest
-  // ): Res.ViewManagerPermissionResponse {
-  //   return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
-  // },
+ async viewManagerPermissions(
+    req: Req.ViewManagerPermissionRequest
+  ): Promise<Res.ViewManagerPermissionResponse> {
+    return await ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
+  },
 
   // addDiscount(req: Req.AddDiscountRequest) {
   //   const { data, error } = ServiceFacade.addDiscount(
