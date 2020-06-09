@@ -47,8 +47,8 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
         return {
             date: pDate,
             user: p.purchases[0].userName,
-            last4: p.lastCC4,
-            total: p.totalCharged,
+            last4: p.payment.lastCC4,
+            total: p.payment.totalCharged + "$",
             purchases: p.purchases
         };
     });
