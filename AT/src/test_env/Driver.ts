@@ -71,7 +71,9 @@ class Driver {
      shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh', {async: false})
   }
 
-
+  dropDBDor(){
+    shell.exec('/home/dorbiren/Desktop/sadna/se-workshop-project/AT/dropalldor.sh', {async: false})
+ }
 
 async initWith(cred: Credentials): Promise<Driver> {
     await this.bridge.init(cred);

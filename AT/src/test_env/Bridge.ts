@@ -32,7 +32,7 @@ export interface Bridge {
   // removeUser(user: User): DummyTypes.IResponse;
   // getUserByName(user: User): DummyTypes.IUserResponse;
   // getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
-  // search(input: Req.SearchRequest): DummyTypes.ISearchResponse;
+   search(input: Req.SearchRequest): Promise<DummyTypes.ISearchResponse>;
   // // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
   // addToCart(
   //   store: Store,
