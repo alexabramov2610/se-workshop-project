@@ -138,6 +138,7 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
     const { data, error } = await ServiceFacade.assignStoreOwner(
       wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
     );
+    const x = data || error;
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
