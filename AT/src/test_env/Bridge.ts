@@ -76,7 +76,7 @@ export interface Bridge {
   ): Promise<Res.ViewRUserPurchasesHistoryRes>;
   purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
-  // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
+  removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse>;
   // viewManagerPermissions(
   //   req: Partial<Req.ViewManagerPermissionRequest>
   // ): Res.ViewManagerPermissionResponse;
@@ -84,10 +84,10 @@ export interface Bridge {
   pay(req: Req.PayRequest): Promise<Res.PaymentResponse>;
   // pay(req: Req.PayRequest): Res.PaymentResponse;
   deliver(req: Req.DeliveryRequest): Promise<Res.DeliveryResponse>;
-  // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
+   setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Promise<Res.BoolResponse>;
   //  addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
   // removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
-  // setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Res.BoolResponse
-  // viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Res.ViewStorePurchasePolicyResponse
+  setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse>;
+  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse>;
 
 }

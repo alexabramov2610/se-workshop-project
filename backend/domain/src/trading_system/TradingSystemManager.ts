@@ -702,6 +702,7 @@ export class TradingSystemManager {
 
     async pay(req: Req.PayRequest): Promise<Res.PaymentResponse> {
         logger.info(`trying to pay using external system`)
+
         const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
         if (!isPaid)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
@@ -789,6 +790,30 @@ export class TradingSystemManager {
 
     async getItemIds(req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
+    }
+
+    async lockStores(token: string): Promise<string[]> {
+
+        const user: User = await this._userManager.getUserByToken(token);
+        const storesName: string[] = Array.from(user.cart.keys())
+        logger.debug(`trying to get locks for ${storesName}`)
+        logger.debug(`locks on: ${this._storeManager.locks}`)
+        const newLocks: string[] = [];
+        for (const s of storesName) {
+            if (this._storeManager.locks.length > 0 && this._storeManager.locks.some((name) => name === s))
+                return []
+            else
+                newLocks.push(s);
+        }
+        this._storeManager.locks = this._storeManager.locks.concat(newLocks)
+        logger.debug(`GOT THE LOCK! ${newLocks}`)
+        return newLocks;
+    }
+
+    async unlockStores(stores: string[]): Promise<boolean> {
+        logger.debug(`trying to unlock: ${stores}`)
+        this._storeManager.locks = this._storeManager.locks.filter((s) => !stores.some((locks) => locks === s))
+        return true;
     }
 
     //region to be deleted

@@ -291,12 +291,12 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
-  //   const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
+    const { data, error } =await ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   // removeProductDiscount(req: Req.RemoveDiscountRequest){
   //   const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
@@ -305,19 +305,19 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //     : { data: data, error: undefined }; 
   // },
 
-  // setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+    async  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // }
+  async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  }
 
 
 };
