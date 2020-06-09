@@ -1,4 +1,10 @@
-import {ICondition, IDiscount, IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    ICondition,
+    IDiscount,
+    IItem,
+    IProduct,
+    ISimplePurchasePolicy
+} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Store} from "./Store";
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
@@ -8,6 +14,12 @@ import {CondDiscount} from "./discounts/CondDiscount";
 import {ShownDiscount} from "./discounts/ShownDiscount";
 import {MinPayCondition} from "./discounts/conditions/MinPayCondition";
 import {MinAmountCondition} from "./discounts/conditions/MinAmountCondition";
+import {PurchasePolicy} from "./PurchasePolicy/PurchasePolicy";
+import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
+import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
+import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
+import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
+import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 
 
 export function productFromDbToDomain(product): IProduct {
@@ -69,10 +81,19 @@ export function storeMapperFromDB(store: any): Store {
     const {storeName, description, products, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, discountPolicy} = store;
     const realProducts: Map<IProduct, IItem[]> = productsAndItemsMapperFromDB(products);
     const realDiscountPolicy = discountFromDB(discountPolicy);
-    const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, purchasePolicy, realDiscountPolicy)
+    const realPurchasePolicy = purchasePolicyFromDB(purchasePolicy);
+    const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, realPurchasePolicy, realDiscountPolicy)
     return realStore
 }
-
+export function purchasePolicyFromDB(purchasePolicy) : PurchasePolicy{
+    const newPolicy: PurchasePolicy = new PurchasePolicyImpl();
+    const children = purchasePolicy.children;
+    for(const c of children){
+        const newPol: PurchasePolicy = parsePurchasePolicy(c);
+        newPolicy.add(newPol, c.operator);
+    }
+    return newPolicy;
+}
 export function discountFromDB(discountPolicy) : Discount{
     const newPolicy: Discount = new DiscountPolicy();
     const children = discountPolicy.children;
@@ -81,6 +102,19 @@ export function discountFromDB(discountPolicy) : Discount{
         newPolicy.add(newDiscount, c.operator);
     }
     return newPolicy;
+}
+function parsePurchasePolicy(iPolicy): PurchasePolicy {
+    let purchasePolicy: PurchasePolicy;
+    if (iPolicy.countries && iPolicy.countries.length > 0) {
+        purchasePolicy = new UserPolicy(iPolicy.countries)
+    } else if (iPolicy.catalogNumber) {
+        purchasePolicy = new ProductPolicy(iPolicy.catalogNumber, iPolicy.minAmount, iPolicy.maxAmount);
+    } else if (iPolicy.minAmount && iPolicy.maxAmount) {
+        purchasePolicy = new BagPolicy(iPolicy.minAmount, iPolicy.maxAmount);
+    } else if (iPolicy.notForSellDays) {
+        purchasePolicy = new SystemPolicy(iPolicy.notForSellDays);
+    }
+    return purchasePolicy;
 }
 
 function parseDiscount(iDiscount): Discount {

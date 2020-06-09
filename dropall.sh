@@ -13,4 +13,6 @@ db.subscribers.drop()
 db.discountpolicies.drop()
 db.discounts.drop()
 db.conditions.drop()
+db.purchasepolicieselements.drop()
+db.purchasepolicies.drop()
 EOF

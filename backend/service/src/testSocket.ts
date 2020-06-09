@@ -1,5 +1,5 @@
 import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
-import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators} from "se-workshop-20-interfaces/dist/src/Enums";
 import {
     IItem,
     IProduct,
@@ -296,7 +296,7 @@ export async function t2() {
                     expMonth: "5",
                     cvv: "40"
                 }, address: "batyam", city: "batya", country: "israel"
-            },total: 100
+            }, total: 100
         }, token: token
     }
     await createStore(storeName, token);
@@ -308,12 +308,23 @@ export async function t2() {
         body: {storeName, catalogNumber: products[0].catalogNumber, amount: 1},
         token: token
     }
-    const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
-    const res2 = await ServiceFacade.viewCart({body: {},token})
+    const res = await ServiceFacade.setPurchasePolicy({
+        body: {
+            storeName,
+            policy: {
+                policy: [{
+                    policy: {productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 3}},
+                    operator: Operators.AND
+                }]
+            }
+        }, token
+    })
+    //const res = await ServiceFacade.saveProductToCart(saveProductToCartReqFix);
+    // const res2 = await ServiceFacade.viewCart({body: {},token})
     await logout(token);
     //await registerUser(buyer1.name, "buyer1password", token, false);
-   //const viewRes = await ServiceFacade.viewCart({body: {}, token})
-   //const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
+    //const viewRes = await ServiceFacade.viewCart({body: {}, token})
+    //const res2 = await ServiceFacade.viewStoreInfo({body: {storeName: "Max Stock"}, token});
     //const resPurchase = await ServiceFacade.purchase(purchaseReq);
 
     // region old tests

@@ -29,7 +29,14 @@ import {PurchasePolicyImpl} from "./PurchasePolicy/PurchasePolicyImpl";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
-import {ProductModel, DiscountPolicyModel, DiscountModel, ConditionModel} from "dal"
+import {
+    ProductModel,
+    DiscountPolicyModel,
+    DiscountModel,
+    ConditionModel,
+    PurchasePolicyModel,
+    PurchasePolicyElementModel
+} from "dal"
 
 const logger = loggerW(__filename)
 
@@ -57,8 +64,6 @@ export class Store {
         this.storeOwners = storeOwner
         this.storeManagers = storeManagers;
         this.receipts = receipts;
-        // this.purchasePolicy = new PurchasePolicyImpl();
-        // this.discountPolicy = new DiscountPolicy();
         this.purchasePolicy = purchasePolicy;
         this.discountPolicy = discountPolicy;
         this.rating = Rating.MEDIUM;
@@ -452,7 +457,8 @@ export class Store {
                 percentage: newDiscount.percentage,
                 productsInDiscount: newDiscount.productsInDiscount,
                 category: newDiscount.category,
-                conditions: conditionDocs
+                conditions: conditionDocs,
+                storeName: this.storeName
             })
         }
 
@@ -481,13 +487,35 @@ export class Store {
         return finalPrice;
     }
 
-    setPurchasePolicy(policy: IPurchasePolicyElement[]): boolean {
+    async setPurchasePolicy(policy: IPurchasePolicyElement[]): Promise<boolean> {
         const newPolicy: PurchasePolicy = new PurchasePolicyImpl();
+        try {
+            await PurchasePolicyElementModel.deleteMany({storeName: this.storeName})
+        } catch (e) {
+            return false;
+        }
+        const newDocs = [];
         for (const purchasePolicy of policy) {
             const newPurchasePolicy: PurchasePolicy = this.parseIPurchasePolicy(purchasePolicy.policy);
             if (!newPurchasePolicy)
                 return false;
             newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
+            newDocs.push({
+                operator: purchasePolicy.operator,
+                notForSellDays: newPurchasePolicy.getNotForSellDays(),
+                catalogNumber: newPurchasePolicy.getCatalogNumber(),
+                minAmount: newPurchasePolicy.getMinAmount(),
+                maxAmount: newPurchasePolicy.getMaxAmount(),
+                countries: newPurchasePolicy.getCountries(),
+                storeName: this.storeName
+            })
+        }
+        try {
+            const policiesDocs = await PurchasePolicyElementModel.create(newDocs);
+            const purchasePolicy = await PurchasePolicyModel.findOneAndUpdate({storeName: this.storeName}, {children: policiesDocs});
+        } catch (e) {
+            logger.error(`setDiscountPolicy discounts ERROR DB ${e} `)
+            return false;
         }
         this.purchasePolicy = newPolicy;
         return true;
@@ -618,8 +646,6 @@ export class Store {
     }
 
     verifyStorePolicy(user: RegisteredUser, bagItems: BagItem[]): boolean {
-        return true;
-        // TODO when pruchase policy is valid
-        // return this.purchasePolicy.isSatisfied(bagItems, user);
+        return this.purchasePolicy.isSatisfied(bagItems, user);
     }
 }

@@ -19,14 +19,13 @@ import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
 import {
-    BagItemModel,
     DiscountPolicyModel,
     ProductModel,
     ReceiptModel,
     StoreManagerModel,
     StoreModel,
     StoreOwnerModel,
-    UserModel
+    PurchasePolicyModel,
 } from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
@@ -35,7 +34,7 @@ import {mapToJson} from "../api-int/utils";
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy"];
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy","purchasePolicy"];
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
@@ -68,7 +67,6 @@ export class StoreManagement {
                 return {path: field}
             });
             const s = await StoreModel.findOne({storeName}).populate(populateQuery)
-                .populate(populateQuery);
             return s;
         } catch (e) {
             logger.error(`findStoreModelByName DB ERROR: ${e}`);
@@ -100,7 +98,8 @@ export class StoreManagement {
         try {
             const storeOwners = [firstOwner]
             const discountPolicy = await DiscountPolicyModel.create({children: [], storeName})
-            await StoreModel.create({storeName, description, firstOwner, storeOwners,discountPolicy})
+            const purchasePolicy = await PurchasePolicyModel.create({children: [], storeName})
+            await StoreModel.create({storeName, description, firstOwner, storeOwners, discountPolicy,purchasePolicy})
             await firstOwner.save();
             logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
             return {data: {result: true}}
@@ -742,8 +741,9 @@ export class StoreManagement {
                 error: {message: errorMsg.E_PERMISSION}
             }
 
-        const iReceipts: IReceipt[] = storeModel.receipts.map((r) =>
-            { return {purchases: r.purchases, date: r.date} })
+        const iReceipts: IReceipt[] = storeModel.receipts.map((r) => {
+            return {purchases: r.purchases, date: r.date}
+        })
         return {data: {result: true, receipts: iReceipts}}
     }
 
@@ -899,9 +899,9 @@ export class StoreManagement {
         const store: Store = await this.findStoreByName(storeName);
         // reset prices from last check
         for (const bagItem of bagItems) {
-            const lastPrice : number = bagItem.finalPrice
+            const lastPrice: number = bagItem.finalPrice
             bagItem.finalPrice = bagItem.product.price * bagItem.amount;
-            if(bagItem.finalPrice !== lastPrice){
+            if (bagItem.finalPrice !== lastPrice) {
                 logger.info(`final price changed! new final price ${bagItem.finalPrice}`)
             }
         }
@@ -949,7 +949,7 @@ export class StoreManagement {
         const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const setPolicyOk: boolean = store.setPurchasePolicy(policy.policy);
+        const setPolicyOk: boolean = await store.setPurchasePolicy(policy.policy);
         return setPolicyOk ? {data: {result: true}} :
             {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
     }

@@ -29,7 +29,9 @@ export class SystemPolicy extends PurchasePolicy {
     public getPolicyTag():string{
         return "system";
     }
-
+    public getNotForSellDays() : WeekDays[]{
+        return this._notForSellDays;
+    }
 
     get notForSellDays(): WeekDays[] {
         return this._notForSellDays;

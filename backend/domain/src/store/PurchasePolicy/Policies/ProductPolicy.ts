@@ -46,7 +46,15 @@ export class ProductPolicy extends PurchasePolicy {
         if (!bagItem) return true;
         return this.minAmount <= bagItem.amount && bagItem.amount <= this.maxAmount;
     }
-
+    public getCatalogNumber() : number{
+        return this._catalogNumber;
+    }
+    public getMinAmount() : number{
+        return this._minAmount;
+    }
+    public getMaxAmount() : number{
+        return this._maxAmount;
+    }
     public getPolicyTag(): string {
         return "product";
     }

@@ -16,8 +16,12 @@ import StoreOwnerSubscriptionModel from "./src/models/common_models/StoreOwnerSu
 import DiscountPolicyModel from "./src/models/store_models/DiscountPolicyModel";
 import DiscountModel from "./src/models/store_models/DiscountModel";
 import ConditionModel from "./src/models/store_models/ConditionModel";
+import PurchasePolicyModel from "./src/models/store_models/PurchasePolicyModel";
+import PurchasePolicyElementModel from "./src/models/store_models/PurchasePolicyElementModel";
 
 export {
+    PurchasePolicyModel,
+    PurchasePolicyElementModel,
     ConditionModel,
     DiscountPolicyModel,
     DiscountModel,
@@ -35,6 +39,7 @@ export {
     ItemModel,
     EventModel,
     SystemModel,
+
 }
 /*
 async function register_test() {
