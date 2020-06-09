@@ -111,8 +111,9 @@ export const Adapter: any = {
       product: Product,
       quantity: number
   ): Promise<DummyTypes.IResponse> {
- return await this.saveProductToCart(wrapWithToken({body:{storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}}))
-},
+return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
+
+  },
   // removeProductsFromStore(store: Store, products: Product[]) {
   //   const catalogNumbers = products.map((p) => {
   //     return { catalogNumber: p.catalogNumber };
