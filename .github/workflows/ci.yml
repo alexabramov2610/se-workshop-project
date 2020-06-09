@@ -108,6 +108,9 @@ jobs:
 #          cd AT
 #          npm run comp
 #          cd ..
+      - name: Start MongoDB
+        run: |
+          sudo service mongod start
 #      - name: Unit Tests
 #        run: |
 #          cd backend
