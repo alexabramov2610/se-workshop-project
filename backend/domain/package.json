@@ -13,7 +13,7 @@
     "test:ch": "TEST_MODE=1 SILENT=1 jest --maxWorkers=1 -o",
     "test:silent": "TEST_MODE=1 SILENT=1 jest --maxWorkers=1",
     "test:clear": "jest --maxWorkers=1 --clearCache",
-    "test:cov": "jest --maxWorkers=1 --coverage --forceExit --detectOpenHandles",
+    "test:cov": "MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --coverage --forceExit --detectOpenHandles",
     "test:watch": "npm t -- --watch",
     "clean": "rm -rf dist",
     "clean:hard": "rm -rf dist && rm -rf logs"
