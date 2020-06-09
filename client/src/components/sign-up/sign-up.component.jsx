@@ -16,6 +16,15 @@ class SignUp extends React.Component {
     };
   }
 
+  analyzeResult = (result) => {
+    if (result.data.error) {
+      Modal.error(result.data.error.message);
+    }
+    else {
+      Modal.success("Welcome! You are officially part of our system :)");
+    }
+  }
+
   handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -32,7 +41,7 @@ class SignUp extends React.Component {
       password: "",
       confirmPassword: "",
     });
-    await register(displayName, password);
+    await register(displayName, password).then(r => this.analyzeResult(r));
   };
 
   handleChange = (event) => {

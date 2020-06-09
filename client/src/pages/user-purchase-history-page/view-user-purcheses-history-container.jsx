@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import * as api from '../../utils/api';
-import AdminViewUsersPurchaseHistoryPage from "./admin-view-user-purchases-history";
+import AdminViewUsersPurchaseHistoryPage from "./view-user-purchases-history";
 import * as generalUtils from "../../utils/utils";
 
-const AdminViewUsersPurchaseHistoryContainer = () => {
+const ViewUsersPurchaseHistoryContainer = () => {
 
     const [fetching, setFetching] = useState(false);
     const [username, setUsername] = useState(undefined);
@@ -16,9 +16,13 @@ const AdminViewUsersPurchaseHistoryContainer = () => {
             await generalUtils.sleep(1000);
 
             const purchasesHistoryRes = await api.viewUserPurchaseHistory(username);
-            const receipts = purchasesHistoryRes.data.data.receipts;
-            const keyedHistory = generalUtils.addKeys(receipts);
-            setPurchasesHistory(keyedHistory);
+            console.log(purchasesHistoryRes);
+
+            if (purchasesHistoryRes.data.data.result) {
+                const receipts = purchasesHistoryRes.data.data.receipts;
+                const keyedHistory = generalUtils.addKeys(receipts);
+                setPurchasesHistory(keyedHistory);
+            }
             setFetching(false);
         }
 
@@ -41,4 +45,4 @@ const AdminViewUsersPurchaseHistoryContainer = () => {
     );
 }
 
-export default AdminViewUsersPurchaseHistoryContainer;
+export default ViewUsersPurchaseHistoryContainer;

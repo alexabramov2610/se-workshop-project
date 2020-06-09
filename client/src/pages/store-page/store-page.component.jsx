@@ -9,11 +9,13 @@ import ManageManagersPageContainer from "../manage-managers-page/manage-managers
 import ManageOwnersPageContainer from "../manage-owners-page/manage-owners-page-container";
 import BuyingPolicyPageContainer from "../buying-policy-page/buying-policy-page.container";
 import * as utils from "./store-page-utils";
+import ViewStoresPurchaseHistoryContainer from "../stores-purchase-history-page/view-stores-purchase-history-container";
 
 
 const {Sider, Content} = Layout;
 const screens = [
     <StoreOverview/>,
+    <ViewStoresPurchaseHistoryContainer isAdmin={false}/>,
     <div>EDIT STORE INFO</div>,
     <ManageProductsContainer/>,
     <DiscountPageContainer/>,
