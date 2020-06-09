@@ -37,9 +37,9 @@ export const Adapter: any = {
       : { data: data, error: undefined };
   },
 
-  // reset() {
-  //   ServiceFacade.reset();
-  // },
+   async reset() {
+    await ServiceFacade.reset();
+   },
 
   async register(credentials: Types.Credentials): Promise<DummyTypes.IResponse> {
     const reqCred = {

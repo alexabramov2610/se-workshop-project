@@ -35,7 +35,9 @@ class Driver {
     };
     this.makeABuy = this.makeABuy.bind(this)
   }
-
+  public reset() {
+    this.bridge.reset();
+  }
   private loginDefCredentials: Credentials = {
     userName: "ron",
     password: "avishay",

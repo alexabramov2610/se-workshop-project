@@ -50,7 +50,7 @@ export interface Bridge {
     store: Store,
     permissions: PERMISSION[]
   ): Promise<DummyTypes.IResponse>;
-  // reset(): void;
+  reset(): Promise<void>;
   assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
   changeProductName(
     req: Partial<Req.ChangeProductNameRequest>
