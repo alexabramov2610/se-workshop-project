@@ -223,12 +223,12 @@ export const Adapter: any = {
   // },
 
 
-  // watchCart(): Res.ViewCartRes {
-  //   const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async watchCart(): Promise<Res.ViewCartRes> {
+    const { data, error } = await ServiceFacade.viewCart(wrapWithToken({}));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
 
 

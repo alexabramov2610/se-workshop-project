@@ -35,7 +35,7 @@ export interface Bridge {
    search(input: Req.SearchRequest): Promise<DummyTypes.ISearchResponse>;
   // // rate(toRate: Store | Product, rate: RATE): DummyTypes.IResponse;
   addToCart(store: Store,product: Product,quantity: number): Promise<DummyTypes.IResponse>;
-  watchCart(): Res.ViewCartRes;
+  watchCart(): Promise<Res.ViewCartRes>;
   
   // setDiscountToStore(store: Store, discount: Discount): DummyTypes.IResponse;
   // setDiscountToItem(
