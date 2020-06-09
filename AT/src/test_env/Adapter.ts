@@ -277,12 +277,12 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //     : { data: data, error: undefined };
   // },
 
-  // pay(req: Req.PayRequest) {
-  //   const { data, error } = ServiceFacade.pay(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async pay(req: Req.PayRequest) {
+    const { data, error } = await ServiceFacade.pay(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   // deliver(req: Req.DeliveryRequest) {
   //   const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));

@@ -81,7 +81,7 @@ export interface Bridge {
   //   req: Partial<Req.ViewManagerPermissionRequest>
   // ): Res.ViewManagerPermissionResponse;
   // addDiscount(req: Req.AddDiscountRequest);
-  // pay(req: Req.PayRequest): Res.PaymentResponse;
+  pay(req: Req.PayRequest): Promise<Res.PaymentResponse>;
   // deliver(req: Req.DeliveryRequest): Res.DeliveryResponse;
   // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
   //  addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
