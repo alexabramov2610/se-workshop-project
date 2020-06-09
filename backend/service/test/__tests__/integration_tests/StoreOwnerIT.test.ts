@@ -931,6 +931,7 @@ describe("Store Owner Integration Tests", () => {
             token: token
         }
         const makeDiscountRes: Res.AddDiscountResponse = await ServiceFacade.setDiscountsPolicy(setPolicyReq);
+        expect(makeDiscountRes.data.result)
 
         const req : Req.ViewStoreDiscountsPolicyRequest = {body: {storeName}, token:token};
         const res: Res.ViewStoreDiscountsPolicyResponse = await ServiceFacade.viewDiscountsPolicy(req);
