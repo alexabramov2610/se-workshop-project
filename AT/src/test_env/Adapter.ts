@@ -76,7 +76,7 @@ export const Adapter: any = {
 
   async createStore(store: Types.Store): Promise<DummyTypes.IStoreResponse> {
     const req = wrapWithToken({ storeName: store.name,description:'blabla' });
-    const { error, data } = await  ServiceFacade.createStore(req);
+    const { error, data } = await ServiceFacade.createStore(req);
     if (error || !data.result) return { data: undefined, error: error.message };
     else if (data.result) return { data: { name: store.name } };
   },
@@ -108,14 +108,14 @@ export const Adapter: any = {
   //   return error ? { data, error: error.message } : { data, error: undefined };
   // },
 
-  // viewStore(store: Store) {
-  //   const { data, error } = ServiceFacade.viewStoreInfo(
-  //     wrapWithToken({ storeName: store.name })
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data.info, error: undefined };
-  // },
+  async viewStore(store: Store) {
+    const { data, error } = await ServiceFacade.viewStoreInfo(
+      wrapWithToken({ storeName: store.name })
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data.info, error: undefined };
+  },
 
   // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
   //   const { data, error } = ServiceFacade.assignStoreOwner(
@@ -202,17 +202,17 @@ export const Adapter: any = {
     );
   },
 
-  // viewProduct(store: Store, product: Product): Res.ProductInfoResponse {
-  //   const { data, error } = ServiceFacade.viewProductInfo(
-  //     wrapWithToken({
-  //       storeName: store.name,
-  //       catalogNumber: product.catalogNumber,
-  //     })
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async viewProduct(store: Store, product: Product): Promise<Res.ProductInfoResponse> {
+    const { data, error } = await ServiceFacade.viewProductInfo(
+      wrapWithToken({
+        storeName: store.name,
+        catalogNumber: product.catalogNumber,
+      })
+    );
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   async purchase(req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> {
     return await ServiceFacade.purchase(wrapWithToken(req.body));

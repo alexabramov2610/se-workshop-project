@@ -439,13 +439,13 @@ export class TradingSystemManager {
 
     //region verifications
     async verifyTokenExists(req: Req.Request): Promise<Res.BoolResponse> {
-        logger.info(`checking if token exists ${req.token}`)
+        logger.debug(`checking if token exists ${req.token}`)
         return this._userManager.isTokenTaken(req.token) ? {data: {result: true}} :
             {data: {result: false}, error: {message: errorMsg.E_BAD_TOKEN}}
     }
 
     async isLoggedInUserByToken(req: Req.Request): Promise<Res.GetLoggedInUserResponse> {
-        logger.info(`checking is logged in user by received token`);
+        logger.debug(`checking is logged in user by received token`);
         return {data: {username: this._userManager.getLoggedInUsernameByToken(req.token)}}
     }
 
