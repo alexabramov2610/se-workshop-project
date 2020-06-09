@@ -94,7 +94,7 @@ class App extends React.Component {
         return (!this.state.systemIsClose) ? (
             <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
-                    <Header isLoggedIn={this.state.isLoggedIn} isAdmin={this.state.asAdmin} onLogout={this.onLogout} />
+                    <Header isLoggedIn={this.state.isLoggedIn} isAdmin={this.state.isAdmin} onLogout={this.onLogout} />
                     <Switch>
                         <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route path="/category" component={CategoryPage} />

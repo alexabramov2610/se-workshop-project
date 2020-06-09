@@ -75,7 +75,7 @@ export class Header extends React.Component {
                         >
                             SEARCH
                         </Link>
-                        {this.adminOptions()}
+                        {this.props.isAdmin && this.adminOptions()}
                         <Link
                             style={linkStyle}
                             className="hvr-underline-from-center"
