@@ -4,8 +4,8 @@ import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW, UserRole} from "../api-int/internal_api";
-import {AdminModel, StoreModel, UserModel} from 'dal'
+import {errorMsg, loggerW} from "../api-int/internal_api";
+import {AdminModel, UserModel} from 'dal'
 import * as UserMapper from './UserMapper'
 import {createAdmin, createGuest, createRegisteredUser} from "../api-int/utils";
 
@@ -15,14 +15,14 @@ export class UserManager {
     private readonly DEFAULT_USER_POPULATION: string[] = ["receipts", "pendingEvents"];
     private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
-    private admins: Admin[];
+    private admins: Map<string, string>;
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
         this.loggedInUsers = new Map();
         this.guests = new Map<string, Guest>();
-        this.admins = [];
+        this.admins = new Map();
     }
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
@@ -42,7 +42,7 @@ export class UserManager {
         }
     }
 
-    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
+    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {     /** at this point credentials are already verified **/
         const userName = req.body.username;
         // const user = this.getUserByName(userName)
         if (this.isLoggedIn(userName)) { // already logged in
@@ -50,11 +50,18 @@ export class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
         }
         try {
-            await UserModel.findOne({name: userName}).lean();
+            // await UserModel.findOne({name: userName});
+            const rUser = await UserModel.findOne({name: req.body.username})
+            if (req.body.asAdmin) {
+                const isAdmin: boolean = await this.verifyAdminLogin(rUser);
+                if (isAdmin)
+                    this.admins.set(req.token, userName);
+                else
+                    return {data: {result: false}, error: {message: errorMsg.E_NA}}
+            }
             this.loggedInUsers.set(req.token, userName)
             this.guests.delete(req.token);
-            logger.info(`login ${userName} succeed! `);
-            logger.info(`remove guest token ${req.token} `);
+            logger.info(`login ${userName} ${req.body.asAdmin ? 'as admin ' : ''}succeed!`);
             return {data: {result: true}};
         } catch (e) {
             logger.error(`login ${userName} failed!`);
@@ -62,9 +69,21 @@ export class UserManager {
         }
     }
 
+    async verifyAdminLogin(rUserModel): Promise<boolean> {
+       try {
+           const admin = await AdminModel.findOne({user: rUserModel._id});
+           return admin ? true : false;
+       } catch (e) {
+           logger.error(`verifyAdminLogin DB ERROR: ${e}`)
+       }
+       return false;
+    }
+
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         this.loggedInUsers.delete(req.token)
+        if (this.admins.has(req.token))
+            this.admins.delete(req.token)
         this.guests.set(req.token, createGuest());
         return {data: {result: true}}
     }
@@ -152,12 +171,8 @@ export class UserManager {
         return "";
     }
 
-    isAdmin(u: RegisteredUser): boolean {
-        for (const user of this.admins) {
-            if (u.name === user.name)
-                return true;
-        }
-        return false;
+    checkIsAdminByToken(token: string): boolean {
+        return this.admins.has(token);
     }
 
     isLoggedIn(userToCheck: string): boolean {
@@ -180,36 +195,36 @@ export class UserManager {
 
     async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = await this.getAdminByToken(req.token);
-        if (this.admins.length !== 0 && (!admin)) {
+        if (this.admins.size !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
         try {
-            const user: RegisteredUser = await this.findUserModelByName(req.body.newAdminUserName);
-            if (!user)
+            const userModel = await this.findUserModelByName(req.body.newAdminUserName);
+            if (!userModel)
                 return {data: {result: false}, error: {message: errorMsg.E_NF}}
-            const isAdmin: boolean = this.isAdmin(user);
+            const isAdmin: boolean = await this.verifyAdminLogin(userModel);
             if (isAdmin)
                 return {data: {result: false}, error: {message: errorMsg.E_AL}}
-
-            await AdminModel.create({user})
-
+            await AdminModel.create({user: userModel})
         } catch (e) {
-            logger.error(`DB ERROR ${e}`)
+            logger.error(`setAdmin DB ERROR: ${e}`)
         }
 
         return {data: {result: true}};
     }
 
 
-    private async getAdminByName(token: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
+    private async getAdminByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
             const u = await AdminModel.findOne({name}).populate('user')
+            if (!u)
+                return undefined;
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return createAdmin(u.name, u.password, u.receipts, u.cart, u.pendingEvents)
         } catch (e) {
-            logger.error(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getAdminByName DB ERROR: ${e}`)
             return undefined
         }
     }

@@ -67,13 +67,14 @@ export const addNewProducts = async (req: Req.AddProductsRequest): Promise<Res.P
 }
 
 export const viewProductInfo = async (req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> => {
-    const verifyProductsRes: Res.BoolResponse = await ts.verifyProducts({
+    const verifyReq: Req.VerifyProducts = {
         body: {
             storeName: req.body.storeName,
-            productsCatalogNumbers: [req.body.catalogNumber]
+            productsCatalogNumbers: [+req.body.catalogNumber]
         },
         token: req.token
-    })
+    };
+    const verifyProductsRes: Res.BoolResponse = await ts.verifyProducts(verifyReq)
     if (!verifyProductsRes.data.result)
         return verifyProductsRes
     return ts.viewProductInfo(req);

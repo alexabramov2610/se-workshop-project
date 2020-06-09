@@ -6,6 +6,7 @@ import {notificationMsg} from "../api-int/Notifications";
 import {ExternalSystemsManager} from "../external_systems/internal_api"
 import {
     EventCode,
+    ManagementPermission,
     NotificationsType,
     ProductCategory,
     TradingSystemState
@@ -48,9 +49,9 @@ export class TradingSystemManager {
             .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
     }
 
-    dropAllDB() {
+    async dropAllDB() {
         const shell = require('shelljs')
-        shell.exec('../../dropall.sh')
+        await shell.exec('../../dropall.sh', {async: true})
     }
 
     async initSubscribers(): Promise<string> {
@@ -451,13 +452,17 @@ export class TradingSystemManager {
     async verifyStorePermission(req: Req.VerifyStorePermission, storeModel?): Promise<Res.BoolResponse> {
         logger.debug(`verifying store permissions`)
         const username = this._userManager.getLoggedInUsernameByToken(req.token)
+        const isAdminWatchesHistories: boolean = req.body.permission === ManagementPermission.WATCH_PURCHASES_HISTORY && this._userManager.checkIsAdminByToken(req.token)
+        if (isAdminWatchesHistories)
+            return {data: {result: true}};
         return username ? this._storeManager.verifyStoreOperation(req.body.storeName, username, req.body.permission, storeModel) :
             {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
     }
 
-    verifyProducts(req: Req.VerifyProducts) {
+    async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
         logger.debug(`verifying products`)
-        return this._storeManager.verifyProducts(req);
+        const res: Res.BoolResponse = await this._storeManager.verifyProducts(req);
+        return res;
     }
 
     verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {
@@ -588,8 +593,8 @@ export class TradingSystemManager {
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         const userToView: RegisteredUser = (req.body && req.body.userName) ? await this._userManager.getUserByName(req.body.userName) : user;
         if (!userToView)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
-        const isAdminReq: boolean = req.body && req.body.userName && user.role === UserRole.ADMIN;
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}}
+        const isAdminReq: boolean = req.body && req.body.userName && this._userManager.checkIsAdminByToken(req.token);
         if (userToView.name !== user.name && !isAdminReq)
             return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         return this._userManager.viewRegisteredUserPurchasesHistory(userToView);
@@ -598,7 +603,8 @@ export class TradingSystemManager {
     async viewStorePurchasesHistory(req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> {
         logger.info(`retrieving receipts from store: ${req.body.storeName}`);
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName);
+        const isAdmin: boolean = this._userManager.checkIsAdminByToken(req.token)
+        return this._storeManager.viewStorePurchaseHistory(user, req.body.storeName, isAdmin);
     }
 
     //endregion
@@ -782,8 +788,6 @@ export class TradingSystemManager {
     async getItemIds(req: Req.GetItemsIdsRequest): Promise<Res.GetItemsIdsResponse> {
         return this._storeManager.getItemIds(req.body.storeName, +req.body.product)
     }
-
-    //endregion
 
     //region to be deleted
 
