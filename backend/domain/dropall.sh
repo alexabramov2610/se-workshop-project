@@ -1,4 +1,4 @@
-mongo trading-system-db <<EOF
+mongo dev-trading-system-db <<EOF
 db.users.drop()
 db.stores.drop()
 db.storeowners.drop()
@@ -10,5 +10,9 @@ db.admins.drop()
 db.systems.drop()
 db.notifications.drop()
 db.subscribers.drop()
-
+db.discountpolicies.drop()
+db.discounts.drop()
+db.conditions.drop()
+db.purchasepolicieselements.drop()
+db.purchasepolicies.drop()
 EOF

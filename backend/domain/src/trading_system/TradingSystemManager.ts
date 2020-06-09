@@ -50,6 +50,7 @@ export class TradingSystemManager {
     }
 
     async dropAllDB() {
+        logger.warn("drpping database...")
         const shell = require('shelljs')
         await shell.exec('../../dropall.sh', {async: true})
     }
