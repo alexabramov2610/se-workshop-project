@@ -743,7 +743,7 @@ export class StoreManagement {
             }
 
         const iReceipts: IReceipt[] = storeModel.receipts.map((r) => {
-            return {purchases: r.purchases, date: r.date}
+            return {purchases: r.purchases, date: r.date , payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged}}
         })
         return {data: {result: true, receipts: iReceipts}}
     }
