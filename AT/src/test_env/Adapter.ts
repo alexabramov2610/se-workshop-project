@@ -174,11 +174,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductName(wrapWithToken(req.body));
-  // },
+  async changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse> {
+    return await ServiceFacade.changeProductName(wrapWithToken(req.body));
+  },
 
   // changeProductPrice(
   //   req: Partial<Req.ChangeProductPriceRequest>
