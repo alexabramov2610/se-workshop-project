@@ -114,16 +114,16 @@ export const Adapter: any = {
 return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
 
   },
-  // removeProductsFromStore(store: Store, products: Product[]) {
-  //   const catalogNumbers = products.map((p) => {
-  //     return { catalogNumber: p.catalogNumber };
-  //   });
-  //   const removeReq = { storeName: store.name, products: catalogNumbers };
-  //   const { data, error } = ServiceFacade.removeProducts(
-  //     wrapWithToken(removeReq)
-  //   );
-  //   return error ? { data, error: error.message } : { data, error: undefined };
-  // },
+  async removeProductsFromStore(store: Store, products: Product[]) {
+    const catalogNumbers = products.map((p) => {
+      return { catalogNumber: p.catalogNumber };
+    });
+    const removeReq = { storeName: store.name, products: catalogNumbers };
+    const { data, error } = await ServiceFacade.removeProducts(
+      wrapWithToken(removeReq)
+    );
+    return error ? { data, error: error.message } : { data, error: undefined };
+  },
 
   async viewStore(store: Store) {
     const { data, error } = await ServiceFacade.viewStoreInfo(
@@ -175,17 +175,17 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductName(wrapWithToken(req.body));
-  // },
+  async changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse> {
+    return await ServiceFacade.changeProductName(wrapWithToken(req.body));
+  },
 
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
-  // },
+  async changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse> {
+    return  await ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  },
 
  // async saveProductToCart(req : SaveToCartRequest) {
  //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));

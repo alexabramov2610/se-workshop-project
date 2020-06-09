@@ -23,10 +23,10 @@ export interface Bridge {
   createStore(store: Store): Promise<DummyTypes.IStoreResponse>;
   addItemsToStore(store: Store, item: Item[]): Promise<DummyTypes.IResponse>;
   addProductsToStore(store: Store, products: Product[]): Promise<DummyTypes.IResponse>;
-  // removeProductsFromStore(
-  //   store: Store,
-  //   Products: Product[]
-  // ): DummyTypes.IProductsRemovalResponse;
+  removeProductsFromStore(
+    store: Store,
+    Products: Product[]
+  ): Promise<DummyTypes.IProductsRemovalResponse>;
    viewStore(store: Store): Promise<DummyTypes.IViewStoreResponse>;
    viewProduct(store: Store, product: Product): Promise<Res.ProductInfoResponse>;
   // removeUser(user: User): DummyTypes.IResponse;
@@ -52,12 +52,12 @@ export interface Bridge {
   ): Promise<DummyTypes.IResponse>;
   // reset(): void;
   assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse;
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse;
+  changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse>;
+  changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse>;
   // watchPermissions(
   //   store: Store,
   //   credentials: Credentials

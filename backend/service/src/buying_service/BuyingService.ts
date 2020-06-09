@@ -44,7 +44,11 @@ export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseRe
             body: {price: calcRes.data.price, payment: req.body.payment},
             token: req.token,
         });
-        if (!isPaid.data.result) return isPaid;
+        if (!isPaid.data.result)
+        {
+            await ts.unlockStores(lock);
+            return isPaid;
+        }
         const updateStockRequest: Req.UpdateStockRequest = {token: req.token, body: {payment: isPaid.data.payment}}
         const purchaseRes: Res.PurchaseResponse = await ts.purchase(updateStockRequest)
         await ts.unlockStores(lock);
