@@ -7,7 +7,8 @@ import {
     UserOutlined,
     AppstoreOutlined,
     EditOutlined,
-    UsergroupAddOutlined
+    UsergroupAddOutlined,
+    HistoryOutlined
 } from '@ant-design/icons';
 import {StorePageCtx} from "../../pages/store-page/store-page-ctx";
 import * as utils from "../../pages/store-page/store-page-utils";
@@ -27,19 +28,21 @@ const StoreMenu = ({onChange}) => {
             >
                 <Menu.Item key="1" icon={<AppstoreOutlined/>}>Store Overview</Menu.Item>
                 {utils.isManager(props) &&
-                <Menu.Item key="2" icon={<EditOutlined/>}>Edit Store Info</Menu.Item>}
+                <Menu.Item key="2" icon={<HistoryOutlined />}>Store Purchases History</Menu.Item>}
+                {utils.isManager(props) &&
+                <Menu.Item key="3" icon={<EditOutlined/>}>Edit Store Info</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MANAGE_INVENTORY, props.permissions) &&
-                <Menu.Item key="3" icon={<AppstoreAddOutlined/>}>Manage Products</Menu.Item>}
+                <Menu.Item key="4" icon={<AppstoreAddOutlined/>}>Manage Products</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MODIFY_DISCOUNT, props.permissions) &&
-                <Menu.Item key="4" icon={<PercentageOutlined/>}>Manage Discount Policy</Menu.Item>}
+                <Menu.Item key="5" icon={<PercentageOutlined/>}>Manage Discount Policy</Menu.Item>}
                 {utils.hasPermission(utils.permissions.MODIFY_BUYING_METHODS, props.permissions) &&
-                <Menu.Item key="5" icon={<ShoppingOutlined/>}>Manage Buying Policy</Menu.Item>}
+                <Menu.Item key="6" icon={<ShoppingOutlined/>}>Manage Buying Policy</Menu.Item>}
                 {utils.isOwner(props) &&
                 <SubMenu icon={<UsergroupAddOutlined/>} title="Manage Stuff">
-                    <Menu.Item key="6" icon={<UserOutlined />}>
+                    <Menu.Item key="7" icon={<UserOutlined />}>
                         Managers
                     </Menu.Item>
-                    <Menu.Item key="7" icon={<UserOutlined />}>
+                    <Menu.Item key="8" icon={<UserOutlined />}>
                         Owners
                     </Menu.Item>
                 </SubMenu>}

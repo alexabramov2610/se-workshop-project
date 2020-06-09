@@ -103,6 +103,9 @@ jobs:
           cd communication/http
           npm run comp
           cd ..
+      - name: Start MongoDB
+        run: |
+          sudo service mongod start
       #      - name: Compile AT
       #        run: |
       #          cd AT

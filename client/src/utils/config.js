@@ -12,7 +12,6 @@ export const getLoggedInUser = () => {
     return loggedInUser;
 }
 
-
 export const admingSet = () => {
     isInit = !isInit;
 }

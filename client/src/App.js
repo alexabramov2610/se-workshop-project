@@ -20,15 +20,12 @@ import ManageProductItemsContainer from './pages/manage-products-page/manage-pro
 import { CartCtx } from './contexts/cart-context'
 import { history } from './utils/config'
 import * as config from './utils/config'
-import DiscountPageContainer from "./pages/discount-page/discount-page-container";
 import StorePageContainer from "./pages/store-page/store-page-container";
 import { CheckoutPage } from './pages/checkout-page/checkout.component'
-import * as wssClient from "./utils/wss.client";
-import ManageManagersPageContainer from "./pages/manage-managers-page/manage-managers-page-container";
-import AdminViewStoresPurchaseHistoryContainer
-    from "./pages/admin-view-stores-purchase-history-page/admin-view-stores-purchase-history-container";
-import AdminViewUsersPurchaseHistoryContainer
-    from "./pages/admin-view-user-purchase-history-page/admin-view-user-purcheses-history-container";
+import ViewStoresPurchaseHistoryContainer
+    from "./pages/stores-purchase-history-page/view-stores-purchase-history-container";
+import ViewUsersPurchaseHistoryContainer
+    from "./pages/user-purchase-history-page/view-user-purcheses-history-container";
 
 
 
@@ -36,6 +33,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isAdmin: false,
             isLoggedIn: false,
             systemIsClose: false,
             cartItemsCounter: 0
@@ -45,8 +43,8 @@ class App extends React.Component {
         this.cartCountUpdater = this.cartCountUpdater.bind(this);
     }
 
-    onLogin = async (username) => {
-        this.setState({ isLoggedIn: true, systemIsClose: false }, () => config.setLoggedInUser(username))
+    onLogin = async (username, asAdmin) => {
+        this.setState({ isLoggedIn: true, systemIsClose: false, isAdmin: asAdmin }, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }
 
@@ -93,7 +91,7 @@ class App extends React.Component {
         return (!this.state.systemIsClose) ? (
             <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
-                    <Header isLoggedIn={this.state.isLoggedIn} onLogout={this.onLogout} />
+                    <Header isLoggedIn={this.state.isLoggedIn} isAdmin={this.state.isAdmin} onLogout={this.onLogout} />
                     <Switch>
                         <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route path="/category" component={CategoryPage} />
@@ -108,8 +106,8 @@ class App extends React.Component {
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />
                         <Route exact path="/personalinfo" component={PersonalInfo} />
-                        <Route exact path="/adminViewStores" component={AdminViewStoresPurchaseHistoryContainer} />
-                        <Route exact path="/adminViewUsers" component={AdminViewUsersPurchaseHistoryContainer} />
+                        <Route exact path="/viewStoresPurchasesHistory" render={(props) => <ViewStoresPurchaseHistoryContainer isAdmin={true}/>} />
+                        <Route exact path="/viewUsersPurchasesHistory" component={ViewUsersPurchaseHistoryContainer} />
                     </Switch>
                 </Router>
             </CartCtx.Provider>
