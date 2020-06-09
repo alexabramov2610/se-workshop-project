@@ -307,36 +307,7 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
     })
 
 
-    // test('store discount ,get 50% discount on milk if you buy in more then 100$',async () => {
-    //     const storeName = _testStore1.name
-    //
-    //     const storeContDiscout = {
-    //         startDate: new Date(), percentage: 50, duration: 5,
-    //         products: [_testMilk.catalogNumber],
-    //         condition: [{condition: {minPay: 90}, operator: Operators.AND}]
-    //     }
-    //
-    //     const policy: IDiscountPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
-    //     const setPolicyReq: Req.SetDiscountsPolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
-    //
-    //    await _driver.loginWithDefaults();
-    //     const makeDiscountRes = await _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount
-    //
-    //     const _testBanana2 = new ItemBuilder().withId(17).withCatalogNumber(_testBanana.catalogNumber).getItem();
-    //     await _serviceBridge.addItemsToStore(_testStore1, [_testBanana2]);
-    //
-    //     await _serviceBridge.logout();
-    //
-    //     const {data, error} = await _driver.given.store(_testStore1).products([_testCola, _testBanana, _testMilk]).makeABuy(2);
-    //     expect(data.result).toBeTruthy()
-    //
-    //     const expectedCharge = (2 * _testCondDiscount2.percentage * _testMilk.price / 100) + (2 * _testBanana.price + 2 * _testCola.price);
-    //     expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
-    //
-    // })
+
 
 
 //policies
@@ -534,6 +505,38 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
         const res =await _driver.given.store(_testStore1).products([_testBanana, _testEggs]).makeABuy(1); //cart contain 6 items
         expect(res.data.result).toBeTruthy()
         expect(res.data.receipt).toBeDefined()
+
+    })
+
+
+    test('store discount ,get 50% discount on milk if you buy in more then 100$',async () => {
+        const storeName = _testStore1.name
+
+        const storeContDiscout = {
+            startDate: new Date(), percentage: 50, duration: 5,
+            products: [_testMilk.catalogNumber],
+            condition: [{condition: {minPay: 90}, operator: Operators.AND}]
+        }
+
+        const policy: IDiscountPolicy = {discounts: [{discount: storeContDiscout, operator: Operators.AND}]}
+        const setPolicyReq: Req.SetDiscountsPolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+
+        await _driver.loginWithDefaults();
+        const makeDiscountRes = await _serviceBridge.setDiscountsPolicy(setPolicyReq);   //add discount
+
+        const _testBanana2 = new ItemBuilder().withId(17).withCatalogNumber(_testBanana.catalogNumber).getItem();
+        await _serviceBridge.addItemsToStore(_testStore1, [_testBanana2]);
+
+        await _serviceBridge.logout();
+
+        const {data, error} = await _driver.given.store(_testStore1).products([_testCola, _testBanana, _testMilk]).makeABuy(2);
+        expect(data.result).toBeTruthy()
+
+        const expectedCharge = (2 * _testCondDiscount2.percentage * _testMilk.price / 100) + (2 * _testBanana.price + 2 * _testCola.price);
+        expect(data.receipt.payment.totalCharged).toEqual(expectedCharge)
 
     })
 
