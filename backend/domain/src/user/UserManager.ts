@@ -99,6 +99,8 @@ export class UserManager {
                 return {path: field}
             });
             const u = await UserModel.findOne({name}).populate(populateQuery);
+            if(!u)
+                return u;
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return createRegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
