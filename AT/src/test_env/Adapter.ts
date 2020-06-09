@@ -138,6 +138,7 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
     const { data, error } = await ServiceFacade.assignStoreOwner(
       wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
     );
+    const x = data || error;
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
@@ -234,10 +235,10 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   async purchase(req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> {
     return await ServiceFacade.purchase(wrapWithToken(req.body));
   },
-  // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse{
-  //   return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
+  async  removeProductFromCart(req: Req.RemoveFromCartRequest):Promise<Res.BoolResponse>{
+    return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
 
-  // },
+  },
 
 
   async watchCart(): Promise<Res.ViewCartRes> {

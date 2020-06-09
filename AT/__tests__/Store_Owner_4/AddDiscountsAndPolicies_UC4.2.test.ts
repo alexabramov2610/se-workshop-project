@@ -341,111 +341,111 @@ describe("Store owner add Disconts and policies , UC: 4.2", () => {
 
 //policies
 
-    // test('set and view buying policy ',async () => {
-    //
-    //     const storeName = _testStore1.name
-    //
-    //     const simplePolicy1 = {productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}}
-    //     const simplePolicy2 = {bagPolicy: {minAmount: 2, maxAmount: 3}}
-    //     const simplePolicy3 = {systemPolicy: {notForSellDays: [WeekDays.FRIDAY]}}
-    //     const simplePolicy4 = {userPolicy: {countries: ["israel"]}}
-    //
-    //
-    //     const policy: IPurchasePolicy = {
-    //         policy: [
-    //             {policy: simplePolicy1, operator: Operators.OR},
-    //             {policy: simplePolicy2, operator: Operators.AND},
-    //             {policy: simplePolicy3, operator: Operators.XOR},
-    //             {policy: simplePolicy4, operator: Operators.AND}]
-    //     }
-    //
-    //     const setPolicyReq: Req.SetPurchasePolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
-    //
-    //     const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
-    //     expect(makePolicyRes.data.result).toBeTruthy()
-    //
-    //     const req: Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token: '123'};
-    //     const res: Res.ViewStorePurchasePolicyResponse = await _serviceBridge.viewPurchasePolicy(req);
-    //     expect(res.data.policy).toEqual(policy);
-    //
-    // })
+    test('set and view buying policy ',async () => {
+
+        const storeName = _testStore1.name
+
+        const simplePolicy1 = {productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}}
+        const simplePolicy2 = {bagPolicy: {minAmount: 2, maxAmount: 3}}
+        const simplePolicy3 = {systemPolicy: {notForSellDays: [WeekDays.FRIDAY]}}
+        const simplePolicy4 = {userPolicy: {countries: ["israel"]}}
 
 
-    // test('buy with simple product buying policy',async () => {
-    //     const storeName = _testStore1.name
-    //     const simplePolicy1 = {productPolicy: {catalogNumber: _testCola.catalogNumber, minAmount: 1, maxAmount: 2}}
-    //
-    //
-    //     const policy: IPurchasePolicy = {
-    //         policy: [
-    //             {policy: simplePolicy1, operator: Operators.OR}
-    //         ]
-    //     }
-    //     const setPolicyReq: Req.SetPurchasePolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
-    //     const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
-    //     expect(makePolicyRes.data.result).toBeTruthy()
-    //
-    //     const {data, error} = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(3);
-    //     expect(error).toBeDefined()
-    //     expect(data.result).toBeFalsy()
-    //
-    //     const req: Req.RemoveFromCartRequest = {
-    //         body: {storeName, catalogNumber: _testCola.catalogNumber, amount: 3},
-    //         token: '123'
-    //     }
-    //     await _serviceBridge.removeProductFromCart(req)
-    //
-    //     const res = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(1);
-    //     expect(res.data.result).toBeTruthy()
-    //     expect(res.data.receipt).toBeDefined()
-    //
-    // })
+        const policy: IPurchasePolicy = {
+            policy: [
+                {policy: simplePolicy1, operator: Operators.OR},
+                {policy: simplePolicy2, operator: Operators.AND},
+                {policy: simplePolicy3, operator: Operators.XOR},
+                {policy: simplePolicy4, operator: Operators.AND}]
+        }
 
-    // test('buy with simple bagitem buying policy',async () => {
-    //     const storeName = _testStore1.name
-    //     const simplePolicy1 = {bagPolicy: {minAmount: 2, maxAmount: 2}}
-    //
-    //
-    //     const policy: IPurchasePolicy = {
-    //         policy: [
-    //             {policy: simplePolicy1, operator: Operators.OR}
-    //         ]
-    //     }
-    //     const setPolicyReq: Req.SetPurchasePolicyRequest = {
-    //         body: {storeName, policy},
-    //         token: '123'
-    //     }
-    //     const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
-    //     expect(makePolicyRes.data.result).toBeTruthy()
-    //
-    //     const {data, error} = await _driver.given.store(_testStore1).products([_testCola, _testBanana, _testEggs]).makeABuy(1);
-    //     expect(error).toBeDefined()
-    //     expect(data.result).toBeFalsy()
-    //
-    //     const req: Req.RemoveFromCartRequest = {
-    //         body: {storeName, catalogNumber: _testCola.catalogNumber, amount: 1},
-    //         token: '123'
-    //     }
-    //     await _serviceBridge.removeProductFromCart(req);
-    //
-    //     const req2: Req.RemoveFromCartRequest = {
-    //         body: {storeName, catalogNumber: _testBanana.catalogNumber, amount: 1},
-    //         token: '123'
-    //     }
-    //     await _serviceBridge.removeProductFromCart(req2)
-    //
-    //     const res = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(1);
-    //     expect(res.data.result).toBeTruthy();
-    //     expect(res.data.receipt).toBeDefined()
-    //
-    //
-    // })
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+
+        const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        const req: Req.ViewStorePurchasePolicyRequest = {body: {storeName}, token: '123'};
+        const res: Res.ViewStorePurchasePolicyResponse = await _serviceBridge.viewPurchasePolicy(req);
+        expect(res.data.policy).toEqual(policy);
+
+    })
+
+
+    test('buy with simple product buying policy',async () => {
+        const storeName = _testStore1.name
+        const simplePolicy1 = {productPolicy: {catalogNumber: _testCola.catalogNumber, minAmount: 1, maxAmount: 2}}
+
+
+        const policy: IPurchasePolicy = {
+            policy: [
+                {policy: simplePolicy1, operator: Operators.OR}
+            ]
+        }
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        const {data, error} = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(3);
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+
+        const req: Req.RemoveFromCartRequest = {
+            body: {storeName, catalogNumber: _testCola.catalogNumber, amount: 3},
+            token: '123'
+        }
+        await _serviceBridge.removeProductFromCart(req)
+
+        const res = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(1);
+        expect(res.data.result).toBeTruthy()
+        expect(res.data.receipt).toBeDefined()
+
+    })
+
+    test('buy with simple bagitem buying policy',async () => {
+        const storeName = _testStore1.name
+        const simplePolicy1 = {bagPolicy: {minAmount: 2, maxAmount: 2}}
+
+
+        const policy: IPurchasePolicy = {
+            policy: [
+                {policy: simplePolicy1, operator: Operators.OR}
+            ]
+        }
+        const setPolicyReq: Req.SetPurchasePolicyRequest = {
+            body: {storeName, policy},
+            token: '123'
+        }
+        const makePolicyRes: Res.BoolResponse = await _serviceBridge.setPurchasePolicy(setPolicyReq);
+        expect(makePolicyRes.data.result).toBeTruthy()
+
+        const {data, error} = await _driver.given.store(_testStore1).products([_testCola, _testBanana, _testEggs]).makeABuy(1);
+        expect(error).toBeDefined()
+        expect(data.result).toBeFalsy()
+
+        const req: Req.RemoveFromCartRequest = {
+            body: {storeName, catalogNumber: _testCola.catalogNumber, amount: 1},
+            token: '123'
+        }
+        await _serviceBridge.removeProductFromCart(req);
+
+        const req2: Req.RemoveFromCartRequest = {
+            body: {storeName, catalogNumber: _testBanana.catalogNumber, amount: 1},
+            token: '123'
+        }
+        await _serviceBridge.removeProductFromCart(req2)
+
+        const res = await _driver.given.store(_testStore1).products([_testCola]).makeABuy(1);
+        expect(res.data.result).toBeTruthy();
+        expect(res.data.receipt).toBeDefined()
+
+
+    })
 
 
     test('buy with Comp And buying policy',async () => {
