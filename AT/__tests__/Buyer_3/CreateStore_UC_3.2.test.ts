@@ -3,57 +3,65 @@ import * as utils from "../../utils"
 
 
 describe("Create Store Buyer, UC: 3.2", () => {
-    let _serviceBridge: Bridge;
+    let _serviceBridge: Partial<Bridge>;
     let _storeInformation: Store;
     let _driver: Driver;
-    beforeEach(() => {
+    beforeEach(async () => {
         _driver = new Driver()
-            .resetState()
-            .startSession()
-            .initWithDefaults()
-            .registerWithDefaults()
-            .loginWithDefaults();
+        _driver.dropDB();
+        await _driver.startSession()
+        await _driver.initWithDefaults()
+        await _driver.registerWithDefaults()
+        await _driver.loginWithDefaults();
         _serviceBridge = _driver.getBridge();
         _storeInformation = {name: "mock-name-each"};
     });
 
 
-    afterAll(() => {
+    afterAll((done) => {
+        _driver.dropDB();
         utils.terminateSocket();
+        done();
     });
 
-    test("Create Store - Happy Path: valid store information - logged in user", () => {
+    test("Create Store - Happy Path: valid store information - logged in user", async (done) => {
         _storeInformation = {name: "some-store"};
-        const {name} = _serviceBridge.createStore(_storeInformation).data;
-        expect(name).toBe(_storeInformation.name);
+        // const {name} = await await _serviceBridge.createStore(_storeInformation).data;
+        const {data} = await  _serviceBridge.createStore(_storeInformation);
+        expect(data.name).toBe(_storeInformation.name);
+        done();
     });
 
-    test("Create Store - Sad Path:  - not logged in user", () => {
-        _serviceBridge.logout();
+    test("Create Store - Sad Path:  - not logged in user",async (done) => {
+       await _serviceBridge.logout();
         _storeInformation = {name: "mocked-sad-store"};
-        const error = _serviceBridge.createStore(_storeInformation);
+        const error = await _serviceBridge.createStore(_storeInformation);
         expect(error).toBeDefined();
+        done();
     });
 
-    test("Create Store - Sad Path:  - logged in user empty store info", () => {
+    test("Create Store - Sad Path:  - logged in user empty store info",async (done) => {
         _storeInformation = {name: ""};
-        const error = _serviceBridge.createStore(_storeInformation);
+        const error = await _serviceBridge.createStore(_storeInformation);
         expect(error).toBeDefined();
+        done();
     });
 
-    test("Create Store - Sad Path:  - logged in user sore name taken", () => {
+    test("Create Store - Sad Path:  - logged in user sore name taken",async (done) => {
         _storeInformation = {name: "some-store"};
-        const {name} = _serviceBridge.createStore(_storeInformation).data;
-        expect(name).toBe(_storeInformation.name);
+        const res = await _serviceBridge.createStore(_storeInformation);
+        expect(res.data.name).toBe(_storeInformation.name);
         _storeInformation = {name: "some-store"};
-        const error = _serviceBridge.createStore(_storeInformation);
+        const error = await _serviceBridge.createStore(_storeInformation);
         expect(error).toBeDefined();
+        done();
     });
 
-    test("Create Store - Bad Path:  - not logged in user empty store info", () => {
-        _serviceBridge.logout();
+    test("Create Store - Bad Path:  - not logged in user empty store info",async (done) => {
+        await _serviceBridge.logout();
         _storeInformation = {name: ""};
-        const error = _serviceBridge.createStore(_storeInformation);
+        const error = await _serviceBridge.createStore(_storeInformation);
         expect(error).toBeDefined();
+        done();
     });
 });

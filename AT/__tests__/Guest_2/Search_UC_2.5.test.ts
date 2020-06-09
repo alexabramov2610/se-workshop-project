@@ -15,11 +15,11 @@ import {
 import {Req} from "se-workshop-20-interfaces"
 import {Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import * as utils from "../../utils"
-
+ 
 
 describe("Guest Search, UC: 2.5", () => {
     let _driver = new Driver();
-    let _serviceBridge: Bridge;
+    let _serviceBridge: Partial<Bridge>;
     let _testStore1: Store;
     let _testStore2: Store;
     let _testProduct1: Product;
@@ -32,14 +32,15 @@ describe("Guest Search, UC: 2.5", () => {
     let _priceRange: PriceRange;
     let _credentials: Credentials;
 
-    beforeEach(() => {
-        _serviceBridge = _driver
-            .resetState()
-            .startSession()
-            .initWithDefaults()
-            .registerWithDefaults()
-            .loginWithDefaults()
-            .getBridge();
+    beforeEach(async() => {
+        _driver.dropDB();
+        await _driver.startSession()
+        await _driver.initWithDefaults();
+        await _driver.registerWithDefaults()
+        await _driver.loginWithDefaults()
+        _serviceBridge = await _driver.getBridge();
+        
+            
 
         _credentials = {userName: "", password: "",};
         _testProduct1 = new ProductBuilder()
@@ -67,13 +68,13 @@ describe("Guest Search, UC: 2.5", () => {
         _testStore1 = {name: "testStore1Name"};
         _testStore2 = {name: "testStore2Name"};
 
-        _serviceBridge.createStore(_testStore1);
-        _serviceBridge.createStore(_testStore2);
+        await _serviceBridge.createStore(_testStore1);
+        await _serviceBridge.createStore(_testStore2);
 
-        _serviceBridge.addProductsToStore(_testStore1, [_testProduct1, _testProduct3, _testProduct4]);
-        _serviceBridge.addProductsToStore(_testStore2, [_testProduct1, _testProduct2]);
+        await _serviceBridge.addProductsToStore(_testStore1, [_testProduct1, _testProduct3, _testProduct4]);
+        await _serviceBridge.addProductsToStore(_testStore2, [_testProduct1, _testProduct2]);
 
-        _serviceBridge.logout();
+        await _serviceBridge.logout();
 
         _priceRange = {min: 0, max: Number.MAX_SAFE_INTEGER};
         _testFilters = {
@@ -93,15 +94,17 @@ describe("Guest Search, UC: 2.5", () => {
     });
 
     afterAll(() => {
-        utils.terminateSocket();
+        //utils.terminateSocket();
+        _driver.dropDB();
+
     });
 
-    test("Valid search input, no filters", () => {
+    test("Valid search input, no filters", async () => {
         _testSearchData.body.filters = {};
         _testSearchQuery.productName = _testProduct1.name;
         _testSearchData.body.searchQuery = _testSearchQuery;
 
-        const {data, error} = _serviceBridge.search(_testSearchData);
+        const {data, error} = await _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -117,12 +120,12 @@ describe("Guest Search, UC: 2.5", () => {
         expect(products[0].catalogNumber).toEqual(_testProduct1.catalogNumber);
     });
 
-    test("Valid search input, category filter", () => {
+    test("Valid search input, category filter", async() => {
         _testSearchData.body.filters = {productCategory: ProductCategory.ELECTRONICS};
         _testSearchQuery = {};
         _testSearchData.body.searchQuery = _testSearchQuery;
 
-        const {data, error} = _serviceBridge.search(_testSearchData);
+        const {data, error} = await _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -139,12 +142,12 @@ describe("Guest Search, UC: 2.5", () => {
         expect(catalogNumbers).toContainEqual(_testProduct4.catalogNumber);
     });
 
-    test("Valid search input, price range filter", () => {
+    test("Valid search input, price range filter", async() => {
         _testSearchData.body.filters = {priceRange: {min: 4, max: 20}};
         _testSearchQuery = {};
         _testSearchData.body.searchQuery = _testSearchQuery;
 
-        const {data, error} = _serviceBridge.search(_testSearchData);
+        const {data, error} = await _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -159,11 +162,11 @@ describe("Guest Search, UC: 2.5", () => {
         expect(products[0].catalogNumber).toEqual(_testProduct3.catalogNumber);
     });
 
-    test("Invalid search input, no filters", () => {
+    test("Invalid search input, no filters", async() => {
         _testSearchData.body.filters = {};
         _testSearchData.body.searchQuery = _testSearchQuery;
 
-        const {data, error} = _serviceBridge.search(_testSearchData);
+        const {data, error} =await _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -171,7 +174,7 @@ describe("Guest Search, UC: 2.5", () => {
         expect(productsInStore.length).toEqual(0);
     });
 
-    test("Valid search input, all filter", () => {
+    test("Valid search input, all filter", async () => {
         _testSearchData.body.filters = {
             priceRange: {min: 0, max: 40},
             productCategory: ProductCategory.ELECTRONICS
@@ -179,7 +182,7 @@ describe("Guest Search, UC: 2.5", () => {
         _testSearchQuery = {};
         _testSearchData.body.searchQuery = _testSearchQuery;
 
-        const {data, error} = _serviceBridge.search(_testSearchData);
+        const {data, error} = await _serviceBridge.search(_testSearchData);
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
 
@@ -195,4 +198,4 @@ describe("Guest Search, UC: 2.5", () => {
         expect(catalogNumbers).toContainEqual(_testProduct3.catalogNumber);
         expect(catalogNumbers).toContainEqual(_testProduct4.catalogNumber);
     });
-});
+ });

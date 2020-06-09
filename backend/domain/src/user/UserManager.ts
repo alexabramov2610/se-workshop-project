@@ -1,164 +1,288 @@
-import {UserRole} from "../api-int/Enums";
-import {
-    IProduct,
-    BagItem,
-    Cart,
-    CartProduct
-} from "se-workshop-20-interfaces/src/CommonInterface"
+import {BagItem, Cart, CartProduct, IProduct} from "se-workshop-20-interfaces/src/CommonInterface"
 import {Admin, RegisteredUser} from "./internal_api";
 import {User} from "./users/User";
 import {Guest} from "./users/Guest";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
 import {errorMsg, loggerW} from "../api-int/internal_api";
+import {AdminModel, UserModel} from 'dal'
+import * as UserMapper from './UserMapper'
+import {createAdmin, createGuest, createRegisteredUser} from "../api-int/utils";
 
 const logger = loggerW(__filename)
 
 export class UserManager {
-    private registeredUsers: RegisteredUser[];
-    private loggedInUsers: Map<string, RegisteredUser>;                  // token -> user
-    private loggedInRegisteredUsers: Map<string, RegisteredUser>;        // username -> user
+    private readonly DEFAULT_USER_POPULATION: string[] = ["receipts", "pendingEvents"];
+    private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
-    private admins: Admin[];
+    private admins: Map<string, string>;
     private _externalSystems: ExternalSystemsManager;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
-        this.registeredUsers = [];
-        this.loggedInUsers = new Map<string, RegisteredUser>();
-        this.loggedInRegisteredUsers = new Map<string, RegisteredUser>();
+        this.loggedInUsers = new Map();
         this.guests = new Map<string, Guest>();
-        this.admins = [];
+        this.admins = new Map();
     }
 
-    register(req: Req.RegisterRequest): Res.BoolResponse {
+    async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         const userName = req.body.username;
         const password = req.body.password;
-        const hashed = this._externalSystems.securitySystem.encryptPassword(password);
-        if (this.getUserByName(userName)) {
-            logger.debug(`fail to register ,${userName} already exist `);
-            return {data: {result: false}, error: {message: errorMsg.E_BU}}
-        } else {
+        const hashed = await this._externalSystems.securitySystem.encryptPassword(password);
+        try {
+            await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
             logger.debug(`${userName} has registered to the system `);
-            this.registeredUsers = this.registeredUsers.concat([new RegisteredUser(userName, hashed)]);
-            return {data: {result: true}};
+            return {data: {result: true}}
+        } catch (e) {
+            if (e.errors && e.errors.name && e.errors.name.kind && e.errors.name.kind === 'unique') {
+                logger.warn(`fail to register ,${userName} already exist `);
+                return {data: {result: false}, error: {message: errorMsg.E_BU}}
+            }
+            return {data: {result: false}, error: {message: e.errors.name}}
         }
     }
 
-    login(req: Req.LoginRequest): Res.BoolResponse {
+    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {     // at this point credentials are already verified
         const userName = req.body.username;
-        const user = this.getUserByName(userName)
+        // const user = this.getUserByName(userName)
         if (this.isLoggedIn(userName)) { // already logged in
             logger.warn(`failed to login ${userName}, user is already logged in `);
             return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        } else if (req.body.asAdmin && !this.isAdmin(user)) {
-            logger.warn(`failed to login ${userName} as Admin- this user doesn't have admin privileges `);
-            return {data: {result: false}, error: {message: errorMsg.E_NA}}
-        } else {
-            logger.info(`${userName} has logged in  `);
-            this.loggedInUsers = this.loggedInUsers.set(req.token, user);
-            this.loggedInRegisteredUsers = this.loggedInRegisteredUsers.set(req.body.username, user);
-            user.role = req.body.asAdmin ? UserRole.ADMIN : UserRole.BUYER;
+        }
+        try {
+            // await UserModel.findOne({name: userName});
+            const rUser = await UserModel.findOne({name: req.body.username})
+            if (req.body.asAdmin) {
+                const isAdmin: boolean = await this.verifyAdminLogin(rUser);
+                if (isAdmin)
+                    this.admins.set(req.token, userName);
+                else
+                    return {data: {result: false}, error: {message: errorMsg.E_NA}}
+            }
+            this.loggedInUsers.set(req.token, userName)
+            this.guests.delete(req.token);
+            logger.info(`login ${userName} ${req.body.asAdmin ? 'as admin ' : ''}succeed!`);
             return {data: {result: true}};
+        } catch (e) {
+            logger.error(`login ${userName} failed!`);
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
     }
 
-    logout(req: Req.LogoutRequest): Res.BoolResponse {
+    async verifyAdminLogin(rUserModel): Promise<boolean> {
+       try {
+           const admin = await AdminModel.findOne({user: rUserModel._id});
+           return admin ? true : false;
+       } catch (e) {
+           logger.error(`verifyAdminLogin DB ERROR: ${e}`)
+       }
+       return false;
+    }
+
+    async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
-        if (this.getLoggedInUserByToken(req.token) && this.loggedInRegisteredUsers.has(this.getLoggedInUserByToken(req.token).name))
-            this.loggedInRegisteredUsers.delete(this.getLoggedInUserByToken(req.token).name);
+        if (!this.loggedInUsers.has(req.token)) {
+            logger.warn("user is not logged in!")
+            return { data: { result: false }, error: { message: errorMsg.E_NOT_LOGGED_IN } }
+        }
         this.loggedInUsers.delete(req.token)
+        if (this.admins.has(req.token))
+            this.admins.delete(req.token)
+        this.guests.set(req.token, createGuest());
         return {data: {result: true}}
     }
 
-    verifyPassword(userName: string, password: string, hashed: string): boolean {
-        return this._externalSystems.securitySystem.comparePassword(password, hashed);
+    async getUserByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const u = await UserModel.findOne({name}).populate(populateQuery);
+            if(!u)
+                return u;
+            const cart = await UserMapper.cartMapperFromDB(u.cart)
+            return createRegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
+        } catch (e) {
+            logger.error(`getUserByName DB ERROR: ${e}`)
+            return undefined
+        }
     }
 
-    isValidPassword(password: string) {
-        return password.length >= 6;
+    async getUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const u = await UserModel.findOne({name}).populate(populateQuery);
+            return u;
+        } catch (e) {
+            logger.error(`getUserModelByName DB ERROR: ${e}`)
+            return undefined
+        }
     }
 
-    getLoggedInUsers(): RegisteredUser[] {
-        return Array.from(this.loggedInUsers.values());
+    async saveNotification(username: string, event): Promise<void> {
+        const u = await this.getUserModelByName(username);
+        try {
+            u.pendingEvents.push(event);
+            if (u) {
+                await u.save();
+                logger.debug(`saveNotification: successfully save event to user: ${username} in DB`)
+            } else
+                logger.error(`saveNotification: ${errorMsg.E_USER_DOES_NOT_EXIST}`)
+        } catch (e) {
+            logger.error(`saveNotification DB ERROR: ${e}`)
+        }
+
     }
 
-    getRegisteredUsers(): RegisteredUser[] {
-        return this.registeredUsers;
+    isTokenTaken(token: string): boolean {
+        if (this.guests.get(token) || this.loggedInUsers.get(token))
+            return true;
+        return false;
     }
 
-    getUserByName(name: string): RegisteredUser {
-        return this.registeredUsers.filter((u) => u.name === name).pop();
+    async getUserByToken(token: string): Promise<User> {
+        const user: string = this.loggedInUsers.get(token)
+        if (user) {
+            const u: RegisteredUser = await this.getUserByName(user)
+            return u;
+        } else {
+            return this.guests.get(token);
+        }
     }
 
-    getLoggedInUserByName(name: string): RegisteredUser {
-        return this.loggedInRegisteredUsers.get(name);
+    getLoggedInUserByToken(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
+        const username = this.loggedInUsers.get(token)
+        if (username) {
+            return this.getUserByName(username,populateWith)
+        } else {
+            return undefined
+        }
     }
 
-    getUserByToken(token: string): User {
-        const user: User = this.loggedInUsers.get(token);
-        return user ? user :
-            this.guests.get(token);
+    getLoggedInUsernameByToken(token: string): string {
+        return this.loggedInUsers.get(token)
     }
 
-    getLoggedInUserByToken(token: string): RegisteredUser {
-        return this.loggedInUsers.get(token);
+    getGuestByToken(token: string): User {
+        return this.guests.get(token);
     }
 
     getTokenOfLoggedInUser(username: string): string {
         this.loggedInUsers.forEach((user, token) => {
-           if (user.name === username)
-               return token;
+            if (user === username)
+                return token;
         });
         return "";
     }
 
-    isAdmin(u: RegisteredUser): boolean {
-        for (const user of this.admins) {
-            if (u.name === user.name)
-                return true;
-        }
-        return false;
+    checkIsAdminByToken(token: string): boolean {
+        return this.admins.has(token);
     }
 
     isLoggedIn(userToCheck: string): boolean {
-        for (const user of this.loggedInUsers.values()) {
-            if (userToCheck === user.name)
-                return true;
-        }
-        return false;
+        return Array.from(this.loggedInUsers.values()).some((name) => name === userToCheck);
     }
 
-    setAdmin(req: Req.SetAdminRequest): Res.BoolResponse {
-        const admin: Admin = this.getAdminByToken(req.token);
-        if (this.admins.length !== 0 && (!admin)) {
+    async findUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
+        try {
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const s = await UserModel.findOne({name}).populate(populateQuery);
+            return s;
+        } catch (e) {
+            logger.error(`findUserModelByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
+    async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
+        const admin: Admin = await this.getAdminByToken(req.token);
+        if (this.admins.size !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }
-        const user: RegisteredUser = this.getUserByName(req.body.newAdminUserName)
-        if (!user)
-            return {data: {result: false}, error: {message: errorMsg.E_NF}}
-        const isAdmin: boolean = this.isAdmin(user);
-        if (isAdmin)
-            return {data: {result: false}, error: {message: errorMsg.E_AL}}
-        this.admins = this.admins.concat([user]);
+        try {
+            const userModel = await this.findUserModelByName(req.body.newAdminUserName);
+            if (!userModel)
+                return {data: {result: false}, error: {message: errorMsg.E_NF}}
+            const isAdmin: boolean = await this.verifyAdminLogin(userModel);
+            if (isAdmin)
+                return {data: {result: false}, error: {message: errorMsg.E_AL}}
+            await AdminModel.create({user: userModel})
+        } catch (e) {
+            logger.error(`setAdmin DB ERROR: ${e}`)
+        }
+
         return {data: {result: true}};
     }
 
+
+    private async getAdminByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<Admin> {
+        try {
+            logger.debug(`trying to find user ${name} in DB`)
+            const u = await AdminModel.findOne({name}).populate('user')
+            if (!u)
+                return undefined;
+            const cart = await UserMapper.cartMapperFromDB(u.cart)
+            return createAdmin(u.name, u.password, u.receipts, u.cart, u.pendingEvents)
+        } catch (e) {
+            logger.error(`getAdminByName DB ERROR: ${e}`)
+            return undefined
+        }
+    }
+
+    private async getAdminByToken(token: string): Promise<Admin> {
+        const user: RegisteredUser = await this.getLoggedInUserByToken(token);
+        return !user ? user : this.getAdminByName(user.name)
+    }
+
     addGuestToken(token: string): void {
-        this.guests.set(token, new Guest());
+        this.guests.set(token, createGuest());
     }
 
-    removeGuest(token: string): void {
-        this.guests.delete(token);
+    isGuest(token: string): boolean {
+        return this.guests.get(token) !== undefined
     }
 
-    saveProductToCart(user: User, storeName: string, product: IProduct, amount: number): void {
-        user.saveProductToCart(storeName, product, amount);
+    async saveProductToCart(user: User, storeName: string, product: IProduct, amount: number, isGuest: boolean): Promise<boolean> {
+        this.saveProductToUserCart(storeName, product, amount, user);
+        if (!isGuest) {
+            const rUser = user as RegisteredUser;
+            const cart = UserMapper.cartMapperToDB(rUser.cart);
+            try {
+                await UserModel.updateOne({name: rUser.name}, {cart})
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
     }
 
-    removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number): Res.BoolResponse {
+    saveProductToUserCart(storeName: string, product: IProduct, amount: number, user: User): void {
+        logger.debug(`saving ${amount} of product ${product.name} to cart`)
         const storeBag: BagItem[] = user.cart.get(storeName);
+        if (!storeBag) {
+            logger.debug(`new bag for store ${storeName}`)
+            const newBag: BagItem = {product, amount};
+            user.cart.set(storeName, [newBag]);
+            return
+        }
+        logger.debug(`add bag item to existing bag in store ${storeName}`)
+        const oldBagItem = storeBag.find((b) => b.product.catalogNumber === product.catalogNumber)
+        const newBagItem = oldBagItem ? {product, amount: oldBagItem.amount + amount} : {product, amount}
+        const newStoreBag = storeBag.filter((b) => b.product.catalogNumber !== product.catalogNumber).concat([newBagItem]);
+        user.cart.set(storeName, newStoreBag);
+    }
+
+    async removeProductFromCart(user: User, storeName: string, product: IProduct, amountToRemove: number, rUser: RegisteredUser): Promise<Res.BoolResponse> {
+        const storeBag: BagItem[] = user.cart.get(storeName);
+
         if (!storeBag) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_NOT_EXIST}}
         }
@@ -169,25 +293,49 @@ export class UserManager {
         if (oldBagItem.amount - amountToRemove < 0) {
             return {data: {result: false}, error: {message: errorMsg.E_BAG_BAD_AMOUNT}}
         }
-        user.removeProductFromCart(storeName, product, amountToRemove)
-        return {
-            data: {result: true}
+        this.removeProductFromUserCart(storeName, product, amountToRemove, user)
+        if (rUser) {
+            try {
+                const cart = UserMapper.cartMapperToDB(rUser.cart);
+                await UserModel.updateOne({name: rUser.name}, {cart})
+                return {data: {result: true}}
+            } catch (e) {
+                logger.error(`removeProductFromCart ${e}`)
+                return {data: {result: false}, error: {message: errorMsg.E_DB}}
+            }
+        }
+        else // guest
+            return {data: {result: true}};
+
+    }
+
+    removeProductFromUserCart(storeName: string, product: IProduct, amount: number, user: User): void {
+        const storeCart: BagItem[] = user.cart.get(storeName);
+        const oldBagItem: BagItem = storeCart.find((b) => b.product.catalogNumber === product.catalogNumber);
+        const newBagItem = {product: oldBagItem.product, amount: oldBagItem.amount - amount}
+
+        const filteredBag = storeCart.filter((b) => b.product.catalogNumber !== product.catalogNumber)
+        if (newBagItem.amount > 0) {
+            user.cart.set(storeName, filteredBag.concat([newBagItem]))
+        } else {
+            user.cart.set(storeName, filteredBag)
         }
     }
 
-    viewCart(req: Req.ViewCartReq): Res.ViewCartRes {
-        const user = this.getUserByToken(req.token);
+    async viewCart(req: Req.ViewCartReq): Promise<Res.ViewCartRes> {
+        const user = await this.getUserByToken(req.token);
         if (!user)
-            return { data: { result: false, cart: undefined}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+            return {data: {result: false, cart: undefined}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const cartRes: Cart = this.transferToCartRes(user.cart)
         return {data: {result: true, cart: cartRes}}
     }
 
-    viewRegisteredUserPurchasesHistory(user: RegisteredUser): Res.ViewRUserPurchasesHistoryRes {
+    async viewRegisteredUserPurchasesHistory(user: RegisteredUser): Promise<Res.ViewRUserPurchasesHistoryRes> {
         return {
             data: {
                 result: true, receipts: user.receipts.map(r => {
-                    return {date: r.date, purchases: r.purchases}
+                    // @ts-ignore
+                    return {date: r.date, purchases: Array.from(r.purchases), payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged}}
                 })
             }
         }
@@ -197,44 +345,75 @@ export class UserManager {
         return user.cart;
     }
 
-    verifyCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
-        const rUser: RegisteredUser = this.getUserByName(req.body.username)
-        if (!rUser)
+    resetUserCart(user: User) {
+        user.cart = new Map();
+    }
+
+    async verifyCredentials(req: Req.VerifyCredentialsReq): Promise<Res.BoolResponse> {
+        try {
+            const rUser = await UserModel.findOne({name: req.body.username})
+            const isValid: boolean = rUser && this.verifyPassword(req.body.username, req.body.password, rUser.password)
+            return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
+        } catch (e) {
+            logger.error(`verifyCredentials DB ERROR: ${e}`);
             return {data: {result: false}, error: {message: errorMsg.E_NF}}  // not found
-        const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
-        return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
+        }
+    }
+
+    verifyPassword(userName: string, password: string, hashed: string): boolean {
+        return this._externalSystems.securitySystem.comparePassword(password, hashed);
     }
 
     isValidUserName(username: string): boolean {
-        return this.getUserByName(username) === undefined && username.length >= 2;
+        return username.length >= 2;
     }
 
     verifyNewCredentials(req: Req.VerifyCredentialsReq): Res.BoolResponse {
         const validName: boolean = this.isValidUserName(req.body.username)
         if (!validName)
-            return {data: {result: false}, error: {message: errorMsg.E_USER_EXISTS}}
+            return {data: {result: false}, error: {message: errorMsg.E_USER_NOT_VALID}}
         const validPass: boolean = this.isValidPassword(req.body.password)
         if (!validPass)
             return {data: {result: false}, error: {message: errorMsg.E_BP}}
         return {data: {result: true}}
     }
 
-    verifyToken(token: string): Res.BoolResponse {
-        return { data: { result: this.guests.has(token) || this.loggedInUsers.has(token) } };
+    isValidPassword(password: string) {
+        return password.length >= 6;
     }
 
-    private getAdminByToken(token: string): Admin {
-        const user: RegisteredUser = this.getLoggedInUserByToken(token);
-        return !user ? user : this.admins.find((a) => user.name === a.name)
+    verifyToken(token: string): Res.BoolResponse {
+        return {data: {result: this.guests.has(token) || this.loggedInUsers.has(token)}};
     }
 
     private transferToCartRes(cart: Map<string, BagItem[]>): Cart {
         const cartProducts: CartProduct[] = [];
         for (const [storeName, bagItems] of cart) {
+
             cartProducts.push({storeName, bagItems})
         }
         const cartRes: Cart = {products: cartProducts}
         return cartRes
     }
+
+    async getAllUsers(req: Req.Request): Promise<Res.GetAllUsersResponse> {
+        if (!this.checkIsAdminByToken(req.token))
+            return { data: {result: false, users:[] }, error: {message: errorMsg.E_NOT_AUTHORIZED} }
+        try {
+            const adminName: string = this.getLoggedInUsernameByToken(req.token);
+            logger.debug(`trying to retrieve all users for admin: ${adminName} from DB`)
+            const u = await UserModel.find({})
+            if (!u)
+                throw new Error(`retrieved undefined from DB`)
+            return { data: {result: true, users: u.map(currUser => currUser.name) } }
+        } catch (e) {
+            logger.error(`getAllUsers DB ERROR: ${e}`)
+            return { data: {result: false, users:[] }, error: {message: e} }
+        }
+    }
+
+
+
+
 
 }

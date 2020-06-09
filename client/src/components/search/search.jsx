@@ -16,11 +16,11 @@ import {
 } from "./search.styles";
 
 const Category = {
-  GENERAL: 0,
-  ELECTRONICS: 1,
-  HOBBIES: 2,
-  HOME: 3,
-  CLOTHING: 4,
+  GENERAL: "GENERAL",
+  ELECTRONICS: "ELECTRONICS",
+  HOBBIES: "HOBBIES",
+  HOME: "HOME",
+  CLOTHING: "CLOTHING",
 };
 Object.freeze(Category);
 class Search extends React.Component {
@@ -57,9 +57,9 @@ class Search extends React.Component {
         filters: {
           priceRange: { min, max },
           productRating:
-            productRating !== "" ? Number.parseInt(productRating) - 1 : "",
+            productRating !== "" ? Number.parseInt(productRating) : "",
           storeRating:
-            storeRating !== "" ? Number.parseInt(storeRating) - 1 : "",
+            storeRating !== "" ? Number.parseInt(storeRating) : "",
           productCategory,
         },
       },

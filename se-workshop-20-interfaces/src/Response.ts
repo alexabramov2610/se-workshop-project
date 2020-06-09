@@ -23,15 +23,15 @@ interface Response {
 }
 
 interface ItemsAdditionResponse extends BoolResponse {
-  data: { result: boolean; itemsNotAdded: IItem[] };
+  data: { result: boolean; itemsNotAdded: IItem[], itemsAdded?: IItem[] };
 }
 
 interface ItemsRemovalResponse extends Response {
-  data: { result: boolean; itemsNotRemoved: IItem[] };
+  data: { result: boolean; itemsNotRemoved: IItem[], itemsRemoved?: IItem[] };
 }
 
 interface ProductAdditionResponse extends Response {
-  data: { result: boolean; productsNotAdded: IProduct[] };
+  data: { result: boolean; productsNotAdded: IProduct[], productsAdded?: IProduct[] };
 }
 
 interface ProductRemovalResponse extends Response {
@@ -39,6 +39,7 @@ interface ProductRemovalResponse extends Response {
     result: boolean;
     productsNotRemoved: ProductCatalogNumber[];
     itemsRemoved?: IItem[];
+    productsRemoved?: IProduct[];
   };
 }
 
@@ -139,7 +140,8 @@ interface GetAllCategoriesResponse extends Response {
 }
 
 interface GetPersonalDetailsResponse extends Response {
-  data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+  // data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[], managedStores: StoreInfo[], ownedStores: StoreInfo[] }
+  data: {result: boolean, username: string, cart: Cart, purchasesHistory: IReceipt[] }
 }
 
 interface GetAllManagersPermissionsResponse extends Response {
@@ -154,7 +156,16 @@ interface GetItemsIdsResponse extends Response {
   data: {result: boolean, items: number[]}
 }
 
+interface RemoveStoreOwnerResponse extends Response {
+  data: {result: boolean, owners: string[]}
+}
+
+interface GetAllUsersResponse extends Response {
+  data: {result: boolean, users: string[]}
+}
+
 export {
+  RemoveStoreOwnerResponse,
   GetItemsIdsResponse,
   GetOwnersAssignedByResponse,
   GetAllManagersPermissionsResponse,
@@ -185,5 +196,6 @@ export {
   ViewRUserPurchasesHistoryRes,
   ViewCartRes,
   ViewStoreDiscountsPolicyResponse,
-  ViewStorePurchasePolicyResponse
+  ViewStorePurchasePolicyResponse,
+  GetAllUsersResponse
 };

@@ -42,6 +42,14 @@ export class BagPolicy extends PurchasePolicy {
         return this.minAmount <= bagSize && bagSize <= this.maxAmount;
     }
 
+    public getMinAmount(): number {
+        return this._minAmount;
+    }
+
+    public getMaxAmount(): number {
+        return this._maxAmount;
+    }
+
     public getPolicyTag(): string {
         return "bag";
     }

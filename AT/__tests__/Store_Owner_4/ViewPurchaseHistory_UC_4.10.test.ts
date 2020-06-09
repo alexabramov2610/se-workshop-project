@@ -3,64 +3,65 @@ import { ProductBuilder } from "../../src/test_env/mocks/builders/product-builde
 import { Credentials } from "../../src/test_env/types";
 import * as utils from "../../utils"
 
-describe("Watch Purchases History, UC: 3.7", () => {
-  let _serviceBridge: Bridge;
+describe("Watch Purchases History, UC: 3.7", async () => {
+  let _serviceBridge: Partial<Bridge>;
   let _driver: Driver;
   let _item: Item;
   let _prodct: Product;
   let _store: Store;
   let _shopoholic: Credentials;
-  beforeEach(() => {
+  beforeEach(async () => {
     _driver = new Driver()
-      .resetState()
-      .startSession()
-      .initWithDefaults()
-      .registerWithDefaults()
-      .loginWithDefaults();
+      _driver.dropDB()
+      await _driver.startSession()
+      await _driver.initWithDefaults()
+      await _driver.registerWithDefaults()
+      await _driver.loginWithDefaults();
     _store = { name: "stor-e-tell" };
     _serviceBridge = _driver.getBridge();
     _prodct = new ProductBuilder().getProduct();
     _shopoholic = { userName: "shopoholic", password: "ibuyALL123" };
     _item = { id: 123, catalogNumber: _prodct.catalogNumber };
-    _serviceBridge.createStore(_store);
-    _serviceBridge.addProductsToStore(_store, [_prodct]);
-    _serviceBridge.addItemsToStore(_store, [_item]);
-    _serviceBridge.logout();
-    _serviceBridge.register(_shopoholic);
+    await _serviceBridge.createStore(_store);
+    await _serviceBridge.addProductsToStore(_store, [_prodct]);
+    await _serviceBridge.addItemsToStore(_store, [_item]);
+    await _serviceBridge.logout();
+    await _serviceBridge.register(_shopoholic);
   });
 
 
 
   afterAll(() => {
+      _driver.dropDB()
     utils.terminateSocket();
  });
 
 
 
-  test("logged in user without permissions, with history", () => {
-    _serviceBridge.login(_shopoholic);
+  test("logged in user without permissions, with history", async() => {
+    await _serviceBridge.login(_shopoholic);
     _driver.given.store(_store).products([_prodct]).makeABuy();
-    const res = _serviceBridge.viewStorePurchasesHistory({
+    const res = await _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
     expect(res.data.result).toBe(false);
   });
-  test("logged out, with history", () => {
-    _serviceBridge.login(_shopoholic);
-    _driver.given.store(_store).products([_prodct]).makeABuy();
-    _serviceBridge.logout();
+  test("logged out, with history", async() => {
+      await _serviceBridge.login(_shopoholic);
+      await _driver.given.store(_store).products([_prodct]).makeABuy();
+      await _serviceBridge.logout();
 
-    const res = _serviceBridge.viewStorePurchasesHistory({
+    const res = await _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
     expect(res.error.message).toBeDefined();
   });
-  test("logged in, with history", () => {
-    _serviceBridge.login(_shopoholic);
-    _driver.given.store(_store).products([_prodct]).makeABuy();
-    _serviceBridge.logout();
-    _driver.loginWithDefaults();
-    const res = _serviceBridge.viewStorePurchasesHistory({
+  test("logged in, with history", async () => {
+      await _serviceBridge.login(_shopoholic);
+      await _driver.given.store(_store).products([_prodct]).makeABuy();
+      await _serviceBridge.logout();
+      await _driver.loginWithDefaults();
+    const res = await _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
     const itemCatalogNumber: any[] = [].concat
@@ -73,9 +74,9 @@ describe("Watch Purchases History, UC: 3.7", () => {
 
     expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
   });
-  test("logged in, no history", () => {
-    _driver.loginWithDefaults();
-    const res = _serviceBridge.viewStorePurchasesHistory({
+  test("logged in, no history", async() => {
+      await _driver.loginWithDefaults();
+    const res =await _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
     const itemCatalogNumber: any[] = [].concat
@@ -89,9 +90,9 @@ describe("Watch Purchases History, UC: 3.7", () => {
       expect(itemCatalogNumber.length).toBe(0);
   });
 
-  test("logged out, no history", () => {
-    _serviceBridge.logout();
-    const { error, data } = _serviceBridge.viewStorePurchasesHistory({
+  test("logged out, no history", async() => {
+      await _serviceBridge.logout();
+    const { error, data } =await _serviceBridge.viewStorePurchasesHistory({
       body: { storeName: _store.name },
     });
     expect(error.message).toBeDefined();

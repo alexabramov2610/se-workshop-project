@@ -1,6 +1,10 @@
-import { Bridge, Proxy } from "../..";
+import { Bridge, Adapter } from "../..";
+import mongoose from "mongoose";
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
+import shell from "shelljs";
+import {IResponse} from "./mocks/responses";
+/* Connect to the DB */
 
 
 
@@ -13,7 +17,7 @@ class Driver {
     password: "admin123",
   };
   constructor() {
-    this.bridge = Proxy;
+    this.bridge = Adapter;
     this.refMe = this.given;
     this._pi = {
       payment: {  
@@ -29,16 +33,19 @@ class Driver {
         country: "CatZone",
       },
     };
+    this.makeABuy = this.makeABuy.bind(this)
   }
-
+  public reset() {
+    this.bridge.reset();
+  }
   private loginDefCredentials: Credentials = {
     userName: "ron",
     password: "avishay",
   };
   private sessionToken: string;
-  private bridge: Bridge;
+  private bridge: Partial<Bridge>;
 
-  getBridge(): Bridge {
+  getBridge(): Partial<Bridge> {
     return this.bridge;
   }
 
@@ -58,40 +65,62 @@ class Driver {
     return this._pi;
   }
 
-  initWithDefaults(): Driver {
-    this.bridge.init(this.initDefCredentials);
+  async initWithDefaults(): Promise<Driver> {
+    await this.bridge.init(this.initDefCredentials);
     return this;
   }
 
-  initWith(cred: Credentials): Driver {
-    this.bridge.init(cred);
+  dropDB(){
+     shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh', {async: false})
+  }
+
+  dropDBDor(){
+    this.dropDB()
+ }
+
+async initWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.init(cred);
     return this;
   }
 
-  startSession(): Driver {
-    this.sessionToken = this.bridge.startSession().data.token;
+  async startSession(): Promise<Driver> {
+    const res = await this.bridge.startSession();
+    const x = res.data
+    // this.sessionToken =  res.data.token
     this.bridge.setToken(this.sessionToken);
     return this;
   }
 
-  loginWith(cred: Credentials): Driver {
-    this.bridge.login(cred);
+  async loginWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.login(cred);
     return this;
   }
 
-  loginWithDefaults(): Driver {
-    this.bridge.login(this.loginDefCredentials);
+  async loginWithDefaults(): Promise<IResponse> {
+   return await this.bridge.login(this.loginDefCredentials);
+
+  }
+
+  async registerWith(cred: Credentials): Promise<Driver> {
+    await this.bridge.register(cred);
     return this;
   }
 
-  registerWith(cred: Credentials): Driver {
-    this.bridge.register(cred);
+  async registerWithDefaults(): Promise<Driver> {
+    await this.bridge.register(this.loginDefCredentials);
     return this;
   }
 
-  registerWithDefaults(): Driver {
-    this.bridge.register(this.loginDefCredentials);
-    return this;
+  async connectDB() {
+    await mongoose.connect("mongodb://localhost:27017/trading-system-db?readPreference=primary&appname=MongoDB%20Compass&ssl=false", { useNewUrlParser: true })
+ }
+
+  async removeAllCollections () {
+    const collections = Object.keys(mongoose.connection.collections)
+    for (const collectionName of collections) {
+      const collection = mongoose.connection.collections[collectionName]
+      await collection.deleteMany()
+    }
   }
 
   given: IGiven = {
@@ -109,24 +138,24 @@ class Driver {
     },
   };
 
-  makeABuy(amount: number = 1): Res.PurchaseResponse {
-    this.mutant.p.map((p) =>
-      this.bridge.saveProductToCart({
-        body: {
-          storeName: this.mutant.s.name,
-          catalogNumber: p.catalogNumber,
-          amount,
-        },
-      })
-    );
+  async makeABuy(amount: number = 1): Promise<Res.PurchaseResponse> {
+    for (let i = 0; i <this.mutant.p.length; i++){
+     const req = {
+       body: {
+         storeName: this.mutant.s.name,
+         catalogNumber: this.mutant.p[i].catalogNumber,
+         amount,
+       },
+     }
+      const res = await this.bridge.saveProductToCart(req)
+      const res2 = res;
+    }
 
-    return this.bridge.purchase({ body: this._pi });
+
+    const res = await this.bridge.purchase({ body: this._pi });
+    return res;
   }
 
-  resetState() {
-    this.bridge.reset();
-    return this;
-  }
 }
 interface IGiven {
   shopper: (u: User) => IGiven;

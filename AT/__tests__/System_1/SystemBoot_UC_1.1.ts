@@ -2,12 +2,15 @@ import {Bridge, Driver, Store, Credentials, Item, PERMISSION} from "../../";
 import * as utils from "../../utils";
 
 describe("System Boot - UC 1", () => {
-    let _serviceBridge: Bridge;
+    let _serviceBridge: Partial<Bridge>;
     let _driver = new Driver();
     let _credentials: Credentials;
 
-    beforeEach(() => {
-        _serviceBridge = _driver.resetState().startSession().getBridge();
+    beforeEach(async() => {
+        _driver.dropDB();
+        await _driver.startSession();
+        await _driver.getBridge();
+        _serviceBridge = _driver.getBridge();
         _credentials = {userName: "Admin", password: "Admin"};
     });
 
@@ -15,8 +18,8 @@ describe("System Boot - UC 1", () => {
         utils.terminateSocket();
     });
 
-    test("SystemBoot, valid admin details", () => {
-        const {data, error} = _serviceBridge.init({
+    test("SystemBoot, valid admin details", async () => {
+        const {data, error} = await _serviceBridge.init({
             userName: "admin",
             password: "adas123",
         });
@@ -24,14 +27,14 @@ describe("System Boot - UC 1", () => {
         expect(data).toBeDefined();
     });
 
-    test("SystemBoot, valid admin details - init and init again", () => {
-        const {data, error} = _serviceBridge.init({
+    test("SystemBoot, valid admin details - init and init again", async() => {
+        const {data, error} = await _serviceBridge.init({
             userName: "admin",
             password: "adas123",
         });
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
-        const res2 = _serviceBridge.init({
+        const res2 = await _serviceBridge.init({
             userName: "admin",
             password: "adas123",
         });
@@ -39,8 +42,8 @@ describe("System Boot - UC 1", () => {
         expect(res2.error).toBeDefined();
     });
 
-    test("SystemBoot, try to register user without init", () => {
-        const {data, error} = _serviceBridge.register({
+    test("SystemBoot, try to register user without init", async() => {
+        const {data, error} = await _serviceBridge.register({
             userName: "validuser",
             password: "validpwd123",
         });
@@ -48,16 +51,16 @@ describe("System Boot - UC 1", () => {
         expect(error).toBeDefined();
     });
 
-    test("SystemBoot, invalid admin details - password too short", () => {
-        const {data, error} = _serviceBridge.init({
+    test("SystemBoot, invalid admin details - password too short", async() => {
+        const {data, error} = await _serviceBridge.init({
             userName: "admin",
             password: "a",
         });
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
     });
-    test("SystemBoot, invalid admin details - empty string as name", () => {
-        const {data, error} = _serviceBridge.init({
+    test("SystemBoot, invalid admin details - empty string as name", async() => {
+        const {data, error} = await _serviceBridge.init({
             userName: "",
             password: "adas",
         });

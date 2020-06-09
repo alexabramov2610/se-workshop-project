@@ -1,32 +1,14 @@
 import {Store} from './internal_api'
-import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
-import {ContactUsMessage, Item, Product} from "../trading_system/internal_api";
+import {RegisteredUser, StoreManager} from "../user/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
 import {
-    BagItem,
-    IDiscount,
-    IItem,
-    IPayment,
-    IProduct as ProductReq,
-    IReceipt,
-    ProductCatalogNumber,
-    ProductInStore,
-    ProductWithQuantity,
-    Purchase,
-    SearchFilters,
-    SearchQuery,
-    IContactUsMessage,
-    IDiscountPolicy,
-    IDiscountInPolicy,
-    IConditionOfDiscount,
-    IPurchasePolicy,
-    StoreInfo,
-    IPurchasePolicyElement,
-    ISimplePurchasePolicy, ManagerNamePermission
+    BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
+    Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
+    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {ManagementPermission, Operators, ProductCategory} from "se-workshop-20-interfaces/dist/src/Enums";
+import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
-import {errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
+import {errorMsg as Error, errorMsg, loggerW, StringTuple, UserRole} from '../api-int/internal_api'
 import {Discount} from "./discounts/Discount";
 import {DiscountPolicy} from "./discounts/DiscountPolicy";
 import {CondDiscount} from "./discounts/CondDiscount";
@@ -36,142 +18,291 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
+import {
+    DiscountPolicyModel,
+    ProductModel,
+    ReceiptModel,
+    StoreManagerModel,
+    StoreModel,
+    StoreOwnerModel,
+    PurchasePolicyModel,
+} from 'dal'
+import * as StoreMapper from './StoreMapper'
+import {productsMapperFromDB} from "./StoreMapper";
+import {mapToJson} from "../api-int/utils";
 
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private readonly _stores: Store[];
-    private _storeByStoreName: Map<string, Store>;
-    private _storeManagerAssigners: Map<RegisteredUser, RegisteredUser[]>;
-    private _storeOwnerAssigners: Map<RegisteredUser, RegisteredUser[]>;
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy", "purchasePolicy"];
     private _externalSystems: ExternalSystemsManager;
+    locks: string[];
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
-        this._stores = [];
-        this._storeManagerAssigners = new Map();
-        this._storeOwnerAssigners = new Map();
-        this._storeByStoreName = new Map();
+        this.locks = []
     }
 
-    addStore(storeName: string, description: string, owner: RegisteredUser): Res.BoolResponse {
-        const newStore = new Store(storeName, description);
-        newStore.setFirstOwner(owner);
-        this._stores.push(newStore);
-        this._storeByStoreName.set(newStore.storeName, newStore);
-        logger.debug(`successfully added store: ${newStore.storeName} with first owner: ${owner.name} to system`)
+    async findStoreByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
+        const storeModel = await this.findStoreModelByName(storeName, populateWith);
+        return StoreMapper.storeMapperFromDB(storeModel);
+        // try {
+        //     logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
+        //     const populateQuery = populateWith.map(field => {
+        //         return {path: field}
+        //     });
+        //     const s = await StoreModel.findOne({storeName}).populate(populateQuery)
+        //         .populate(populateQuery);
+        //     const store: Store = StoreMapper.storeMapperFromDB(s);
+        //     return store;
+        // } catch (e) {
+        //     logger.error(`findStoreByName DB ERROR: ${e}`);
+        //     return undefined
+        // }
+        // return undefined;
+    }
+
+    async findStoreModelByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
+        try {
+            logger.debug(`findStoreModelByName trying to find store ${storeName} in DB`)
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const s = await StoreModel.findOne({storeName}).populate(populateQuery)
+            return s;
+        } catch (e) {
+            logger.error(`findStoreModelByName DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
+    async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
+        try {
+            logger.debug(`trying to find all stores in DB`)
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const s = await StoreModel.find().populate('products')
+                .populate(populateQuery);
+            return s.map(currStore => StoreMapper.storeMapperFromDB(currStore));
+        } catch (e) {
+            logger.error(`findAllStores DB ERROR: ${e}`);
+            return [];
+        }
+        return [];
+    }
+
+    async addStore(storeName: string, description: string, owner: RegisteredUser): Promise<Res.BoolResponse> {
+        const firstOwner = new StoreOwnerModel({name: owner.name})
+        // const purchasePolicy = new PurchasePolicyModel()
+        // const discountPolicy = new DiscountPolicyModel()
+        try {
+            const storeOwners = [firstOwner]
+            const discountPolicy = await DiscountPolicyModel.create({children: [], storeName})
+            const purchasePolicy = await PurchasePolicyModel.create({children: [], storeName})
+            await StoreModel.create({storeName, description, firstOwner, storeOwners, discountPolicy, purchasePolicy})
+            await firstOwner.save();
+            logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
+            return {data: {result: true}}
+        } catch (e) {
+            if (e.errors && e.errors.name && e.errors.name.kind === 'unique') {
+                logger.warn(`fail to open store ,${storeName} already exist `);
+                return {data: {result: false}, error: {message: errorMsg.E_STORE_EXISTS}}
+            }
+            return {data: {result: false}, error: {message: e.errors.name}}
+        }
         return {data: {result: true}}
     }
 
-    verifyStoreExists(storeName: string): boolean {
-        for (const store of this._stores) {
-            if (store.storeName === storeName)
-                return true;
-        }
-        logger.debug(`store "${storeName}" doesn't exist`);
-        return false;
+    async verifyStoreExists(storeName: string): Promise<boolean> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        return storeModel ? true : false;
     }
 
-    isStoreLegal(store: Store): boolean {
-        return store.storeName.length > 0 && store.UUID && store.UUID.length > 0;
+    async getOwnersAssignedBy(storeName: string, user: RegisteredUser): Promise<Res.GetOwnersAssignedByResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel)
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}}
+        const storeOwner = this.findStoreOwner(storeModel, user.name);
+        return {
+            data: {
+                result: true,
+                owners: storeOwner.ownersAssigned.map(curr => curr.name)
+            }
+        };
     }
 
-    getOwnersAssignedBy(storeName: string, user: RegisteredUser): Res.GetOwnersAssignedByResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return { data: {result: false, owners: []}, error: { message: errorMsg.E_INVALID_STORE } }
-        return { data: {result: true, owners: store.getStoreOwner(user.name).assignedStoreOwners.reduce((acc, curr) => acc.concat(curr.name), []) }};
-    }
-
-    verifyStoreOwner(storeName: string, user: RegisteredUser): boolean {
-        const store: Store = this.findStoreByName(storeName);
-        return store ? store.verifyIsStoreOwner(user.name) : false;
-    }
-
-    verifyStoreManager(storeName: string, user: RegisteredUser): boolean {
-        const store: Store = this.findStoreByName(storeName);
-        return store ? store.verifyIsStoreManager(user.name) : false;
-    }
-
-    verifyStoreOperation(storeName: string, user: RegisteredUser, permission: ManagementPermission): Res.BoolResponse {
+    async verifyStoreOperation(storeName: string, username: string, permission: ManagementPermission, storeModel?): Promise<Res.BoolResponse> {
         let error: string;
-        const store: Store = this.findStoreByName(storeName);
+        const store = storeModel ? storeModel : await this.findStoreModelByName(storeName); // Document
         if (!store)
             error = errorMsg.E_INVALID_STORE;
-        else if (!store.verifyPermission(user.name, permission))
+        else if (!this.findStoreOwner(store, username) && !this.verifyManagerPermission(store.storeManagers, username, permission))
             error = errorMsg.E_PERMISSION;
         return error ? {data: {result: false}, error: {message: error}} : {data: {result: true}};
     }
 
-    changeProductName = (user: RegisteredUser, catalogNumber: number, storeName: string, newProductName: string): Res.BoolResponse => {
-        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} name in store: ${storeName} 
+    private findStoreOwner(storeModel, username: string) { // returns doc
+        return storeModel.storeOwners.find((owner) => owner.name === username);
+    }
+
+    private findStoreManager(storeModel, username: string) { // returns doc
+        return storeModel.storeManagers.find((owner) => owner.name === username);
+    }
+
+    private verifyManagerPermission(managers: StoreManager[], username: string, permissionToCheck: ManagementPermission): boolean {
+        for (const manager of managers) {
+            if (manager.name === username) {
+                for (const permission of manager.managerPermissions) {
+                    if (permission === permissionToCheck)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    async changeProductName(username: string, catalogNumber: number, storeName: string, newProductName: string): Promise<Res.BoolResponse> {
+        logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
-        const store: Store = this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
-        product.name = newProductName;
-        logger.debug(`changeProductName: successfully changed name`);
-        return {data: {result: true}};
+        // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
+        const productToChange = store.products.find(p => p.catalogNumber === +catalogNumber)
+        productToChange.name = newProductName;
+        try {
+            await productToChange.save()
+            logger.info(`changeProductName: successfully changed name`);
+            return {data: {result: true}};
+        } catch (e) {
+            logger.warn(`changeProductName: error ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+        }
     }
 
-    changeProductPrice = (user: RegisteredUser, catalogNumber: number, storeName: string, newPrice: number): Res.BoolResponse => {
-        logger.debug(`changeProductName: ${user.name} changes product: ${catalogNumber} price in store: ${storeName} 
+    async changeProductPrice(username: string, catalogNumber: number, storeName: string, newPrice: number): Promise<Res.BoolResponse> {
+        logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
-        const store: Store = this.findStoreByName(storeName);
+        const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
-
-        product.price = newPrice;
-        logger.debug(`changeProductName: successfully changed price`);
-        return {data: {result: true}};
+        // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
+        const productToChange = store.products.find((p) => p.catalogNumber === +catalogNumber)
+        productToChange.price = newPrice;
+        try {
+            await productToChange.save()
+            logger.info(`changeProductPrice: successfully changed price`);
+            return {data: {result: true}};
+        } catch (e) {
+            logger.warn(`changeProductName: error ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+        }
     }
 
-    addItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsAdditionResponse {
-        const store: Store = this.findStoreByName(storeName);
-        const items: Item[] = this.getItemsFromRequest(itemsReq);
-        return store.addItems(items);
+    async addItems(username: string, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsAdditionResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ItemsAdditionResponse = store.addItems(itemsReq);
+        if (res.data.result) {
+            try {
+                res.data.itemsAdded.forEach(item => {
+                    const product = storeModel.products.find((p) => p.catalogNumber === +item.catalogNumber);
+                    product.items.push(item);
+                })
+                for (const product of storeModel.products) {
+                    await product.save()
+                }
+                logger.info(`new items added into store: ${storeName}`)
+            } catch (e) {
+                logger.error(`addItems DB ERROR: ${e}`);
+                return {
+                    data: {result: false, itemsNotAdded: itemsReq},
+                    error: {message: Error.E_ITEMS_ADD}
+                }
+            }
+        }
+        return res;
     }
 
-    removeItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Res.ItemsRemovalResponse {
-        const store: Store = this.findStoreByName(storeName);
-        const items: Item[] = this.getItemsFromRequest(itemsReq);
-        return store.removeItems(items);
-
+    async removeItems(user: RegisteredUser, storeName: string, itemsReq: IItem[]): Promise<Res.ItemsRemovalResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ItemsRemovalResponse = store.removeItems(itemsReq);
+        if (res.data.result) {
+            try {
+                res.data.itemsRemoved.forEach(item => {
+                    const product = storeModel.products.find(p => p.catalogNumber === item.catalogNumber);
+                    product.items.pull(item.db_id);
+                })
+                for (const product of storeModel.products) {
+                    await product.save()
+                }
+                logger.info(`removed items from store: ${storeName}`)
+            } catch (e) {
+                logger.error(`removeItems DB ERROR: ${e}`);
+                return {
+                    data: {result: false, itemsNotRemoved: itemsReq},
+                    error: {message: Error.E_ITEMS_REM}
+                }
+            }
+        }
+        return res;
     }
 
-    removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Res.ProductRemovalResponse {
-        const store: Store = this.findStoreByName(storeName);
-        return store.removeProductsWithQuantity(productsReq, isReturnItems);
+    async addNewProducts(username: string, storeName: string, productsReq: IProduct[]): Promise<Res.ProductAdditionResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
+        const res: Res.ProductAdditionResponse = store.addNewProducts(productsReq);
+        if (res.data.result) {
+            try {
+                const newProductsInserted = await ProductModel.insertMany(res.data.productsAdded);
+                newProductsInserted.forEach((p) => storeModel.products.push(p));
+                storeModel.markModified('products')
+                await storeModel.save()
+                logger.info(`new products updated success in DB`);
+            } catch (e) {
+                logger.error(`addNewProducts DB ERROR: ${e}`);
+                return {data: {result: false, productsNotAdded: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
+            }
+        }
+        return res;
     }
 
-    addNewProducts(user: RegisteredUser, storeName: string, productsReq: ProductReq[]): Res.ProductAdditionResponse {
-        const store: Store = this.findStoreByName(storeName);
-        const products: Product[] = this.getProductsFromRequest(productsReq);
-        return store.addNewProducts(products);
+    async removeProducts(username: string, storeName: string, productsReq: ProductCatalogNumber[]): Promise<Res.ProductRemovalResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel); // need to return IProduct[] so we can send them directly to DB
+        const res: Res.ProductRemovalResponse = store.removeProductsByCatalogNumber(productsReq);
+        if (res.data.result) {
+            try {
+                await ProductModel.deleteMany({_id: {$in: res.data.productsRemoved.map(p => p.db_id)}});
+                res.data.productsRemoved.forEach(p => storeModel.products.pull(p.db_id));
+                storeModel.markModified('products')
+                await storeModel.save();
+                logger.info(`removed products from store ${storeName}`);
+            } catch (e) {
+                logger.error(`removeProducts DB ERROR: ${e}`);
+                return {data: {result: false, productsNotRemoved: productsReq}, error: {message: errorMsg.E_PROD_ADD}}
+            }
+        }
+        return res;
     }
 
-    removeProducts(user: RegisteredUser, storeName: string, products: ProductCatalogNumber[]): Res.ProductRemovalResponse {
-        const store: Store = this.findStoreByName(storeName);
-        return store.removeProductsByCatalogNumber(products);
-    }
-
-    assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Res.BoolResponse {
+    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as an owner in store: ${JSON.stringify(storeName)}`)
 
+        const storeModel = await this.findStoreModelByName(storeName); // Document
         let error: string;
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
+        if (!storeModel) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoAssigns.name);
+        const userWhoAssignsOwner = this.findStoreOwner(storeModel, userWhoAssigns.name);
         if (!userWhoAssignsOwner) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
@@ -179,300 +310,401 @@ export class StoreManagement {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        if (store.verifyIsStoreOwner(userToAssign.name)) {   // already store manager
+        if (this.findStoreOwner(storeModel, userToAssign.name)) {   // already store manager
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        const newUserToAssign: StoreOwner = new StoreOwner(userToAssign.name);
-
-        logger.debug(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
-        const additionRes: Res.BoolResponse = store.addStoreOwner(newUserToAssign);
-        if (additionRes.data.result)
-            userWhoAssignsOwner.assignStoreOwner(newUserToAssign);
-        return additionRes;
+        try {
+            const ownerToAdd = new StoreOwnerModel({name: userToAssign.name})
+            userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
+            storeModel.storeOwners.push(ownerToAdd);
+            storeModel.markModified('storeOwners')
+            await ownerToAdd.save();
+            await userWhoAssignsOwner.save();
+            await storeModel.save()
+            logger.info(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+        } catch (e) {
+            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
+        return {data: {result: true}}
     }
 
-    assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Res.BoolResponse {
-        logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
-                ${userToAssign.name} as a manager in store: ${storeName}`)
-        let error: string;
-
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
-            error = errorMsg.E_INVALID_STORE;
-            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        }
-
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoAssigns.name);
-        if (!userWhoAssignsOwner) {
-            error = errorMsg.E_NOT_AUTHORIZED;
-            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        }
-
-        if (store.verifyIsStoreManager(userToAssign.name)) {   // already store manager
-            error = errorMsg.E_AL;
-            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
-                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
-        }
-
-        const newUserToAssign: StoreManager = new StoreManager(userToAssign.name);
-
-        logger.debug(`successfully assigned user: ${userToAssign.name} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
-        const additionRes: Res.BoolResponse = store.addStoreManager(newUserToAssign);
-        if (additionRes.data.result)
-            userWhoAssignsOwner.assignStoreManager(newUserToAssign);
-        return additionRes;
-    }
-
-    removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser, ownersToRemove: StringTuple[]): Res.BoolResponse {
+    async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.RemoveStoreOwnerResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as an owner in store: ${JSON.stringify(storeName)} `)
         let error: string;
 
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
-        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
+        const userWhoRemovesDoc = this.findStoreOwner(storeModel, userWhoRemoves.name);
+        if (!userWhoRemovesDoc || userToRemove.name === userWhoRemoves.name) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+            return {data: {result: false, owners: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        const userOwnerToRemove: StoreOwner = store.getStoreOwner(userToRemove.name);
-        if (!userOwnerToRemove) {   // not store owner
+        const userOwnerToRemoveDoc = this.findStoreOwner(storeModel, userToRemove.name);
+        if (!userOwnerToRemoveDoc) {   // not store owner
             error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
+            return {data: {result: false, owners: []}, error: {message: error}};
         }
 
-        if (!userWhoRemovesOwner.isAssignerOfOwner(userOwnerToRemove)) {
-            error = errorMsg.E_NOT_ASSIGNER + userOwnerToRemove.name;
-            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove owner:
-                ${userOwnerToRemove.name}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
+        if (!this.isAssignerOfOwner(userWhoRemovesDoc, userToRemove.name)) {
+            error = errorMsg.E_NOT_ASSIGNER + userToRemove.name;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove owner:
+                ${userToRemove.name}. error: ${error}`);
+            return {data: {result: false, owners: []}, error: {message: error}};
         }
 
-        const res: Res.BoolResponse = ownersToRemove.reduce((res: Res.BoolResponse, ownersTuple) => {
-            if (!res.data.result)
-                return res
-            const currRemover: StoreOwner = store.getStoreOwner(ownersTuple[0]);
-            const currToRemove: StoreOwner = store.getStoreOwner(ownersTuple[1]);
+        const ownersToRemove: any[] = this.getStoreOwnersToRemove(userOwnerToRemoveDoc, storeModel);
 
-            currToRemove.assignedStoreManagers.forEach((manager: StoreManager) => {
-                store.removeStoreManager(manager);
+        try {
+            ownersToRemove.forEach(owner => {
+                owner.managersAssigned.forEach(manager => storeModel.storeManagers.pull({_id: manager._id.toString()}))
+                storeModel.storeOwners.pull({_id: owner.id})
             })
-
-            const additionRes: Res.BoolResponse = store.removeStoreOwner(currToRemove);
-            if (additionRes.data.result && currRemover)
-                currRemover.removeStoreOwner(currToRemove);
-            return additionRes;
-        }, {data: {result: true}});
-
-        return res;
+            userWhoRemovesDoc.ownersAssigned = userWhoRemovesDoc.ownersAssigned.filter(owner => owner.name !== userToRemove.name);
+            storeModel.markModified('storeOwners')
+            storeModel.markModified('storeManagers')
+            await StoreOwnerModel.deleteMany({_id: {$in: ownersToRemove.map(owner => owner.id)}});
+            await StoreManagerModel.deleteMany({
+                _id: {
+                    $in: ownersToRemove.reduce((acc, currOwner) =>
+                        acc.concat(currOwner.managersAssigned.map(manager => manager._id.toString())), [])
+                }
+            });
+            await userWhoRemovesDoc.save();
+            await storeModel.save();
+            logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
+        } catch (e) {
+            logger.error(`removeStoreOwner DB ERROR: ${e}`);
+            return {
+                data: {result: false, owners: ownersToRemove.map(owner => owner.name)},
+                error: {message: errorMsg.E_DB}
+            }
+        }
+        return {data: {result: true, owners: ownersToRemove.map(owner => owner.name)}}
     }
 
-    getStoreOwnersToRemove(toRemove: string, storeName: string): StringTuple[] {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return [];
-        const firstOwner: StoreOwner = store.getStoreOwner(toRemove);
-        return this.concatAllStoreOwnersToRemove(firstOwner);
+    private getStoreOwnersToRemove(owner, storeModel): any[] {
+        return [owner].concat(owner.ownersAssigned.reduce(
+            (acc, curr) => acc.concat(this.getStoreOwnersToRemove(this.findStoreOwner(storeModel, curr.name), storeModel)), [])
+        );
     }
 
-    private concatAllStoreOwnersToRemove(firstOwner: StoreOwner): StringTuple[] {
-        return firstOwner.assignedStoreOwners.reduce((acc: StringTuple[], currAssigned: StoreOwner) => {
-            return acc
-                .concat([[firstOwner.name, currAssigned.name]])
-                .concat(this.concatAllStoreOwnersToRemove(currAssigned))
-        }, [])
+    private isAssignerOfOwner(userWhoRemoves, username: string): boolean {
+        return userWhoRemoves.ownersAssigned.find(manager => manager.name === username);
     }
 
-    removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Res.BoolResponse {
+    async assignStoreManager(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
+        logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
+                ${userToAssign.name} as a manager in store: ${storeName}`)
+        let error: string;
+
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+
+        const userWhoAssignsOwner = this.findStoreOwner(storeModel, userWhoAssigns.name);
+        if (!userWhoAssignsOwner) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        if (this.findStoreManager(storeModel, userToAssign.name)) {   // already store manager
+            error = errorMsg.E_AL;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as a manager in store: ${storeName}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        try {
+            const managerToAdd: StoreManager = {
+                name: userToAssign.name, managerPermissions:
+                    [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS]
+            };
+            const newManagerModel = new StoreManagerModel(managerToAdd);
+            userWhoAssignsOwner.managersAssigned.push(newManagerModel);
+            storeModel.storeManagers.push(newManagerModel);
+            storeModel.markModified('storeOwners')
+            storeModel.markModified('storeManagers')
+            await newManagerModel.save();
+            await userWhoAssignsOwner.save();
+            await storeModel.save();
+            logger.info(`successfully assigned user: ${userToAssign.name} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+        } catch (e) {
+            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
+        return {data: {result: true}}
+    }
+
+    async removeStoreManager(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.BoolResponse> {
         logger.debug(`user: ${JSON.stringify(userWhoRemoves.name)} requested to remove user:
                 ${JSON.stringify(userToRemove.name)} as a manager in store: ${JSON.stringify(storeName)} `)
         let error: string;
 
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoRemovesOwner: StoreOwner = store.getStoreOwner(userWhoRemoves.name);
-        if (!userWhoRemovesOwner || userToRemove.name === userWhoRemoves.name) {
+        const userWhoRemovesDoc = this.findStoreOwner(storeModel, userWhoRemoves.name);
+        if (!userWhoRemovesDoc || userToRemove.name === userWhoRemoves.name) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        const userManagerToRemove: StoreManager = store.getStoreManager(userToRemove.name);
-        if (!userManagerToRemove) {   // not store owner
+        const userManagerToRemoveDoc = this.findStoreManager(storeModel, userToRemove.name);
+        if (!userManagerToRemoveDoc) {   // not store manager
             error = errorMsg.E_NOT_OWNER;
             logger.warn(`user: ${userWhoRemoves.name} failed to remove user:
                 ${userToRemove.name} as a manager in store: ${storeName}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!userWhoRemovesOwner.isAssignerOfManager(userManagerToRemove)) {
-            error = errorMsg.E_NOT_ASSIGNER + userManagerToRemove.name;
-            logger.warn(`user: ${userWhoRemovesOwner.name} failed to remove manager:
-                ${userManagerToRemove.name}. error: ${error}`);
+        if (!this.isAssignerOfManager(userWhoRemovesDoc, userToRemove.name)) {
+            error = errorMsg.E_NOT_ASSIGNER + userToRemove.name;
+            logger.warn(`user: ${userWhoRemoves.name} failed to remove manager:
+                ${userToRemove.name}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        const additionRes: Res.BoolResponse = store.removeStoreManager(userManagerToRemove);
-        if (additionRes.data.result)
-            userWhoRemovesOwner.removeStoreManager(userManagerToRemove);
-        return additionRes;
+        try {
+            userWhoRemovesDoc.managersAssigned = userWhoRemovesDoc.managersAssigned.filter(manager => manager.name !== userToRemove.name);
+            storeModel.storeManagers.pull({_id: userManagerToRemoveDoc.id});
+            storeModel.markModified('storeOwners')
+            storeModel.markModified('storeManagers')
+            await StoreManagerModel.deleteOne({_id: userManagerToRemoveDoc.id})
+            await userWhoRemovesDoc.save();
+            await storeModel.save();
+            logger.info(`successfully removed user: ${userToRemove.name} as a manager in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
+        } catch (e) {
+            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
+        return {data: {result: true}}
     }
 
-    removeManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]): Res.BoolResponse => {
-        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange}
-         in store ${storeName}`)
-        let error: string;
-
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
-            error = errorMsg.E_INVALID_STORE;
-            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
-                ${managerToChange}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        }
-
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoChanges.name);
-        if (!userWhoAssignsOwner) {
-            error = errorMsg.E_NOT_AUTHORIZED;
-            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
-                ${managerToChange}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
-        }
-
-        const userManagerToRemove: StoreManager = store.getStoreManager(managerToChange);
-        if (!userManagerToRemove) {   // not store owner
-            error = errorMsg.E_NOT_MANAGER;
-            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
-                ${managerToChange}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
-        }
-
-        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToRemove)) {
-            error = errorMsg.E_NOT_ASSIGNER + managerToChange;
-            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
-                ${managerToChange}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
-        }
-
-        if (!this.verifyPermissions(permissions)) {
-            error = errorMsg.E_INVALID_PERM;
-            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
-                ${userWhoChanges}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
-        }
-
-        permissions.forEach(permission => userManagerToRemove.removePermission(permission));
-        return {data: {result: true}};
+    private isAssignerOfManager(userWhoRemoves, username: string): boolean {
+        return userWhoRemoves.managersAssigned.find(manager => manager.name === username);
     }
 
-    addManagerPermissions = (userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]): Res.BoolResponse => {
-        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to add permissions from user: ${usernameToChange}
-         in store ${storeName}`)
+    async addManagerPermissions(userWhoChanges: RegisteredUser, storeName: string, usernameToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse> {
+        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to add permissions from user: ${usernameToChange} in store ${storeName}`)
         let error: string;
 
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
 
-        const userWhoAssignsOwner: StoreOwner = store.getStoreOwner(userWhoChanges.name);
-        if (!userWhoAssignsOwner) {
+        const userWhoAssignsOwnerDoc = this.findStoreOwner(storeModel, userWhoChanges.name);
+        if (!userWhoAssignsOwnerDoc) {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
         }
 
-        const userManagerToAdd: StoreManager = store.getStoreManager(usernameToChange);
-        if (!userManagerToAdd) {   // not store owner
+        const userManagerToAddDoc = this.findStoreManager(storeModel, usernameToChange);
+        if (!userManagerToAddDoc) {   // not store owner
             error = errorMsg.E_NOT_MANAGER;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!userWhoAssignsOwner.isAssignerOfManager(userManagerToAdd)) {
+        if (!this.isAssignerOfManager(userWhoAssignsOwnerDoc, usernameToChange)) {
             error = errorMsg.E_NOT_ASSIGNER + usernameToChange;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        if (!this.verifyPermissions(permissions)) {
+        if (!this.verifyValidPermissions(permissions)) {
             error = errorMsg.E_INVALID_PERM;
             logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
                 ${usernameToChange}. error: ${error}`);
             return {data: {result: false}, error: {message: error}};
         }
 
-        permissions.forEach(permission => userManagerToAdd.addPermission(permission));
+        try {
+            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.concat(permissions);
+            userManagerToAddDoc.managerPermissions = [...new Set(userManagerToAddDoc.managerPermissions)];
+            storeModel.markModified('storeManagers')
+            await userManagerToAddDoc.save();
+            await storeModel.save();
+            logger.info(`successfully added permissions to user: ${usernameToChange}`)
+        } catch (e) {
+            logger.error(`addManagerPermissions DB ERROR: ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
         return {data: {result: true}};
     }
 
-    findStoreByName(storeName: string): Store {
-        for (const store of this._stores) {
-            if (store.storeName === storeName)
-                return store;
+    async removeManagerPermissions(userWhoChanges: RegisteredUser, storeName: string, managerToChange: string, permissions: ManagementPermission[]): Promise<Res.BoolResponse> {
+        logger.debug(`user: ${JSON.stringify(userWhoChanges.name)} requested to remove permissions from user: ${managerToChange} in store ${storeName}`)
+        let error: string;
+
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
+            error = errorMsg.E_INVALID_STORE;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         }
-        return undefined;
+
+        const userWhoAssignsOwnerDoc = this.findStoreOwner(storeModel, userWhoChanges.name);
+        if (!userWhoAssignsOwnerDoc) {
+            error = errorMsg.E_NOT_AUTHORIZED;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+
+        const userManagerToAddDoc = this.findStoreManager(storeModel, managerToChange);
+        if (!userManagerToAddDoc) {   // not store owner
+            error = errorMsg.E_NOT_MANAGER;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!this.isAssignerOfManager(userWhoAssignsOwnerDoc, managerToChange)) {
+            error = errorMsg.E_NOT_ASSIGNER + managerToChange;
+            logger.warn(`user: ${userWhoChanges.name} failed to remove permissions to user:
+                ${managerToChange}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        if (!this.verifyValidPermissions(permissions)) {
+            error = errorMsg.E_INVALID_PERM;
+            logger.warn(`user: ${userWhoChanges.name} failed to add permissions to user:
+                ${userWhoChanges}. error: ${error}`);
+            return {data: {result: false}, error: {message: error}};
+        }
+
+        try {
+            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(p => permissions.indexOf(p) === - 1)
+            storeModel.markModified('storeManagers')
+            await userManagerToAddDoc.save();
+            await storeModel.save();
+            logger.info(`successfully removed permissions from user: ${managerToChange}`)
+        } catch (e) {
+            logger.error(`addManagerPermissions DB ERROR: ${e}`);
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
+        return {data: {result: true}};
     }
 
-    viewStoreInfo(storeName: string): Res.StoreInfoResponse {
-        const store = this.findStoreByName(storeName);
+    private verifyValidPermissions(permissions: ManagementPermission[]): boolean {
+        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
+    }
+
+    async getManagerPermissions(username: string, storeName: string): Promise<Res.ViewManagerPermissionResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const isStoreOwner = this.findStoreOwner(storeModel, username);
+        if (isStoreOwner)
+            return {data: {result: true, permissions: this.getAllPermissions()}};
+        const isStoreManager = this.findStoreManager(storeModel, username);
+        if (!isStoreManager)
+            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
+        return {data: {result: true, permissions: isStoreManager.managerPermissions}}
+    }
+
+    private getAllPermissions(): ManagementPermission[] {
+        return Object.values(ManagementPermission);
+    }
+
+    async search(filters: SearchFilters, query: SearchQuery): Promise<Res.SearchResponse> {
+        let productsFound: ProductInStore[] = [];
+        const DBSearchQuery = this.createSearchQuery(filters, query);
+        try {
+            const productsInDB = await ProductModel.find(DBSearchQuery)
+            const productsInDomain: IProduct[] = productsMapperFromDB(productsInDB);
+            productsFound = productsInDomain.map(product => {
+                return {product, storeName: product.storeName}
+            })
+        } catch (e) {
+            logger.error(`search DB ERROR: ${e}`);
+        }
+        return {data: {result: true, products: productsFound}};
+    }
+
+    private createSearchQuery(filters: SearchFilters, query: SearchQuery) {
+        const searchQuery: Map<string, any> = new Map();
+        // if (filters.storeRating && filters.storeRating as unknown !== "")
+        //     searchQuery.set("rating", +filters.storeRating);
+        if (filters.productRating && filters.productRating as unknown !== "")
+            searchQuery.set("rating", +filters.productRating);
+        if (filters.productCategory && filters.productCategory as unknown !== "")
+            searchQuery.set("category", filters.productCategory);
+        if (filters.priceRange) {
+            const priceRange: Map<any, any> = new Map();
+            if (filters.priceRange.min && filters.priceRange.min as unknown !== "")
+                priceRange.set("$gte", +filters.priceRange.min);
+            if (filters.priceRange.max && filters.priceRange.max as unknown !== "")
+                priceRange.set("$lte", +filters.priceRange.max);
+            if (priceRange.size > 0)
+                searchQuery.set("price", mapToJson(priceRange));
+        }
+        if (query.productName && query.productName as unknown !== "")
+            searchQuery.set("name", query.productName);
+        if (query.storeName && query.storeName as unknown !== "")
+            searchQuery.set("storeName", query.storeName);
+
+        return mapToJson(searchQuery);
+    }
+
+    async viewStoreInfo(storeName: string): Promise<Res.StoreInfoResponse> {
+        const store = await this.findStoreModelByName(storeName);
         if (store) {
-            return store.viewStoreInfo();
+            const storeInfo: StoreInfo = {
+                storeName: store.storeName,
+                description: store.description,
+                storeRating: store.rating,
+                storeOwnersNames: store.storeOwners.map(o => o.name),
+                storeManagersNames: store.storeOwners.map(o => o.name),
+                productsNames: store.products.map(p => p.name)
+            }
+            return {data: {result: true, info: storeInfo}}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         }
     }
 
-    viewStorePurchaseHistory(user: RegisteredUser, storeName: string): Res.ViewShopPurchasesHistoryResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_PURCHASES_HISTORY) && (user.role !== UserRole.ADMIN))
-            return {
-                data: {result: false, receipts: []},
-                error: {message: errorMsg.E_PERMISSION}
-            }
-        const iReceipts: IReceipt[] = store.getPurchasesHistory().map(r => {
-            return {purchases: r.purchases, date: r.date}
-        })
-        return {data: {result: true, receipts: iReceipts}}
-    }
-
-    viewProductInfo(req: Req.ProductInfoRequest): Res.ProductInfoResponse {
-        const store = this.findStoreByName(req.body.storeName);
+    async viewProductInfo(req: Req.ProductInfoRequest): Promise<Res.ProductInfoResponse> {
+        const store = await this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
         const product = store.getProductByCatalogNumber(req.body.catalogNumber)
@@ -493,180 +725,34 @@ export class StoreManagement {
         }
     }
 
-    viewUsersContactUsMessages(user: RegisteredUser, storeName: string): Res.ViewUsersContactUsMessagesResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store) return {data: {result: false, messages: []}, error: {message: errorMsg.E_NF}}
-        if (!store.verifyPermission(user.name, ManagementPermission.WATCH_USER_QUESTIONS) && (user.role !== UserRole.ADMIN)) return {
-            data: {result: false, messages: []},
-            error: {message: errorMsg.E_PERMISSION}
+    async viewStorePurchaseHistory(user: RegisteredUser, storeName: string, isAdmin?: boolean): Promise<Res.ViewShopPurchasesHistoryResponse> {
+        const storeModel = await this.findStoreModelByName(storeName);
+        if (!storeModel)
+            return {data: {result: false, receipts: []}, error: {message: errorMsg.E_NF}}
+
+        let isPermitted: boolean = isAdmin;
+        if (!isPermitted) {
+            const permissionsVerification: Res.BoolResponse = await this.verifyStoreOperation(storeName, user.name, ManagementPermission.WATCH_PURCHASES_HISTORY, storeModel);
+            isPermitted = permissionsVerification.data.result;
         }
-        const newMessages: ContactUsMessage[] = store.getContactUsMessages();
-        const newMessageI: IContactUsMessage[] = newMessages.map((contactUs) => {
+
+        if (!isPermitted)
             return {
-                question: contactUs.question, date: contactUs.date, response: contactUs.response,
-                responderName: contactUs.responderName, responseDate: contactUs.responseDate
+                data: {result: false, receipts: []},
+                error: {message: errorMsg.E_PERMISSION}
             }
+
+        const iReceipts: IReceipt[] = storeModel.receipts.map((r) => {
+            return {purchases: r.purchases, date: r.date , payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged}}
         })
-        return {data: {result: true, messages: newMessageI}}
+        return {data: {result: true, receipts: iReceipts}}
     }
 
-    search(filters: SearchFilters, query: SearchQuery): Res.SearchResponse {
-        if (query.storeName && query.storeName.length > 0) {
-            const store: Store = this.findStoreByName(query.storeName);
-            if (!store)
-                return {data: {result: false, products: []}, error: {message: errorMsg.E_INVALID_STORE}};
-            if (!filters.storeRating || (filters.storeRating as unknown) === "" || filters.storeRating === store.rating)
-                return {data: {result: true, products: store.search(filters, query)}};
-            else
-                return {data: {result: true, products: []}};
-        }
-
-        let productsFound: ProductInStore[] = [];
-        for (const store of this._stores) {
-            if (typeof filters.storeRating === "undefined" || (filters.storeRating as unknown) === "" || filters.storeRating === store.rating)
-                productsFound = productsFound.concat(store.search(filters, query));
-        }
-        return {data: {result: true, products: productsFound}};
-    }
-
-    verifyPermissions(permissions: ManagementPermission[]): boolean {
-        return permissions.reduce((acc, perm) => Object.values(ManagementPermission).includes(perm) || acc, false);
-    }
-
-    verifyStoreBag(storeName: string, bagItems: BagItem[]): Res.BoolResponse {
-        const store: Store = this.findStoreByName(storeName);
+    async verifyProductOnStock(req: Req.VerifyProductOnStock): Promise<Res.BoolResponse> {
+        const store: Store = await this.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const notInStock: BagItem[] = bagItems.filter((bagItem) => (store.getProductQuantity(bagItem.product.catalogNumber) - bagItem.amount) < 0)
-        return notInStock.length === 0 ? {data: {result: true}} : {
-            data: {result: false},
-            error: {message: errorMsg.E_STOCK, options: notInStock}
-        }
-
-    }
-
-    purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment: IPayment): Purchase[] {
-        const store: Store = this.findStoreByName(storeName);
-        const purchases: Purchase[] = [];
-
-        for (const bagItem of bagItems) {
-            const items: Item[] = store.getItemsFromStock(bagItem.product, bagItem.amount)
-            for (const item of items) {
-                const outputItem: IItem = {catalogNumber: item.catalogNumber, id: item.id}
-                purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice / bagItem.amount})
-            }
-        }
-
-        store.addReceipt(purchases, payment)
-        return purchases
-    }
-
-    calculateFinalPrices(storeName: string, bagItems: BagItem[]): BagItem[] {
-        logger.info(`calculate final prices in store ${storeName}`)
-        const store: Store = this.findStoreByName(storeName);
-        // reset prices from last check
-        for (const bagItem of bagItems) {
-            bagItem.finalPrice = bagItem.product.price * bagItem.amount;
-        }
-        return store.calculateFinalPrices(bagItems)
-    }
-
-    viewManagerPermissions(owner: RegisteredUser, manager: RegisteredUser, req: Req.ViewManagerPermissionRequest): Res.ViewManagerPermissionResponse {
-        const store: Store = this.findStoreByName(req.body.storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const storeOwner: StoreOwner = store.getStoreOwner(owner.name)
-        if (!storeOwner && manager.name !== owner.name)
-            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
-        const managerToView: StoreManager = store.getStoreManager(manager.name);
-        if (!managerToView)
-            return {data: {result: false}, error: {message: errorMsg.E_MANGER_NOT_EXISTS}};
-        const permissions = managerToView.getPermissions();
-        return {data: {result: true, permissions}}
-    }
-
-    getManagerPermissions(username: string, storeName: string): Res.ViewManagerPermissionResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const storeOwner: StoreOwner = store.getStoreOwner(username);
-        if (storeOwner)
-            return {data: {result: true, permissions: this.getAllPermissions()}};
-        const storeManager: StoreManager = store.getStoreManager(username);
-        if (!storeManager)
-            return {data: {result: false}, error: {message: errorMsg.E_PERMISSION}};
-        return {data: {result: true, permissions: storeManager.getPermissions()}}
-
-    }
-
-    getAllPermissions(): ManagementPermission[] {
-        return Object.keys(ManagementPermission).map((key: any) => ManagementPermission[key]);
-    }
-
-
-    addDiscount(user: RegisteredUser, storeName: string, discount: IDiscount): Res.AddDiscountResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.addDiscount(discount);
-        return {data: {result: true, discountID}}
-    }
-
-    setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Res.AddDiscountResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const discountID: string = store.setDiscountPolicy(discounts.discounts);
-        return {data: {result: true, discountID}}
-    }
-
-    getStoreDiscountPolicy(user: RegisteredUser, storeName: string): IDiscountPolicy {
-        const store: Store = this.findStoreByName(storeName);
-        const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
-        const children: Map<Discount, Operators> = discount.children;
-        const discountInPolicy: IDiscountInPolicy[] = [];
-        for (const [discount, operator] of children) {
-            const iDiscount: IDiscount = this.convertDiscountToIDiscount(discount);
-            discountInPolicy.push({discount: iDiscount, operator});
-        }
-        const policy: IDiscountPolicy = {discounts: discountInPolicy}
-
-        return policy;
-    }
-
-    getStorePurchasePolicy(user: RegisteredUser, storeName: string): IPurchasePolicy {
-        const store: Store = this.findStoreByName(storeName);
-        const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
-        const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
-        const purchasePolicyElements: IPurchasePolicyElement[] = [];
-        for (const [policy, operator] of children) {
-            const iPurchasePolicy: ISimplePurchasePolicy = this.convertPolicyToISimplePurchasePolicy(policy);
-            purchasePolicyElements.push({policy: iPurchasePolicy, operator});
-        }
-        const policy: IPurchasePolicy = {policy: purchasePolicyElements}
-
-        return policy;
-    }
-
-    removeProductDiscount(user: RegisteredUser, storeName: string, catalogNumber: number, discountID: string): Res.BoolResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const isRemoved: boolean = store.removeDiscount(catalogNumber, discountID);
-        if (!isRemoved)
-            return {
-                data: {result: false},
-                error: {message: errorMsg.E_MODIFY_DISCOUNT}
-            }
-        return {data: {result: true}}
-
-    }
-
-    verifyProductOnStock(req: Req.VerifyProductOnStock): Res.BoolResponse {
-        const store: Store = this.findStoreByName(req.body.storeName);
-        if (!store)
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const product: Product = store.getProductByCatalogNumber(req.body.catalogNumber)
+        const product: IProduct = store.getProductByCatalogNumber(req.body.catalogNumber)
         if (!product) {
             return {data: {result: false}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}};
         }
@@ -674,11 +760,11 @@ export class StoreManagement {
         if (stockAmount < req.body.amount)
             return {data: {result: false}, error: {message: errorMsg.E_STOCK, options: {available: stockAmount}}};
         return {data: {result: true}}
-
     }
 
-    verifyProducts(req: Req.VerifyProducts): Res.BoolResponse {
-        const store: Store = this.findStoreByName(req.body.storeName);
+    async verifyProducts(req: Req.VerifyProducts): Promise<Res.BoolResponse> {
+        const storeModel = await this.findStoreModelByName(req.body.storeName);
+        const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const productsNotExists = [];
@@ -698,37 +784,36 @@ export class StoreManagement {
                 error: {message: errorMsg.E_PROD_DOES_NOT_EXIST, options: {productsNotExists}}
             }
         }
-
-
     }
 
-    getStoresWithOffset(limit: number, offset: number): Res.GetStoresWithOffsetResponse {
+    async getStoresWithOffset(limit: number, offset: number): Promise<Res.GetStoresWithOffsetResponse> {
         const storeInfos: StoreInfo[] = [];
         if (limit <= 0 || offset < 0)
             return {data: {stores: []}, error: {message: errorMsg.E_INVALID_PARAM}};
 
-        const maxIndex = offset + limit >= this._stores.length ? this._stores.length : offset + limit;
+        const stores: Store[] = await this.findAllStores();
+
+        const maxIndex = offset + limit >= stores.length ? stores.length : offset + limit;
 
         while (offset < maxIndex) {
-            storeInfos.push(this._stores[offset].viewStoreInfo().data.info);
+            storeInfos.push(stores[offset].viewStoreInfo().data.info);
             offset++;
         }
 
         return {data: {stores: storeInfos}};
     }
 
-    getAllProductsInStore(storeName: string): Res.GetAllProductsInStoreResponse {
+    async getAllProductsInStore(storeName: string): Promise<Res.GetAllProductsInStoreResponse> {
         const productInStore: ProductInStore[] = [];
-        const store: Store = this._storeByStoreName.get(storeName);
-        if (!store)
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+
+        if (!storeModel)
             return {data: {products: []}};
 
-        const prodIterator = store.products.keys();
-        let currProd: Product = prodIterator.next().value;
-        while (currProd) {
+        for (const currProd of storeModel.products) {
             const currProductInStore: ProductInStore = {
                 storeName,
-                storeRating: store.rating,
+                storeRating: storeModel.rating,
                 product: {
                     catalogNumber: currProd.catalogNumber,
                     price: currProd.price,
@@ -738,39 +823,141 @@ export class StoreManagement {
                 }
             }
             productInStore.push(currProductInStore);
-            currProd = prodIterator.next().value;
         }
 
         return {data: {products: productInStore}};
     }
 
-    getAllCategoriesInStore(storeName: string): Res.GetCategoriesResponse {
+    async getAllCategoriesInStore(storeName: string): Promise<Res.GetCategoriesResponse> {
         const categoriesInStore: ProductCategory[] = [];
-        if (!this._storeByStoreName.has(storeName))
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel)
             return {data: {categories: []}};
 
-        const prodIterator = this._storeByStoreName.get(storeName).products.keys();
-        let currProd: Product = prodIterator.next().value;
-        while (currProd) {
+        for (const currProd of storeModel.products) {
             categoriesInStore.push(currProd.category);
-            currProd = prodIterator.next().value;
         }
 
-        return {data: {categories: categoriesInStore}};
+        return {data: {categories: [...new Set(categoriesInStore)]}};
     }
 
-    setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Res.BoolResponse {
-        const store: Store = this.findStoreByName(storeName);
+    async getManagersPermissions(storeName: string): Promise<Res.GetAllManagersPermissionsResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel)
+            return {data: {result: false, permissions: []}, error: {message: errorMsg.E_INVALID_STORE}}
+        const permissions: ManagerNamePermission[] = [];
+
+        storeModel.storeManagers.forEach(storeManager => {
+            permissions.push({managerName: storeManager.name, permissions: storeManager.managerPermissions})
+        })
+        return {data: {result: true, permissions}}
+    }
+
+
+    async verifyStoreBag(storeName: string, bagItems: BagItem[]): Promise<Res.BoolResponse> {
+        const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const setPolicyOk: boolean = store.setPurchasePolicy(policy.policy);
+        const notInStock: BagItem[] = bagItems.filter((bagItem) => (store.getProductQuantity(bagItem.product.catalogNumber) - bagItem.amount) < 0)
+        return notInStock.length === 0 ? {data: {result: true}} : {
+            data: {result: false},
+            error: {message: errorMsg.E_STOCK, options: notInStock}
+        }
+
+    }
+
+    async purchaseFromStore(storeName: string, bagItems: BagItem[], userName: string, payment: IPayment): Promise<Purchase[]> {
+        const store: Store = await this.findStoreByName(storeName);
+        const purchases: Purchase[] = [];
+
+        for (const bagItem of bagItems) {
+            const items: IItem[] = await store.getItemsFromStock(bagItem.product, bagItem.amount)
+            for (const item of items) {
+                const outputItem: IItem = {catalogNumber: item.catalogNumber, id: item.id}
+                purchases.push({storeName, userName, item: outputItem, price: bagItem.finalPrice / bagItem.amount})
+            }
+        }
+        try {
+            const receipt = await ReceiptModel.create({
+                date: new Date(),
+                lastCC4: payment.lastCC4,
+                totalCharged: payment.totalCharged,
+                purchases
+            });
+            store.addReceipt(receipt);
+            const res = await StoreModel.updateOne({storeName: store.storeName}, {receipts: store.receipts})
+
+        } catch (e) {
+            logger.error(`DB ERROR ${e}`);
+            return [];
+        }
+
+        return purchases
+    }
+
+    async calculateFinalPrices(storeName: string, bagItems: BagItem[]): Promise<BagItem[]> {
+        logger.info(`calculate final prices in store ${storeName}`)
+        const store: Store = await this.findStoreByName(storeName);
+        // reset prices from last check
+        for (const bagItem of bagItems) {
+            const lastPrice: number = bagItem.finalPrice
+            bagItem.finalPrice = bagItem.product.price * bagItem.amount;
+            if (bagItem.finalPrice !== lastPrice) {
+                logger.info(`final price changed! new final price ${bagItem.finalPrice}`)
+            }
+        }
+
+        return store.calculateFinalPrices(bagItems)
+    }
+
+    async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
+        const store: Store = await this.findStoreByName(storeName, ["discountPolicy","products"] );
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const isSuccess: boolean = await store.setDiscountPolicy(discounts.discounts);
+        return isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_DB}}
+    }
+
+    async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
+        const store: Store = await this.findStoreByName(storeName,["discountPolicy","products"]);
+        const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
+        const children: Map<Discount, Operators> = discount.children;
+        const discountInPolicy: IDiscountInPolicy[] = [];
+        for (const [discount, operator] of children) {
+            const iDiscount: IDiscount = this.convertDiscountToIDiscount(discount);
+            discountInPolicy.push({discount: iDiscount, operator});
+        }
+        const policy: IDiscountPolicy = {discounts: discountInPolicy}
+
+        return policy;
+    }
+
+    async getStorePurchasePolicy(user: RegisteredUser, storeName: string): Promise<IPurchasePolicy> {
+        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
+        const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
+        const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
+        const purchasePolicyElements: IPurchasePolicyElement[] = [];
+        for (const [policy, operator] of children) {
+            const iPurchasePolicy: ISimplePurchasePolicy = this.convertPolicyToISimplePurchasePolicy(policy);
+            purchasePolicyElements.push({policy: iPurchasePolicy, operator});
+        }
+        const policy: IPurchasePolicy = {policy: purchasePolicyElements}
+
+        return policy;
+    }
+
+    async setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Promise<Res.BoolResponse> {
+        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
+        if (!store)
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        const setPolicyOk: boolean = await store.setPurchasePolicy(policy.policy);
         return setPolicyOk ? {data: {result: true}} :
             {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
     }
 
-    verifyStorePolicy(user: RegisteredUser, storeName: string, bagItems: BagItem[]): Res.BoolResponse {
+    async verifyStorePolicy(user: RegisteredUser, storeName: string, bagItems: BagItem[]): Promise<Res.BoolResponse> {
         logger.info(`request to verify purchase policy in store ${storeName}`)
-        const store: Store = this.findStoreByName(storeName);
+        const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const isPolicyOk: boolean = store.verifyStorePolicy(user, bagItems);
@@ -780,50 +967,16 @@ export class StoreManagement {
         }
     }
 
-    getStoresInfoOfManagedBy(username: string): StoreInfo[] {
-        const stores: StoreInfo[] = [];
-        this._stores.forEach(store => {
-                if (store.verifyIsStoreManager(username))
-                    stores.push(store.viewStoreInfo().data.info);
-            }
-        )
-        return stores;
-    }
-
-    getStoresInfoOfOwnedBy(username: string): StoreInfo[] {
-        const stores: StoreInfo[] = [];
-        this._stores.forEach(store => {
-                if (store.verifyIsStoreOwner(username))
-                    stores.push(store.viewStoreInfo().data.info);
-            }
-        )
-        return stores;
-    }
-
-    getManagersPermissions(storeName: string): Res.GetAllManagersPermissionsResponse {
-        const store: Store = this.findStoreByName(storeName);
+    async getItemIds(storeName: string, catalogNumber: number): Promise<Res.GetItemsIdsResponse> {
+        const store: Store = await this.findStoreByName(storeName);
         if (!store)
-            return {data: {result: false, permissions: []}, error: { message: errorMsg.E_INVALID_STORE} }
-        let permissions: ManagerNamePermission[] = [];
+            return {data: {result: false, items: []}, error: {message: errorMsg.E_INVALID_STORE}}
 
-        store.storeManagers.forEach(storeManager => {
-            permissions.push({ managerName: storeManager.name, permissions: storeManager.getPermissions() })
-        })
-
-        return { data: {result: true, permissions: permissions} }
-
-    }
-
-    getItemIds(storeName: string, catalogNumber: number): Res.GetItemsIdsResponse {
-        const store: Store = this.findStoreByName(storeName);
-        if (!store)
-            return { data: { result: false, items: [] }, error: { message: errorMsg.E_INVALID_STORE} }
-
-        const product: Product = store.getProductByCatalogNumber(catalogNumber);
+        const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
         if (!product)
-            return { data: { result: false, items: [] }, error: { message: errorMsg.E_PROD_DOES_NOT_EXIST} }
+            return {data: {result: false, items: []}, error: {message: errorMsg.E_PROD_DOES_NOT_EXIST}}
 
-        return { data: { result: true, items: store.products.get(product).reduce((acc, curr) => acc.concat(curr.id) ,[])}}
+        return {data: {result: true, items: store.products.get(product).reduce((acc, curr) => acc.concat(curr.id), [])}}
     }
 
     private convertDiscountToIDiscount(discount: Discount): IDiscount {
@@ -868,24 +1021,6 @@ export class StoreManagement {
 
     }
 
-    private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
-        const products: Product[] = [];
-        for (const productReq of productsReqs) {
-            const product: Product = new Product(productReq.name, +productReq.catalogNumber, productReq.price, productReq.category);
-            products.push(product);
-        }
-        return products;
-    }
-
-    private getItemsFromRequest(itemsReq: IItem[]): Item[] {
-        const items: Item[] = [];
-        for (const itemReq of itemsReq) {
-            const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
-            items.push(item);
-        }
-        return items;
-    }
-
     private convertPolicyToISimplePurchasePolicy(policy: PurchasePolicy): ISimplePurchasePolicy {
         const tag: string = policy.getPolicyTag();
         switch (tag) {
@@ -907,12 +1042,12 @@ export class StoreManagement {
             }
             case "system": {
                 const systemP: SystemPolicy = policy as SystemPolicy;
-                return {systemPolicy: {notForSellDays: systemP.notForSellDays}}
+                return {systemPolicy: {notForSellDays: Array.from(systemP.notForSellDays)}}
                 break;
             }
             case "user": {
                 const userP: UserPolicy = policy as UserPolicy;
-                return {userPolicy: {countries: userP.countries}}
+                return {userPolicy: {countries: Array.from(userP.countries)}}
                 break;
             }
             default: {
@@ -924,4 +1059,58 @@ export class StoreManagement {
     }
 
 
+    //region TO BE DELETED
+
+    // getStoresInfoOfManagedBy(username: string): StoreInfo[] {
+    //     const stores: StoreInfo[] = [];
+    //
+    //     this._stores.forEach(store => {
+    //             if (store.verifyIsStoreManager(username))
+    //                 stores.push(store.viewStoreInfo().data.info);
+    //         }
+    //     )
+    //     return stores;
+    // }
+    //
+    // getStoresInfoOfOwnedBy(username: string): StoreInfo[] {
+    //     const stores: StoreInfo[] = [];
+    //     this._stores.forEach(store => {
+    //             if (store.verifyIsStoreOwner(username))
+    //                 stores.push(store.viewStoreInfo().data.info);
+    //         }
+    //     )
+    //     return stores;
+    // }
+
+    // async verifyStoreManager(storeName: string, user: RegisteredUser): Promise<boolean> {
+    //     const store: Store = await this.findStoreByName(storeName);
+    //     return store ? store.verifyIsStoreManager(user.name) : false;
+    // }
+
+
+    // async removeProductsWithQuantity(user: RegisteredUser, storeName: string, productsReq: ProductWithQuantity[], isReturnItems: boolean): Promise<Res.ProductRemovalResponse> {
+    //     const store: Store = await this.findStoreByName(storeName);
+    //     return store.removeProductsWithQuantity(productsReq, isReturnItems);
+    // }
+
+    // private getProductsFromRequest(productsReqs: ProductReq[]): Product[] {
+    //     const products: Product[] = [];
+    //     for (const productReq of productsReqs) {
+    //         const product: Product = new Product(productReq.name, +productReq.catalogNumber, productReq.price, productReq.category);
+    //         products.push(product);
+    //     }
+    //     return products;
+    // }
+
+    // private getItemsFromRequest(itemsReq: IItem[]): Item[] {
+    //     const items: Item[] = [];
+    //     for (const itemReq of itemsReq) {
+    //         const item: Item = new Item(itemReq.id, itemReq.catalogNumber);
+    //         items.push(item);
+    //     }
+    //     return items;
+    // }
+
+
+    //endregion
 }

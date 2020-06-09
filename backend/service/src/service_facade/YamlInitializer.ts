@@ -4,9 +4,9 @@ const path = require("path");
 import {Req, Res} from "se-workshop-20-interfaces";
 import {loggerW} from "domain_layer/dist/src/api-int/Logger";
 import * as ServiceFacade from "./ServiceFacade";
-import {Product} from "domain_layer/dist/src/trading_system/data/Product";
-import {IItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {IItem, IProduct} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission} from "se-workshop-20-interfaces/dist/src/Enums";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 
 const logger = loggerW(__filename)
 const PATH: string = '../../states/state.yml';
@@ -15,107 +15,132 @@ let adminToken: string;
 let usersMap: Map<string,string> = new Map<string,string>(); // username -> pw
 let itemIds: Map<number,number> = new Map<number,number>(); // catalog num -> id
 
-export const initSystemFromFile = (req: Req.Request): Res.BoolResponse => {
+export const initSystemFromFile = async (req: Req.Request): Promise<Res.BoolResponse> => {
+    let isSystemOn: boolean|void = false;
     try {
         console.log(__dirname)
         const file = fs.readFileSync(path.resolve(__dirname, PATH), 'utf8')
         const ymlDoc = YAML.parse(file);
         // console.log(ymlDoc.stores);
 
-        systemInit(ymlDoc.init.username, ymlDoc.init.password);
-        registerUsers(ymlDoc.users);
-        createStores(ymlDoc.stores);
+        isSystemOn = await systemInit(ymlDoc.init.username, ymlDoc.init.password);
+        if (!isSystemOn)
+            return { data: { result: false }, error: { message: "System init failed" } }
 
-        return { data: { result: true } }
+        await registerUsers(ymlDoc.users);
+        await createStores(ymlDoc.stores);
+
+        return { data: { result: isSystemOn ? isSystemOn : false } }
     } catch (e) {
         logger.error(e)
-        return { data: { result: ServiceFacade.isSystemUp().data.result }, error: { message: e.message } }
+
+        return { data: { result: isSystemOn ? isSystemOn : false }, error: { message: e.message } }
     }
 }
 
-const LogoutAndThrowError = (errorMsg: string, token: string): void => {
-    logout(token);
+const LogoutAndThrowError = async (errorMsg: string, token: string): Promise<void> => {
+    await logout(token);
     throw new Error(errorMsg);
-
 }
 
-const getSession = (): string => {
-    return ServiceFacade.startNewSession();
+const getSession = async (): Promise<string> => {
+    const res: string = await ServiceFacade.startNewSession();
+    return res;
 }
 
-const systemInit = (username: string, password: string): void => {
-    adminToken = getSession();
+const systemInit = async (username: string, password: string): Promise<boolean|void> => {
+    adminToken = await getSession();
     const initReq: Req.InitReq = {  body: { firstAdminName: username, firstAdminPassword: password } , token: adminToken};
-    if (!ServiceFacade.systemInit(initReq).data.result)
-        LogoutAndThrowError(`System init failed. {username: ${username}, password: ${password}`, adminToken)
+    const res: BoolResponse = await ServiceFacade.systemInit(initReq)
+    if (!res.data.result)
+        return LogoutAndThrowError(`System init failed. {username: ${username}, password: ${password}`, adminToken)
     usersMap.set(username, password);
+    return true;
 }
 
-const registerUser = (username: string, password: string, token, isLoggedInNow: boolean): void => {
+const registerUser = async (username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
     if (isLoggedInNow) {
-        logout(token);
+        await logout(token);
     }
     const regReq: Req.RegisterRequest = {body: {username, password}, token};
-    if (!ServiceFacade.registerUser(regReq).data.result)
-        LogoutAndThrowError(`Registration failed. {username: ${username}, password: ${password}`, token)
+    const res = await ServiceFacade.registerUser(regReq)
+    if (!res.data.result)
+        return LogoutAndThrowError(`Registration failed. {username: ${username}, password: ${password}`, token)
     usersMap.set(username, password);
 }
 
-const registerUsers = (users: any[]): void => {
-    users.forEach(user => {
-        registerUser(user.username, user.password, getSession(), false)
+const registerUsers = async (users: any[]): Promise<void> => {
+    for (const user of users) {
+        await registerUser(user.username, user.password, await getSession(), false)
         usersMap.set(user.username, user.password);
-    })
+    }
 }
 
-const loginUser = (username: string, password: string, token, isLoggedInNow: boolean): void => {
+const loginUser = async (username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
     if (isLoggedInNow) {
-        logout(token);
+        await logout(token);
     }
     const loginReq: Req.LoginRequest = {body: {username, password}, token};
-    if (!ServiceFacade.loginUser(loginReq).data.result)
-        LogoutAndThrowError(`Login failed. {username: ${username}, password: ${password}}`, token)
+    const res: Res.BoolResponse = await ServiceFacade.loginUser(loginReq);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Login failed. {username: ${username}, password: ${password}}`, token)
 }
 
-const logout = (token: string): void => {
+const logout = async (token: string): Promise<void> => {
     const logoutReq: Req.LogoutRequest = {body: {}, token};
-    if (!ServiceFacade.logoutUser(logoutReq).data.result)
-        LogoutAndThrowError(`Logout failed.`, token)
+    const res: Res.BoolResponse = await ServiceFacade.logoutUser(logoutReq);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Logout failed.`, token)
 }
 
-const createStore = (storeName: string, token: string): void => {
+const createStore = async (storeName: string, token: string): Promise<void> => {
     const req: Req.OpenStoreRequest = {body: {storeName, description: "store desc"}, token};
-    if (!ServiceFacade.createStore(req).data.result)
-        LogoutAndThrowError(`Create store failed. {storeName: ${storeName}}`, token)
+    const res: Res.BoolResponse = await ServiceFacade.createStore(req);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Create store failed. {storeName: ${storeName}}`, token)
 }
 
-const addNewProducts = (storeName: string, products: Product[], token: string): void => {
-    if (!ServiceFacade.addNewProducts({body: {storeName, products}, token}).data.result)
-        LogoutAndThrowError(`Add new products failed. {storeName: ${storeName}}`, token)
+const addNewProducts = async (storeName: string, products: IProduct[], token: string): Promise<void> => {
+    const res: Res.BoolResponse = await ServiceFacade.addNewProducts({body: {storeName, products}, token})
+    if (!res.data.result)
+        return LogoutAndThrowError(`Add new products failed. {storeName: ${storeName}}`, token)
     products.forEach(product => {
         if (!itemIds.has(product.catalogNumber))
             itemIds.set(product.catalogNumber, 0)
     })
 }
 
-const addNewItems = (storeName: string, items: IItem[], token: string): void => {
-    if (!ServiceFacade.addItems({body: {storeName, items}, token}).data.result)
-        LogoutAndThrowError(`Add new items failed. {storeName: ${storeName}}`, token)
+const addNewItems = async (storeName: string, items: IItem[], token: string): Promise<void> => {
+    const res: Res.BoolResponse = await ServiceFacade.addItems({body: {storeName, items}, token});
+    if (!res.data.result)
+        return LogoutAndThrowError(`Add new items failed. {storeName: ${storeName}}`, token)
 }
 
-const assignStoreManager = (storeName: string, assigner: string, assignee: string, token: string): void => {
+const assignStoreManager = async (storeName: string, assigner: string, assignee: string, token: string): Promise<void> => {
+    let assignStoreManagerRequest: Req.AssignStoreManagerRequest = {
+        body: {
+            storeName,
+            usernameToAssign: assignee
+        }, token
+    };
+    const res: Res.BoolResponse = await ServiceFacade.assignStoreManager(assignStoreManagerRequest);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Assign store manager failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
+}
+
+const assignStoreOwner = async (storeName: string, assigner: string, assignee: string, token: string): Promise<void> => {
     let assignStoreManagerRequest: Req.AssignStoreOwnerRequest = {
         body: {
             storeName,
             usernameToAssign: assignee
         }, token
     };
-    const res = ServiceFacade.assignStoreManager(assignStoreManagerRequest);
+    const res: Res.BoolResponse = await ServiceFacade.assignStoreOwner(assignStoreManagerRequest);
     if (!res.data.result)
-        LogoutAndThrowError(`Assign store manager failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
+        return LogoutAndThrowError(`Assign store owner failed. {storeName: ${storeName}, assigner: ${assigner}, assignee: ${assignee}}. Error: '${res.error.message}'`, token)
 }
 
-const addPermissions = (manager: string, storeName: string, permissions: ManagementPermission[], token: string): void => {
+const addPermissions = async (manager: string, storeName: string, permissions: ManagementPermission[], token: string): Promise<void> => {
     const changeManagerPermissionReq: Req.ChangeManagerPermissionRequest = {
         body: {
             managerToChange: manager,
@@ -123,18 +148,20 @@ const addPermissions = (manager: string, storeName: string, permissions: Managem
             permissions: permissions
         }, token
     };
-    if (!ServiceFacade.addManagerPermissions(changeManagerPermissionReq))
-        LogoutAndThrowError(`Add manager permissions failed. {manager to add permissions: ${manager}, store name ${storeName}}`, token)
+    const res: Res.BoolResponse = await ServiceFacade.addManagerPermissions(changeManagerPermissionReq);
+    if (!res.data.result)
+        return LogoutAndThrowError(`Add manager permissions failed. {manager to add permissions: ${manager}, store name ${storeName}}`, token)
 }
 
-const createStores = (stores: any[]): void => {
-    stores.forEach(store => {
-        const token: string = getSession();
-        loginUser(store.owner, usersMap.get(store.owner), token, false);
-        createStore(store.storeName, token);
+const createStores = async (stores: any[]): Promise<void> => {
+    for (const store of stores) {
+        const token: string = await getSession();
+        await loginUser(store.owner, usersMap.get(store.owner), token, false);
+        await createStore(store.storeName, token);
 
-        const products: Product[] = store.items.reduce((acc, curr) => acc.concat([new Product(curr.name, curr.catalogNumber, curr.price, curr.category)]), [])
-        addNewProducts(store.storeName, products, token);
+        const products: IProduct[] = store.items.reduce((acc, curr) =>
+            acc.concat([{name: curr.name, catalogNumber: curr.catalogNumber, price: curr.price, category: curr.category}]), [])
+        await addNewProducts(store.storeName, products, token);
 
         const items: IItem[] = store.items.reduce((acc: IItem[], curr) => {
             let currItems: IItem[] = [];
@@ -144,15 +171,21 @@ const createStores = (stores: any[]): void => {
             }
             return acc.concat(currItems);
         }, []);
-        addNewItems(store.storeName, items, token);
-        logout(token);
+        await addNewItems(store.storeName, items, token);
+        await logout(token);
 
-        store.managers.forEach(currAssign => {
-            loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
-            assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
+        for (const currAssign of store.managers) {
+            await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
+            await assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
             if (currAssign.permissions && currAssign.permissions.length > 0)
-                addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
-            logout(token);
-        })
-    })
+                await addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
+            await logout(token);
+        }
+
+        for (const currAssign of store.owners) {
+            await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
+            await assignStoreOwner(store.storeName, currAssign.assigner, currAssign.assignee, token);
+            await logout(token);
+        }
+    }
 }

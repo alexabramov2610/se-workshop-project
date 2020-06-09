@@ -37,7 +37,7 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}====================== CLEANING CLIENT =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $client
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+#sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  communication
 echo -e "${BLUE}============================================================${NC}"
@@ -141,7 +141,7 @@ echo -e "${BLUE}===========================================================${NC}
 echo -e "${BLUE}=============== INSTALLING ACCEPTANCE TESTS ===============${NC}"
 echo -e "${BLUE}===========================================================${NC}"
 cd $AT
-sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo npm i && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 #################################################################################
@@ -223,7 +223,7 @@ echo -e "${BLUE}================= RUNNING DOMAIN UNIT TESTS ================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
 sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"
@@ -231,7 +231,7 @@ echo -e "${BLUE}================ RUNNING INTEGRATION TESTS =================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $service
 sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  AT
 echo -e "${BLUE}============================================================${NC}"
@@ -239,7 +239,7 @@ echo -e "${BLUE}================= RUNNING ACCEPTANCE TESTS =================${NC
 echo -e "${BLUE}============================================================${NC}"
 cd $AT
 #sudo jest --clearCache
-#sudo TEST_MODE=1 SILENT=1 jest --maxWorkers=1 && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 
 

@@ -67,7 +67,7 @@ export class PaymentSystem {
             }
             isPaid = this.validateBalance(creditCard, price);
             if (!isPaid) {
-                logger.error("payment failed - Not enough money")
+                logger.error("payment failed - ough money")
                 return isPaid
             }
         }
@@ -82,7 +82,7 @@ export class PaymentSystem {
         } else {
             const today: Date = new Date();
             let expOk: boolean = creditCard.expYear.length === 2 && ((parseInt('20' + creditCard.expYear, 10) > today.getFullYear() ||
-                (parseInt(creditCard.expYear, 10) === today.getFullYear() && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1)))
+                (parseInt(creditCard.expYear, 10) === today.getFullYear() % 100 && parseInt(creditCard.expMonth, 10) >= today.getMonth() + 1)))
             expOk = expOk && creditCard.holderName && creditCard.holderName.length > 0 &&
                 creditCard.number && creditCard.number.length > 0 &&
                 creditCard.cvv && creditCard.cvv.length > 0;
@@ -91,7 +91,7 @@ export class PaymentSystem {
     }
 
     private validateBalance(creditCard: CreditCard, amountToCharge: number) {
-        logger.info(`validating balance on credit card ending on: ${creditCard.number.substring(creditCard.number.length-4)}`);
+        logger.info(`validating balance on credit card ending on: ${creditCard.number.substring(creditCard.number.length-4)} want to charge ${amountToCharge}`);
         if (this._paymentSys) {
             return this._paymentSys.validateBalance();
         } else {

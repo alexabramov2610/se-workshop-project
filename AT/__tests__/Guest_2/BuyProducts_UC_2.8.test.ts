@@ -16,7 +16,7 @@ import * as utils from "../../utils"
 
 describe("Guest buy items, UC: 2.8", () => {
     let _driver = new Driver();
-    let _serviceBridge: Bridge;
+    let _serviceBridge: Partial<Bridge>;
     let _testStore1: Store;
     let _testStore2: Store;
 
@@ -39,15 +39,17 @@ describe("Guest buy items, UC: 2.8", () => {
     let _testSimpleDiscount2: IDiscount;
     let _testCondDiscount1: IDiscount;
     let _testCondDiscount2: IDiscount;
+    afterAll(()=>{
+        _driver.dropDB();
+    })
+    beforeEach(async() => {
 
-    beforeEach(() => {
-        _serviceBridge = _driver
-            .resetState()
-            .startSession()
-            .initWithDefaults()
-            .registerWithDefaults()
-            .loginWithDefaults()
-            .getBridge();
+        _driver.dropDB();
+        await _driver.startSession()
+        await _driver.initWithDefaults()
+        await _driver.registerWithDefaults()
+        await _driver.loginWithDefaults()
+        _serviceBridge = await _driver.getBridge();
 
         _testMilk = new ProductBuilder().withName("testProduct1").withCatalogNumber(123).withPrice(5).getProduct();
         _testEggs = new ProductBuilder().withName("testProduct2").withCatalogNumber(456).withPrice(30).getProduct();
@@ -70,26 +72,27 @@ describe("Guest buy items, UC: 2.8", () => {
         _testStore1 = {name: "testStore1Name"};
         _testStore2 = {name: "testStore2Name"};
 
-        _serviceBridge.createStore(_testStore1);
-        _serviceBridge.createStore(_testStore2);
+      await _serviceBridge.createStore(_testStore1);
+      await _serviceBridge.createStore(_testStore2);
 
-        _serviceBridge.addProductsToStore(_testStore1, [_testMilk, _testBanana, _testCola, _testEggs]);
-        _serviceBridge.addProductsToStore(_testStore2, [_testMilk, _testEggs]);
+      await  _serviceBridge.addProductsToStore(_testStore1, [_testMilk, _testBanana, _testCola, _testEggs]);
+      await    _serviceBridge.addProductsToStore(_testStore2, [_testMilk, _testEggs]);
 
-        _serviceBridge.addItemsToStore(_testStore1, [_testMilk1, _testMilk2, _testCola1, _testCola2, _testCola3, _testEggs1, _testBanana1]);
-        _serviceBridge.addItemsToStore(_testStore2, [_testMilk2, _testEggs1]);
+      await  _serviceBridge.addItemsToStore(_testStore1, [_testMilk1, _testMilk2, _testCola1, _testCola2, _testCola3, _testEggs1, _testBanana1]);
+      await   _serviceBridge.addItemsToStore(_testStore2, [_testMilk2, _testEggs1]);
 
-        _serviceBridge.logout();
+      await  _serviceBridge.logout();
 
 
     });
 
     afterAll(() => {
         utils.terminateSocket();
+        _driver.dropDB();
     });
 
-    test("Non empty cart, items in stock, no discount", () => {
-        const {data, error} = _driver.given.store(_testStore1).products([_testMilk]).makeABuy();
+    test("Non empty cart, items in stock, no discount", async() => {
+        const {data, error} = await _driver.given.store(_testStore1).products([_testMilk]).makeABuy();
         expect(data).toBeDefined();
         expect(error).toBeUndefined();
 
@@ -113,31 +116,32 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(totalCharged).toEqual(_testMilk.price);
     });
 
-    test(" empty cart, no discount", () => {
+    test(" empty cart, no discount", async() => {
         const req = {token: "123", body: {payment: _driver.getPaymentInfo().payment}};
-        const {error} = _serviceBridge.purchase(req);
+        const {error} = await _serviceBridge.purchase(req);
         expect(error).toBeDefined();
     });
 
 
-    test('Non empty cart, items not stock', () => {
-        const res = _driver.given.store(_testStore2).products([_testEggs]).makeABuy();
+    test('Non empty cart, items not stock', async () => {
+        const res = await _driver.given.store(_testStore2).products([_testEggs]).makeABuy();
         expect(res.data.result).toBeTruthy()
         expect(res.data.receipt).toBeDefined()
         expect(res.error).toBeUndefined()
-        const res2 = _driver.given.store(_testStore2).products([_testEggs]).makeABuy();
+        const res2 = await _driver.given.store(_testStore2).products([_testEggs]).makeABuy();
 
         expect(res2.error.message).toEqual('The cart is empty')
         expect(res2.data.result).toBeFalsy()
         expect(res2.data.receipt).toBeUndefined()
 
     })
-    test('Non empty cart, items in stock,card expaired,check stock ', () => {
+    test('Non empty cart, items in stock,card expaired,check stock ', async() => {
 
 
-        const ItemStockBefore = _serviceBridge.viewProduct(_testStore1, _testMilk).data.info.quantity
-
-        _serviceBridge.addToCart(_testStore1, _testMilk, 1);
+        const {data} =await _serviceBridge.viewProduct(_testStore1, _testMilk);
+        const ItemStockBefore = data.info.quantity
+      const res1=  await _serviceBridge.addToCart(_testStore1, _testMilk, 1);
+        const res2 = res1
         const req = {
             body: {
                 payment: {
@@ -155,25 +159,26 @@ describe("Guest buy items, UC: 2.8", () => {
             }
         };
 
-        const res = _serviceBridge.purchase(req);
+        const res = await _serviceBridge.purchase(req);
         expect(res.data.result).toBeFalsy()
         expect(res.error.message).toEqual('Payment failure.')
 
-        const ItemStockAfter = _serviceBridge.viewProduct(_testStore1, _testMilk).data.info.quantity
+        const response  = await _serviceBridge.viewProduct(_testStore1, _testMilk)
+        const ItemStockAfter = response.data.info.quantity
         expect(ItemStockBefore).toEqual(ItemStockAfter)
 
     })
 
-    test('Non empty cart, items in stock,no money', () => {
-        const {data, error} = _driver.given.store(_testStore1).products([_testGold]).makeABuy();
+    test('Non empty cart, items in stock,no money', async() => {
+        const {data, error} =await _driver.given.store(_testStore1).products([_testGold]).makeABuy();
         expect(error).toBeDefined
         expect(data.result).toBeFalsy()
     })
 
-    test('logged in user, Non empty cart, items in stock', () => {
+    test('logged in user, Non empty cart, items in stock', async () => {
 
         _driver.loginWithDefaults()
-        const res = _driver.given.store(_testStore1).products([_testMilk]).makeABuy();
+        const res =await _driver.given.store(_testStore1).products([_testMilk]).makeABuy();
         expect(res.data.result).toBeTruthy()
         expect(res.error).toBeUndefined();
         expect(res.data.receipt.purchases.length).toEqual(1)

@@ -4,42 +4,43 @@ import {Credentials} from "../../src/test_env/types";
 import * as utils from "../../utils";
 
 describe("Watch Purchases History, UC: 3.7", () => {
-    let _serviceBridge: Bridge;
+    let _serviceBridge: Partial<Bridge>;
     let _driver: Driver;
     let _item: Item;
     let _prodct: Product;
     let _store: Store;
     let _shopoholic: Credentials;
-    beforeEach(() => {
+    beforeEach(async () => {
         _driver = new Driver()
-            .resetState()
-            .startSession()
-            .initWithDefaults()
-            .registerWithDefaults()
-            .loginWithDefaults();
-        _store = {name: "stor-e-tell"};
+        _driver.dropDB();
+        await _driver.startSession()
+        await _driver.initWithDefaults()
+        await _driver.registerWithDefaults()
+        await _driver.loginWithDefaults();
         _serviceBridge = _driver.getBridge();
+        _store = {name: "stor-e-tell"};
+
         _prodct = new ProductBuilder().getProduct();
         _shopoholic = {userName: "shopoholic", password: "ibuyALL123"};
         _item = {id: 123, catalogNumber: _prodct.catalogNumber};
-        _serviceBridge.createStore(_store);
-        _serviceBridge.addProductsToStore(_store, [_prodct]);
-        _serviceBridge.addItemsToStore(_store, [_item]);
-        _serviceBridge.logout();
-        _serviceBridge.register(_shopoholic);
+       await _serviceBridge.createStore(_store);
+       await _serviceBridge.addProductsToStore(_store, [_prodct]);
+       await _serviceBridge.addItemsToStore(_store, [_item]);
+       await _serviceBridge.logout();
+       await _serviceBridge.register(_shopoholic);
     });
 
     afterAll(() => {
-        utils.terminateSocket();
+        _driver.dropDB();
     });
 
-    test("logged in, with history", () => {
-        _serviceBridge.login(_shopoholic);
-        _driver.given.store(_store).products([_prodct]).makeABuy();
-        const res = _serviceBridge.viewUserPurchasesHistory({
+    test("logged in, with history",async () => {
+        await _serviceBridge.login(_shopoholic);
+         _driver.given.store(_store).products([_prodct]);
+        await _driver.makeABuy()
+        const res = await _serviceBridge.viewUserPurchasesHistory({
             body: {userName: _shopoholic.userName},
         });
-
 
         const itemCatalogNumber: any[] = [].concat
             .apply(
@@ -51,9 +52,9 @@ describe("Watch Purchases History, UC: 3.7", () => {
         expect(itemCatalogNumber[0]).toBe(_prodct.catalogNumber);
     });
 
-    test("logged in, no history", () => {
-        _serviceBridge.login(_shopoholic);
-        const res = _serviceBridge.viewUserPurchasesHistory({
+    test("logged in, no history",async () => {
+        await _serviceBridge.login(_shopoholic);
+        const res =await _serviceBridge.viewUserPurchasesHistory({
             body: {userName: _shopoholic.userName},
         });
         const itemCatalogNumber: any[] = [].concat
@@ -66,20 +67,20 @@ describe("Watch Purchases History, UC: 3.7", () => {
         expect(itemCatalogNumber[0]).toBeUndefined();
     });
 
-    test("logged out, with history", () => {
-        _serviceBridge.login(_shopoholic);
-        _driver.given.store(_store).products([_prodct]).makeABuy();
-        _serviceBridge.logout();
-        const {error, data} = _serviceBridge.viewUserPurchasesHistory({
+    test("logged out, with history",async () => {
+       await _serviceBridge.login(_shopoholic);
+      await  _driver.given.store(_store).products([_prodct]).makeABuy();
+        await  _serviceBridge.logout();
+        const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
             body: {userName: _shopoholic.userName},
         });
 
         expect(error.message).toBeDefined();
     });
 
-    test("logged out, no history", () => {
+    test("logged out, no history",async () => {
         _serviceBridge.logout();
-        const {error, data} = _serviceBridge.viewUserPurchasesHistory({
+        const {error, data} = await _serviceBridge.viewUserPurchasesHistory({
             body: {userName: _shopoholic.userName},
         });
 

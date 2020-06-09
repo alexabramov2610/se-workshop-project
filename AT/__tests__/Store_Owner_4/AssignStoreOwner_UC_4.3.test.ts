@@ -4,18 +4,18 @@ import * as utils from "../../utils"
 
 
 describe("Add Remove Edit Products, UC: 3.2", () => {
-  let _serviceBridge: Bridge;
+  let _serviceBridge:Partial<Bridge>;
   let _storeInformation: Store;
   let _driver: Driver;
   let _newOwner: User;
   let _newOwnerCreds: Credentials;
-  beforeEach(() => {
-    _driver = new Driver()
-      .resetState()
-      .startSession()
-      .initWithDefaults()
-      .registerWithDefaults()
-      .loginWithDefaults();
+  beforeEach(async() => {
+    _driver = new Driver();
+
+    await _driver.startSession()
+      await _driver.initWithDefaults()
+      await _driver.registerWithDefaults()
+      await _driver.loginWithDefaults();
     _storeInformation = { name: "this-is-the-coolest-store" };
     _serviceBridge = _driver.getBridge();
     _newOwnerCreds = {
@@ -23,52 +23,54 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
       password: "owner123",
     };
     _newOwner = { username: _newOwnerCreds.userName };
-    _serviceBridge.logout();
-    _serviceBridge.register(_newOwnerCreds);
+    await _serviceBridge.logout();
+    await _serviceBridge.register(_newOwnerCreds);
   });
 
   afterAll(() => {
+      _driver.dropDB()
     utils.terminateSocket();
  });
-  test("Add Store Owner - Happy Path: valid store ,not already assigned", () => {
-    _serviceBridge.login(_driver.getLoginDefaults());
-    _serviceBridge.createStore(_storeInformation);
-    const { data } = _serviceBridge.assignStoreOwner(
+  test("Add Store Owner - Happy Path: valid store ,not already assigned", async() => {
+    await _driver.loginWithDefaults();
+    await _serviceBridge.createStore(_storeInformation);
+    const { data } = await _serviceBridge.assignStoreOwner(
       _storeInformation,
       _newOwner
     );
-    const { storeOwnersNames } = _serviceBridge.viewStore(
+    const res = await _serviceBridge.viewStore(
       _storeInformation
-    ).data;
+    );
+      const { storeOwnersNames } = res.data;
     expect(storeOwnersNames).toContain(_newOwner.username);
   });
 
-  test("Add Owner - Sad Path: store owner not logged in", () => {
-    _serviceBridge.logout();
-    const { error } = _serviceBridge.assignStoreOwner(
+  test("Add Owner - Sad Path: store owner not logged in", async() => {
+   await _serviceBridge.logout();
+    const { error } = await _serviceBridge.assignStoreOwner(
       _storeInformation,
       _newOwner
     );
     expect(error).toBeDefined();
   });
 
-  test("Add Owner - Sad Path: store owner logged in, User with ID is already assigned as store owner by", () => {
+  test("Add Owner - Sad Path: store owner logged in, User with ID is already assigned as store owner by", async() => {
     const newOwner2: Credentials = {
       userName: "newOwner2",
       password: "newPass2",
     };
-    _serviceBridge.register(newOwner2);
+   await _serviceBridge.register(newOwner2);
 
-    _serviceBridge.login(_driver.getLoginDefaults());
-    _serviceBridge.createStore(_storeInformation);
-    _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
-    _serviceBridge.assignStoreOwner(_storeInformation, {
+    await _serviceBridge.login(_driver.getLoginDefaults());
+      await _serviceBridge.createStore(_storeInformation);
+      await _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
+      await _serviceBridge.assignStoreOwner(_storeInformation, {
       username: newOwner2.userName,
     });
-    _serviceBridge.logout();
+      await _serviceBridge.logout();
 
-    _serviceBridge.login(_newOwnerCreds);
-    const { error } = _serviceBridge.assignStoreOwner(_storeInformation, {
+      await _serviceBridge.login(_newOwnerCreds);
+    const { error } = await _serviceBridge.assignStoreOwner(_storeInformation, {
       username: newOwner2.userName,
     });
     expect(error).toBeDefined();

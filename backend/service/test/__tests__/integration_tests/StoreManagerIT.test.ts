@@ -8,18 +8,23 @@ describe("Store Manager Integration Tests", () => {
 
     let token: string;
 
-    beforeAll(() => {
-        utils.systemInit();
+    beforeAll(async (done) => {
+        await utils.clearDB();
+        await utils.systemInit();
+        done();
     });
 
-    beforeEach(() => {
-        utils.systemReset();
-        token = utils.initSessionRegisterLogin(storeManagerName, storeManagerPassword);
+    beforeEach(async (done) => {
+        await utils.systemReset();
+        await utils.systemInit();
+        token = await utils.initSessionRegisterLogin(storeManagerName, storeManagerPassword);
         expect(token).toBeDefined();
+        done();
     });
 
-    afterAll(() => {
-        utils.terminateSocket();
+    afterAll((done) => {
+        utils.safeShutdown();
+        done();
     });
 
 

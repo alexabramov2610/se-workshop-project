@@ -1,19 +1,8 @@
-import {v4 as uuid} from 'uuid';
 import {BagItem} from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Operators} from "se-workshop-20-interfaces/dist/src/Enums";
+import {Operators, WeekDays} from "se-workshop-20-interfaces/dist/src/Enums";
 import {RegisteredUser} from "../../user/internal_api";
 
 export abstract class PurchasePolicy {
-
-    constructor() {
-        this._id = uuid();
-    }
-
-    private _id: string;
-
-    get id(): string {
-        return this._id;
-    }
 
     abstract isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean;
 
@@ -24,7 +13,21 @@ export abstract class PurchasePolicy {
     public abstract isComposite(): boolean;
 
     public abstract getPolicyTag():string;
-
+    public getNotForSellDays() : WeekDays[]{
+        return undefined;
+    }
+    public getCountries() : string[]{
+        return undefined;
+    }
+    public getCatalogNumber() : number{
+        return undefined;
+    }
+    public getMinAmount() : number{
+        return undefined;
+    }
+    public getMaxAmount() : number{
+        return undefined;
+    }
 
 
 

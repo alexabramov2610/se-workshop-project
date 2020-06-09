@@ -10,8 +10,8 @@ export class SecuritySystem {
         this._securitySys = bcrypt;
     }
 
-    encryptPassword(password: string) {
-        const hash = bcrypt.hashSync(password, 10);
+    async encryptPassword(password: string) {
+        const hash = await bcrypt.hash(password,1);
         return hash;
     }
 

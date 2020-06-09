@@ -5,106 +5,128 @@ import * as DummyTypes from "./mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
-
+import mongoose from "mongoose";
+import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
 };
 
-export const Adapter: Partial<Env.Bridge> = {
+
+
+
+export const Adapter: any = {
   setToken(sessionToken: string): void {
     token = sessionToken;
   },
 
-  startSession() {
-    const token: string = ServiceFacade.startNewSession();
+  async startSession(): Promise<DummyTypes.ISessionResponse> {
+    const token: string = await ServiceFacade.startNewSession();
+    const sss = token;
     return { data: { token: token } };
   },
 
-  init(credentials: Types.Credentials): DummyTypes.IResponse {
+  async init(credentials: Types.Credentials): Promise<DummyTypes.IResponse> {
     const initReq = {
       firstAdminName: credentials.userName,
       firstAdminPassword: credentials.password,
     };
-    const { data, error } = ServiceFacade.systemInit(wrapWithToken(initReq));
+    const { data, error } = await ServiceFacade.systemInit(wrapWithToken(initReq));
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  reset() {
-    ServiceFacade.reset();
-  },
+   async reset() {
+    await ServiceFacade.reset();
+   },
 
-  register(credentials: Types.Credentials): DummyTypes.IResponse {
+  async register(credentials: Types.Credentials): Promise<DummyTypes.IResponse> {
     const reqCred = {
       username: credentials.userName,
       password: credentials.password,
     };
-    const response = ServiceFacade.registerUser(wrapWithToken(reqCred));
+    const response = await ServiceFacade.registerUser(wrapWithToken(reqCred));
     return response.error
       ? { data: undefined, error: response.error.message }
       : { data: response.data };
   },
 
-  login(
+  async login(
     credentials: Types.Credentials,
     asAdmin: boolean = false
-  ): DummyTypes.IResponse {
+  ): Promise<DummyTypes.IResponse> {
     const reqCred = {
       username: credentials.userName,
       password: credentials.password,
       asAdmin
     };
-    const { data, error } = ServiceFacade.loginUser(wrapWithToken(reqCred));
+    const { data, error } = await ServiceFacade.loginUser(wrapWithToken(reqCred));
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  logout(): DummyTypes.IResponse {
-    const { data, error } = ServiceFacade.logoutUser(wrapWithToken({}));
+  async logout(): Promise<DummyTypes.IResponse> {
+    const { data, error } = await ServiceFacade.logoutUser(wrapWithToken({}));
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  createStore(store: Types.Store): DummyTypes.IStoreResponse {
+  async createStore(store: Types.Store): Promise<DummyTypes.IStoreResponse> {
     const req = wrapWithToken({ storeName: store.name,description:'blabla' });
-    const { error, data } = ServiceFacade.createStore(req);
+    const { error, data } = await ServiceFacade.createStore(req);
     if (error || !data.result) return { data: undefined, error: error.message };
     else if (data.result) return { data: { name: store.name } };
   },
 
-  addItemsToStore(store: Store, items: Item[]): DummyTypes.IResponse {
+  async  addItemsToStore(store: Store, items: Item[]): Promise<DummyTypes.IResponse> {
     const req = { storeName: store.name, items };
-    const { data, error } = ServiceFacade.addItems(wrapWithToken(req));
+    const { data, error } = await ServiceFacade.addItems(wrapWithToken(req));
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
+  async addProductsToStore(store: Store, products: Product[]): Promise<DummyTypes.IResponse> {
     const req = { storeName: store.name, products: products };
-    const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));
+    const { data, error } = await ServiceFacade.addNewProducts(wrapWithToken(req));
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  removeProductsFromStore(store: Store, products: Product[]) {
+//   interface SaveToCartRequest extends Request {
+// //   body: {
+// //     storeName: string;
+// //     catalogNumber: number;
+// //     amount: number;
+// //   };
+// // }
+
+
+  async addToCart(
+      store: Store,
+      product: Product,
+      quantity: number
+  ): Promise<DummyTypes.IResponse> {
+return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
+
+  },
+  async removeProductsFromStore(store: Store, products: Product[]) {
     const catalogNumbers = products.map((p) => {
       return { catalogNumber: p.catalogNumber };
     });
     const removeReq = { storeName: store.name, products: catalogNumbers };
-    const { data, error } = ServiceFacade.removeProducts(
+    const { data, error } = await ServiceFacade.removeProducts(
       wrapWithToken(removeReq)
     );
     return error ? { data, error: error.message } : { data, error: undefined };
   },
 
-  viewStore(store: Store) {
-    const { data, error } = ServiceFacade.viewStoreInfo(
+  async viewStore(store: Store) {
+    const { data, error } = await ServiceFacade.viewStoreInfo(
       wrapWithToken({ storeName: store.name })
     );
     return error
@@ -112,21 +134,22 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data.info, error: undefined };
   },
 
-  assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
-    const { data, error } = ServiceFacade.assignStoreOwner(
+ async assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse> {
+    const { data, error } = await ServiceFacade.assignStoreOwner(
       wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
     );
+    const x = data || error;
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
   },
 
-  assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
+  async assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse> {
     const req = {
       storeName: store.name,
       usernameToAssign: credentials.userName,
     };
-    const { data, error } = ServiceFacade.assignStoreManager(
+    const { data, error } = await ServiceFacade.assignStoreManager(
       wrapWithToken(req)
     );
     return error
@@ -134,17 +157,17 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  grantPermissions(
+ async grantPermissions(
     credentials: Credentials,
     store: Store,
     permissions: PERMISSION[]
-  ): DummyTypes.IResponse {
+  ): Promise<DummyTypes.IResponse> {
     const req = {
       managerToChange: credentials.userName,
       storeName: store.name,
       permissions: permissions,
     };
-    const { data, error } = ServiceFacade.addManagerPermissions(
+    const { data, error } = await ServiceFacade.addManagerPermissions(
       wrapWithToken(req)
     );
     return error
@@ -152,58 +175,56 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  changeProductName(
+  async changeProductName(
     req: Partial<Req.ChangeProductNameRequest>
-  ): Res.BoolResponse {
-    return ServiceFacade.changeProductName(wrapWithToken(req.body));
+  ): Promise<Res.BoolResponse> {
+    return await ServiceFacade.changeProductName(wrapWithToken(req.body));
   },
 
-  changeProductPrice(
+  async changeProductPrice(
     req: Partial<Req.ChangeProductPriceRequest>
-  ): Res.BoolResponse {
-    return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  ): Promise<Res.BoolResponse> {
+    return  await ServiceFacade.changeProductPrice(wrapWithToken(req.body));
   },
 
-  addToCart(store: Store, product: Product, quantity: number) {
-    const req = {
-      storeName: store.name,
-      catalogNumber: product.catalogNumber,
-      amount: quantity,
-    };
-    const { data, error } = ServiceFacade.saveProductToCart(wrapWithToken(req));
-    return error
-      ? { data: undefined, error: error.message }
-      : { data: data, error: undefined };
-  },
+ // async saveProductToCart(req : SaveToCartRequest) {
+ //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
+ //    return error
+ //      ? { data: undefined, error: error.message }
+ //      : { data: data, error: undefined };
+ //  },
 
-  removeStoreManager(
+  async removeStoreManager(
     req: Partial<Req.RemoveStoreManagerRequest>
-  ): Res.BoolResponse {
-    return ServiceFacade.removeStoreManager(wrapWithToken(req.body));
+  ): Promise<Res.BoolResponse> {
+      const yx = 2;
+      const x = await ServiceFacade.removeStoreManager(wrapWithToken(req.body));
+      const y= req;
+      return x;
   },
 
-  removeManagerPermissions(
-    req: Req.ChangeManagerPermissionRequest
-  ): Res.BoolResponse {
-    return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
-  },
+  // removeManagerPermissions(
+  //   req: Req.ChangeManagerPermissionRequest
+  // ): Res.BoolResponse {
+  //   return ServiceFacade.removeManagerPermissions(wrapWithToken(req.body));
+  // },
 
-  viewStorePurchasesHistory(
+ async viewStorePurchasesHistory(
     req: Req.ViewShopPurchasesHistoryRequest
-  ): Res.ViewShopPurchasesHistoryResponse {
-    return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
+  ): Promise<Res.ViewShopPurchasesHistoryResponse> {
+    return await ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
   },
 
-  viewUserPurchasesHistory(
+  async viewUserPurchasesHistory(
     req: Req.ViewRUserPurchasesHistoryReq
-  ): Res.ViewRUserPurchasesHistoryRes {
-    return ServiceFacade.viewRegisteredUserPurchasesHistory(
+  ): Promise<Res.ViewRUserPurchasesHistoryRes> {
+    return await ServiceFacade.viewRegisteredUserPurchasesHistory(
       wrapWithToken(req.body)
     );
   },
 
-  viewProduct(store: Store, product: Product): Res.ProductInfoResponse {
-    const { data, error } = ServiceFacade.viewProductInfo(
+  async viewProduct(store: Store, product: Product): Promise<Res.ProductInfoResponse> {
+    const { data, error } = await ServiceFacade.viewProductInfo(
       wrapWithToken({
         storeName: store.name,
         catalogNumber: product.catalogNumber,
@@ -214,17 +235,17 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  purchase(req: Req.PurchaseRequest): Res.PurchaseResponse {
-    return ServiceFacade.purchase(wrapWithToken(req.body));
+  async purchase(req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> {
+    return await ServiceFacade.purchase(wrapWithToken(req.body));
   },
-  removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse{
+  async  removeProductFromCart(req: Req.RemoveFromCartRequest):Promise<Res.BoolResponse>{
     return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
 
   },
 
 
-  watchCart(): Res.ViewCartRes {
-    const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
+  async watchCart(): Promise<Res.ViewCartRes> {
+    const { data, error } = await ServiceFacade.viewCart(wrapWithToken({}));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
@@ -232,12 +253,12 @@ export const Adapter: Partial<Env.Bridge> = {
 
 
 
-  saveProductToCart(req: Req.SaveToCartRequest): Res.BoolResponse {
-    return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
+  async saveProductToCart(req: Req.SaveToCartRequest): Promise<Res.BoolResponse> {
+    return await  ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   },
 
-  search(searchData: Req.SearchRequest): ISearchResponse {
-    const { data, error } = ServiceFacade.search(
+  async search(searchData: Req.SearchRequest): Promise<ISearchResponse> {
+    const { data, error } = await ServiceFacade.search(
       wrapWithToken(searchData.body)
     );
     return error
@@ -245,61 +266,61 @@ export const Adapter: Partial<Env.Bridge> = {
       : { data: data, error: undefined };
   },
 
-  viewManagerPermissions(
+ async viewManagerPermissions(
     req: Req.ViewManagerPermissionRequest
-  ): Res.ViewManagerPermissionResponse {
-    return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
+  ): Promise<Res.ViewManagerPermissionResponse> {
+    return await ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
   },
 
-  addDiscount(req: Req.AddDiscountRequest) {
-    const { data, error } = ServiceFacade.addDiscount(
-      wrapWithToken(req.body)
-    );
+  // addDiscount(req: Req.AddDiscountRequest) {
+  //   const { data, error } = ServiceFacade.addDiscount(
+  //     wrapWithToken(req.body)
+  //   );
+  //   return error
+  //     ? { data: undefined, error: error }
+  //     : { data: data, error: undefined };
+  // },
+
+  async pay(req: Req.PayRequest) {
+    const { data, error } = await ServiceFacade.pay(wrapWithToken(req.body));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
 
-  pay(req: Req.PayRequest) {
-    const { data, error } = ServiceFacade.pay(wrapWithToken(req.body));
+  async deliver(req: Req.DeliveryRequest) {
+    const { data, error } = await ServiceFacade.deliver(wrapWithToken(req.body));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
 
-  deliver(req: Req.DeliveryRequest) {
-    const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));
+async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
+    const { data, error } =await ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
   },
 
-  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
-    const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
+  // removeProductDiscount(req: Req.RemoveDiscountRequest){
+  //   const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
+  //   return error
+  //     ? { data: undefined, error: error }
+  //     : { data: data, error: undefined }; 
+  // },
+
+    async  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
     return error
       ? { data: undefined, error: error }
-      : { data: data, error: undefined }; 
+      : { data: data, error: undefined };
   },
 
-  removeProductDiscount(req: Req.RemoveDiscountRequest){
-    const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
+  async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
     return error
       ? { data: undefined, error: error }
-      : { data: data, error: undefined }; 
-  },
-
-  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
-    const { data, error } = ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
-    return error
-      ? { data: undefined, error: error }
-      : { data: data, error: undefined }; 
-  },
-
-  viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
-    const { data, error } = ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
-    return error
-      ? { data: undefined, error: error }
-      : { data: data, error: undefined }; 
+      : { data: data, error: undefined };
   }
 
 
