@@ -41,7 +41,7 @@ describe("Guest - View Information, UC: 2.4", () => {
        await _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
        await _serviceBridge.addItemsToStore(_testStore, [_testItem]);
 
-       //await _serviceBridge.logout();
+       await _serviceBridge.logout();
 
         const {data, error} = await _serviceBridge.viewProduct(_testStore, _testProduct);
         const product = data.info;

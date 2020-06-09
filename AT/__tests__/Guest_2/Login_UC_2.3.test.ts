@@ -1,64 +1,70 @@
-// import {Bridge, Driver, Credentials} from "../..";
-// import * as utils from "../../utils"
+import {Bridge, Driver, Credentials} from "../..";
+import * as utils from "../../utils"
 
 
-// describe("Guest Login, UC: 2.3", () => {
-//     let _serviceBridge: Bridge;
-//     let _credentials: Credentials;
-//     let _driver: Driver;
+describe("Guest Login, UC: 2.3", () => {
+    let _serviceBridge: Partial<Bridge>;
+    let _credentials: Credentials;
+    let _driver: Driver;
 
-//     beforeEach(() => {
-//         _driver = new Driver();
-//         _serviceBridge = _driver.resetState().startSession().initWithDefaults().getBridge();
-//         _credentials = {userName: "test-username", password: "test-Password132"};
-//     });
+    beforeEach(async() => {
+        _driver = new Driver();
+        _driver.dropDBDor();
+         await _driver.startSession()
+         await _driver.initWithDefaults()
+         _serviceBridge=await _driver.getBridge()
+        _credentials = {userName: "test-username", password: "test-Password132"};
+    });
 
-//     afterAll(() => {
-//         utils.terminateSocket();
-//     });
+    afterAll(() => {
+        _driver.dropDBDor();
+        utils.terminateSocket();
 
-//     test("Valid details and registered", () => {
-//         _credentials.userName = "validUsername";
-//         _credentials.password = "validPassword123";
-//         _serviceBridge.register(_credentials);
 
-//         const {data, error} = _serviceBridge.login(_credentials);
-//         expect(error).toBeUndefined();
-//         expect(data).toBeDefined();
-//     });
+    });
 
-//     test("Wrong password and registered", () => {
-//         const passwordDefect = "234jERFAs$%^hb5@#$@#4bjh";
-//         _credentials.userName = "validUsername";
-//         _credentials.password = "wrongPassword123";
-//         _serviceBridge.register(_credentials);
+    test("Valid details and registered", async() => {
+        _credentials.userName = "validUsername";
+        _credentials.password = "validPassword123";
+        await _serviceBridge.register(_credentials);
 
-//         _credentials.password += passwordDefect;
-//         const {data, error} = _serviceBridge.login(_credentials);
-//         expect(data).toBeUndefined();
-//         expect(error).toBeDefined();
-//     });
+        const {data, error} =await _serviceBridge.login(_credentials);
+        expect(error).toBeUndefined();
+        expect(data).toBeDefined();
+    });
 
-//     test("Valid details and not registered", () => {
-//         _credentials.userName = "unregisteredUsername";
-//         _credentials.password = "validPassword123";
+    test("Wrong password and registered", async() => {
+        const passwordDefect = "234jERFAs$%^hb5@#$@#4bjh";
+        _credentials.userName = "validUsername";
+        _credentials.password = "wrongPassword123";
+        await _serviceBridge.register(_credentials);
 
-//         const {data, error} = _serviceBridge.login(_credentials);
-//         expect(data).toBeUndefined();
-//         expect(error).toBeDefined();
-//     });
+        _credentials.password += passwordDefect;
+        const {data, error} = await _serviceBridge.login(_credentials);
+        expect(data).toBeUndefined();
+        expect(error).toBeDefined();
+    });
 
-//     test("Valid details and registered and logged in", () => {
-//         _credentials.userName = "alreadyLoggedInUsername";
-//         _credentials.password = "validPassword123";
+    test("Valid details and not registered", async() => {
+        _credentials.userName = "unregisteredUsername";
+        _credentials.password = "validPassword123";
 
-//         _serviceBridge.register(_credentials);
-//         const res = _serviceBridge.login(_credentials);
-//         expect(res.data).toBeDefined();
-//         expect(res.error).toBeUndefined();
+        const {data, error} =await _serviceBridge.login(_credentials);
+        expect(data).toBeUndefined();
+        expect(error).toBeDefined();
+    });
 
-//         const {data, error} = _serviceBridge.login(_credentials);
-//         expect(error).toBeDefined();
-//         expect(data).toBeUndefined();
-//     });
-// });
+    test("Valid details and registered and logged in", async() => {
+        _credentials.userName = "alreadyLoggedInUsername";
+        _credentials.password = "validPassword123";
+
+        await _serviceBridge.register(_credentials);
+        const res =await _serviceBridge.login(_credentials);
+        expect(res.data).toBeDefined();
+        expect(res.error).toBeUndefined();
+
+        const {data, error} =await _serviceBridge.login(_credentials);
+        expect(error).toBeDefined();
+        expect(data).toBeUndefined();
+    });
+ });

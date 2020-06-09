@@ -6,7 +6,7 @@ import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
-import {SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
+import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -97,6 +97,23 @@ export const Adapter: any = {
       : { data: data, error: undefined };
   },
 
+//   interface SaveToCartRequest extends Request {
+// //   body: {
+// //     storeName: string;
+// //     catalogNumber: number;
+// //     amount: number;
+// //   };
+// // }
+
+
+  async addToCart(
+      store: Store,
+      product: Product,
+      quantity: number
+  ): Promise<DummyTypes.IResponse> {
+return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
+
+  },
   // removeProductsFromStore(store: Store, products: Product[]) {
   //   const catalogNumbers = products.map((p) => {
   //     return { catalogNumber: p.catalogNumber };
@@ -223,12 +240,12 @@ export const Adapter: any = {
   // },
 
 
-  // watchCart(): Res.ViewCartRes {
-  //   const { data, error } = ServiceFacade.viewCart(wrapWithToken({}));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async watchCart(): Promise<Res.ViewCartRes> {
+    const { data, error } = await ServiceFacade.viewCart(wrapWithToken({}));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
 
 
