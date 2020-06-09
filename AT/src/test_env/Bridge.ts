@@ -27,8 +27,8 @@ export interface Bridge {
   //   store: Store,
   //   Products: Product[]
   // ): DummyTypes.IProductsRemovalResponse;
-  // viewStore(store: Store): DummyTypes.IViewStoreResponse;
-  // viewProduct(store: Store, product: Product): Res.ProductInfoResponse;
+   viewStore(store: Store): Promise<DummyTypes.IViewStoreResponse>;
+   viewProduct(store: Store, product: Product): Promise<Res.ProductInfoResponse>;
   // removeUser(user: User): DummyTypes.IResponse;
   // getUserByName(user: User): DummyTypes.IUserResponse;
   // getPurchaseHistory(): DummyTypes.IPurchaseHistoryResponse;
