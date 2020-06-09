@@ -82,7 +82,7 @@ export interface Bridge {
   // ): Res.ViewManagerPermissionResponse;
   // addDiscount(req: Req.AddDiscountRequest);
   // pay(req: Req.PayRequest): Res.PaymentResponse;
-  // deliver(req: Req.DeliveryRequest): Res.DeliveryResponse;
+  deliver(req: Req.DeliveryRequest): Promise<Res.DeliveryResponse>;
   // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest): Res.BoolResponse;
   //  addDiscount  (req: Req.AddDiscountRequest): Res.BoolResponse;
   // removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 

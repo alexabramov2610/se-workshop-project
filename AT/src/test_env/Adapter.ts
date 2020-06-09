@@ -284,12 +284,12 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //     : { data: data, error: undefined };
   // },
 
-  // deliver(req: Req.DeliveryRequest) {
-  //   const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async deliver(req: Req.DeliveryRequest) {
+    const { data, error } = await ServiceFacade.deliver(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
   //   const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
