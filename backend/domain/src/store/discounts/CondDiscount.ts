@@ -20,6 +20,8 @@ export class CondDiscount extends Discount {
         const res: BagItem[] = [];
         for (const bagItem of bag) {
             if (this.isProductInDiscount(bagItem) || this.isStoreDiscount()) {
+                logger.info(`isProductInDiscount ${this.isProductInDiscount(bagItem)}  isStoreDiscount ${this.isStoreDiscount()}`)
+
                 const minAmount = this.findMinAmount(bagItem.product.catalogNumber);
                 logger.info(`product ${bagItem.product.catalogNumber}  cat ${bagItem.product.category} in discount! calculating price... min amount is ${minAmount}`)
                 let diffAmount = 1;
@@ -27,7 +29,7 @@ export class CondDiscount extends Discount {
                     diffAmount = Math.floor(bagItem.amount / (minAmount + 1)) / bagItem.amount;
                 }
                 const newPrice: number = bagItem.finalPrice - ((bagItem.finalPrice * this.percentage * diffAmount) / (100));
-                logger.info(`new final price for product ${bagItem.product.catalogNumber} is ${newPrice}`)
+                logger.info(`new final price for product ${bagItem.product.catalogNumber} amount ${bagItem.amount} is ${newPrice}`)
                 res.push({
                     product: bagItem.product,
                     amount: bagItem.amount,
@@ -97,7 +99,7 @@ export class CondDiscount extends Discount {
     private isStoreDiscount(): boolean {
         const conditions: Condition[] = Array.from(this._conditions.keys());
         for (const c of conditions) {
-            if (typeof c.getMinPay() !== undefined &&  c.getMinPay() >= 0)
+            if (this.productsInDiscount.length === 0 && typeof c.getMinPay() !== undefined &&  c.getMinPay() >= 0)
                 return true;
         }
         return false;
