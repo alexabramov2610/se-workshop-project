@@ -34,11 +34,13 @@ import {mapToJson} from "../api-int/utils";
 const logger = loggerW(__filename)
 
 export class StoreManagement {
-    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy","purchasePolicy"];
+    private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy", "purchasePolicy"];
     private _externalSystems: ExternalSystemsManager;
+    locks: string[];
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
+        this.locks = []
     }
 
     async findStoreByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
@@ -99,7 +101,7 @@ export class StoreManagement {
             const storeOwners = [firstOwner]
             const discountPolicy = await DiscountPolicyModel.create({children: [], storeName})
             const purchasePolicy = await PurchasePolicyModel.create({children: [], storeName})
-            await StoreModel.create({storeName, description, firstOwner, storeOwners, discountPolicy,purchasePolicy})
+            await StoreModel.create({storeName, description, firstOwner, storeOwners, discountPolicy, purchasePolicy})
             await firstOwner.save();
             logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
             return {data: {result: true}}
@@ -1040,12 +1042,12 @@ export class StoreManagement {
             }
             case "system": {
                 const systemP: SystemPolicy = policy as SystemPolicy;
-                return {systemPolicy: {notForSellDays: systemP.notForSellDays}}
+                return {systemPolicy: {notForSellDays: Array.from(systemP.notForSellDays)}}
                 break;
             }
             case "user": {
                 const userP: UserPolicy = policy as UserPolicy;
-                return {userPolicy: {countries: userP.countries}}
+                return {userPolicy: {countries: Array.from(userP.countries)}}
                 break;
             }
             default: {

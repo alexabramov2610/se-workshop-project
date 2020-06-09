@@ -19,20 +19,46 @@ export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseRe
     if (!calcRes)
         return calcRes
     if (req.body.total && +req.body.total !== calcRes.data.price) {
-        return {data: {result: false},
+        return {
+            data: {result: false},
             error: {
                 message: "Total price has been changed.",
                 options: {oldPrice: req.body.total, newPrice: calcRes.data.price}
             }
         }
     }
-    const isPaid: Res.PaymentResponse = await ts.pay({
-        body: {price: calcRes.data.price, payment: req.body.payment},
-        token: req.token,
-    });
-    if (!isPaid.data.result) return isPaid;
-    const updateStockRequest: Req.UpdateStockRequest = {token: req.token, body: {payment: isPaid.data.payment}}
-    return ts.purchase(updateStockRequest)
+    let lock: string[] = [];
+    while (!lock.length) {
+        lock = await ts.lockStores(req.token);
+    }
+    try {
+        const isCartOnStockVer: Res.BoolResponse = await ts.verifyCart({
+            body: {},
+            token: req.token,
+        });
+        if (!isCartOnStockVer.data.result) {
+            await ts.unlockStores(lock);
+            return isCartOnStockVer;
+        }
+        const isPaid: Res.PaymentResponse = await ts.pay({
+            body: {price: calcRes.data.price, payment: req.body.payment},
+            token: req.token,
+        });
+        if (!isPaid.data.result)
+        {
+            await ts.unlockStores(lock);
+            return isPaid;
+        }
+        const updateStockRequest: Req.UpdateStockRequest = {token: req.token, body: {payment: isPaid.data.payment}}
+        const purchaseRes: Res.PurchaseResponse = await ts.purchase(updateStockRequest)
+        await ts.unlockStores(lock);
+        return purchaseRes
+    } catch (e) {
+        await ts.unlockStores(lock);
+        return {data: {result: false}}
+    }
+
+
 };
 
 export const pay = (req: Req.PayRequest): Promise<Res.PaymentResponse> => {

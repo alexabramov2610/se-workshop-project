@@ -114,16 +114,16 @@ export const Adapter: any = {
 return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catalogNumber:product.catalogNumber, amount:quantity}))
 
   },
-  // removeProductsFromStore(store: Store, products: Product[]) {
-  //   const catalogNumbers = products.map((p) => {
-  //     return { catalogNumber: p.catalogNumber };
-  //   });
-  //   const removeReq = { storeName: store.name, products: catalogNumbers };
-  //   const { data, error } = ServiceFacade.removeProducts(
-  //     wrapWithToken(removeReq)
-  //   );
-  //   return error ? { data, error: error.message } : { data, error: undefined };
-  // },
+  async removeProductsFromStore(store: Store, products: Product[]) {
+    const catalogNumbers = products.map((p) => {
+      return { catalogNumber: p.catalogNumber };
+    });
+    const removeReq = { storeName: store.name, products: catalogNumbers };
+    const { data, error } = await ServiceFacade.removeProducts(
+      wrapWithToken(removeReq)
+    );
+    return error ? { data, error: error.message } : { data, error: undefined };
+  },
 
   async viewStore(store: Store) {
     const { data, error } = await ServiceFacade.viewStoreInfo(
@@ -134,57 +134,58 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data.info, error: undefined };
   },
 
-  // assignStoreOwner(store: Store, user: User): DummyTypes.IResponse {
-  //   const { data, error } = ServiceFacade.assignStoreOwner(
-  //     wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse> {
+    const { data, error } = await ServiceFacade.assignStoreOwner(
+      wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
+    );
+    const x = data || error;
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // assignManager(store: Store, credentials: Credentials): DummyTypes.IResponse {
-  //   const req = {
-  //     storeName: store.name,
-  //     usernameToAssign: credentials.userName,
-  //   };
-  //   const { data, error } = ServiceFacade.assignStoreManager(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async assignManager(store: Store, credentials: Credentials): Promise<DummyTypes.IResponse> {
+    const req = {
+      storeName: store.name,
+      usernameToAssign: credentials.userName,
+    };
+    const { data, error } = await ServiceFacade.assignStoreManager(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // grantPermissions(
-  //   credentials: Credentials,
-  //   store: Store,
-  //   permissions: PERMISSION[]
-  // ): DummyTypes.IResponse {
-  //   const req = {
-  //     managerToChange: credentials.userName,
-  //     storeName: store.name,
-  //     permissions: permissions,
-  //   };
-  //   const { data, error } = ServiceFacade.addManagerPermissions(
-  //     wrapWithToken(req)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+ async grantPermissions(
+    credentials: Credentials,
+    store: Store,
+    permissions: PERMISSION[]
+  ): Promise<DummyTypes.IResponse> {
+    const req = {
+      managerToChange: credentials.userName,
+      storeName: store.name,
+      permissions: permissions,
+    };
+    const { data, error } = await ServiceFacade.addManagerPermissions(
+      wrapWithToken(req)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductName(wrapWithToken(req.body));
-  // },
+  async changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse> {
+    return await ServiceFacade.changeProductName(wrapWithToken(req.body));
+  },
 
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
-  // },
+  async changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse> {
+    return  await ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  },
 
  // async saveProductToCart(req : SaveToCartRequest) {
  //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));
@@ -234,10 +235,10 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   async purchase(req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> {
     return await ServiceFacade.purchase(wrapWithToken(req.body));
   },
-  // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse{
-  //   return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
+  async  removeProductFromCart(req: Req.RemoveFromCartRequest):Promise<Res.BoolResponse>{
+    return ServiceFacade.removeProductFromCart(wrapWithToken(req.body));
 
-  // },
+  },
 
 
   async watchCart(): Promise<Res.ViewCartRes> {
@@ -277,26 +278,26 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //     : { data: data, error: undefined };
   // },
 
-  // pay(req: Req.PayRequest) {
-  //   const { data, error } = ServiceFacade.pay(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async pay(req: Req.PayRequest) {
+    const { data, error } = await ServiceFacade.pay(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // deliver(req: Req.DeliveryRequest) {
-  //   const { data, error } = ServiceFacade.deliver(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined };
-  // },
+  async deliver(req: Req.DeliveryRequest) {
+    const { data, error } = await ServiceFacade.deliver(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
-  //   const { data, error } = ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
+    const { data, error } =await ServiceFacade.setDiscountsPolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
   // removeProductDiscount(req: Req.RemoveDiscountRequest){
   //   const { data, error } = ServiceFacade.removeProductDiscount(wrapWithToken(req.body));
@@ -305,19 +306,19 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
   //     : { data: data, error: undefined }; 
   // },
 
-  // setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // },
+    async  setPurchasePolicy(req: Req.SetPurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.setPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  },
 
-  // viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
-  //   const { data, error } = ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
-  //   return error
-  //     ? { data: undefined, error: error }
-  //     : { data: data, error: undefined }; 
-  // }
+  async viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest){
+    const { data, error } = await ServiceFacade.viewPurchasePolicy(wrapWithToken(req.body));
+    return error
+      ? { data: undefined, error: error }
+      : { data: data, error: undefined };
+  }
 
 
 };

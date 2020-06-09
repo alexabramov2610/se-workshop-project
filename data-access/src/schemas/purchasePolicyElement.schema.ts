@@ -7,7 +7,7 @@ const purchasePolicyElementSchema = new Schema({
             required: true
         },
         notForSellDays: {
-            type: String,
+            type: [Number],
             enum: Object.values(WeekDays),
         },
         catalogNumber: {
