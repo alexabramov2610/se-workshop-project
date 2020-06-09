@@ -232,7 +232,7 @@ const viewStorePurchaseHistory = async (storeName) => {
 };
 
 const viewUserPurchaseHistory = async (username) => {
-    const req = {"body": {"userName": username}};
+    const req = {body: {userName: username}};
     return instance.post(`${baseDomain}/users/viewRegisteredUserPurchasesHistory`, req);
 };
 

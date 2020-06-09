@@ -48,8 +48,8 @@ const ViewStoresPurchaseHistoryPage = (props) => {
         return {
             date: pDate,
             user: p.purchases[0].userName,
-            last4: 1234,
-            total: getTotalPrice(p) + "$",
+            last4: p.lastCC4,
+            total: p.totalCharged,
             purchases: p.purchases
         };
     });
