@@ -44,6 +44,7 @@ class App extends React.Component {
     }
 
     onLogin = async (username, asAdmin) => {
+        asAdmin && config.setIsAdmin(true);
         this.setState({ isLoggedIn: true, systemIsClose: false, isAdmin: asAdmin }, () => config.setLoggedInUser(username))
         await this.cartCountUpdater();
     }
@@ -72,6 +73,7 @@ class App extends React.Component {
     onLogout = async () => {
         this.setState({ isLoggedIn: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
+        config.setIsAdmin(false);
         await this.cartCountUpdater();
     }
 
@@ -105,9 +107,9 @@ class App extends React.Component {
                         <Route path="/store/:storename" render={(props) => <StorePageContainer isLoggedIn={this.state.isLoggedIn} />} />
                         <Route exact path="/search" component={SearchPage} />
                         <Route exact path="/checkout" render={(props) => <CheckoutPage cartCountUpdater={this.cartCountUpdater} />} />
-                        <Route exact path="/personalinfo" component={PersonalInfo} />
+                        <Route exact path="/personalinfo" render={(props) => <ViewUsersPurchaseHistoryContainer isAdmin={false}/>} component={ViewUsersPurchaseHistoryContainer} />
                         <Route exact path="/viewStoresPurchasesHistory" render={(props) => <ViewStoresPurchaseHistoryContainer isAdmin={true}/>} />
-                        <Route exact path="/viewUsersPurchasesHistory" component={ViewUsersPurchaseHistoryContainer} />
+                        <Route exact path="/viewUsersPurchasesHistory" render={(props) => <ViewUsersPurchaseHistoryContainer />} />
                     </Switch>
                 </Router>
             </CartCtx.Provider>

@@ -236,7 +236,12 @@ const viewUserPurchaseHistory = async (username) => {
     return instance.post(`${baseDomain}/users/viewRegisteredUserPurchasesHistory`, req);
 };
 
+const getUsers = async () => {
+    return instance.get(`${baseDomain}/users/viewRegisteredUserPurchasesHistory`);
+};
+
 export {
+    getUsers,
     viewUserPurchaseHistory,
     viewStorePurchaseHistory,
     setStoreBuyingPolicy,

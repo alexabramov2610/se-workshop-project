@@ -3,7 +3,7 @@ import * as api from '../../utils/api';
 import AdminViewUsersPurchaseHistoryPage from "./view-user-purchases-history";
 import * as generalUtils from "../../utils/utils";
 
-const ViewUsersPurchaseHistoryContainer = () => {
+const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
 
     const [fetching, setFetching] = useState(false);
     const [username, setUsername] = useState(undefined);
@@ -15,6 +15,7 @@ const ViewUsersPurchaseHistoryContainer = () => {
             setFetching(true);
             await generalUtils.sleep(1000);
 
+            // const usersRes = await api.getUsers();
             const purchasesHistoryRes = await api.viewUserPurchaseHistory(username);
             console.log(purchasesHistoryRes);
 

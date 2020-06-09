@@ -1,9 +1,11 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Descriptions, Divider, Space, Table} from "antd";
 import SearchSelect from "../../components/search-select/search-select.component";
 import {AiOutlineUser} from "react-icons/ai";
 import moment from "moment";
 import * as generalUtils from "../../utils/utils";
+import * as config from "../../utils/config";
+import {useParams} from "react-router-dom";
 import {BsThreeDots} from "react-icons/bs";
 
 const itemStyle = {borderBottom: "1px solid lightskyblue"};
@@ -17,7 +19,8 @@ const getExtended = (record) => {
                     <React.Fragment>
                         <Descriptions.Item style={itemStyle} label={<BsThreeDots/>}></Descriptions.Item>
                         <Descriptions.Item style={itemStyle} label="Store:">{purchase.storeName}</Descriptions.Item>
-                        <Descriptions.Item style={itemStyle} label="Product:">{purchase.item.catalogNumber}</Descriptions.Item>
+                        <Descriptions.Item style={itemStyle}
+                                           label="Product:">{purchase.item.catalogNumber}</Descriptions.Item>
                         <Descriptions.Item style={itemStyle} label="Price:">{purchase.price + "$"}</Descriptions.Item>
                     </React.Fragment>
                 )
@@ -28,6 +31,10 @@ const getExtended = (record) => {
 
 const getTotalPrice = (p) => {
     return p.purchases.reduce((acc, curr) => acc += curr.price, 0);
+}
+
+const getValue = (props) => {
+    return !config.isAdmin ? config.loggedInUser : props.data.username;
 }
 
 const AdminViewUsersPurchaseHistoryPage = (props) => {
@@ -47,20 +54,25 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
         };
     });
 
+    useEffect(() => {
+        !config.isAdmin && props.data.selectUser(config.loggedInUser);
+    });
+
     return (
         <React.Fragment>
             <Divider style={{fontSize: "25px"}} orientation={"left"}>View User Purchases History</Divider>
             <Space style={{paddingBottom: "20px"}}>
                 <AiOutlineUser/>
-                <SearchSelect
+                {config.isAdmin ? <SearchSelect
                     size={"large"}
                     isLoading={data.isLoading}
-                    value={data.username}
+                    value={getValue(props)}
                     onChangeCallback={e => data.selectUser(e)}
                     bordered={false}
                     placeholder={"select a user"}
                     options={users}
                 />
+                : `${config.loggedInUser}`}
             </Space>
             <Table
                 expandable={{
