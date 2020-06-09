@@ -29,12 +29,13 @@ export const systemReset = async (): Promise<void> => {
 }
 
 export const clearDB = async (): Promise<void> => {
-    await ServiceFacade.tradingSystem.dropAllDB();
+    const path: string = "../../dev-dropall.sh";
+    await ServiceFacade.dropDB(path);
 }
 
 export const safeShutdown = async (): Promise<void> => {
     await ServiceFacade.tradingSystem.terminateSocket();
-    await ServiceFacade.tradingSystem.dropAllDB();
+    await clearDB();
 }
 
 export const logout = async (token: string): Promise<void> => {
