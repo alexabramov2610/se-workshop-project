@@ -33,7 +33,7 @@ describe("Guest Search, UC: 2.5", () => {
     let _credentials: Credentials;
 
     beforeEach(async() => {
-        _driver.dropDBDor();
+        _driver.dropDB();
         await _driver.startSession()
         await _driver.initWithDefaults();
         await _driver.registerWithDefaults()
@@ -95,7 +95,7 @@ describe("Guest Search, UC: 2.5", () => {
 
     afterAll(() => {
         //utils.terminateSocket();
-        _driver.dropDBDor();
+        _driver.dropDB();
 
     });
 
