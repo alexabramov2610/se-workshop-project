@@ -206,7 +206,7 @@ export class StoreManagement {
         if (res.data.result) {
             try {
                 res.data.itemsAdded.forEach(item => {
-                    const product = storeModel.products.find((p) => p.catalogNumber === item.catalogNumber);
+                    const product = storeModel.products.find((p) => p.catalogNumber === +item.catalogNumber);
                     product.items.push(item);
                 })
                 for (const product of storeModel.products) {
