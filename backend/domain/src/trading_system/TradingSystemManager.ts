@@ -107,7 +107,7 @@ export class TradingSystemManager {
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         logger.info(`trying to register new user: ${req.body.username} `);
-        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token,[]);
         if (rUser) {
             logger.debug(`logged in user, can't register`);
             return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
@@ -583,11 +583,6 @@ export class TradingSystemManager {
         logger.debug(`terminating socket`);
         this._publisher.terminateSocket();
     }
-
-
-    //endregion
-
-    //region needs testing
 
     async viewRegisteredUserPurchasesHistory(req: Req.ViewRUserPurchasesHistoryReq): Promise<Res.ViewRUserPurchasesHistoryRes> {
         logger.info(`retrieving purchases history`)

@@ -45,7 +45,7 @@ export function productsMapperFromDB(products: any): IProduct[] {
 export function productsAndItemsMapperFromDB(products: any): Map<IProduct, IItem[]> {
     const mappedProducts = new Map<IProduct, IItem[]>();
 
-    products.forEach( (product) => {
+    products.forEach((product) => {
         const retrievedProduct: IProduct = productFromDbToDomain(product)
         const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
             const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
@@ -85,24 +85,36 @@ export function storeMapperFromDB(store: any): Store {
     const realStore: Store = new Store(storeName, description, realProducts, storeOwners, storeManagers, receipts, firstOwner, realPurchasePolicy, realDiscountPolicy)
     return realStore
 }
-export function purchasePolicyFromDB(purchasePolicy) : PurchasePolicy{
+
+export function purchasePolicyFromDB(purchasePolicy): PurchasePolicy {
     const newPolicy: PurchasePolicy = new PurchasePolicyImpl();
+    if (!purchasePolicy)
+        return newPolicy
     const children = purchasePolicy.children;
-    for(const c of children){
+    if (!children)
+        return newPolicy
+    for (const c of children) {
         const newPol: PurchasePolicy = parsePurchasePolicy(c);
         newPolicy.add(newPol, c.operator);
     }
     return newPolicy;
 }
-export function discountFromDB(discountPolicy) : Discount{
+
+export function discountFromDB(discountPolicy): Discount {
+
     const newPolicy: Discount = new DiscountPolicy();
+    if (!discountPolicy)
+        return newPolicy
     const children = discountPolicy.children;
-    for(const c of children){
+    if (!children)
+        return newPolicy
+    for (const c of children) {
         const newDiscount: Discount = parseDiscount(c);
         newPolicy.add(newDiscount, c.operator);
     }
     return newPolicy;
 }
+
 function parsePurchasePolicy(iPolicy): PurchasePolicy {
     let purchasePolicy: PurchasePolicy;
     if (iPolicy.countries && iPolicy.countries.length > 0) {

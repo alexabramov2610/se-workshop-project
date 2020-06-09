@@ -911,15 +911,15 @@ export class StoreManagement {
     }
 
     async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName);
+        const store: Store = await this.findStoreByName(storeName, ["discountPolicy","products"] );
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        const isSuccsess: boolean = await store.setDiscountPolicy(discounts.discounts);
-        return isSuccsess ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_DB}}
+        const isSuccess: boolean = await store.setDiscountPolicy(discounts.discounts);
+        return isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_DB}}
     }
 
     async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
-        const store: Store = await this.findStoreByName(storeName);
+        const store: Store = await this.findStoreByName(storeName,["discountPolicy","products"]);
         const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
         const children: Map<Discount, Operators> = discount.children;
         const discountInPolicy: IDiscountInPolicy[] = [];
@@ -933,7 +933,7 @@ export class StoreManagement {
     }
 
     async getStorePurchasePolicy(user: RegisteredUser, storeName: string): Promise<IPurchasePolicy> {
-        const store: Store = await this.findStoreByName(storeName);
+        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
         const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
         const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
         const purchasePolicyElements: IPurchasePolicyElement[] = [];
@@ -947,7 +947,7 @@ export class StoreManagement {
     }
 
     async setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName);
+        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const setPolicyOk: boolean = await store.setPurchasePolicy(policy.policy);

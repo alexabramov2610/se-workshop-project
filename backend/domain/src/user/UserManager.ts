@@ -42,7 +42,7 @@ export class UserManager {
         }
     }
 
-    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {     /** at this point credentials are already verified **/
+    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {     // at this point credentials are already verified
         const userName = req.body.username;
         // const user = this.getUserByName(userName)
         if (this.isLoggedIn(userName)) { // already logged in
@@ -92,12 +92,13 @@ export class UserManager {
         return {data: {result: true}}
     }
 
-    async getUserByName(name: string): Promise<RegisteredUser> {
+    async getUserByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
-            const u = await UserModel.findOne({name})
-                .populate('receipts')
-                .populate('pendingEvents');
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const u = await UserModel.findOne({name}).populate(populateQuery);
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return createRegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
         } catch (e) {
@@ -106,12 +107,13 @@ export class UserManager {
         }
     }
 
-    async getUserModelByName(name: string): Promise<any> {
+    async getUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
         try {
             logger.debug(`trying to find user ${name} in DB`)
-            const u = await UserModel.findOne({name})
-                .populate('receipts')
-                .populate('pendingEvents');
+            const populateQuery = populateWith.map(field => {
+                return {path: field}
+            });
+            const u = await UserModel.findOne({name}).populate(populateQuery);
             return u;
         } catch (e) {
             logger.error(`getUserByName DB ERROR: ${e}`)
@@ -150,10 +152,10 @@ export class UserManager {
         }
     }
 
-    getLoggedInUserByToken(token: string): Promise<RegisteredUser> {
+    getLoggedInUserByToken(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
         const username = this.loggedInUsers.get(token)
         if (username) {
-            return this.getUserByName(username)
+            return this.getUserByName(username,populateWith)
         } else {
             return undefined
         }
@@ -300,7 +302,7 @@ export class UserManager {
                 return {data: {result: false}, error: {message: errorMsg.E_DB}}
             }
         }
-        else //guest
+        else // guest
             return {data: {result: true}};
 
     }
@@ -330,7 +332,7 @@ export class UserManager {
         return {
             data: {
                 result: true, receipts: user.receipts.map(r => {
-                    return {date: r.date, purchases: r.purchases}
+                    return {date: r.date, purchases: r.purchases, payment: r.payment}
                 })
             }
         }
