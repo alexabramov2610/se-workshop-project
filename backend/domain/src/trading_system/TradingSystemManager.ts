@@ -643,6 +643,7 @@ export class TradingSystemManager {
         let finalPrice: number = 0;
 
         for (const [storeName, bagItems] of cart.entries()) {
+
             const bagItemsWithPrices: BagItem[] = await this._storeManager.calculateFinalPrices(storeName, bagItems)
 
             finalPrice = finalPrice + bagItemsWithPrices.reduce((acc, curr) => acc + curr.finalPrice, 0)
