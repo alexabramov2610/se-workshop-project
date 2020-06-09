@@ -138,6 +138,7 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
     const { data, error } = await ServiceFacade.assignStoreOwner(
       wrapWithToken({ storeName: store.name, usernameToAssign: user.username })
     );
+    const x = data || error;
     return error
       ? { data: undefined, error: error.message }
       : { data: data, error: undefined };
@@ -174,17 +175,17 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductName(wrapWithToken(req.body));
-  // },
+  async changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse> {
+    return await ServiceFacade.changeProductName(wrapWithToken(req.body));
+  },
 
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse {
-  //   return ServiceFacade.changeProductPrice(wrapWithToken(req.body));
-  // },
+  async changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse> {
+    return  await ServiceFacade.changeProductPrice(wrapWithToken(req.body));
+  },
 
  // async saveProductToCart(req : SaveToCartRequest) {
  //    const { data, error } = await ServiceFacade.saveProductToCart(wrapWithToken(req));

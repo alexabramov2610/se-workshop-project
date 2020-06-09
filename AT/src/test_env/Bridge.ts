@@ -52,12 +52,12 @@ export interface Bridge {
   ): Promise<DummyTypes.IResponse>;
   // reset(): void;
   assignStoreOwner(store: Store, user: User): Promise<DummyTypes.IResponse>;
-  // changeProductName(
-  //   req: Partial<Req.ChangeProductNameRequest>
-  // ): Res.BoolResponse;
-  // changeProductPrice(
-  //   req: Partial<Req.ChangeProductPriceRequest>
-  // ): Res.BoolResponse;
+  changeProductName(
+    req: Partial<Req.ChangeProductNameRequest>
+  ): Promise<Res.BoolResponse>;
+  changeProductPrice(
+    req: Partial<Req.ChangeProductPriceRequest>
+  ): Promise<Res.BoolResponse>;
   // watchPermissions(
   //   store: Store,
   //   credentials: Credentials

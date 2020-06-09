@@ -101,130 +101,136 @@ describe("Add Remove Edit Products, UC: 4.1", () => {
     expect(result).toBe(true);
   });
 
-//   test("Remove product - remove existing product user logged out", () => {
-//     const { name } = _serviceBridge.createStore(_storeInformation).data;
-//     expect(name).toBe(_storeInformation.name);
-//     const productToAdd = new ProductBuilder()
-//       .withCatalogNumber(789)
-//       .getProduct();
-//     const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
-//       productToAdd,
-//     ]).data;
-//     expect(resProduct.result).toBe(true);
-//     const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
-//       { id: 123, catalogNumber: productToAdd.catalogNumber },
-//     ]).data.result;
-//     expect(resItem).toBe(true);
-//     const res = _serviceBridge.logout();
-//     expect(res.data).toBeDefined();
-//     const { error } = _serviceBridge.removeProductsFromStore(
-//       _storeInformation,
-//       [productToAdd]
-//     );
-//     expect(error).toBeDefined();
-//   });
+  test("Remove product - remove existing product user logged out", async () => {
+    const createStoreRes=await _serviceBridge.createStore(_storeInformation)
+    const { name } = createStoreRes.data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const addProductsToStoreRes=await _serviceBridge.addProductsToStore(_storeInformation, [productToAdd,])
+    const resProduct = addProductsToStoreRes.data;
+    expect(resProduct.result).toBe(true);
+    const addItemsToStoreRes=await _serviceBridge.addItemsToStore(_storeInformation, [
+        { id: 123, catalogNumber: productToAdd.catalogNumber },
+      ])
+    const resItem = addItemsToStoreRes.data.result;
+    expect(resItem).toBe(true);
+    const res = await _serviceBridge.logout();
+    expect(res.data).toBeDefined();
+    const { error } =await _serviceBridge.removeProductsFromStore(
+      _storeInformation,
+      [productToAdd]
+    );
+    expect(error).toBeDefined();
+  });
 
-//   test("Remove product - Happy Path: remove non-existing product user logged in", () => {
-//     const { name } = _serviceBridge.createStore(_storeInformation).data;
-//     expect(name).toBe(_storeInformation.name);
-//     const productToAdd = new ProductBuilder()
-//       .withCatalogNumber(789)
-//       .getProduct();
-//     const {
-//       data,
-//       error,
-//     } = _serviceBridge.removeProductsFromStore(_storeInformation, [
-//       productToAdd,
-//     ]);
+  test("Remove product - Happy Path: remove non-existing product user logged in", async () => {
+    const createStoreRes=await _serviceBridge.createStore(_storeInformation)
+    const { name } =createStoreRes.data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const {data,error,} =await _serviceBridge.removeProductsFromStore(_storeInformation, [
+      productToAdd,
+    ]);
 
-//     expect(data[0]).toBeUndefined();
-//     expect(error).toBeDefined();
-//   });
+    expect(data[0]).toBeUndefined();
+    expect(error).toBeDefined();
+  });
 
-//   test("Edit product - change product name and price - Product exsits user logged in with permission", () => {
-//     const { name } = _serviceBridge.createStore(_storeInformation).data;
-//     expect(name).toBe(_storeInformation.name);
-//     const productToAdd = new ProductBuilder()
-//       .withCatalogNumber(789)
-//       .getProduct();
-//     const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
-//       productToAdd,
-//     ]).data;
-//     expect(resProduct.result).toBe(true);
-//     const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
-//       { id: 123, catalogNumber: productToAdd.catalogNumber },
-//     ]).data.result;
-//     expect(resItem).toBe(true);
+  test("Edit product - change product name and price - Product exsits user logged in with permission", async () => {
+    const createStoreRes=await  _serviceBridge.createStore(_storeInformation)
+    const { name } =createStoreRes.data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const addProductsToStoreRes=await _serviceBridge.addProductsToStore(_storeInformation, [
+        productToAdd,
+      ])
+    const resProduct = addProductsToStoreRes.data;
+    expect(resProduct.result).toBe(true);
+    const addItemsToStoreRes=await _serviceBridge.addItemsToStore(_storeInformation, [
+        { id: 123, catalogNumber: productToAdd.catalogNumber },
+      ])
+    const resItem = addItemsToStoreRes.data.result;
+    expect(resItem).toBe(true);
 
-//     const resName = _serviceBridge.changeProductName({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newName: "new Name!",
-//       },
-//     });
-//     const resPrice = _serviceBridge.changeProductPrice({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newPrice: 555,
-//       },
-//     });
-//     expect(resName.data.result).toBe(true);
-//     expect(resPrice.data.result).toBe(true);
-//   });
+    const resName = await _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = await _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.data.result).toBe(true);
+    expect(resPrice.data.result).toBe(true);
+  });
 
-//   test("Edit product - Product exsits user logged out with permission", () => {
-//     const { name } = _serviceBridge.createStore(_storeInformation).data;
-//     expect(name).toBe(_storeInformation.name);
-//     const productToAdd = new ProductBuilder()
-//       .withCatalogNumber(789)
-//       .getProduct();
-//     const resProduct = _serviceBridge.addProductsToStore(_storeInformation, [
-//       productToAdd,
-//     ]).data;
-//     expect(resProduct.result).toBe(true);
-//     const resItem = _serviceBridge.addItemsToStore(_storeInformation, [
-//       { id: 123, catalogNumber: productToAdd.catalogNumber },
-//     ]).data.result;
-//     expect(resItem).toBe(true);
-//     _serviceBridge.logout();
-//     const resName = _serviceBridge.changeProductName({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newName: "new Name!",
-//       },
-//     });
-//     const resPrice = _serviceBridge.changeProductPrice({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newPrice: 555,
-//       },
-//     });
-//     expect(resName.error.message).toBeDefined();
-//     expect(resPrice.error.message).toBeDefined();
-//   });
+  test("Edit product - Product exsits user logged out with permission",async () => {
+    const createStoreRes=await _serviceBridge.createStore(_storeInformation)
+    const { name } = createStoreRes.data;
+    expect(name).toBe(_storeInformation.name);
+    const productToAdd = new ProductBuilder()
+      .withCatalogNumber(789)
+      .getProduct();
+    const addProductsToStoreRes=await _serviceBridge.addProductsToStore(_storeInformation, [
+        productToAdd,
+      ])
+    const resProduct = addProductsToStoreRes.data;
+    expect(resProduct.result).toBe(true);
+    const addItemsToStoreRes=await _serviceBridge.addItemsToStore(_storeInformation, [
+        { id: 123, catalogNumber: productToAdd.catalogNumber },
+      ])
+    const resItem = addItemsToStoreRes.data.result;
+    expect(resItem).toBe(true);
+    await _serviceBridge.logout();
+    const resName = await _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = await _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.error.message).toBeDefined();
+    expect(resPrice.error.message).toBeDefined();
+  });
 
-//   test("Edit product - change product name and price - Product not exsits user logged in with permission", () => {
-//     const { name } = _serviceBridge.createStore(_storeInformation).data;
-//     expect(name).toBe(_storeInformation.name);
-//     const resName = _serviceBridge.changeProductName({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newName: "new Name!",
-//       },
-//     });
-//     const resPrice = _serviceBridge.changeProductPrice({
-//       body: {
-//         storeName: _storeInformation.name,
-//         catalogNumber: 789,
-//         newPrice: 555,
-//       },
-//     });
-//     expect(resName.error.message).toBeDefined();
-//     expect(resPrice.error.message).toBeDefined();
-//   });
+  test("Edit product - change product name and price - Product not exsits user logged in with permission", async () => {
+    const createStoreRes=await _serviceBridge.createStore(_storeInformation)
+    const { name } = createStoreRes.data;
+    expect(name).toBe(_storeInformation.name);
+    const resName = await _serviceBridge.changeProductName({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newName: "new Name!",
+      },
+    });
+    const resPrice = await _serviceBridge.changeProductPrice({
+      body: {
+        storeName: _storeInformation.name,
+        catalogNumber: 789,
+        newPrice: 555,
+      },
+    });
+    expect(resName.error.message).toBeDefined();
+    expect(resPrice.error.message).toBeDefined();
+  });
  });
