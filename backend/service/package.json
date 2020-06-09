@@ -10,7 +10,7 @@
     "start:comp": "cd ../domain && tsc && cd ../service && tsc && node dist/index.js",
     "test": "jest --maxWorkers=1 --forceExit --detectOpenHandles",
     "test:clear": "jest --maxWorkers=1 --clearCache",
-    "test:silent": "TEST_MODE=1 SILENT=1 jest --maxWorkers=1",
+    "test:silent": "TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles",
     "test:watch": "npm t -- --watch"
   },
   "author": "",
