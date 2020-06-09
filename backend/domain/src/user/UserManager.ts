@@ -116,7 +116,7 @@ export class UserManager {
             const u = await UserModel.findOne({name}).populate(populateQuery);
             return u;
         } catch (e) {
-            logger.error(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getUserModelByName DB ERROR: ${e}`)
             return undefined
         }
     }
@@ -405,7 +405,7 @@ export class UserManager {
                 throw new Error(`retrieved undefined from DB`)
             return { data: {result: true, users: u.map(currUser => currUser.name) } }
         } catch (e) {
-            logger.error(`getUserByName DB ERROR: ${e}`)
+            logger.error(`getAllUsers DB ERROR: ${e}`)
             return { data: {result: false, users:[] }, error: {message: e} }
         }
     }
