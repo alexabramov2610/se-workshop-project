@@ -77,9 +77,9 @@ export interface Bridge {
   purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
   removeProductFromCart(req: Req.RemoveFromCartRequest): Promise<Res.BoolResponse>;
-  // viewManagerPermissions(
-  //   req: Partial<Req.ViewManagerPermissionRequest>
-  // ): Res.ViewManagerPermissionResponse;
+  viewManagerPermissions(
+    req: Partial<Req.ViewManagerPermissionRequest>
+  ): Promise<Res.ViewManagerPermissionResponse>;
   // addDiscount(req: Req.AddDiscountRequest);
   pay(req: Req.PayRequest): Promise<Res.PaymentResponse>;
   // pay(req: Req.PayRequest): Res.PaymentResponse;

@@ -263,11 +263,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       : { data: data, error: undefined };
   },
 
-  // viewManagerPermissions(
-  //   req: Req.ViewManagerPermissionRequest
-  // ): Res.ViewManagerPermissionResponse {
-  //   return ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
-  // },
+ async viewManagerPermissions(
+    req: Req.ViewManagerPermissionRequest
+  ): Promise<Res.ViewManagerPermissionResponse> {
+    return await ServiceFacade.viewManagerPermissions(wrapWithToken(req.body));
+  },
 
   // addDiscount(req: Req.AddDiscountRequest) {
   //   const { data, error } = ServiceFacade.addDiscount(

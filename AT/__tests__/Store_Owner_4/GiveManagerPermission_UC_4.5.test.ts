@@ -3,7 +3,7 @@ import { Store, Credentials, User } from "../../src/test_env/types";
 import * as utils from "../../utils"
 
 
-describe("Add Remove Edit Products, UC: 3.2", () => {
+describe("Give Manager Permissions, UC: 4.5", () => {
   let _serviceBridge: Partial<Bridge>;
   let _storeInformation: Store;
   let _driver: Driver;
