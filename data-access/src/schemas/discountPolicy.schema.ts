@@ -8,7 +8,7 @@ const discountPolicySchema = new Schema({
         },
         storeName: {type: String, unique:true}
     },
-    {timestamps: false,})
+    {timestamps: false,});
 
 discountPolicySchema.plugin(uniqueValidator);
 

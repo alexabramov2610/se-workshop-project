@@ -37,7 +37,7 @@ const storeSchema = new Schema({
             required: true,
         },
         purchasePolicy: {
-            type: String,
+            type: Types.ObjectId, ref: 'purchasePolicies',
         },
         discountPolicy: {
             type: Types.ObjectId, ref: 'discountPolicies',

@@ -236,14 +236,14 @@ export const Adapter: any = {
   //   return ServiceFacade.saveProductToCart(wrapWithToken(req.body));
   // },
 
-  // search(searchData: Req.SearchRequest): ISearchResponse {
-  //   const { data, error } = ServiceFacade.search(
-  //     wrapWithToken(searchData.body)
-  //   );
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async search(searchData: Req.SearchRequest): Promise<ISearchResponse> {
+    const { data, error } = await ServiceFacade.search(
+      wrapWithToken(searchData.body)
+    );
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // viewManagerPermissions(
   //   req: Req.ViewManagerPermissionRequest

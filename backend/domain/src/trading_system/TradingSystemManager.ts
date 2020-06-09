@@ -752,7 +752,7 @@ export class TradingSystemManager {
     }
 
     async setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> {
-        logger.info(`setting discount policy to store ${req.body.storeName} `)
+        logger.info(`setting purchase policy to store ${req.body.storeName} `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         return this._storeManager.setPurchasePolicy(user, req.body.storeName, req.body.policy)
     }

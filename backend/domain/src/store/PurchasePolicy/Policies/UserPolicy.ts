@@ -33,7 +33,9 @@ export class UserPolicy extends PurchasePolicy {
         return "user";
     }
 
-
+    public getCountries() : string[]{
+        return this._countries;
+    }
     get countries(): string[] {
         return this._countries;
     }
