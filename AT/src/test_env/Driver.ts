@@ -2,7 +2,8 @@ import { Bridge, Adapter } from "../..";
 import mongoose from "mongoose";
 import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
-
+import shell from "shelljs";
+import {IResponse} from "./mocks/responses";
 /* Connect to the DB */
 
 
@@ -66,7 +67,13 @@ class Driver {
     return this;
   }
 
-  async initWith(cred: Credentials): Promise<Driver> {
+  dropDB(){
+     shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh', {async: false})
+  }
+
+
+
+async initWith(cred: Credentials): Promise<Driver> {
     await this.bridge.init(cred);
     return this;
   }
@@ -84,9 +91,9 @@ class Driver {
     return this;
   }
 
-  async loginWithDefaults(): Promise<Driver> {
-    await this.bridge.login(this.loginDefCredentials);
-    return this;
+  async loginWithDefaults(): Promise<IResponse> {
+   return await this.bridge.login(this.loginDefCredentials);
+
   }
 
   async registerWith(cred: Credentials): Promise<Driver> {
@@ -99,11 +106,16 @@ class Driver {
     return this;
   }
 
-  async dropDB() {
-    mongoose.connect('mongodb://localhost:27017/trading-system-db?readPreference=primary&appname=MongoDB%20Compass&ssl=false',function(){
-      /* Drop the DB */
-      mongoose.connection.db.dropDatabase();
-    });
+  async connectDB() {
+    await mongoose.connect("mongodb://localhost:27017/trading-system-db?readPreference=primary&appname=MongoDB%20Compass&ssl=false", { useNewUrlParser: true })
+ }
+
+  async removeAllCollections () {
+    const collections = Object.keys(mongoose.connection.collections)
+    for (const collectionName of collections) {
+      const collection = mongoose.connection.collections[collectionName]
+      await collection.deleteMany()
+    }
   }
 
   given: IGiven = {
@@ -122,15 +134,17 @@ class Driver {
   };
 
   async makeABuy(amount: number = 1): Promise<Res.PurchaseResponse> {
-    this.mutant.p.map(async (p) =>
+    for (let i = 0; i <this.mutant.p.length; i++){
       await this.bridge.saveProductToCart({
         body: {
           storeName: this.mutant.s.name,
-          catalogNumber: p.catalogNumber,
+          catalogNumber: this.mutant.p[i].catalogNumber,
           amount,
         },
       })
-    );
+    }
+
+
     const res = await this.bridge.purchase({ body: this._pi });
     return res;
   }

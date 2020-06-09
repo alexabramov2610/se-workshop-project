@@ -5,11 +5,14 @@ import * as DummyTypes from "./mocks/responses";
 import { Product, Store, Item, User, Credentials, PERMISSION } from "../..";
 import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
-
+import mongoose from "mongoose";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
 };
+
+
+
 
 export const Adapter: any = {
   setToken(sessionToken: string): void {
@@ -77,21 +80,21 @@ export const Adapter: any = {
     else if (data.result) return { data: { name: store.name } };
   },
 
-  // addItemsToStore(store: Store, items: Item[]): DummyTypes.IResponse {
-  //   const req = { storeName: store.name, items };
-  //   const { data, error } = ServiceFacade.addItems(wrapWithToken(req));
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async  addItemsToStore(store: Store, items: Item[]): Promise<DummyTypes.IResponse> {
+    const req = { storeName: store.name, items };
+    const { data, error } = await ServiceFacade.addItems(wrapWithToken(req));
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
-  // addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse {
-  //   const req = { storeName: store.name, products: products };
-  //   const { data, error } = ServiceFacade.addNewProducts(wrapWithToken(req));
-  //   return error
-  //     ? { data: undefined, error: error.message }
-  //     : { data: data, error: undefined };
-  // },
+  async addProductsToStore(store: Store, products: Product[]): Promise<DummyTypes.IResponse> {
+    const req = { storeName: store.name, products: products };
+    const { data, error } = await ServiceFacade.addNewProducts(wrapWithToken(req));
+    return error
+      ? { data: undefined, error: error.message }
+      : { data: data, error: undefined };
+  },
 
   // removeProductsFromStore(store: Store, products: Product[]) {
   //   const catalogNumbers = products.map((p) => {
@@ -195,13 +198,13 @@ export const Adapter: any = {
   //   return ServiceFacade.viewStorePurchasesHistory(wrapWithToken(req.body));
   // },
 
-  // viewUserPurchasesHistory(
-  //   req: Req.ViewRUserPurchasesHistoryReq
-  // ): Res.ViewRUserPurchasesHistoryRes {
-  //   return ServiceFacade.viewRegisteredUserPurchasesHistory(
-  //     wrapWithToken(req.body)
-  //   );
-  // },
+  async viewUserPurchasesHistory(
+    req: Req.ViewRUserPurchasesHistoryReq
+  ): Promise<Res.ViewRUserPurchasesHistoryRes> {
+    return await ServiceFacade.viewRegisteredUserPurchasesHistory(
+      wrapWithToken(req.body)
+    );
+  },
 
   // viewProduct(store: Store, product: Product): Res.ProductInfoResponse {
   //   const { data, error } = ServiceFacade.viewProductInfo(

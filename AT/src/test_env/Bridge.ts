@@ -21,8 +21,8 @@ export interface Bridge {
   // removeItem(item: Item): DummyTypes.IResponse;
   // removeStore(store: Store): DummyTypes.IResponse;
   createStore(store: Store): Promise<DummyTypes.IStoreResponse>;
-  // addItemsToStore(store: Store, item: Item[]): DummyTypes.IResponse;
-  // addProductsToStore(store: Store, products: Product[]): DummyTypes.IResponse;
+  addItemsToStore(store: Store, item: Item[]): Promise<DummyTypes.IResponse>;
+  addProductsToStore(store: Store, products: Product[]): Promise<DummyTypes.IResponse>;
   // removeProductsFromStore(
   //   store: Store,
   //   Products: Product[]
@@ -75,9 +75,9 @@ export interface Bridge {
   // viewStorePurchasesHistory(
   //   req: Partial<Req.ViewShopPurchasesHistoryRequest>
   // ): Res.ViewShopPurchasesHistoryResponse;
-  // viewUserPurchasesHistory(
-  //   req: Partial<Req.ViewRUserPurchasesHistoryReq>
-  // ): Res.ViewRUserPurchasesHistoryRes;
+  viewUserPurchasesHistory(
+    req: Partial<Req.ViewRUserPurchasesHistoryReq>
+  ): Promise<Res.ViewRUserPurchasesHistoryRes>;
   purchase(req: Partial<Req.PurchaseRequest>): Promise<Res.PurchaseResponse>;
   saveProductToCart(req: Partial<Req.SaveToCartRequest>): Promise<Res.BoolResponse>;
   // removeProductFromCart(req: Req.RemoveFromCartRequest):Res.BoolResponse;
