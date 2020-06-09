@@ -1,4 +1,5 @@
 import React from "react";
+import * as Modal from "../../components/modal/modal"
 import { history } from "../../utils/config";
 import {
   CreateStorePageContainer,
@@ -20,12 +21,12 @@ class CreateStorePage extends React.Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     const { storeName, description } = this.state;
-    console.log(this.state);
     this.setState({
       storeName: "",
       description: "",
     });
-    api.createStore(storeName, description);
+    const { data } = await api.createStore(storeName, description);
+    (data.error && data.error.message) ? Modal.error(data.error.message) : Modal.success("Welcome! Happy Trading!");
   };
 
   handleChange = (event) => {
