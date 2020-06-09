@@ -33,7 +33,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
     });
 
     test("Create Store - Sad Path:  - not logged in user",async (done) => {
-       await  _serviceBridge.logout();
+       await _serviceBridge.logout();
         _storeInformation = {name: "mocked-sad-store"};
         const error = await _serviceBridge.createStore(_storeInformation);
         expect(error).toBeDefined();

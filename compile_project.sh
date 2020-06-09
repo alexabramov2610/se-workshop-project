@@ -24,7 +24,7 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}===================== COMPILING API ======================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $api
-#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  api
 echo -e "${BLUE}==========================================================${NC}"

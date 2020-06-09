@@ -79,3 +79,7 @@ export const isLoggedInUser = (req: Req.Request): Promise<Res.GetLoggedInUserRes
 export const verifyToken = (req: Req.Request): Promise<Res.BoolResponse> => {
     return ts.verifyTokenExists(req);
 }
+
+export const getAllUsers = (req: Req.Request): Promise<Res.GetAllUsersResponse> => {
+    return ts.getAllUsers(req);
+}

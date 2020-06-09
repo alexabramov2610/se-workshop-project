@@ -32,6 +32,11 @@ export async function removeProductFromCart(req,res) {
 
 // get
 
+export async function getAllUsers(req, res) {
+    const result = await wrapHttp(req, ServiceFacade.getAllUsers);
+    return res.send(result);
+}
+
 export async function viewCart(req,res) {
     const result = await wrapHttp(req, ServiceFacade.viewCart);
     return res.send(result);

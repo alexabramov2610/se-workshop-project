@@ -393,7 +393,21 @@ export class UserManager {
         return cartRes
     }
 
-
+    async getAllUsers(req: Req.Request): Promise<Res.GetAllUsersResponse> {
+        if (!this.checkIsAdminByToken(req.token))
+            return { data: {result: false, users:[] }, error: {message: errorMsg.E_NOT_AUTHORIZED} }
+        try {
+            const adminName: string = this.getLoggedInUsernameByToken(req.token);
+            logger.debug(`trying to retrieve all users for admin: ${adminName} from DB`)
+            const u = await UserModel.find({})
+            if (!u)
+                throw new Error(`retrieved undefined from DB`)
+            return { data: {result: true, users: u.map(currUser => currUser.name) } }
+        } catch (e) {
+            logger.error(`getUserByName DB ERROR: ${e}`)
+            return { data: {result: false, users:[] }, error: {message: e} }
+        }
+    }
 
 
 

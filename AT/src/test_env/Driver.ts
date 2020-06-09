@@ -35,7 +35,9 @@ class Driver {
     };
     this.makeABuy = this.makeABuy.bind(this)
   }
-
+  public reset() {
+    this.bridge.reset();
+  }
   private loginDefCredentials: Credentials = {
     userName: "ron",
     password: "avishay",
@@ -73,7 +75,7 @@ class Driver {
   }
 
   dropDBDor(){
-    shell.exec('/home/dorbiren/Desktop/sadna/se-workshop-project/AT/dropalldor.sh', {async: false})
+    this.dropDB()
  }
 
 async initWith(cred: Credentials): Promise<Driver> {

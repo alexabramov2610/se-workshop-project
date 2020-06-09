@@ -436,6 +436,11 @@ export class TradingSystemManager {
 
     }
 
+    async getAllUsers(req: Req.Request): Promise<Res.GetAllUsersResponse> {
+        logger.info(`retrieving all users in system`)
+        return this._userManager.getAllUsers(req);
+    }
+
     //endregion
 
     //region verifications
