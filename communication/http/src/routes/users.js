@@ -10,7 +10,7 @@ router.post("/saveProduct", UserController.saveProductToCart);
 router.post("/removeProduct", UserController.removeProductFromCart);
 router.post("/viewRegisteredUserPurchasesHistory", UserController.viewRegisteredUserPurchasesHistory);
 
-
+router.get("/allUsers", UserController.getAllUsers);
 router.get("/viewCart", UserController.viewCart);
 router.get("/personalDetails", UserController.personalDetails);
 
