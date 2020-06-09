@@ -34,7 +34,7 @@ const getTotalPrice = (p) => {
 }
 
 const getValue = (props) => {
-    return !config.isAdmin ? config.loggedInUser : props.data.username;
+    return config.isAdmin && props.data.username;
 }
 
 const AdminViewUsersPurchaseHistoryPage = (props) => {
@@ -44,35 +44,35 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
     const tableData = data.purchasesHistory.map(p => {
         const currDate = moment(p.date);
         const pDate = currDate.format('DD/MM/YYYY');
-
         return {
             date: pDate,
             user: p.purchases[0].userName,
-            last4: 1234,
-            total: getTotalPrice(p) + "$",
+            last4: p.last4,
+            total: p.total,
             purchases: p.purchases
         };
     });
 
     useEffect(() => {
         !config.isAdmin && props.data.selectUser(config.loggedInUser);
-    });
+    },[]);
 
     return (
         <React.Fragment>
             <Divider style={{fontSize: "25px"}} orientation={"left"}>View User Purchases History</Divider>
             <Space style={{paddingBottom: "20px"}}>
                 <AiOutlineUser/>
-                {config.isAdmin ? <SearchSelect
-                    size={"large"}
-                    isLoading={data.isLoading}
-                    value={getValue(props)}
-                    onChangeCallback={e => data.selectUser(e)}
-                    bordered={false}
-                    placeholder={"select a user"}
-                    options={users}
-                />
-                : `${config.loggedInUser}`}
+                {config.isAdmin
+                    ? <SearchSelect
+                        size={"large"}
+                        isLoading={data.isLoading}
+                        value={getValue(props)}
+                        onChangeCallback={e => data.selectUser(e)}
+                        bordered={false}
+                        placeholder={"select a user"}
+                        options={users}
+                    />
+                    : `${config.loggedInUser}`}
             </Space>
             <Table
                 expandable={{

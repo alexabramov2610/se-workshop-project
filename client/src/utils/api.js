@@ -237,7 +237,7 @@ const viewUserPurchaseHistory = async (username) => {
 };
 
 const getUsers = async () => {
-    return instance.get(`${baseDomain}/users/viewRegisteredUserPurchasesHistory`);
+    return instance.get(`${baseDomain}/users/allUsers`);
 };
 
 export {

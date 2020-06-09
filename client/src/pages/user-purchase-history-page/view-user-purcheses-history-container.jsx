@@ -7,22 +7,27 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
 
     const [fetching, setFetching] = useState(false);
     const [username, setUsername] = useState(undefined);
+    const [users, setUsers] = useState([]);
     const [purchasesHistory, setPurchasesHistory] = useState([]);
-    let users = ["buyer1", "avishai", "alex", "tal", "ron"];
+    // let users = ["buyer1", "avishai", "alex", "tal", "ron"];
 
     useEffect(() => {
         const fetchData = async () => {
             setFetching(true);
             await generalUtils.sleep(1000);
 
-            // const usersRes = await api.getUsers();
+            const usersRes = await api.getUsers();
             const purchasesHistoryRes = await api.viewUserPurchaseHistory(username);
-            console.log(purchasesHistoryRes);
 
             if (purchasesHistoryRes.data.data.result) {
                 const receipts = purchasesHistoryRes.data.data.receipts;
                 const keyedHistory = generalUtils.addKeys(receipts);
                 setPurchasesHistory(keyedHistory);
+            }
+            console.log("purchasesHistoryRes:", purchasesHistoryRes);
+
+            if (!usersRes.data.error) {
+                setUsers(usersRes.data.data.users);
             }
             setFetching(false);
         }

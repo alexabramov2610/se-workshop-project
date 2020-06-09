@@ -56,7 +56,7 @@ const ViewStoresPurchaseHistoryPage = (props) => {
 
     useEffect(() => {
         !props.isAdmin && props.data.selectStore(storename);
-    });
+    },[]);
 
     return (
         <React.Fragment>
