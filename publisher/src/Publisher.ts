@@ -5,9 +5,10 @@ import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
+import { IPublisher } from "se-workshop-20-interfaces/dist/src/CommonInterface"
 import { terminate, setOnCloseEvent, removeClient } from "websocket";
 
-export class Publisher {
+export class Publisher implements IPublisher {
 
     private notificationId: number;
     private _subscriptions: Map<EventCode, Map<string, any>>;
@@ -96,7 +97,7 @@ export class Publisher {
     }
 
     /** unsubscribe **/
-    unsubscribe(username: string, subscriptionEvent: EventCode, key: string) {
+    unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void {
         const eventType: number = this.getEventFromEventCode(subscriptionEvent);
         if (eventType === -1)
             return;
@@ -244,7 +245,7 @@ export class Publisher {
         return -1;
     }
 
-    terminateSocket() {
+    terminateSocket(): void {
         terminate()
     }
 

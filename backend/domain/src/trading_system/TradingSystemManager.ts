@@ -20,7 +20,7 @@ import {
     Purchase,
     IProduct,
     Cart,
-    CartProduct
+    CartProduct, IPublisher
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
@@ -36,7 +36,7 @@ export class TradingSystemManager {
     private _storeManager: StoreManagement;
     private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
-    private _publisher: Publisher;
+    private _publisher: IPublisher;
 
     constructor() {
         this._publisher = new Publisher(logoutUserByName);
@@ -610,6 +610,10 @@ export class TradingSystemManager {
 
     //endregion
 
+    setPublisher(publisher: IPublisher): void {
+        if (publisher)
+            this._publisher = publisher;
+    }
 
     async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
         try {

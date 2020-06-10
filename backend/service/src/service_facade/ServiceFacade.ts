@@ -4,6 +4,7 @@ import * as UserService from '../user_service/UserService';
 import * as StoreService from '../store_service/StoreService';
 import * as BuyingService from '../buying_service/BuyingService';
 import * as YamlInitializer from './YamlInitializer';
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 let tradingSystem = getInstance();
 
@@ -304,6 +305,11 @@ export const safeShutdown = async (): Promise<void> => {
 export const dropDB = async (path?: string): Promise<void> => {
     await tradingSystem.dropAllDB(path);
 }
+export const setPublisher = async (publisher: IPublisher): Promise<void> => {
+    tradingSystem.setPublisher(publisher);
+}
+
+//todo: set publisher and test
 
 export const startNewSession = (): Promise<string> => {
     return tradingSystem.startNewSession();
