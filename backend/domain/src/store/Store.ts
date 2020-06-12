@@ -500,7 +500,7 @@ export class Store {
             if (!newPurchasePolicy)
                 return false;
             newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
-            console.log(`${newPurchasePolicy.getNotForSellDays()}`)
+            console.log(`${newPurchasePolicy.getNotForSellDays()} ${newPurchasePolicy.getCatalogNumber()} ${newPurchasePolicy.getMinAmount()} ${newPurchasePolicy.getMaxAmount()}`)
             newDocs.push({
                 operator: purchasePolicy.operator,
                 notForSellDays: newPurchasePolicy.getNotForSellDays(),

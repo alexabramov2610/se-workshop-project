@@ -192,7 +192,7 @@ export class TradingSystemManager {
         const amount: number = req.body.amount;
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
-        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token,["cart"]);
 
         const user: User = rUser ? rUser : this._userManager.getGuestByToken(req.token);
 
