@@ -1,6 +1,15 @@
-import {ManagementPermission, Operators, ProductCategory, Rating, WeekDays} from "./Enums";
+import {EventCode, ManagementPermission, Operators, ProductCategory, Rating, WeekDays} from "./Enums";
+import {Event} from "./Event";
 
 export {ProductCategory};
+
+export interface IPublisher {
+    subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void;
+    unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void;
+    notify(event: Event): string[];
+    terminateSocket(): void;
+    removeClient(username: string);
+}
 
 export interface IItem extends ProductCatalogNumber {
     id: number;
