@@ -179,6 +179,9 @@ export class Publisher implements IPublisher {
         else if (eventType === EventCode.LOTTERY_EVENTS)
             return this.handleLotteryEvent(<LotteryEvent> event);
 
+        else if (eventType === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
+            return this.handleApproveOwnerEvent(<Event.ApproveOwnerEvent> event);
+
         return notificationNotSent;
     }
 
@@ -188,7 +191,12 @@ export class Publisher implements IPublisher {
             return [event.username];
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.storeName), event);
     }
-
+    private handleApproveOwnerEvent(event: Event.ApproveOwnerEvent): string[] {
+        const eventType: EventCode = EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED;
+        if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.storeName))
+            return [event.username];
+        return this.updateSubscribers(this._subscriptions.get(eventType).get(event.storeName), event);
+    }
     private handleRegisteredUserEvent(event: Event.Event): string[] {
         const eventType: EventCode = EventCode.USER_EVENTS;
         if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username)) {

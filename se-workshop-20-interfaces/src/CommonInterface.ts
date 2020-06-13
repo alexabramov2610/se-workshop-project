@@ -202,3 +202,11 @@ export interface ManagerNamePermission {
     managerName: string,
     permissions: ManagementPermission[]
 }
+
+export interface AssignAgreement {
+    assignedByOwner: string;
+    newOwner: string
+    requiredApprove: [string],
+    approvedBy: [string],
+    storeName: string
+}

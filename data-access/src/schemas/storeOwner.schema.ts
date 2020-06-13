@@ -17,6 +17,10 @@ const storeOwnerSchema = new Schema({
             required: true,
             default: []
         },
+        agreements: {
+            type: [{type: Types.ObjectId, ref: 'assignAgreements'}],
+            default: []
+        },
     },
     {timestamps: false,});
 
