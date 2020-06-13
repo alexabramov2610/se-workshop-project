@@ -1,12 +1,12 @@
 import {StoreOwnerNotificationsSubscriber} from "./subscribers/StoreOwnerNotificationsSubscriber";
-import { Event } from "se-workshop-20-interfaces"
+import {Event} from "se-workshop-20-interfaces"
 import {EventCode} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { IPublisher } from "se-workshop-20-interfaces/dist/src/CommonInterface"
-import { terminate, setOnCloseEvent, removeClient } from "websocket";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface"
+import {removeClient, setOnCloseEvent, terminate} from "websocket";
 
 export class Publisher implements IPublisher {
 
@@ -179,9 +179,6 @@ export class Publisher implements IPublisher {
         else if (eventType === EventCode.LOTTERY_EVENTS)
             return this.handleLotteryEvent(<LotteryEvent> event);
 
-        else if (eventType === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
-            return this.handleApproveOwnerEvent(<Event.ApproveOwnerEvent> event);
-
         return notificationNotSent;
     }
 
@@ -191,12 +188,7 @@ export class Publisher implements IPublisher {
             return [event.username];
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.storeName), event);
     }
-    private handleApproveOwnerEvent(event: Event.ApproveOwnerEvent): string[] {
-        const eventType: EventCode = EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED;
-        if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.storeName))
-            return [event.username];
-        return this.updateSubscribers(this._subscriptions.get(eventType).get(event.storeName), event);
-    }
+
     private handleRegisteredUserEvent(event: Event.Event): string[] {
         const eventType: EventCode = EventCode.USER_EVENTS;
         if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username)) {
@@ -234,7 +226,7 @@ export class Publisher implements IPublisher {
         if (eventCode === EventCode.STORE_OWNER_EVENTS ||
             eventCode === EventCode.NEW_PURCHASE ||
             eventCode === EventCode.STORE_CLOSED ||
-            eventCode === EventCode.STORE_OPENED)
+            eventCode === EventCode.STORE_OPENED || eventCode === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
             return EventCode.STORE_OWNER_EVENTS;
 
         else if (eventCode === EventCode.ASSIGNED_AS_STORE_OWNER ||
