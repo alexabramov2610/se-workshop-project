@@ -285,8 +285,9 @@ export class TradingSystemManager {
         const res: { res: Res.BoolResponse, notify?: string[] } = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
         if (res.res.data.result) {
             if (res.notify && res.notify.length > 0)
-                await this.notifyStoreOwnerOfNewApproveRequired(res.notify, req.body.storeName, req.body.usernameToAssign)
-            await this.addOwnerIfAccepted(req.body.usernameToAssign, req.body.storeName);
+                await this.notifyStoreOwnerOfNewApproveRequired(res.notify, req.body.storeName, req.body.usernameToAssign, usernameWhoAssigns.name)
+            else
+                await this.addOwnerIfAccepted(req.body.usernameToAssign, req.body.storeName);
         }
         return res.res;
     }
@@ -413,7 +414,7 @@ export class TradingSystemManager {
     async getOwnersAssignedBy(req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetOwnersAssignedByResponse> {
         const assignedBy: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
         if (!assignedBy)
-            return {data: {result: false, owners: [],agreements:[]}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+            return {data: {result: false, owners: [], agreements: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         logger.info(`retrieving owners assigned by ${assignedBy.name}`);
         return this._storeManager.getOwnersAssignedBy(req.body.storeName, assignedBy);
     }
@@ -595,7 +596,7 @@ export class TradingSystemManager {
         }
     }
 
-    async notifyStoreOwnerOfNewApproveRequired(owners: string[], storeName: string, newOwner: string): Promise<void> {
+    async notifyStoreOwnerOfNewApproveRequired(owners: string[], storeName: string, newOwner: string, assigner: string): Promise<void> {
         logger.info(`notifying store owners about new approve required by him`)
         const notification: Event.Notification = {
             message: formatString(notificationMsg.M_NEED_APPROVE,
@@ -607,7 +608,7 @@ export class TradingSystemManager {
                 code: EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED,
                 storeName,
                 notification,
-                newOwner
+                assigner
             };
             const usersNotSend: string[] = this._publisher.notify(event);
             for (const userToSave of usersNotSend) {
