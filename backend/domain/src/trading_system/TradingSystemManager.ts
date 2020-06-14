@@ -411,11 +411,11 @@ export class TradingSystemManager {
     }
 
     async getOwnersAssignedBy(req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetOwnersAssignedByResponse> {
-        logger.info(`retrieving owners assigned`);
-        const usernameWhoRemoves: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
-        if (!usernameWhoRemoves)
-            return {data: {result: false, owners: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
-        return this._storeManager.getOwnersAssignedBy(req.body.storeName, usernameWhoRemoves);
+        const assignedBy: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        if (!assignedBy)
+            return {data: {result: false, owners: [],agreements:[]}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+        logger.info(`retrieving owners assigned by ${assignedBy.name}`);
+        return this._storeManager.getOwnersAssignedBy(req.body.storeName, assignedBy);
     }
 
     async getPersonalDetails(req: Req.Request): Promise<Res.GetPersonalDetailsResponse> {

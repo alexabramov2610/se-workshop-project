@@ -4,7 +4,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {
     BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
     Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
-    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission
+    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission, AssignAgreement
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -125,12 +125,15 @@ export class StoreManagement {
     async getOwnersAssignedBy(storeName: string, user: RegisteredUser): Promise<Res.GetOwnersAssignedByResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         if (!storeModel)
-            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}}
+            return {data: {result: false, owners: [], agreements: []}, error: {message: errorMsg.E_INVALID_STORE}}
         const storeOwner = this.findStoreOwner(storeModel, user.name);
+        const agreements= await AssignAgreementModel.find( {$or:[{storeName, requiredApprove: user.name}, {storeName, assignedByOwner: user.name}] })
+        const filtered= agreements.filter((a)=> a.requiredApprove.length !== a.approvedBy.length)
         return {
             data: {
                 result: true,
-                owners: storeOwner.ownersAssigned.map(curr => curr.name)
+                owners: storeOwner.ownersAssigned.map(curr => curr.name),
+                agreements: filtered
             }
         };
     }
@@ -717,6 +720,7 @@ export class StoreManagement {
                 storeManagersNames: store.storeOwners.map(o => o.name),
                 productsNames: store.products.map(p => p.name)
             }
+
             return {data: {result: true, info: storeInfo}}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
