@@ -77,11 +77,11 @@ export enum NotificationsType {
 }
 
 export enum WeekDays {
-    SUNDAY = 1,
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY
+    SUNDAY = "Sunday",
+    MONDAY = "Monday",
+    TUESDAY = "Tuesday",
+    WEDNESDAY = "Wednesday",
+    THURSDAY = "Thursday",
+    FRIDAY = "Friday",
+    SATURDAY = "Saturday"
 }

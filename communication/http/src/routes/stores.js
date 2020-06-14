@@ -42,7 +42,7 @@ router.get("/getManagerPermissions/", StoreController.getManagerPermissions);   
 router.get("/getDiscountsPolicy", StoreController.getDiscountsPolicy);              //usage: stores/getDiscountsPolicy/?storeName=shufersal
 router.get("/getStoreInfo", StoreController.viewStoreInfo);                        //usage: stores/getStoreInfo/?storeName=shufersal
 router.get("/getManagersPermissions", StoreController.getManagersPermissions);                        //usage: stores/getStoreInfo/?storeName=shufersal
-router.get("/getOwnersAssignedBy", StoreController.getOwnersAssignedBy);                        //usage: stores/getStoreInfo/?storeName=shufersal
+router.get("/getOwnersAssignedBy", StoreController.getOwnersAssignedBy);                        //usage: stores/getOwnersAssignedBy/?storeName=shufersal
 router.get("/getPurchasePolicy", StoreController.getPurchasePolicy);              //usage: stores/getPurchasePolicy/?storeName=shufersal
 router.get("/getItemIds/", StoreController.getItemIds);      // usage: stores/getItemIds/?storeName=alibaba&product=3
 

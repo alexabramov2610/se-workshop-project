@@ -515,7 +515,7 @@ export class Store {
             const policiesDocs = await PurchasePolicyElementModel.create(newDocs);
             const purchasePolicy = await PurchasePolicyModel.findOneAndUpdate({storeName: this.storeName}, {children: policiesDocs});
         } catch (e) {
-            logger.error(`setPurchasePolicy discounts ERROR DB ${e} `)
+            logger.error(`setPurchasePolicy ERROR DB ${e} `)
             return false;
         }
         this.purchasePolicy = newPolicy;
