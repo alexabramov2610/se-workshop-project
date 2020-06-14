@@ -32,7 +32,7 @@ interface StoreOwnerEvent extends Event {
 }
 
 interface ApproveOwnerEvent extends StoreOwnerEvent {
-    newOwner: string
+    assigner: string
 }
 
 interface NewPurchaseEvent extends StoreOwnerEvent {
