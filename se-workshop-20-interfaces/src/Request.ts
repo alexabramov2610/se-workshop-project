@@ -4,7 +4,14 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission
+    SearchFilters,
+    IPayment,
+    IDiscount,
+    CreditCard,
+    IDiscountPolicy,
+    IPurchasePolicy,
+    ManagerNamePermission,
+    AssignAgreement
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 import {Response} from "./Response";
@@ -263,7 +270,12 @@ interface GetItemsIdsRequest extends Request {
     body: { storeName: string, product: number }
 }
 
+interface ApproveNewOwnerRequest extends Request {
+    body: { storeName: string, newOwnerName: string }
+}
+
 export {
+    ApproveNewOwnerRequest,
     GetItemsIdsRequest,
     GetOwnersAssignedByRequest,
     ChangeMultipleManagerPermissionRequest,

@@ -19,6 +19,8 @@ router.post("/setDiscountsPolicy", StoreController.setDiscountsPolicy);
 router.post("/addDiscount", StoreController.addDiscount);
 router.post("/removeProductDiscount", StoreController.removeProductDiscount);
 router.post("/assignStoreOwner", StoreController.assignStoreOwner);
+router.post("/approveStoreOwner", StoreController.approveStoreOwner);
+
 router.post("/removeStoreOwner", StoreController.removeStoreOwner);
 router.post("/assignStoreManager", StoreController.assignStoreManager);
 router.post("/addManagerPermissions", StoreController.addManagerPermissions);

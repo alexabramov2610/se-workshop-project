@@ -60,6 +60,7 @@ export enum EventCode {
 
     LOTTERY_DESTINATION_PRICE_REACHED,
 
+    APPROVE_NEW_STORE_OWNER_REQUIRED
 }
 
 export enum Operators {

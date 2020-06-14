@@ -31,6 +31,10 @@ interface StoreOwnerEvent extends Event {
     storeName: string
 }
 
+interface ApproveOwnerEvent extends StoreOwnerEvent {
+    assigner: string
+}
+
 interface NewPurchaseEvent extends StoreOwnerEvent {
     // code: EventCode.NEW_PURCHASE
 }
@@ -43,5 +47,6 @@ export {
     AuctionEvent,
     LotteryEvent,
     StoreOwnerEvent,
-    NewPurchaseEvent
+    NewPurchaseEvent,
+    ApproveOwnerEvent
 };
