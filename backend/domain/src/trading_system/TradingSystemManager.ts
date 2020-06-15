@@ -295,7 +295,7 @@ export class TradingSystemManager {
         const isAdded: boolean = await this._storeManager.addOwnerIfAccepted(newOwner, storeName);
         if (isAdded) {
             logger.info(`successfully assigned user: ${newOwner} as store owner of store: ${storeName}`)
-            await this.subscribeStoreOwner(newOwner, storeName)
+            await this.subscribeAndNotifyStoreOwner(newOwner, storeName, false)
         }
         return isAdded;
     }
