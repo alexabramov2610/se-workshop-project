@@ -4,9 +4,10 @@ import {EventCode} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
-import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
+import {AuctionEvent, LotteryEvent, StatisticsUpdateEvent} from "se-workshop-20-interfaces/dist/src/Event";
 import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface"
 import {removeClient, setOnCloseEvent, terminate} from "websocket";
+import {StatisticsEventsSubscriber} from "./subscribers/StatisticsEventsSubscriber";
 
 export class Publisher implements IPublisher {
 
@@ -57,6 +58,9 @@ export class Publisher implements IPublisher {
 
         else if (eventType === EventCode.LOTTERY_EVENTS)
             this.subscribeLotteryEvents(username, key, storeName);
+
+        else if (eventType === EventCode.WATCH_STATISTICS)
+            this.subscribeStatisticsEvents(username);
     }
 
     private subscribeStoreOwnerEvents(username: string, storeName: string): void {
@@ -97,6 +101,13 @@ export class Publisher implements IPublisher {
         this._subscriptions.get(eventType).get(lotteryId).push(subscriber);
     }
 
+    private subscribeStatisticsEvents(username: string): void {
+        const eventType: EventCode = EventCode.WATCH_STATISTICS;
+        const subscriber: StatisticsEventsSubscriber = new StatisticsEventsSubscriber(username);
+        this._subscriptions.get(eventType).set(username, subscriber);
+    }
+
+
     /** unsubscribe **/
     unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void {
         const eventType: number = this.getEventFromEventCode(subscriptionEvent);
@@ -118,6 +129,9 @@ export class Publisher implements IPublisher {
 
         else if (eventType === EventCode.LOTTERY_EVENTS)
             this.unsubscribeLotteryEvents(username, key);
+
+        else if (eventType === EventCode.WATCH_STATISTICS)
+            this.unsubscribeStatisticsEvents(username);
     }
 
     private unsubscribeStoreOwnerEvents(username: string, storeName: string): void {
@@ -160,6 +174,14 @@ export class Publisher implements IPublisher {
         this._subscriptions.get(eventType).set(lotteryId, subscribers);
     }
 
+    private unsubscribeStatisticsEvents(username: string): void {
+        const eventType: EventCode = EventCode.WATCH_STATISTICS;
+
+        if (!this._subscriptions.get(eventType).has(username))
+            return;
+
+        this._subscriptions.get(eventType).delete(username);
+    }
 
     /** notify **/
     notify(event: Event.Event): string[] {
@@ -182,6 +204,9 @@ export class Publisher implements IPublisher {
 
         else if (eventType === EventCode.LOTTERY_EVENTS)
             return this.handleLotteryEvent(<LotteryEvent> event);
+
+        else if (eventType === EventCode.WATCH_STATISTICS)
+            this.handleStatisticsEvent(<StatisticsUpdateEvent> event);
 
         return notificationNotSent;
     }
@@ -225,6 +250,15 @@ export class Publisher implements IPublisher {
         return this.updateSubscribers(this._subscriptions.get(eventType).get(event.lotteryId), event);
     }
 
+    private handleStatisticsEvent(event: StatisticsUpdateEvent): string[] {
+        const eventType: EventCode = EventCode.WATCH_STATISTICS;
+        if(!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.username)) {
+            // console.log("event wasn't sent")
+            return [event.username];
+        }
+        return this.updateSubscribers([this._subscriptions.get(eventType).get(event.username)], event);
+    }
+
     private updateSubscribers(subscribers: Subscriber[], event: Event.Event): string[] {
         let notificationNotSent: string[] = [];
         const notificationId = this.notificationId++;
@@ -243,7 +277,7 @@ export class Publisher implements IPublisher {
             return EventCode.STORE_OWNER_EVENTS;
 
         else if (eventCode === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
-            return eventCode;
+            return EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED;
 
         else if (eventCode === EventCode.ASSIGNED_AS_STORE_OWNER ||
              eventCode === EventCode.USER_EVENTS ||
@@ -258,6 +292,10 @@ export class Publisher implements IPublisher {
             eventCode === EventCode.AUCTION_WINNER ||
             eventCode === EventCode.LOTTERY_DESTINATION_PRICE_REACHED)
             return EventCode.LOTTERY_EVENTS;
+
+        else if (eventCode === EventCode.WATCH_STATISTICS)
+            return EventCode.WATCH_STATISTICS;
+
         return -1;
     }
 

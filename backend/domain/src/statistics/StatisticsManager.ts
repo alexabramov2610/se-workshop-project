@@ -59,7 +59,7 @@ export class StatisticsManager {
         return dailyStatistics;
     }
 
-    async updateRegisteredUserVisit(adminUsername: string, username: string): Promise<boolean> {
+    async updateRegisteredUserVisit(username: string): Promise<boolean> {
         logger.info(`updating new visit by ${username}`)
 
         const isStoreManager: boolean = await this.isUserStoreManager(username);

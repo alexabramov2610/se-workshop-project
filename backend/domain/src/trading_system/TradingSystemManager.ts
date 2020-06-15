@@ -20,7 +20,7 @@ import {
     Purchase,
     IProduct,
     Cart,
-    CartProduct, IPublisher, DailyStatistics
+    CartProduct, IPublisher, DailyStatistics, VisitorsStatistics
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
@@ -98,13 +98,21 @@ export class TradingSystemManager {
         const adminUsername: string = this._userManager.getLoggedInUsernameByToken(req.token);
         if (!adminUsername || !this._userManager.checkIsAdminByToken(req.token))
             return { data: { result: false, statistics: [] }, error: { message: errorMsg.E_BAD_OPERATION } }
-
+        this._publisher.subscribe(adminUsername, EventCode.WATCH_STATISTICS, "", "");
         const statistics: DailyStatistics[] = await this.statisticsManager.newStatisticsRequest(adminUsername, req.body.from, req.body.to);
-        return { data: { result: false, statistics } }
+        return { data: { result: true, statistics } }
     }
 
-    async updateAdminForRealTimeStatisticsChange(adminsToUpdate: string[]) {
-
+    async updateAdminsForRealTimeStatisticsChange(adminsToUpdate: string[]) {
+        logger.info(`updating ${adminsToUpdate.length} admins about new statistics`);
+        for (const admin of adminsToUpdate) {
+            const event: Event.StatisticsUpdateEvent = {
+                username: admin, code: EventCode.WATCH_STATISTICS,
+                notification: {type: NotificationsType.STATISTICS, message: notificationMsg.M_STATS_UPDATE},
+                statistics: this.statisticsManager.getDailyVisitorsStatistics()
+            };
+            this._publisher.notify(event)
+        }
     }
 
     //endregion
@@ -119,9 +127,8 @@ export class TradingSystemManager {
         this._userManager.addGuestToken(newID);
         this.statisticsManager.updateGuestVisit()
             .then((updateAdmins: boolean) => {
-                logger.info(`updating admin about new statistics`)
                 if (updateAdmins)
-                    this.updateAdminForRealTimeStatisticsChange(this.statisticsManager.getRealTimeStatisticsSubscribers());
+                    this.updateAdminsForRealTimeStatisticsChange(this.statisticsManager.getRealTimeStatisticsSubscribers());
             })
             .catch((error) =>
                 logger.error(`startNewSession failed in updateGuestVisit: ${error}`)
@@ -140,12 +147,20 @@ export class TradingSystemManager {
         return this._userManager.register(req)
     }
 
-    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {     //TODO: use statsmanager.updateRegisteredUserVisit
+    async login(req: Req.LoginRequest): Promise<Res.BoolResponse> {
         logger.info(`logging in user: ${req.body.username} `);
         const res: Res.BoolResponse = await this._userManager.login(req);
         if (res.data.result) {
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
             await this.sendPendingEvents(req.body.username);
+            this.statisticsManager.updateRegisteredUserVisit(req.body.username)
+                .then((updateAdmins: boolean) => {
+                    if (updateAdmins)
+                        this.updateAdminsForRealTimeStatisticsChange(this.statisticsManager.getRealTimeStatisticsSubscribers());
+                })
+                .catch((error) =>
+                    logger.error(`startNewSession failed in updateGuestVisit: ${error}`)
+                )
         } else {
             this._publisher.removeClient(req.body.username);
         }
