@@ -90,6 +90,9 @@ export const removeProducts = async (req: Req.ProductRemovalRequest): Promise<Re
 export const assignStoreOwner = async (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.assignStoreOwner(req);
 }
+export const approveStoreOwner = async (req: Req.ApproveNewOwnerRequest): Promise<Res.BoolResponse> => {
+    return ts.approveStoreOwner(req);
+}
 
 export const removeStoreOwner = async (req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return ts.removeStoreOwner(req);

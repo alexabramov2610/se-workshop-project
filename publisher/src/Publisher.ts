@@ -1,12 +1,12 @@
 import {StoreOwnerNotificationsSubscriber} from "./subscribers/StoreOwnerNotificationsSubscriber";
-import { Event } from "se-workshop-20-interfaces"
+import {Event} from "se-workshop-20-interfaces"
 import {EventCode} from "se-workshop-20-interfaces/dist/src/Enums";
 import {Subscriber} from "./subscribers/Subscriber";
 import {AuctionNotificationsSubscriber} from "./subscribers/AuctionNotificationsSubscriber";
 import {RegisteredUserEventsSubscriber} from "./subscribers/RegisteredUserEventsSubscriber";
 import {AuctionEvent, LotteryEvent} from "se-workshop-20-interfaces/dist/src/Event";
-import { IPublisher } from "se-workshop-20-interfaces/dist/src/CommonInterface"
-import { terminate, setOnCloseEvent, removeClient } from "websocket";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface"
+import {removeClient, setOnCloseEvent, terminate} from "websocket";
 
 export class Publisher implements IPublisher {
 
@@ -19,6 +19,7 @@ export class Publisher implements IPublisher {
      NEW_PURCHASE                       |              "                    |   STORE_OWNER_EVENTS          //in use
      STORE_CLOSED                       |              "                    |   STORE_OWNER_EVENTS
      STORE_OPENED                       |              "                    |   STORE_OWNER_EVENTS
+     APPROVE_NEW_STORE_OWNER_REQUIRED   |              "                    |   STORE_OWNER_EVENTS ---excluding the assigner // in use
      ASSIGNED_AS_STORE_OWNER            | map<username, subscriber>         |   USER_EVENTS                 //in use
      REMOVED_AS_STORE_OWNER             |              "                    |   USER_EVENTS                 //in use
      ----------------------------------------------------------------------------
@@ -170,6 +171,9 @@ export class Publisher implements IPublisher {
         if (eventType === EventCode.STORE_OWNER_EVENTS)
             return this.handleStoreOwnerEvent(<Event.StoreOwnerEvent> event);
 
+        if (eventType === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
+            return this.handleAssignStoreOwnerEvent(<Event.ApproveOwnerEvent> event);
+
         else if (eventType === EventCode.USER_EVENTS)
             return this.handleRegisteredUserEvent(event);
 
@@ -180,6 +184,15 @@ export class Publisher implements IPublisher {
             return this.handleLotteryEvent(<LotteryEvent> event);
 
         return notificationNotSent;
+    }
+
+    private handleAssignStoreOwnerEvent(event: Event.ApproveOwnerEvent): string[] {
+        const eventType: EventCode = EventCode.STORE_OWNER_EVENTS;
+        if (!this._subscriptions.has(eventType) || !this._subscriptions.get(eventType).has(event.storeName))
+            return [event.username];
+        const subscribers: Subscriber[] = this._subscriptions.get(eventType).get(event.storeName).filter((s: Subscriber) => s.username() !== event.assigner)
+        return this.updateSubscribers(subscribers, event);
+
     }
 
     private handleStoreOwnerEvent(event: Event.StoreOwnerEvent): string[] {
@@ -228,6 +241,9 @@ export class Publisher implements IPublisher {
             eventCode === EventCode.STORE_CLOSED ||
             eventCode === EventCode.STORE_OPENED)
             return EventCode.STORE_OWNER_EVENTS;
+
+        else if (eventCode === EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED)
+            return eventCode;
 
         else if (eventCode === EventCode.ASSIGNED_AS_STORE_OWNER ||
              eventCode === EventCode.USER_EVENTS ||

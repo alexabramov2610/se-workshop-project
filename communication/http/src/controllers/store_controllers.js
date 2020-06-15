@@ -75,6 +75,10 @@ export async function assignStoreOwner(req, res) {
     const result = await wrapHttp(req, ServiceFacade.assignStoreOwner);
     return res.send(result)
 }
+export async function approveStoreOwner(req, res) {
+    const result = await wrapHttp(req, ServiceFacade.approveStoreOwner);
+    return res.send(result)
+}
 
 export async function removeStoreOwner(req, res) {
     const result = await wrapHttp(req, ServiceFacade.removeStoreOwner);

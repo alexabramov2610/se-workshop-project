@@ -178,6 +178,9 @@ UC-4.3
 export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.assignStoreOwner));
 }
+export const approveStoreOwner = (req: Req.ApproveNewOwnerRequest): Promise<Res.BoolResponse> => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.approveStoreOwner));
+}
 /*
 UC-4.4
  */

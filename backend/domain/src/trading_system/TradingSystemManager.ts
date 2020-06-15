@@ -107,7 +107,7 @@ export class TradingSystemManager {
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
         logger.info(`trying to register new user: ${req.body.username} `);
-        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token,[]);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token, []);
         if (rUser) {
             logger.debug(`logged in user, can't register`);
             return {data: {result: false}, error: {message: errorMsg.E_BAD_OPERATION}}
@@ -192,7 +192,7 @@ export class TradingSystemManager {
         const amount: number = req.body.amount;
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
-        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token, ["cart"]);
 
         const user: User = rUser ? rUser : this._userManager.getGuestByToken(req.token);
 
@@ -281,12 +281,23 @@ export class TradingSystemManager {
         const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.usernameToAssign)
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
-        const res: Res.BoolResponse = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
-        if (res.data.result) {
-            logger.info(`successfully assigned user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
-            await this.subscribeAndNotifyStoreOwner(req.body.usernameToAssign, req.body.storeName, false)
+        const res: { res: Res.BoolResponse, notify?: string[] } = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
+        if (res.res.data.result) {
+            if (res.notify && res.notify.length > 0)
+                await this.notifyStoreOwnerOfNewApproveRequired(res.notify, req.body.storeName, req.body.usernameToAssign, usernameWhoAssigns.name)
+            else
+                await this.addOwnerIfAccepted(req.body.usernameToAssign, req.body.storeName);
         }
-        return res;
+        return res.res;
+    }
+
+    async addOwnerIfAccepted(newOwner: string, storeName: string): Promise<boolean> {
+        const isAdded: boolean = await this._storeManager.addOwnerIfAccepted(newOwner, storeName);
+        if (isAdded) {
+            logger.info(`successfully assigned user: ${newOwner} as store owner of store: ${storeName}`)
+            await this.subscribeStoreOwner(newOwner, storeName)
+        }
+        return isAdded;
     }
 
     async removeStoreOwner(req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> {
@@ -400,11 +411,11 @@ export class TradingSystemManager {
     }
 
     async getOwnersAssignedBy(req: Req.GetAllManagersPermissionsRequest): Promise<Res.GetOwnersAssignedByResponse> {
-        logger.info(`retrieving owners assigned`);
-        const usernameWhoRemoves: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
-        if (!usernameWhoRemoves)
-            return {data: {result: false, owners: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
-        return this._storeManager.getOwnersAssignedBy(req.body.storeName, usernameWhoRemoves);
+        const assignedBy: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
+        if (!assignedBy)
+            return {data: {result: false, owners: [], agreements: []}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
+        logger.info(`retrieving owners assigned by ${assignedBy.name}`);
+        return this._storeManager.getOwnersAssignedBy(req.body.storeName, assignedBy);
     }
 
     async getPersonalDetails(req: Req.Request): Promise<Res.GetPersonalDetailsResponse> {
@@ -586,6 +597,27 @@ export class TradingSystemManager {
         }
     }
 
+    async notifyStoreOwnerOfNewApproveRequired(owners: string[], storeName: string, newOwner: string, assigner: string): Promise<void> {
+        logger.info(`notifying store owners about new approve required by him`)
+        const notification: Event.Notification = {
+            message: formatString(notificationMsg.M_NEED_APPROVE,
+                [newOwner, storeName]), type: NotificationsType.GREEN
+        };
+        for (const storeOwner of owners) {
+            const event: Event.ApproveOwnerEvent = {
+                username: storeOwner,
+                code: EventCode.APPROVE_NEW_STORE_OWNER_REQUIRED,
+                storeName,
+                notification,
+                assigner
+            };
+            const usersNotSend: string[] = this._publisher.notify(event);
+            for (const userToSave of usersNotSend) {
+                await this._userManager.saveNotification(userToSave, event)
+            }
+        }
+    }
+
     terminateSocket() {
         logger.debug(`terminating socket`);
         this._publisher.terminateSocket();
@@ -757,6 +789,19 @@ export class TradingSystemManager {
             return {data: {result: false}, error: {message: errorMsg.E_DB}}
         }
 
+    }
+
+    async approveStoreOwner(req: Req.ApproveNewOwnerRequest): Promise<Res.BoolResponse> {
+        logger.info(`approving user: ${req.body.newOwnerName} as store owner of store: ${req.body.storeName}`)
+        const usernameWhoApprove: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
+        const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.newOwnerName)
+        if (!usernameToAssign)
+            return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
+        const approved: Res.BoolResponse = await this._storeManager.approveStoreOwner(req.body.storeName, usernameToAssign, usernameWhoApprove);
+        if (approved.data.result) {
+            await this.addOwnerIfAccepted(usernameToAssign.name, req.body.storeName)
+        }
+        return approved
     }
 
     async setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse> {
