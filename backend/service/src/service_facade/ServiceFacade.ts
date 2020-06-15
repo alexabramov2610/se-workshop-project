@@ -236,7 +236,7 @@ UC-6.5
 export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> => {
     return runIfOpen(req, runIfHaveToken(UserService.watchVisitorsInfo));
 }
-export const stopVisitorsStatistics = (req: Req.Request): Promise<void> => {
+export const stopVisitorsStatistics = (req: Req.Request): void => {
     return runIfOpen(req, runIfHaveToken(UserService.stopVisitorsStatistics));
 }
 /*

@@ -88,6 +88,6 @@ export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Re
     return ts.watchVisitorsInfo(req);
 }
 
-export const stopVisitorsStatistics = (req: Req.Request): Promise<void> => {
+export const stopVisitorsStatistics = (req: Req.Request): void => {
     return ts.stopVisitorsStatistics(req);
 }
