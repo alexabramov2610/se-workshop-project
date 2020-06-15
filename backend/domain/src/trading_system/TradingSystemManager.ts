@@ -181,7 +181,7 @@ export class TradingSystemManager {
 
         const res: Res.BoolResponse = await this._storeManager.addStore(req.body.storeName, req.body.description, user);
         if (res.data.result) {
-            this.subscribeStoreOwner(user.name, req.body.storeName);
+            await this.subscribeAndNotifyStoreOwner(user.name, req.body.storeName, true);
             logger.debug(`successfully created store: ${req.body.storeName}`)
         }
         return res;
@@ -284,7 +284,7 @@ export class TradingSystemManager {
         const res: Res.BoolResponse = await this._storeManager.assignStoreOwner(req.body.storeName, usernameToAssign, usernameWhoAssigns);
         if (res.data.result) {
             logger.info(`successfully assigned user: ${req.body.usernameToAssign} as store owner of store: ${req.body.storeName}`)
-            await this.subscribeStoreOwner(req.body.usernameToAssign, req.body.storeName)
+            await this.subscribeAndNotifyStoreOwner(req.body.usernameToAssign, req.body.storeName, false)
         }
         return res;
     }
@@ -301,7 +301,7 @@ export class TradingSystemManager {
 
         if (res.data.result) {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
-            await this.unsubscribeStoreOwner(req.body.usernameToRemove, req.body.storeName, res.data.owners)
+            await this.unsubscribeAndNotifyStoreOwner(req.body.usernameToRemove, req.body.storeName, res.data.owners)
         }
         return res;
     }
@@ -502,16 +502,18 @@ export class TradingSystemManager {
     //endregion
 
     //region notifications
-    async subscribeStoreOwner(username: string, storeName: string): Promise<void> {
+    async subscribeAndNotifyStoreOwner(username: string, storeName: string, isFirst: boolean): Promise<void> {
         this.subscribeNewStoreOwner(username, storeName);
-        const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
-        const event: Event.StoreOwnerEvent = {
-            username, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
-            notification: {type: NotificationsType.GREEN, message: msg}
-        };
+        if (!isFirst) {
+            const msg: string = formatString(notificationMsg.M_ASSIGNED_AS_OWNER, [storeName]);
+            const event: Event.StoreOwnerEvent = {
+                username, code: EventCode.ASSIGNED_AS_STORE_OWNER, storeName,
+                notification: {type: NotificationsType.GREEN, message: msg}
+            };
 
-        if (this._publisher.notify(event).length !== 0)
-            await this._userManager.saveNotification(username, event)
+            if (this._publisher.notify(event).length !== 0)
+                await this._userManager.saveNotification(username, event)
+        }
 
         try {
             let subscriptions = await SubscriberModel.findOne({})
@@ -531,7 +533,7 @@ export class TradingSystemManager {
         this._publisher.subscribe(username, EventCode.USER_EVENTS, storeName, storeName);
     }
 
-    async unsubscribeStoreOwner(username: string, storeName: string, owners: string[]): Promise<void> {
+    async unsubscribeAndNotifyStoreOwner(username: string, storeName: string, owners: string[]): Promise<void> {
         const msg: string = formatString(notificationMsg.M_REMOVED_AS_OWNER, [storeName]);
         const toRemoveMap: Map<string, string> = new Map<string, string>();
         const events: Event.StoreOwnerEvent[] = owners.reduce((acc, curr) =>
