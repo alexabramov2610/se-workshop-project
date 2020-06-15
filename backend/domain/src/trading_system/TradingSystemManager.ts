@@ -115,6 +115,10 @@ export class TradingSystemManager {
         }
     }
 
+    stopVisitorsStatistics(req: Req.Request): void {
+        const adminUsername: string = this._userManager.getLoggedInUsernameByToken(req.token);
+        this.statisticsManager.clearDailyRealTimeStatisticsSubscription(adminUsername);
+    }
     //endregion
 
     // region basic ops

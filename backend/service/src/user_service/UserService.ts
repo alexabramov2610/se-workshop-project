@@ -87,3 +87,7 @@ export const getAllUsers = (req: Req.Request): Promise<Res.GetAllUsersResponse> 
 export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> => {
     return ts.watchVisitorsInfo(req);
 }
+
+export const stopVisitorsStatistics = (req: Req.Request): Promise<void> => {
+    return ts.stopVisitorsStatistics(req);
+}

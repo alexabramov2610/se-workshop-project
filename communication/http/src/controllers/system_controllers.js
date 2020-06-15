@@ -63,3 +63,8 @@ export async function getVisitorsStatistics(req, res) {
         return res.send(invalidRes);
     }
 }
+
+export async function stopVisitorsStatistics(req, res) {
+    const result =await wrapHttp(req, ServiceFacade.stopVisitorsStatistics);
+    return res.send(result)
+}
