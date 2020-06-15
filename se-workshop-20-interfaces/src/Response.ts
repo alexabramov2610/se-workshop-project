@@ -1,15 +1,15 @@
 import {
-    IItem,
-    ProductCatalogNumber,
-    IProduct,
-    BagItem,
-    StoreInfo,
-    IReceipt,
-    ProductInStore,
-    Cart,
-    IPayment,
-    IContactUsMessage,
-    Error, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission, AssignAgreement,
+  IItem,
+  ProductCatalogNumber,
+  IProduct,
+  BagItem,
+  StoreInfo,
+  IReceipt,
+  ProductInStore,
+  Cart,
+  IPayment,
+  IContactUsMessage,
+  Error, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission, AssignAgreement, DailyStatistics,
 } from "./CommonInterface";
 import {
     ManagementPermission,
@@ -166,7 +166,12 @@ interface GetAllUsersResponse extends Response {
     data: { result: boolean, users: string[] }
 }
 
+interface WatchVisitorsInfoResponse extends Response {
+    data: { result: boolean, statistics: DailyStatistics[] }
+}
+
 export {
+    WatchVisitorsInfoResponse,
     RemoveStoreOwnerResponse,
     GetItemsIdsResponse,
     GetOwnersAssignedByResponse,

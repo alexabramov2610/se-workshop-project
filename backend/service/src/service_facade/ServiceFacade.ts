@@ -231,6 +231,12 @@ export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryReque
     return runIfOpen(req, runIfLoggedIn(StoreService.viewStorePurchasesHistory));
 }
 /*
+UC-6.5
+ */
+export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> => {
+    return runIfOpen(req, runIfHaveToken(UserService.watchVisitorsInfo));
+}
+/*
 UC-7
  */
 export const pay = (req: Req.PayRequest): Promise<Res.PaymentResponse> => {

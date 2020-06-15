@@ -274,7 +274,12 @@ interface ApproveNewOwnerRequest extends Request {
     body: { storeName: string, newOwnerName: string }
 }
 
+interface WatchVisitorsInfoRequest extends Request {
+    body: { from: Date, to: Date }
+}
+
 export {
+    WatchVisitorsInfoRequest,
     ApproveNewOwnerRequest,
     GetItemsIdsRequest,
     GetOwnersAssignedByRequest,

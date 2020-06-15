@@ -19,8 +19,10 @@ import ConditionModel from "./src/models/store_models/ConditionModel";
 import PurchasePolicyModel from "./src/models/store_models/PurchasePolicyModel";
 import PurchasePolicyElementModel from "./src/models/store_models/PurchasePolicyElementModel";
 import AssignAgreementModel from "./src/models/common_models/AssignAgreementModel";
+import VisitorsStatisticsModel from "./src/models/common_models/VisitorsStatisticsModel";
 
 export {
+    VisitorsStatisticsModel,
     AssignAgreementModel,
     PurchasePolicyModel,
     PurchasePolicyElementModel,

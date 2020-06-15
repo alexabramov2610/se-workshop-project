@@ -11,6 +11,10 @@ export interface VisitorsStatistics {
     admins: number;
 }
 
+export interface DailyStatistics {
+    date: Date, statistics: VisitorsStatistics
+}
+
 export interface IPublisher {
     subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void;
     unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void;

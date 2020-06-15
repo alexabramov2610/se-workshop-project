@@ -83,3 +83,7 @@ export const verifyToken = (req: Req.Request): Promise<Res.BoolResponse> => {
 export const getAllUsers = (req: Req.Request): Promise<Res.GetAllUsersResponse> => {
     return ts.getAllUsers(req);
 }
+
+export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> => {
+    return ts.watchVisitorsInfo(req);
+}
