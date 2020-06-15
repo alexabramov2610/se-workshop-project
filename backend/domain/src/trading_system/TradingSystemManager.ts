@@ -28,6 +28,7 @@ import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
 import {ReceiptModel, UserModel, SystemModel, SubscriberModel} from "dal";
 import * as UserMapper from '../user/UserMapper'
+import { RealTimeStatisticsManager } from "../statistics/RealTimeStatisticsManager";
 
 const logger = loggerW(__filename)
 
@@ -37,8 +38,10 @@ export class TradingSystemManager {
     private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
     private _publisher: IPublisher;
+    private statisticsManager :RealTimeStatisticsManager;
 
     constructor() {
+        this.statisticsManager = new RealTimeStatisticsManager();
         this._publisher = new Publisher(logoutUserByName);
         this._externalSystems = new ExternalSystemsManager();
         this._userManager = new UserManager(this._externalSystems);
@@ -295,7 +298,7 @@ export class TradingSystemManager {
         const isAdded: boolean = await this._storeManager.addOwnerIfAccepted(newOwner, storeName);
         if (isAdded) {
             logger.info(`successfully assigned user: ${newOwner} as store owner of store: ${storeName}`)
-            await this.subscribeStoreOwner(newOwner, storeName)
+            await this.subscribeAndNotifyStoreOwner(newOwner, storeName, false)
         }
         return isAdded;
     }
