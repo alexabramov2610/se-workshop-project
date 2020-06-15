@@ -9,7 +9,6 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
     const [username, setUsername] = useState(undefined);
     const [users, setUsers] = useState([]);
     const [purchasesHistory, setPurchasesHistory] = useState([]);
-    // let users = ["buyer1", "avishai", "alex", "tal", "ron"];
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,8 +23,6 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
                 const keyedHistory = generalUtils.addKeys(receipts);
                 setPurchasesHistory(keyedHistory);
             }
-            console.log("purchasesHistoryRes:", purchasesHistoryRes);
-
             if (!usersRes.data.error) {
                 setUsers(usersRes.data.data.users);
             }
@@ -45,7 +42,6 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
 
     return (
         <div>
-            {console.log("purchasesHistory: ", purchasesHistory)}
             <AdminViewUsersPurchaseHistoryPage data={data}/>
         </div>
     );
