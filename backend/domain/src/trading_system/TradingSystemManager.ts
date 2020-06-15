@@ -153,7 +153,7 @@ export class TradingSystemManager {
         if (res.data.result) {
             this._publisher.subscribe(req.body.username, EventCode.USER_EVENTS, "", "");
             await this.sendPendingEvents(req.body.username);
-            this.statisticsManager.updateRegisteredUserVisit(req.body.username)
+            this.statisticsManager.updateRegisteredUserVisit(req.body.username, req.token)
                 .then((updateAdmins: boolean) => {
                     if (updateAdmins)
                         this.updateAdminsForRealTimeStatisticsChange(this.statisticsManager.getRealTimeStatisticsSubscribers());

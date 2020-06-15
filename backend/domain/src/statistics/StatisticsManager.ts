@@ -5,11 +5,13 @@ const logger = loggerW(__filename)
 
 
 export class StatisticsManager {
-    private realTimeAdmins :Map<string, string>;        // admin username -> junk
-    private realTimeStatistics :VisitorsStatistics;
+    private realTimeAdmins: Map<string, string>;        // admin username -> junk
+    private realTimeStatistics: VisitorsStatistics;
+    private tokensVerifier: Map<string, string>;
 
     constructor() {
         this.realTimeAdmins = new Map();
+        this.tokensVerifier = new Map();
     }
 
     getRealTimeStatisticsSubscribers() {
@@ -22,6 +24,7 @@ export class StatisticsManager {
 
     clearDailyRealTimeStatisticsSubscription(adminUsername: string) {
         this.realTimeAdmins.delete(adminUsername);
+        this.realTimeStatistics = undefined;
     }
 
     async newStatisticsRequest(adminUsername: string, fromDate: Date, toDate: Date): Promise<DailyStatistics[]> {
@@ -59,7 +62,7 @@ export class StatisticsManager {
         return dailyStatistics;
     }
 
-    async updateRegisteredUserVisit(username: string): Promise<boolean> {
+    async updateRegisteredUserVisit(username: string, token: string): Promise<boolean> {
         logger.info(`updating new visit by ${username}`)
 
         const isStoreManager: boolean = await this.isUserStoreManager(username);
@@ -67,18 +70,19 @@ export class StatisticsManager {
         const isAdmin: boolean = await this.isUserAdmin(username);
 
         if (!isStoreManager && !isStoreOwner && !isAdmin)
-            await this.addRegisteredUserVisit();
+            await this.addRegisteredUserVisit(token);
         else if (isStoreManager && !isStoreOwner && !isAdmin)
-            await this.addStoreManagerVisit();
+            await this.addStoreManagerVisit(token);
         else if (isStoreOwner && !isAdmin)
-            await this.addStoreOwnerVisit();
+            await this.addStoreOwnerVisit(token);
         else if (isAdmin)
-            await this.addAdminVisit();
+            await this.addAdminVisit(token);
         else {
             logger.error(`${username} is not registered in DB`)
             return false;
         }
 
+        this.tokensVerifier.set(token, username);
         return this.isNeedToUpdate();
     }
 
@@ -91,7 +95,7 @@ export class StatisticsManager {
     //region check user type
     private async isUserStoreManager(username: string): Promise<boolean> {
         try {
-            const manager = await StoreManagerModel.findOne({username});
+            const manager = await StoreManagerModel.findOne({name: username});
             return manager ? true : false;
         } catch (e) {
             logger.error(`isUserStoreManager: DB ERROR: ${e}`)
@@ -101,22 +105,25 @@ export class StatisticsManager {
 
     private async isUserStoreOwner(username: string): Promise<boolean> {
         try {
-            const owner = await StoreOwnerModel.findOne({username});
+            const owner = await StoreOwnerModel.findOne({name: username});
             return owner ? true : false;
         } catch (e) {
-            logger.error(`isUserStoreManager: DB ERROR: ${e}`)
+            logger.error(`isUserStoreOwner: DB ERROR: ${e}`)
             return false;
         }
     }
 
     private async isUserAdmin(username: string): Promise<boolean> {
         try {
-            const admin = await AdminModel.findOne({username});
-            return admin ? true : false;
+            const admins = await AdminModel.find({}).populate('user');
+            for (const admin of admins) {
+                if (admin.user.name === username)
+                    return true;
+            }
         } catch (e) {
-            logger.error(`isUserStoreManager: DB ERROR: ${e}`)
-            return false;
+            logger.error(`isUserAdmin: DB ERROR: ${e}`)
         }
+        return false;
     }
 
     //endregion
@@ -125,7 +132,8 @@ export class StatisticsManager {
 
     private async addGuestVisit() {
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.guests++)
-        this.realTimeStatistics.guests++;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.guests++;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.guests = todayStatsModel.guests+1;
@@ -135,9 +143,12 @@ export class StatisticsManager {
         }
     }
 
-    private async removeGuestVisit() {
+    private async removeGuestVisit(token: string) {
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.guests--)
-        this.realTimeStatistics.guests--;
+        if (this.tokensVerifier.has(token))
+            return;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.guests--;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.guests = todayStatsModel.guests-1;
@@ -147,10 +158,11 @@ export class StatisticsManager {
         }
     }
 
-    private async addRegisteredUserVisit() {
-        await this.removeGuestVisit();
+    private async addRegisteredUserVisit(token: string) {
+        await this.removeGuestVisit(token);
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.registeredUsers++)
-        this.realTimeStatistics.registeredUsers++;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.registeredUsers++;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.registeredUsers = todayStatsModel.registeredUsers+1;
@@ -160,10 +172,11 @@ export class StatisticsManager {
         }
     }
 
-    private async addStoreManagerVisit() {
-        await this.removeGuestVisit();
+    private async addStoreManagerVisit(token: string) {
+        await this.removeGuestVisit(token);
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.managers++)
-        this.realTimeStatistics.managers++;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.managers++;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.managers = todayStatsModel.managers+1;
@@ -173,10 +186,11 @@ export class StatisticsManager {
         }
     }
 
-    private async addStoreOwnerVisit() {
-        await this.removeGuestVisit();
+    private async addStoreOwnerVisit(token: string) {
+        await this.removeGuestVisit(token);
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.owners++)
-        this.realTimeStatistics.owners++;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.owners++;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.owners = todayStatsModel.owners+1;
@@ -186,10 +200,11 @@ export class StatisticsManager {
         }
     }
 
-    private async addAdminVisit() {
-        await this.removeGuestVisit();
+    private async addAdminVisit(token: string) {
+        await this.removeGuestVisit(token);
         // Array.from(this.realTimeStatistics.values()).forEach(stat => stat.admins++)
-        this.realTimeStatistics.admins++;
+        if (this.realTimeStatistics)
+            this.realTimeStatistics.admins++;
         try {       // add to db
             const todayStatsModel = await this.getTodayStatsModel();
             todayStatsModel.admins = todayStatsModel.admins+1;
@@ -218,7 +233,7 @@ export class StatisticsManager {
     private async getTodayStatsModel(): Promise<any> {
         try {
             const today: Date = this.getCleanDate(new Date());
-            let manager = await VisitorsStatisticsModel.findOne({today});
+            let manager = await VisitorsStatisticsModel.findOne({date: today});
             if (!manager) {
                 logger.info(`creating visitor statistics for date: {${today}}`)
                 manager = new VisitorsStatisticsModel({date: today, guests: 0, registeredUsers: 0, managers: 0, owners: 0, admins: 0})
@@ -235,14 +250,19 @@ export class StatisticsManager {
         date.setMinutes(0);
         date.setSeconds(0);
         date.setMilliseconds(0);
+        date.setHours(date.getHours()+ -1*date.getTimezoneOffset()/60);
         return date;
     }
 
     private isDateToday(toDate: Date): boolean {
-        const today: Date = new Date();
-        return toDate.getDate() === today.getDate() &&
-            toDate.getMonth() === today.getMonth() &&
-            toDate.getFullYear() === today.getFullYear();
+        try {
+            const today: Date = new Date();
+            return (toDate.getDate() >= today.getDate() && toDate.getMonth() === today.getMonth() && toDate.getFullYear() === today.getFullYear()) ||
+                (toDate.getMonth() > today.getMonth() && toDate.getFullYear() === today.getFullYear()) ||
+                (toDate.getFullYear() > today.getFullYear());
+        } catch (e) {
+            logger.error(`invalid date: ${toDate}, ${e}`);
+        }
     }
 
     private isNeedToUpdate(): boolean {

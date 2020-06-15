@@ -48,3 +48,18 @@ export async function getIsSystemUp(req, res) {
     const result =await wrapHttp(req, ServiceFacade.isSystemUp);
     return res.send(result)
 }
+
+export async function getVisitorsStatistics(req, res) {
+    try {
+        const watchVisitorsInfoReq = {
+            body: {from: new Date(req.query.from), to: new Date(req.query.to)},
+            token: req.cookies['token']
+        };
+        req.body = watchVisitorsInfoReq;
+        const result = await wrapHttp(req, ServiceFacade.watchVisitorsInfo);
+        // console.log('ressss : ' +JSON.stringify(result));
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+}
