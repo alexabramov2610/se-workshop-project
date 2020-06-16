@@ -741,12 +741,12 @@ export class TradingSystemManager {
 
     async pay(req: Req.PayRequest): Promise<Res.PaymentResponse> {
         logger.info(`trying to pay using external system`)
-        const isPaid: number = await this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
-        if (isPaid === -1)
+        const transactionID: number = await this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
+        if (transactionID === -1)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
         const lastCC4 = req.body.payment.cardDetails.number.slice(req.body.payment.cardDetails.number.length - 4, req.body.payment.cardDetails.number.length)
         logger.debug(`paid with credit card ${lastCC4}`)
-        return {data: {result: true, payment: {totalCharged: req.body.price, lastCC4}}}
+        return {data: {result: true, payment: {totalCharged: req.body.price, lastCC4, transactionID}}}
     }
 
     // pre condition: already calculated final prices and put them in bagItem.finalPrice
@@ -761,12 +761,12 @@ export class TradingSystemManager {
             const newPurchase = await this._storeManager.purchaseFromStore(storeName, bagItems, rUser ? rUser.name : "guest", req.body.payment)
             purchases = purchases.concat(newPurchase)
         }
-
         try {
             const receipt = await ReceiptModel.create({
                 date: new Date(),
                 lastCC4: req.body.payment.lastCC4,
                 totalCharged: req.body.payment.totalCharged,
+                transactionID: req.body.payment.transactionID,
                 purchases
             });
             this._userManager.resetUserCart(user);

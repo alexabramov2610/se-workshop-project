@@ -181,6 +181,7 @@ export interface IReceipt {
 export interface IPayment {
     lastCC4: string;
     totalCharged: number;
+    transactionID: number;
 }
 
 export interface StoreInfo {
