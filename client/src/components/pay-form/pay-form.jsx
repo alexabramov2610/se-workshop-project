@@ -29,6 +29,7 @@ export class PayForm extends React.Component {
       exp,
       ccnumber,
       cvv,
+      holderID
     } = this.state;
     const expMonth = exp && exp.split("/")[0];
     const expYear = exp && exp.split("/")[1];
@@ -41,6 +42,7 @@ export class PayForm extends React.Component {
             expMonth,
             expYear,
             cvv,
+            id
           },
           address: street + homeNumber,
           city,
@@ -70,30 +72,38 @@ export class PayForm extends React.Component {
               label="Holder Name"
               name="holderName"
               placeholder="Holder Name"
-              width={6}
+              width={5}
+            />
+            <Form.Input
+              onChange={this.handleChange}
+              label="Card Holder ID"
+              name="id"
+              placeholder="Holder ID"
+              width={5}
             />
             <Form.Input
               onChange={this.handleChange}
               label="Country"
               name="country"
               placeholder="Country"
-              width={4}
+              width={6}
             />
-            <Form.Input
+
+          </Form.Group>
+          <Form.Group>
+          <Form.Input
               onChange={this.handleChange}
               label="City"
               name="city"
               placeholder="City"
               width={6}
             />
-          </Form.Group>
-          <Form.Group>
             <Form.Input
               onChange={this.handleChange}
               label="Street"
               name="street"
               placeholder="Street"
-              width={12}
+              width={6}
             />
             <Form.Input
               onChange={this.handleChange}
