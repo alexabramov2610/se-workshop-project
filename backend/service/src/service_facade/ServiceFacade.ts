@@ -53,8 +53,7 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     if (!logout.data.result) return logout;
     return {data: {result: true}}
 }
-
-export const initFromFile = async (req: Req.Request): Promise<Res.BoolResponse> => {
+export const initFromFile = async (req: Req.InitFromFileRequest): Promise<Res.BoolResponse> => {
     const fn = await runIfHaveToken(YamlInitializer.initSystemFromFile);
     return fn.call(this, req);
 }

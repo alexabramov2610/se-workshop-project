@@ -33,6 +33,10 @@ interface InitReq extends Request {
     body: { firstAdminName: string, firstAdminPassword: string };
 }
 
+interface InitFromFileRequest extends Request {
+    body: { path?: string }
+}
+
 interface VerifyProducts extends Request {
     body: { storeName: string, productsCatalogNumbers: number[] }
 }
@@ -334,5 +338,6 @@ export {
     VerifyProducts,
     ViewStoreDiscountsPolicyRequest,
     ViewStorePurchasePolicyRequest,
-    VerifyPurchasePolicy
+    VerifyPurchasePolicy,
+    InitFromFileRequest
 };
