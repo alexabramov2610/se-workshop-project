@@ -106,10 +106,6 @@ function TableRow({index, row}) {
                             ? row.policy.systemPolicy.notForSellDays.join(', ')
                             : bpUtils.emptyField}
                     </span>
-                    <span style={basicStyle}>
-                        {bpUtils.emptyField}
-                        {/*{row.countires ? row.countires.join(', ') : bpUtils.emptyField}*/}
-                    </span>
                     <SearchSelect
                         options={generalUtils.addValueKey(["AND", "OR", "XOR"])}
                         bordered={false}

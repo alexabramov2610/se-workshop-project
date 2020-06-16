@@ -167,8 +167,6 @@ const BuyingPolicySettings = () => {
             <TabPane tab="Bag" key="3">
                 {bagTab(props)}
             </TabPane>
-            <TabPane tab="User" key="4">
-            </TabPane>
         </Tabs>
     );
 }
