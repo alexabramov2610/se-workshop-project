@@ -73,7 +73,7 @@ echo -e "${BLUE}==========================================================${NC}"
 echo -e "${BLUE}===================== COMPILING HTTP =====================${NC}"
 echo -e "${BLUE}==========================================================${NC}"
 cd $http
-#sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+sudo npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  AT
 echo -e "${BLUE}==========================================================${NC}"

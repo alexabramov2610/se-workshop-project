@@ -3,6 +3,18 @@ import {Event} from "./Event";
 
 export {ProductCategory};
 
+export interface VisitorsStatistics {
+    guests: number;
+    registeredUsers: number;
+    managers: number;
+    owners: number;
+    admins: number;
+}
+
+export interface DailyStatistics {
+    date: Date, statistics: VisitorsStatistics
+}
+
 export interface IPublisher {
     subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void;
     unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void;
