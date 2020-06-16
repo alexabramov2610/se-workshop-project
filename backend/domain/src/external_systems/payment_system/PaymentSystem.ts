@@ -7,13 +7,11 @@ const logger = loggerW(__filename)
 
 export class PaymentSystem {
     private _paymentSys: any;
-    private _name: string;
-    private _isConnected: boolean;
+    private readonly _name: string;
 
     constructor() {
         this._name = "Payment System"
         this._paymentSys = new PaymentSystemAdapter();
-        this._isConnected = false;
     }
 
     setPaymentSys(real: any) {
@@ -22,14 +20,13 @@ export class PaymentSystem {
 
     async connect(): Promise<BoolResponse> {
         logger.info("connecting payment system...");
-        const succ: BoolResponse = {data: {result: true}};
+        const success: BoolResponse = {data: {result: true}};
         if (this._paymentSys) {
             try {
                 const isConnected: BoolResponse = await this._paymentSys.connect();
-                this._isConnected = isConnected.data.result ? true : false;
                 isConnected ? logger.info("successfully connected payment system") :
                     logger.warn("failed connecting payment system");
-                return isConnected ? succ :
+                return isConnected ? success :
                     {error: {message: errorMsg.E_CON + " : " + this._name}, data: {result: false}};
             } catch (e) {
                 const error: string = `${errorMsg.E_CON}. message: ${e}`;
@@ -37,17 +34,14 @@ export class PaymentSystem {
                 return {error: {message: error}, data: {result: false}};
             }
         } else {
-            return succ;
+            return success;
         }
     }
 
     async pay(price: number, creditCard: CreditCard): Promise<number> {
-        if (!this._isConnected) {
-            const connectSucc: BoolResponse = await this.connect()
-            if (!connectSucc.data.result) {
-                logger.info("payment system is not connected");
-                return -1;
-            }
+        const connectSuccess: BoolResponse = await this.connect()
+        if (!connectSuccess.data.result) {
+            return -1;
         }
         logger.info("trying to charge");
         let isPaid: boolean = false;
@@ -69,12 +63,9 @@ export class PaymentSystem {
     }
 
     async cancelPay(transactionID: number): Promise<boolean> {
-        if (!this._isConnected) {
-            const connectSucc: BoolResponse = await this.connect()
-            if (!connectSucc.data.result) {
-                logger.info("payment system is not connected");
-                return false;
-            }
+        const connectSuccess: BoolResponse = await this.connect()
+        if (!connectSuccess.data.result) {
+            return false;
         }
         logger.info("trying to charge");
         if (this._paymentSys) {

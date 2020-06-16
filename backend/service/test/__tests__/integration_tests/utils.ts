@@ -8,7 +8,7 @@ const adminPassword: string = "admin123123";
 let adminToken: string;
 
 export const createProduct = (name: string, catalogNumber: number, price: number, category: ProductCategory): IProduct => {
-    return { name, catalogNumber, price, category }
+    return {name, catalogNumber, price, category}
 }
 
 export const getGuestSession = async (): Promise<string> => {
@@ -18,7 +18,10 @@ export const getGuestSession = async (): Promise<string> => {
 
 export const systemInit = async (): Promise<void> => {
     adminToken = await getGuestSession();
-    const initReq: Req.InitReq = {  body: { firstAdminName: adminName, firstAdminPassword: adminPassword } , token: adminToken};
+    const initReq: Req.InitReq = {
+        body: {firstAdminName: adminName, firstAdminPassword: adminPassword},
+        token: adminToken
+    };
     const res = await ServiceFacade.systemInit(initReq)
     expect(res.data.result).toBeTruthy();
 }
@@ -41,7 +44,7 @@ export const safeShutdown = async (): Promise<void> => {
 export const logout = async (token: string): Promise<void> => {
     const logoutReq: Req.LogoutRequest = {body: {}, token};
     const res = await ServiceFacade.logoutUser(logoutReq)
-        expect(res.data.result).toBe(true);
+    expect(res.data.result).toBe(true);
 }
 
 export const loginUser = async (username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
@@ -50,7 +53,7 @@ export const loginUser = async (username: string, password: string, token, isLog
     }
     const loginReq: Req.LoginRequest = {body: {username, password}, token};
     const res = await ServiceFacade.loginUser(loginReq)
-        expect(res.data.result).toBeTruthy();
+    expect(res.data.result).toBeTruthy();
 }
 
 export const registerUser = async (username: string, password: string, token, isLoggedInNow: boolean): Promise<void> => {
@@ -95,12 +98,18 @@ export const makeStoreWithProduct = async (catalogNumber: number, itemsNumber: n
     if (!ownerToken)
         ownerToken = await initSessionRegisterLogin(username, password);
     await createStore(storeName, ownerToken);
-    const products: IProduct[] = [{name: "bamba", catalogNumber,price: 20, category: ProductCategory.GENERAL, db_id: "0"}]
+    const products: IProduct[] = [{
+        name: "bamba",
+        catalogNumber,
+        price: 20,
+        category: ProductCategory.GENERAL,
+        db_id: "0"
+    }]
     await addNewProducts(storeName, products, ownerToken, true)
     let items: IItem[] = [];
 
-    for (let i = 0; i < itemsNumber; i++ )
-        items = items.concat({catalogNumber: 1, id: i+1});
+    for (let i = 0; i < itemsNumber; i++)
+        items = items.concat({catalogNumber: 1, id: i + 1});
     await ServiceFacade.addItems({token: ownerToken, body: {storeName, items: items}});
 
     return {ownerToken, products}
@@ -115,14 +124,14 @@ export const makeStoreWithProductWithProdDetails = async (name: string, price: n
     await addNewProducts(storeName, products, ownerToken, true)
     let items: IItem[] = [];
 
-    for (let i = 0; i < itemsNumber; i++ )
-        items = items.concat({catalogNumber: 1, id: i+1});
+    for (let i = 0; i < itemsNumber; i++)
+        items = items.concat({catalogNumber: 1, id: i + 1});
     await ServiceFacade.addItems({token: ownerToken, body: {storeName, items: items}});
 
     return {ownerToken, products}
 }
 
-export const getPurchaseReq = async (token: string): Promise<Req.PurchaseRequest> =>{
+export const getPurchaseReq = async (token: string): Promise<Req.PurchaseRequest> => {
     return {
         body: {
             payment: {
@@ -131,7 +140,8 @@ export const getPurchaseReq = async (token: string): Promise<Req.PurchaseRequest
                     number: "152",
                     expYear: "21",
                     expMonth: "5",
-                    cvv: "40"
+                    cvv: "40",
+                    id: "123456789"
                 }, address: "batyam", city: "batya", country: "israel"
             }
         }, token: token
