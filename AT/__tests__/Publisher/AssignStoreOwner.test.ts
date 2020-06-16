@@ -12,7 +12,7 @@ import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder"
 
 
 
-describe("Publisher Notification, UC: 10", () => {
+describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
     let _driver = new Driver();
     let _serviceBridge: Partial<Bridge>;
     let _testPaymentInfo: PayRequest;
@@ -43,7 +43,7 @@ describe("Publisher Notification, UC: 10", () => {
         _driver.dropDBDor();
     });
 
-    test("Publisher Notification - Assign Store Owner",async () => {
+    test("Publisher Notification - Assign Store Owner:Happy Path",async () => {
 
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
@@ -64,7 +64,27 @@ describe("Publisher Notification, UC: 10", () => {
 
     });
 
-    test("Publisher Notification - Remove Store Owner",async () => {
+    test("Publisher Notification - Assign Store Owner:Sad Patch - no such user to assign ",async () => {
+
+        const _newOwnerCreds: Credentials = {
+            userName: "new-boss",
+            password: "owner123",
+        };
+        const _newOwner: User = { username: _newOwnerCreds.userName };
+        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        await _serviceBridge.logout();
+        await _driver.loginWithDefaults();
+        await _serviceBridge.createStore(_storeInformation);
+        const { data } = await _serviceBridge.assignStoreOwner(
+            _storeInformation,
+            _newOwner
+        );
+        expect(_publisher.notified.get(EventCode.ASSIGNED_AS_STORE_OWNER)).toBeUndefined();
+
+    });
+
+    test("Publisher Notification - Assign Store Owner:Sad Patch - Store Owner Logged Out ",async () => {
+
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
@@ -75,63 +95,32 @@ describe("Publisher Notification, UC: 10", () => {
         await _serviceBridge.register(_newOwnerCreds);
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
+        await _serviceBridge.logout();
         const { data } = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
-        const req =
-            {
-                body: {
-                    storeName: _storeInformation.name,
-                    usernameToRemove: _newOwner.username,
-                },
-            }
-        await _serviceBridge.removeStoreOwner(req);
-        expect(_publisher.notified.get(EventCode.REMOVED_AS_STORE_OWNER).get(_newOwnerCreds.userName)).toBe(1);
-        expect(_publisher.notified.get(EventCode.REMOVED_AS_STORE_OWNER).size).toBe(1)
+        expect(_publisher.notified.get(EventCode.ASSIGNED_AS_STORE_OWNER)).toBeUndefined();
     });
 
+    test("Publisher Notification - Assign Store Owner:Sad Patch -Assign From Different User i.e not the store owner.",async () => {
 
-
-    test("Publisher Notification - New Purchase Store Owner Logged in",async () => {
-        //Constants
-        const _shopoholic: Credentials = { userName: "shopoholic", password: "ibuyALL123" };
+        const _newOwnerCreds: Credentials = {
+            userName: "new-boss",
+            password: "owner123",
+        };
+        const _newOwner: User = { username: _newOwnerCreds.userName };
         const _storeInformation: Store = { name: "this-is-the-coolest-store" };
-        const _prodct: Product = new ProductBuilder().getProduct();
-        const _item = { id: 123, catalogNumber: _prodct.catalogNumber };
-        //Test flow
+        await _serviceBridge.logout();
+        await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
-        await _serviceBridge.addProductsToStore(_storeInformation, [_prodct]);
-        await _serviceBridge.addItemsToStore(_storeInformation, [_item]);
         await _serviceBridge.logout();
-        await _serviceBridge.register(_shopoholic);
-        await _serviceBridge.login(_shopoholic);
-        const res = await _driver.given.store(_storeInformation).products([_prodct]).makeABuy();
-        await _serviceBridge.logout();
-        await  _driver.loginWithDefaults();
-        expect(_publisher.notified.get(EventCode.NEW_PURCHASE).get(_driver.getLoginDefaults().userName)).toBe(1);
-        expect(_publisher.notified.get(EventCode.NEW_PURCHASE).size).toBe(1)
+        await _serviceBridge.login(_newOwnerCreds);
+        const { data } = await _serviceBridge.assignStoreOwner(
+            _storeInformation,
+            _newOwner
+        );
+        expect(_publisher.notified.get(EventCode.ASSIGNED_AS_STORE_OWNER)).toBeUndefined();
     });
-
-
-    test("Publisher Notification - New Purchase Store Owner Logged out",async () => {
-        //Constants
-        const _shopoholic: Credentials = { userName: "shopoholic", password: "ibuyALL123" };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
-        const _prodct: Product = new ProductBuilder().getProduct();
-        const _item = { id: 123, catalogNumber: _prodct.catalogNumber };
-        //Test flow
-        await _serviceBridge.createStore(_storeInformation);
-        await _serviceBridge.addProductsToStore(_storeInformation, [_prodct]);
-        await _serviceBridge.addItemsToStore(_storeInformation, [_item]);
-        await _serviceBridge.logout();
-        await _serviceBridge.register(_shopoholic);
-        await _serviceBridge.login(_shopoholic);
-        const res = await _driver.given.store(_storeInformation).products([_prodct]).makeABuy();
-        await _serviceBridge.logout();
-        expect(_publisher.notified.get(EventCode.NEW_PURCHASE).get(_driver.getLoginDefaults().userName)).toBe(1);
-        expect(_publisher.notified.get(EventCode.NEW_PURCHASE).size).toBe(1)
-    });
-
     //add Policy Agreement Test
 });
