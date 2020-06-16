@@ -12,14 +12,19 @@ export interface VisitorsStatistics {
 }
 
 export interface DailyStatistics {
-    date: Date, statistics: VisitorsStatistics
+    date: Date,
+    statistics: VisitorsStatistics
 }
 
 export interface IPublisher {
     subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void;
+
     unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void;
+
     notify(event: Event): string[];
+
     terminateSocket(): void;
+
     removeClient(username: string);
 }
 
@@ -82,6 +87,7 @@ export interface CreditCard {
     expMonth: string;
     expYear: string;
     cvv: string;
+    id: string;
 }
 
 export interface ProductWithQuantity extends ProductCatalogNumber {

@@ -387,10 +387,13 @@ describe("Guest Integration Tests", () => {
         const req: Req.PayRequest = {
             body: {
                 payment: {
-                    cardDetails: {holderName: "tal", number: "152", expYear: "21", expMonth: "5", cvv: "40"},
+                    cardDetails: {
+                        holderName: "tal", number: "152", expYear: "21", expMonth: "5", cvv: "40", id: "123456789"
+                    },
                     address: "batyam",
                     city: "batya",
-                    country: "israel"
+                    country: "israel",
+
                 },
                 price: 30
             },
@@ -420,7 +423,8 @@ describe("Guest Integration Tests", () => {
                         number: "152",
                         expYear: "21",
                         expMonth: "5",
-                        cvv: "40"
+                        cvv: "40",
+                        id: "123456789"
                     }, address: "batyam", city: "batya", country: "israel"
                 }
             }, token: token
@@ -526,7 +530,12 @@ describe("Guest Integration Tests", () => {
             percentage: 50,
         }
 
-        const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.XOR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {
+            discounts: [{
+                discount: simpleDiscount,
+                operator: Operators.XOR
+            }, {discount: simpleDiscount2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -579,7 +588,12 @@ describe("Guest Integration Tests", () => {
             percentage: 20,
         }
 
-        const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND},{discount: simpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {
+            discounts: [{
+                discount: simpleDiscount,
+                operator: Operators.AND
+            }, {discount: simpleDiscount2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -614,41 +628,46 @@ describe("Guest Integration Tests", () => {
         await utils.addNewProducts(storeName, products2, ownerToken, true);
         let items: IItem[] = [];
         for (let i = 0; i < 5; i++)
-          items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+            items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
         await utils.addNewItems(storeName, items, ownerToken, true);
 
         const startDate: Date = new Date()
         const duration: number = 3;
         const simpleDiscount: IDiscount = {
-          startDate,
-          duration,
-          products: [1],
-          percentage: 50,
+            startDate,
+            duration,
+            products: [1],
+            percentage: 50,
         }
         const simpleDiscount2: IDiscount = {
-          startDate,
-          duration,
-          products: [1],
-          percentage: 20,
+            startDate,
+            duration,
+            products: [1],
+            percentage: 20,
         }
 
-        const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.OR},{discount: simpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {
+            discounts: [{
+                discount: simpleDiscount,
+                operator: Operators.OR
+            }, {discount: simpleDiscount2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
-          body: {storeName, policy},
-          token: ownerToken
+            body: {storeName, policy},
+            token: ownerToken
         }
         const makeDiscountRes: Res.AddDiscountResponse = await ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
         // add two products to cart
         let req: Req.SaveToCartRequest = {
-          body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
-          token: token
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+            token: token
         }
         let res: Res.BoolResponse = await ServiceFacade.saveProductToCart(req)
         expect(res.data.result).toBeTruthy();
         req = {
-          body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
-          token: token
+            body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
+            token: token
         }
         res = await ServiceFacade.saveProductToCart(req)
         expect(res.data.result).toBeTruthy();
@@ -667,36 +686,36 @@ describe("Guest Integration Tests", () => {
         await utils.addNewProducts(storeName, products2, ownerToken, true);
         let items: IItem[] = [];
         for (let i = 0; i < 5; i++)
-          items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
+            items = items.concat({catalogNumber: catalogNumber + 1, id: i + 1});
         await utils.addNewItems(storeName, items, ownerToken, true);
 
         const startDate: Date = new Date()
         const duration: number = 3;
         const condDiscount: IDiscount = {
-          startDate,
-          duration,
-          products: [1,2],
-          percentage: 5,
-          condition: [{condition: {minPay: 200}, operator: Operators.AND}]
+            startDate,
+            duration,
+            products: [1, 2],
+            percentage: 5,
+            condition: [{condition: {minPay: 200}, operator: Operators.AND}]
         }
 
         const policy: IDiscountPolicy = {discounts: [{discount: condDiscount, operator: Operators.OR}]}
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
-          body: {storeName, policy},
-          token: ownerToken
+            body: {storeName, policy},
+            token: ownerToken
         }
         const makeDiscountRes: Res.AddDiscountResponse = await ServiceFacade.setDiscountsPolicy(setPolicyReq);
 
         // add two products to cart
         let req: Req.SaveToCartRequest = {
-          body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
-          token: token
+            body: {storeName, catalogNumber: products[0].catalogNumber, amount: 2},
+            token: token
         }
         let res: Res.BoolResponse = await ServiceFacade.saveProductToCart(req)
         expect(res.data.result).toBeTruthy();
         req = {
-          body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
-          token: token
+            body: {storeName, catalogNumber: products2[0].catalogNumber, amount: 2},
+            token: token
         }
         res = await ServiceFacade.saveProductToCart(req)
         expect(res.data.result).toBeTruthy();
@@ -719,14 +738,19 @@ describe("Guest Integration Tests", () => {
         await utils.addNewItems(storeName, items, ownerToken, true);
 
         const simplePolicy1: ISimplePurchasePolicy = {
-            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+            productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}
         }
         const simplePolicy2: ISimplePurchasePolicy = {
-            bagPolicy:{minAmount: 2, maxAmount:3}
+            bagPolicy: {minAmount: 2, maxAmount: 3}
         }
 
 
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.AND}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const policy: IPurchasePolicy = {
+            policy: [{
+                policy: simplePolicy1,
+                operator: Operators.AND
+            }, {policy: simplePolicy2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -763,13 +787,18 @@ describe("Guest Integration Tests", () => {
         await utils.addNewItems(storeName, items, ownerToken, true);
 
         const simplePolicy1: ISimplePurchasePolicy = {
-            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+            productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}
         }
         const simplePolicy2: ISimplePurchasePolicy = {
-            bagPolicy:{minAmount: 3, maxAmount:5}
+            bagPolicy: {minAmount: 3, maxAmount: 5}
         }
 
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.AND}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const policy: IPurchasePolicy = {
+            policy: [{
+                policy: simplePolicy1,
+                operator: Operators.AND
+            }, {policy: simplePolicy2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -811,18 +840,23 @@ describe("Guest Integration Tests", () => {
             startDate,
             duration,
             products: [],
-            category:ProductCategory.GENERAL,
+            category: ProductCategory.GENERAL,
             percentage: 50,
         }
         const simpleDiscount2: IDiscount = {
             startDate,
             duration,
             products: [],
-            category:ProductCategory.ELECTRONICS,
+            category: ProductCategory.ELECTRONICS,
             percentage: 10,
         }
 
-        const policy: IDiscountPolicy = {discounts: [{discount: simpleDiscount, operator: Operators.AND},{discount: simpleDiscount2, operator: Operators.AND} ]}
+        const policy: IDiscountPolicy = {
+            discounts: [{
+                discount: simpleDiscount,
+                operator: Operators.AND
+            }, {discount: simpleDiscount2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetDiscountsPolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
@@ -861,13 +895,18 @@ describe("Guest Integration Tests", () => {
         await utils.addNewItems(storeName, items, ownerToken, true);
 
         const simplePolicy1: ISimplePurchasePolicy = {
-            productPolicy:{catalogNumber: 1,minAmount: 2, maxAmount: 4}
+            productPolicy: {catalogNumber: 1, minAmount: 2, maxAmount: 4}
         }
         const simplePolicy2: ISimplePurchasePolicy = {
-            bagPolicy:{minAmount: 3, maxAmount:5}
+            bagPolicy: {minAmount: 3, maxAmount: 5}
         }
 
-        const policy: IPurchasePolicy = {policy: [{policy: simplePolicy1, operator: Operators.XOR}, {policy: simplePolicy2, operator: Operators.AND}]}
+        const policy: IPurchasePolicy = {
+            policy: [{
+                policy: simplePolicy1,
+                operator: Operators.XOR
+            }, {policy: simplePolicy2, operator: Operators.AND}]
+        }
         const setPolicyReq: Req.SetPurchasePolicyRequest = {
             body: {storeName, policy},
             token: ownerToken
