@@ -203,6 +203,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       const y= req;
       return x;
   },
+  async removeStoreOwner(
+        req: Partial<Req.RemoveStoreOwnerRequest>
+    ): Promise<Res.BoolResponse> {
+        return await ServiceFacade.removeStoreOwner(wrapWithToken(req.body));
+    },
 
   // removeManagerPermissions(
   //   req: Req.ChangeManagerPermissionRequest

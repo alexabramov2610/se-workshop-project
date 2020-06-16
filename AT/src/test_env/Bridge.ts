@@ -66,6 +66,9 @@ export interface Bridge {
   removeStoreManager(
     req: Partial<Req.RemoveStoreManagerRequest>
   ): Promise<Res.BoolResponse>;
+  removeStoreOwner(
+      req: Partial<Req.RemoveStoreOwnerRequest>
+  ): Promise<Res.BoolResponse>;
   // removeManagerPermissions(
   //   req: Partial<Req.ChangeManagerPermissionRequest>
   // ): Res.BoolResponse;
