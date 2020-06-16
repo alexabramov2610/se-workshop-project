@@ -1,4 +1,5 @@
 import {EventCode, NotificationsType} from "./Enums";
+import {VisitorsStatistics} from "./CommonInterface";
 
 interface Notification {
     message: string,
@@ -31,11 +32,20 @@ interface StoreOwnerEvent extends Event {
     storeName: string
 }
 
+interface ApproveOwnerEvent extends StoreOwnerEvent {
+    assigner: string
+}
+
 interface NewPurchaseEvent extends StoreOwnerEvent {
     // code: EventCode.NEW_PURCHASE
 }
 
+interface StatisticsUpdateEvent extends Event {
+    statistics :VisitorsStatistics
+}
+
 export {
+    StatisticsUpdateEvent,
     HighOfferAuctionEvent,
     AuctionWinnerEvent,
     Notification,
@@ -43,5 +53,6 @@ export {
     AuctionEvent,
     LotteryEvent,
     StoreOwnerEvent,
-    NewPurchaseEvent
+    NewPurchaseEvent,
+    ApproveOwnerEvent
 };

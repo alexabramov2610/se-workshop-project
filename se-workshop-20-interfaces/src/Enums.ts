@@ -48,7 +48,6 @@ export enum EventCode {
     LOTTERY_EVENTS,
     USER_EVENTS,
 
-
     NEW_PURCHASE,
     STORE_CLOSED,
     STORE_OPENED,
@@ -60,6 +59,9 @@ export enum EventCode {
 
     LOTTERY_DESTINATION_PRICE_REACHED,
 
+    APPROVE_NEW_STORE_OWNER_REQUIRED,
+
+    WATCH_STATISTICS
 }
 
 export enum Operators {
@@ -69,18 +71,20 @@ export enum Operators {
 }
 
 export enum NotificationsType {
-    RED,
-    BLUE,
-    GREEN,
-    ORANGE
+    RED = 0,
+    BLUE = 1,
+    GREEN = 2,
+    ORANGE = 3,
+
+    STATISTICS = 100
 }
 
 export enum WeekDays {
-    SUNDAY = 1,
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY
+    SUNDAY = "Sunday",
+    MONDAY = "Monday",
+    TUESDAY = "Tuesday",
+    WEDNESDAY = "Wednesday",
+    THURSDAY = "Thursday",
+    FRIDAY = "Friday",
+    SATURDAY = "Saturday"
 }

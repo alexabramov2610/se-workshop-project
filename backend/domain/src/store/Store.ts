@@ -500,7 +500,7 @@ export class Store {
             if (!newPurchasePolicy)
                 return false;
             newPolicy.add(newPurchasePolicy, purchasePolicy.operator);
-            console.log(`${newPurchasePolicy.getNotForSellDays()} ${newPurchasePolicy.getCatalogNumber()} ${newPurchasePolicy.getMinAmount()} ${newPurchasePolicy.getMaxAmount()}`)
+            logger.debug(`${newPurchasePolicy.getNotForSellDays()} ${newPurchasePolicy.getCatalogNumber()} ${newPurchasePolicy.getMinAmount()} ${newPurchasePolicy.getMaxAmount()}`)
             newDocs.push({
                 operator: purchasePolicy.operator,
                 notForSellDays: newPurchasePolicy.getNotForSellDays(),
@@ -515,7 +515,7 @@ export class Store {
             const policiesDocs = await PurchasePolicyElementModel.create(newDocs);
             const purchasePolicy = await PurchasePolicyModel.findOneAndUpdate({storeName: this.storeName}, {children: policiesDocs});
         } catch (e) {
-            logger.error(`setPurchasePolicy discounts ERROR DB ${e} `)
+            logger.error(`setPurchasePolicy ERROR DB ${e} `)
             return false;
         }
         this.purchasePolicy = newPolicy;

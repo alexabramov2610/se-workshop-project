@@ -4,7 +4,14 @@ import {
     IProduct,
     ProductWithQuantity,
     SearchQuery,
-    SearchFilters, IPayment, IDiscount, CreditCard, IDiscountPolicy, IPurchasePolicy, ManagerNamePermission
+    SearchFilters,
+    IPayment,
+    IDiscount,
+    CreditCard,
+    IDiscountPolicy,
+    IPurchasePolicy,
+    ManagerNamePermission,
+    AssignAgreement
 } from "./CommonInterface";
 import {ManagementPermission} from "./Enums";
 import {Response} from "./Response";
@@ -24,6 +31,10 @@ interface SetAdminRequest extends Request {
 
 interface InitReq extends Request {
     body: { firstAdminName: string, firstAdminPassword: string };
+}
+
+interface InitFromFileRequest extends Request {
+    body: { path?: string }
 }
 
 interface VerifyProducts extends Request {
@@ -207,7 +218,7 @@ interface VerifyStoreName extends Request {
 
 interface DeliveryRequest extends Request {
     body: {
-        userDetails: { country: string, city: string, address: string }
+        userDetails: { name: string, country: string, city: string, address: string, zip:string }
     }
 }
 
@@ -263,7 +274,17 @@ interface GetItemsIdsRequest extends Request {
     body: { storeName: string, product: number }
 }
 
+interface ApproveNewOwnerRequest extends Request {
+    body: { storeName: string, newOwnerName: string }
+}
+
+interface WatchVisitorsInfoRequest extends Request {
+    body: { from: Date, to: Date }
+}
+
 export {
+    WatchVisitorsInfoRequest,
+    ApproveNewOwnerRequest,
     GetItemsIdsRequest,
     GetOwnersAssignedByRequest,
     ChangeMultipleManagerPermissionRequest,
@@ -317,5 +338,6 @@ export {
     VerifyProducts,
     ViewStoreDiscountsPolicyRequest,
     ViewStorePurchasePolicyRequest,
-    VerifyPurchasePolicy
+    VerifyPurchasePolicy,
+    InitFromFileRequest
 };

@@ -44,17 +44,16 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     const setAdminRes: Res.BoolResponse = await tradingSystem.setAdmin(setAdminReq)
     if (setAdminRes.error) return setAdminRes;
     const connectExtReq: Req.Request = {body: {}, token: req.token};
-    const connectDeliveryRes: Res.BoolResponse = tradingSystem.connectDeliverySys(connectExtReq);
+    const connectDeliveryRes: Res.BoolResponse = await tradingSystem.connectDeliverySys(connectExtReq);
     if (connectDeliveryRes.error) return connectDeliveryRes;
-    const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
+    const connectPaymentRes: Res.BoolResponse = await tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
     await tradingSystem.openTradeSystem({body: {}, token: req.token})
     const logout: Res.BoolResponse = await tradingSystem.logout({body: {}, token: req.token});
     if (!logout.data.result) return logout;
     return {data: {result: true}}
 }
-
-export const initFromFile = async (req: Req.Request): Promise<Res.BoolResponse> => {
+export const initFromFile = async (req: Req.InitFromFileRequest): Promise<Res.BoolResponse> => {
     const fn = await runIfHaveToken(YamlInitializer.initSystemFromFile);
     return fn.call(this, req);
 }
@@ -178,6 +177,9 @@ UC-4.3
 export const assignStoreOwner = (req: Req.AssignStoreOwnerRequest): Promise<Res.BoolResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.assignStoreOwner));
 }
+export const approveStoreOwner = (req: Req.ApproveNewOwnerRequest): Promise<Res.BoolResponse> => {
+    return runIfOpen(req, runIfLoggedIn(StoreService.approveStoreOwner));
+}
 /*
 UC-4.4
  */
@@ -226,6 +228,17 @@ UC-4.10
  */
 export const viewStorePurchasesHistory = (req: Req.ViewShopPurchasesHistoryRequest): Promise<Res.ViewShopPurchasesHistoryResponse> => {
     return runIfOpen(req, runIfLoggedIn(StoreService.viewStorePurchasesHistory));
+}
+/*
+UC-6.5
+ */
+export const watchVisitorsInfo = (req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> => {
+    return runIfOpen(req, runIfHaveToken(UserService.watchVisitorsInfo));
+}
+export const stopVisitorsStatistics = (req: Req.Request): void => {
+    runIfOpen(req, runIfHaveToken(UserService.stopVisitorsStatistics))
+        .then()
+        .catch();
 }
 /*
 UC-7

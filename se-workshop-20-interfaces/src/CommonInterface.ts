@@ -5,6 +5,18 @@ import {Event} from "./Event";
 
 export {ProductCategory};
 
+export interface VisitorsStatistics {
+    guests: number;
+    registeredUsers: number;
+    managers: number;
+    owners: number;
+    admins: number;
+}
+
+export interface DailyStatistics {
+    date: Date, statistics: VisitorsStatistics
+}
+
 export interface IPublisher {
     subscribe(username: string, eventCode: EventCode, key: string, storeName: string): void;
     unsubscribe(username: string, subscriptionEvent: EventCode, key: string): void;
@@ -183,6 +195,7 @@ export interface IReceipt {
 export interface IPayment {
     lastCC4: string;
     totalCharged: number;
+    transactionID: number;
 }
 
 export interface StoreInfo {
@@ -203,4 +216,12 @@ export interface ProductInStore {
 export interface ManagerNamePermission {
     managerName: string,
     permissions: ManagementPermission[]
+}
+
+export interface AssignAgreement {
+    assignedByOwner: string;
+    newOwner: string
+    requiredApprove: [string],
+    approvedBy: [string],
+    storeName: string
 }

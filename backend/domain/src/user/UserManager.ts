@@ -335,7 +335,7 @@ export class UserManager {
             data: {
                 result: true, receipts: user.receipts.map(r => {
                     // @ts-ignore
-                    return {date: r.date, purchases: Array.from(r.purchases), payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged}}
+                    return {date: r.date, purchases: Array.from(r.purchases), payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged , transactionID: r.transactionID? r.transactionID : r.payment.transactionID}}
                 })
             }
         }

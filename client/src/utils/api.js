@@ -240,7 +240,18 @@ const getUsers = async () => {
     return instance.get(`${baseDomain}/users/allUsers`);
 };
 
+const getOwnersAssignedBy = async (storeName) => {
+    return instance.get(`${baseDomain}/stores/getOwnersAssignedBy/?storeName=${storeName}`)
+}
+
+const approveStoreOwner = async (ownerName, storeName) => {
+    const req = {body: { storeName: storeName, newOwnerName: ownerName }};
+    return instance.post(`${baseDomain}/stores/approveStoreOwner`, req);
+}
+
 export {
+    approveStoreOwner,
+    getOwnersAssignedBy,
     getUsers,
     viewUserPurchaseHistory,
     viewStorePurchaseHistory,

@@ -4,7 +4,7 @@ import {Req, Res} from 'se-workshop-20-interfaces'
 import {
     BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
     Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
-    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission
+    IPurchasePolicy, StoreInfo, IPurchasePolicyElement, ISimplePurchasePolicy, ManagerNamePermission, AssignAgreement
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {ManagementPermission, Operators, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ExternalSystemsManager} from "../external_systems/ExternalSystemsManager";
@@ -26,10 +26,12 @@ import {
     StoreModel,
     StoreOwnerModel,
     PurchasePolicyModel,
+    AssignAgreementModel
 } from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
+import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 
 const logger = loggerW(__filename)
 
@@ -123,12 +125,21 @@ export class StoreManagement {
     async getOwnersAssignedBy(storeName: string, user: RegisteredUser): Promise<Res.GetOwnersAssignedByResponse> {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         if (!storeModel)
-            return {data: {result: false, owners: []}, error: {message: errorMsg.E_INVALID_STORE}}
+            return {data: {result: false, owners: [], agreements: []}, error: {message: errorMsg.E_INVALID_STORE}}
         const storeOwner = this.findStoreOwner(storeModel, user.name);
+        const agreements = await AssignAgreementModel.find({
+            $or: [{storeName, requiredApprove: user.name, pending: true}, {
+                storeName,
+                assignedByOwner: user.name,
+                pending: true
+            }]
+        })
+        const filtered = agreements.filter((a) => a.requiredApprove.length !== a.approvedBy.length)
         return {
             data: {
                 result: true,
-                owners: storeOwner.ownersAssigned.map(curr => curr.name)
+                owners: storeOwner.ownersAssigned.map(curr => curr.name),
+                agreements: filtered
             }
         };
     }
@@ -289,7 +300,7 @@ export class StoreManagement {
         return res;
     }
 
-    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<Res.BoolResponse> {
+    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<{ res: Res.BoolResponse, notify?: string[] }> {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as an owner in store: ${JSON.stringify(storeName)}`)
 
@@ -299,7 +310,7 @@ export class StoreManagement {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+            return {res: {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}};
         }
 
         const userWhoAssignsOwner = this.findStoreOwner(storeModel, userWhoAssigns.name);
@@ -307,30 +318,49 @@ export class StoreManagement {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+            return {res: {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}};
         }
 
         if (this.findStoreOwner(storeModel, userToAssign.name)) {   // already store manager
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {data: {result: false}, error: {message: error}};
+            return {res: {data: {result: false}, error: {message: error}}};
         }
-
+        const allOwners: string[] = storeModel.storeOwners.map((owner) => owner.name);
+        const requiredApprove = allOwners.filter((name) => name !== userWhoAssigns.name)
         try {
-            const ownerToAdd = new StoreOwnerModel({name: userToAssign.name})
-            userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
-            storeModel.storeOwners.push(ownerToAdd);
-            storeModel.markModified('storeOwners')
-            await ownerToAdd.save();
-            await userWhoAssignsOwner.save();
-            await storeModel.save()
-            logger.info(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+            const newAgreement = await AssignAgreementModel.create({
+                assignedByOwner: userWhoAssigns.name,
+                newOwner: userToAssign.name,
+                requiredApprove,
+                approvedBy: [],
+                storeName,
+                pending: true
+            });
+            userWhoAssignsOwner.agreements.push(newAgreement);
+            userWhoAssignsOwner.markModified('agreements')
+            await userWhoAssignsOwner.save()
         } catch (e) {
             logger.error(`assignStoreOwner DB ERROR: ${e}`);
-            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+            return {res: {data: {result: false}, error: {message: errorMsg.E_DB}}}
         }
-        return {data: {result: true}}
+        /*
+                try {
+                    const ownerToAdd = new StoreOwnerModel({name: userToAssign.name})
+                    userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
+                    storeModel.storeOwners.push(ownerToAdd);
+                    storeModel.markModified('storeOwners')
+                    await ownerToAdd.save();
+                    await userWhoAssignsOwner.save();
+                    await storeModel.save()
+                    logger.info(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
+                } catch (e) {
+                    logger.error(`assignStoreOwner DB ERROR: ${e}`);
+                    return {data: {result: false}, error: {message: errorMsg.E_DB}}
+                }
+        */
+        return {res: {data: {result: true}}, notify: requiredApprove}
     }
 
     async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.RemoveStoreOwnerResponse> {
@@ -613,7 +643,7 @@ export class StoreManagement {
         }
 
         try {
-            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(p => permissions.indexOf(p) === - 1)
+            userManagerToAddDoc.managerPermissions = userManagerToAddDoc.managerPermissions.filter(p => permissions.indexOf(p) === -1)
             storeModel.markModified('storeManagers')
             await userManagerToAddDoc.save();
             await storeModel.save();
@@ -697,6 +727,7 @@ export class StoreManagement {
                 storeManagersNames: store.storeOwners.map(o => o.name),
                 productsNames: store.products.map(p => p.name)
             }
+
             return {data: {result: true, info: storeInfo}}
         } else {   // store not found
             return {data: {result: false}, error: {message: errorMsg.E_NF}}
@@ -743,7 +774,14 @@ export class StoreManagement {
             }
 
         const iReceipts: IReceipt[] = storeModel.receipts.map((r) => {
-            return {purchases: r.purchases, date: r.date , payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged}}
+            return {
+                purchases: r.purchases,
+                date: r.date,
+                payment: {
+                    lastCC4: r.lastCC4 ? r.lastCC4 : r.payment.lastCC4,
+                    totalCharged: r.totalCharged ? r.totalCharged : r.payment.totalCharged
+                }
+            }
         })
         return {data: {result: true, receipts: iReceipts}}
     }
@@ -911,7 +949,7 @@ export class StoreManagement {
     }
 
     async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName, ["discountPolicy","products"] );
+        const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const isSuccess: boolean = await store.setDiscountPolicy(discounts.discounts);
@@ -919,7 +957,7 @@ export class StoreManagement {
     }
 
     async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
-        const store: Store = await this.findStoreByName(storeName,["discountPolicy","products"]);
+        const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
         const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
         const children: Map<Discount, Operators> = discount.children;
         const discountInPolicy: IDiscountInPolicy[] = [];
@@ -933,7 +971,7 @@ export class StoreManagement {
     }
 
     async getStorePurchasePolicy(user: RegisteredUser, storeName: string): Promise<IPurchasePolicy> {
-        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
+        const store: Store = await this.findStoreByName(storeName, ["purchasePolicy", "products"]);
         const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
         const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
         const purchasePolicyElements: IPurchasePolicyElement[] = [];
@@ -947,7 +985,7 @@ export class StoreManagement {
     }
 
     async setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName,["purchasePolicy","products"]);
+        const store: Store = await this.findStoreByName(storeName, ["purchasePolicy", "products"]);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const setPolicyOk: boolean = await store.setPurchasePolicy(policy.policy);
@@ -1113,4 +1151,67 @@ export class StoreManagement {
 
 
     //endregion
+    async approveStoreOwner(storeName: any, usernameToAssign: RegisteredUser, usernameWhoApprove: RegisteredUser): Promise<BoolResponse> {
+        const storeModel = await this.findStoreModelByName(storeName); // Document
+        if (!storeModel) {
+            return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
+        }
+        const usernameWhoApproveOwner = this.findStoreOwner(storeModel, usernameWhoApprove.name);
+        if (!usernameWhoApproveOwner) {
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
+        }
+        try {
+            const agreement = await AssignAgreementModel.findOne({storeName, newOwner: usernameToAssign.name})
+            if (!agreement) {
+                logger.warn(`approveStoreOwner didnt found agreement`)
+                return {data: {result: false}, error: {message: errorMsg.E_AGREEMENT}}
+            }
+            const isRequired: boolean = agreement.requiredApprove.find((r) => r === usernameWhoApprove.name) && !agreement.approvedBy.find((r) => r === usernameWhoApprove.name)
+            if (isRequired) {
+                agreement.approvedBy.push(usernameWhoApprove.name);
+                agreement.markModified('approvedBy')
+                await agreement.save();
+                return {data: {result: true}}
+            } else {
+                logger.warn(`approveStoreOwner not required to approve`)
+                return {data: {result: false}, error: {message: errorMsg.E_AGREEMENT}}
+            }
+        } catch (e) {
+            logger.error(`approveStoreOwner DB ERROR ${e}`)
+            return {data: {result: false}, error: {message: errorMsg.E_DB}}
+        }
+    }
+
+    async addOwnerIfAccepted(newOwner: string, storeName: string): Promise<boolean> {
+        try {
+            const agreement = await AssignAgreementModel.findOne({storeName, newOwner})
+            if (agreement.pending !== true) {
+                logger.warn(`trying to accept someone who not pending ${newOwner} as an owner in store: ${storeName}, assigned by user ${agreement.assignedByOwner}`)
+                return false;
+            }
+            if (agreement.requiredApprove.length === agreement.approvedBy.length && agreement.requiredApprove.sort().every((value, index) => {
+                return value === agreement.approvedBy.sort()[index]
+            })) {
+                const storeModel = await this.findStoreModelByName(storeName); // Document
+                const userWhoAssignsOwner = this.findStoreOwner(storeModel, agreement.assignedByOwner);
+                const ownerToAdd = new StoreOwnerModel({name: newOwner})
+                userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
+                storeModel.storeOwners.push(ownerToAdd);
+                storeModel.markModified('storeOwners')
+                agreement.pending = false;
+                await agreement.save()
+                await ownerToAdd.save();
+                await userWhoAssignsOwner.save();
+                await storeModel.save()
+                logger.info(`successfully assigned user: ${newOwner} as an owner in store: ${storeName}, assigned by user ${agreement.assignedByOwner}`)
+                return true;
+            } else {
+                logger.warn(`Need more approved to make ${newOwner} as an owner in store: ${storeName}, assigned by user ${agreement.assignedByOwner}`)
+                return false;
+            }
+        } catch (e) {
+            logger.error(`assignStoreOwner DB ERROR: ${e}`);
+            return false;
+        }
+    }
 }

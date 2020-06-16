@@ -9,6 +9,7 @@ router.get("/initFile", SystemControllers.initFromFile);
 router.get("/status", SystemControllers.isLoggedIn);
 router.get("/healthcheck", SystemControllers.getIsSystemUp);
 router.get("/newtoken", SystemControllers.startNewSession);    // usage: stores/newtoken
-
+router.get("/getStatistics/", SystemControllers.getVisitorsStatistics);      // usage: stores/getStatistics/?from=DATE&to=DATE
+router.get("/stopStatistics/", SystemControllers.stopVisitorsStatistics);      // usage: stores/getStatistics/?from=DATE&to=DATE
 
 export default router;

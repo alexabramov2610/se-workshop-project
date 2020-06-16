@@ -15,11 +15,12 @@ let adminToken: string;
 let usersMap: Map<string,string> = new Map<string,string>(); // username -> pw
 let itemIds: Map<number,number> = new Map<number,number>(); // catalog num -> id
 
-export const initSystemFromFile = async (req: Req.Request): Promise<Res.BoolResponse> => {
+export const initSystemFromFile = async (req: Req.InitFromFileRequest): Promise<Res.BoolResponse> => {
     let isSystemOn: boolean|void = false;
     try {
         console.log(__dirname)
-        const file = fs.readFileSync(path.resolve(__dirname, PATH), 'utf8')
+        const pathToFile: string = req.body && req.body.path ? req.body.path : PATH;
+        const file = fs.readFileSync(path.resolve(__dirname, pathToFile), 'utf8')
         const ymlDoc = YAML.parse(file);
         // console.log(ymlDoc.stores);
 
