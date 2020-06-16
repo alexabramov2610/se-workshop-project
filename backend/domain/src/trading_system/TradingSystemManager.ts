@@ -26,7 +26,7 @@ import {Publisher} from "publisher";
 import {Event} from "se-workshop-20-interfaces/dist";
 import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
-import {ReceiptModel, UserModel, SystemModel, SubscriberModel} from "dal";
+import {ReceiptModel, UserModel, SystemModel, SubscriberModel, AssignAgreementModel} from "dal";
 import * as UserMapper from '../user/UserMapper'
 
 const logger = loggerW(__filename)
@@ -313,6 +313,8 @@ export class TradingSystemManager {
         if (res.data.result) {
             logger.info(`successfully removed user: ${req.body.usernameToRemove} as store owner of store: ${req.body.storeName}`)
             await this.unsubscribeAndNotifyStoreOwner(req.body.usernameToRemove, req.body.storeName, res.data.owners)
+            await this.removePendingsByOwners(res.data.owners, req.body.storeName)
+
         }
         return res;
     }
@@ -669,16 +671,15 @@ export class TradingSystemManager {
         await this.logout(req);
     }
 
-    connectDeliverySys(req: Req.Request): Res.BoolResponse {
+    async connectDeliverySys(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info('connecting to delivery system');
-        const res: Res.BoolResponse = this._externalSystems.connectSystem(ExternalSystems.DELIVERY);
-        return res;
+        return this._externalSystems.connectSystem(ExternalSystems.DELIVERY);
+
     }
 
-    connectPaymentSys(req: Req.Request): Res.BoolResponse {
+    async connectPaymentSys(req: Req.Request): Promise<Res.BoolResponse> {
         logger.info('connecting to payment system');
-        const res: Res.BoolResponse = this._externalSystems.connectSystem(ExternalSystems.PAYMENT);
-        return res;
+        return this._externalSystems.connectSystem(ExternalSystems.PAYMENT);
     }
 
     async calculateFinalPrices(req: Req.CalcFinalPriceReq): Promise<Res.CartFinalPriceRes> {
@@ -740,9 +741,8 @@ export class TradingSystemManager {
 
     async pay(req: Req.PayRequest): Promise<Res.PaymentResponse> {
         logger.info(`trying to pay using external system`)
-
-        const isPaid: boolean = this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
-        if (!isPaid)
+        const isPaid: number = await this._externalSystems.paymentSystem.pay(req.body.price, req.body.payment.cardDetails);
+        if (isPaid === -1)
             return {data: {result: false}, error: {message: errorMsg.E_PAY_FAILURE}}
         const lastCC4 = req.body.payment.cardDetails.number.slice(req.body.payment.cardDetails.number.length - 4, req.body.payment.cardDetails.number.length)
         logger.debug(`paid with credit card ${lastCC4}`)
@@ -883,4 +883,33 @@ export class TradingSystemManager {
 
 
     //endregion
+    private async removePendingsByOwners(owners: string[], storeName: string): Promise<void> {
+        try {
+            await AssignAgreementModel.deleteMany({
+                "$or": [{
+                    assignedByOwner: {"$in": owners},
+                    storeName
+                }, {newOwner: {"$in": owners}, storeName}]
+            })
+        } catch (e) {
+            logger.error(`removePendingsByOwners DB ERROR delete agreements`)
+        }
+        try {
+            const agreements = await AssignAgreementModel.find({
+                storeName,
+                requiredApprove: {"$in": owners}
+            })
+            for (const agreement of agreements) {
+                agreement.requiredApprove = agreement.requiredApprove.filter((user) => !owners.find((o) => o === user))
+                agreement.markModified('requiredApprove')
+                await agreement.save()
+                this.addOwnerIfAccepted(agreement.newOwner, storeName)
+            }
+        } catch (e) {
+            logger.error(`removePendingsByOwners DB ERROR delete required`)
+
+        }
+
+
+    }
 }

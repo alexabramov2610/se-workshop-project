@@ -1,7 +1,7 @@
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 import {CreditCard} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 import {errorMsg, loggerW} from "../../api-int/internal_api";
-
+import {PaymentSystemAdapter} from "./PaymentSystemAdapter";
 const logger = loggerW(__filename)
 
 export class PaymentSystem {
@@ -11,7 +11,7 @@ export class PaymentSystem {
 
     constructor() {
         this._name = "Payment System"
-        this._paymentSys = null;
+        this._paymentSys = new PaymentSystemAdapter();
         this._isConnected = false;
     }
 
@@ -19,7 +19,7 @@ export class PaymentSystem {
         this._paymentSys = real;
     }
 
-    connect(): BoolResponse {
+    async connect(): Promise<BoolResponse> {
         logger.info("connecting payment system...");
         const succ: BoolResponse = {data: {result: true}};
         if (this._paymentSys) {
@@ -40,38 +40,32 @@ export class PaymentSystem {
         }
     }
 
-    pay(price: number, creditCard: CreditCard): boolean {
-        if (!this._isConnected && !this.connect().data.result) {
-            logger.info("payment system is not connected");
-            return false;
+    async pay(price: number, creditCard: CreditCard): Promise<number> {
+        if (!this._isConnected) {
+            const connectSucc : BoolResponse = await this.connect()
+            if(!connectSucc.data.result){
+                logger.info("payment system is not connected");
+                return -1;
+            }
         }
         logger.info("trying to charge" );
         let isPaid: boolean = false;
         if (this._paymentSys) {
-            try {
-                this._paymentSys.validateCreditCard(creditCard);
-                this._paymentSys.validateBalance(creditCard, price);
-                isPaid = this._paymentSys.pay(price, creditCard);
-                isPaid ? logger.info(`successfully charged ${creditCard.number.substring(creditCard.number.length-4)}`) :
-                    logger.warn(`failed charging ${creditCard.number.substring(creditCard.number.length-4)}`)
-            } catch (e) {
-                isPaid = false;
-                const error: string = `${errorMsg.E_CON}. message: ${e}`;
-                logger.error(error);
-            }
+            return this._paymentSys.pay(price,creditCard)
         } else {
             isPaid = this.validateCreditCard(creditCard)
             if (!isPaid) {
                 logger.error("payment failed - invalid credit card")
-                return isPaid;
+                return -1;
             }
             isPaid = this.validateBalance(creditCard, price);
             if (!isPaid) {
                 logger.error("payment failed - ough money")
-                return isPaid
+                return -1
             }
+            return Math.random() * (1000 - 1) + 1;
         }
-        return isPaid;
+
 
     }
 

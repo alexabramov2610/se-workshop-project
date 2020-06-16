@@ -44,9 +44,9 @@ export const systemInit = async (req: Req.InitReq): Promise<Res.BoolResponse> =>
     const setAdminRes: Res.BoolResponse = await tradingSystem.setAdmin(setAdminReq)
     if (setAdminRes.error) return setAdminRes;
     const connectExtReq: Req.Request = {body: {}, token: req.token};
-    const connectDeliveryRes: Res.BoolResponse = tradingSystem.connectDeliverySys(connectExtReq);
+    const connectDeliveryRes: Res.BoolResponse = await tradingSystem.connectDeliverySys(connectExtReq);
     if (connectDeliveryRes.error) return connectDeliveryRes;
-    const connectPaymentRes: Res.BoolResponse = tradingSystem.connectPaymentSys(connectExtReq);
+    const connectPaymentRes: Res.BoolResponse = await tradingSystem.connectPaymentSys(connectExtReq);
     if (connectPaymentRes.error) return connectPaymentRes;
     await tradingSystem.openTradeSystem({body: {}, token: req.token})
     const logout: Res.BoolResponse = await tradingSystem.logout({body: {}, token: req.token});
