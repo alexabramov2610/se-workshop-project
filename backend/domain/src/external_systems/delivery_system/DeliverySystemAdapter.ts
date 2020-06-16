@@ -7,7 +7,7 @@ import * as querystring from "querystring";
 
 const logger = loggerW(__filename)
 
-export class PaymentSystemAdapter {
+export class DeliverySystemAdapter {
     EXTERNAL_URL: string = "https://cs-bgu-wsep.herokuapp.com/"
 
     async connect(): Promise<BoolResponse> {
@@ -28,16 +28,15 @@ export class PaymentSystemAdapter {
         }
     }
 
-    async pay(price: number, creditCard: CreditCard): Promise<number> {
+    async deliver(name:string, country: string, city: string, address: string, zip: string): Promise<number> {
         try {
             const payRes = await axios.post(this.EXTERNAL_URL, querystring.stringify({
-                    action_type: 'pay',
-                    card_number: creditCard.number,
-                    month: creditCard.expMonth,
-                    year: creditCard.expYear,
-                    holder: creditCard.holderName,
-                    ccv: creditCard.cvv,
-                    id: '123'
+                    action_type: 'supply',
+                    name,
+                    address,
+                    city,
+                    country,
+                    zip
                 }),
                 {
                     headers: {
@@ -52,10 +51,10 @@ export class PaymentSystemAdapter {
     }
 
 
-    async cancelPay(transactionID: number): Promise<boolean> {
+    async cancelDeliver(transactionID: number): Promise<boolean> {
         try {
             const payRes = await axios.post(this.EXTERNAL_URL, querystring.stringify({
-                    action_type: 'cancel_pay',
+                    action_type: 'cancel_supply',
                     transaction_id: transactionID,
                 }),
                 {

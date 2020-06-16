@@ -1,5 +1,7 @@
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
-import { errorMsg, loggerW} from "../../api-int/internal_api";
+import {errorMsg, loggerW} from "../../api-int/internal_api";
+import {DeliverySystemAdapter} from "./DeliverySystemAdapter";
+
 const logger = loggerW(__filename)
 
 
@@ -10,7 +12,7 @@ export class DeliverySystem {
 
     constructor() {
         this._name = "Delivery System"
-        this._deliverySys = null;
+        this._deliverySys = new DeliverySystemAdapter();
         this._isConnected = false;
     }
 
@@ -18,16 +20,16 @@ export class DeliverySystem {
         this._deliverySys = real;
     }
 
-    connect(): BoolResponse {
+    async connect(): Promise<BoolResponse> {
         logger.info("connecting to delivery system...");
-        const succ: BoolResponse = {data: {result: true}};
+        const connectSuccess: BoolResponse = {data: {result: true}};
         if (this._deliverySys) {
             try {
-                const isConnected = this._deliverySys.connect();
-                this._isConnected = isConnected ? true : false;
+                const isConnected: BoolResponse = await this._deliverySys.connect();
+                this._isConnected = isConnected.data.result ? true : false;
                 isConnected ? logger.info("successfully connected delivery system") :
                     logger.warn("failed connecting delivery system");
-                return isConnected ? succ :
+                return isConnected.data.result ? connectSuccess :
                     {error: {message: errorMsg.E_CON + " : " + this._name}, data: {result: false}};
             } catch (e) {
                 const error: string = `${errorMsg.E_CON}. message: ${e}`;
@@ -35,32 +37,42 @@ export class DeliverySystem {
                 return {error: {message: error}, data: {result: false}};
             }
         } else {
-            return succ;
+            return connectSuccess;
         }
     }
 
-    deliver(country: string, city: string, address: string): boolean {
-        if (!this._isConnected && !this.connect().data.result) {
-            logger.info("delivery system is not connected");
-            return false;
+    async deliver(name: string, country: string, city: string, address: string, zip: string): Promise<number> {
+        if (!this._isConnected) {
+            const connectSuccess : BoolResponse = await this.connect()
+            if(!connectSuccess.data.result){
+                logger.info("payment system is not connected");
+                return -1;
+            }
         }
         let isDelivered: boolean = false;
         if (this._deliverySys) {
-            try {
-                isDelivered = this._deliverySys.deliver(country, city, address);
-                isDelivered ? logger.info(`delivery has successfully set to ${address}, ${city}`) :
-                    logger.warn(`failed setting delivery to ${address}, ${city}`)
-            } catch (e) {
-                isDelivered = false;
-                const error: string = `${errorMsg.E_CON}. message: ${e}`;
-                logger.error(error);
-            }
+            return this._deliverySys.deliver()
         } else {
             isDelivered = this.validateDelivery(country, city, address)
             if (!isDelivered)
                 logger.error("delivery failed")
         }
-        return isDelivered
+        return Math.random() * (1000 - 1) + 1;
+    }
+
+    async cancelDeliver(deliveryID: number): Promise<boolean> {
+        if (!this._isConnected) {
+            const connectSuccess: BoolResponse = await this.connect()
+            if (!connectSuccess.data.result) {
+                logger.info("payment system is not connected");
+                return false;
+            }
+        }
+        if (this._deliverySys) {
+            return this._deliverySys.cancelDeliver(deliveryID)
+        } else {
+            return true;
+        }
     }
 
     private validateDelivery(country: string, city: string, address: string) {

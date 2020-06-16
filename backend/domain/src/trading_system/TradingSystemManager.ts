@@ -833,9 +833,8 @@ export class TradingSystemManager {
     async deliver(req: Req.DeliveryRequest): Promise<Res.DeliveryResponse> {
         logger.info(`trying to deliver using external system`)
         const user = this._userManager.getUserByToken(req.token);
-        const isDeliver: boolean = this._externalSystems.deliverySystem.deliver(req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address);
-        return isDeliver
-            ? {data: {result: true, deliveryID: "1"}}
+        const deliveryID: number = await this._externalSystems.deliverySystem.deliver(req.body.userDetails.name, req.body.userDetails.country, req.body.userDetails.city, req.body.userDetails.address, req.body.userDetails.zip);
+        return (deliveryID !== -1) ? {data: {result: true, deliveryID}}
             : {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}};
     }
 

@@ -118,7 +118,7 @@ interface ViewManagerPermissionResponse extends BoolResponse {
 }
 
 interface DeliveryResponse extends BoolResponse {
-    data: { result: boolean, deliveryID?: string }
+    data: { result: boolean, deliveryID?: number }
 }
 
 interface GetStoresWithOffsetResponse extends Response {
