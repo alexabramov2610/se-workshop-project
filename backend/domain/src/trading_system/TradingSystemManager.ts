@@ -772,12 +772,10 @@ export class TradingSystemManager {
             this._userManager.resetUserCart(user);
             if (rUser) {
                 rUser.receipts.push(receipt)
-                // const res = await UserModel.updateOne({name: rUser.name}, {cart: UserMapper.cartMapperToDB(rUser.cart), receipts: rUser.receipts});
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();
                 uModel.receipts = rUser.receipts;
-                await UserModel.update({name: rUser.name}, {cart: uModel.cart, receipts: uModel.receipts})
-                // await uModel.save();
+                await UserModel.updateOne({name: rUser.name}, {cart: uModel.cart, receipts: uModel.receipts})
                 logger.debug(`user saved after reset the cart and added receipt `);
             }
             logger.info(`purchase request: successfully purchased`)
