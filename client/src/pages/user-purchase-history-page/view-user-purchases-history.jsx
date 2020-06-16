@@ -29,10 +29,6 @@ const getExtended = (record) => {
     );
 };
 
-const getTotalPrice = (p) => {
-    return p.purchases.reduce((acc, curr) => acc += curr.price, 0);
-}
-
 const getValue = (props) => {
     return config.isAdmin && props.data.username;
 }
@@ -45,6 +41,7 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
         const currDate = moment(p.date);
         const pDate = currDate.format('DD/MM/YYYY');
         return {
+            key: p.key,
             date: pDate,
             user: p.purchases[0].userName,
             last4: p.payment.lastCC4,
