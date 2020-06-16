@@ -9,6 +9,7 @@ import {
 } from "./types";
 import * as DummyTypes from "./mocks/responses";
 import { Req, Res } from "se-workshop-20-interfaces";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
@@ -89,5 +90,5 @@ export interface Bridge {
   // removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
   setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse>;
   viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse>;
-
+  setPublisher(publisher: IPublisher): Promise<void>;
 }

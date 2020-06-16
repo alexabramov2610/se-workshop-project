@@ -7,6 +7,7 @@ import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
 import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -321,7 +322,9 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
-  }
-
-
+  },
+    async setPublisher(publisher: IPublisher): Promise<void>{
+      const x= publisher;
+      await ServiceFacade.setPublisher(publisher);
+    }
 };

@@ -1,3 +1,5 @@
+
+
 import {EventCode, ManagementPermission, Operators, ProductCategory, Rating, WeekDays} from "./Enums";
 import {Event} from "./Event";
 
