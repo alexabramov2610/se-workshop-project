@@ -16,7 +16,7 @@ export class ExternalSystemsManager {
         this._securitySystem = new SecuritySystem();
     }
 
-    connectSystem(system: ExternalSystems): BoolResponse {
+    async connectSystem(system: ExternalSystems): Promise<BoolResponse> {
         logger.debug(`trying to connect to ${system}`);
         switch (system) {
             case (ExternalSystems.DELIVERY):
@@ -27,19 +27,6 @@ export class ExternalSystemsManager {
                 return this._securitySystem.connect();
         }
     }
-
-    connectAllSystems(): BoolResponse {
-        const responses: BoolResponse[] = [this._deliverySystem.connect(), this._paymentSystem.connect(), this._securitySystem.connect()];
-        const errors = responses.filter(val => val.error)
-        if (errors.length === 0) {
-            logger.warn("cant connect to one of the external systems.")
-            return {data: {result: true}}
-        } else {
-            return {data: {result: false}, error: {message: errorMsg.E_CON, options: errors}}
-        }
-    }
-
-
 
     get paymentSystem(): PaymentSystem {
         return this._paymentSystem;

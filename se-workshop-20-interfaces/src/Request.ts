@@ -214,7 +214,7 @@ interface VerifyStoreName extends Request {
 
 interface DeliveryRequest extends Request {
     body: {
-        userDetails: { country: string, city: string, address: string }
+        userDetails: { name: string, country: string, city: string, address: string, zip:string }
     }
 }
 

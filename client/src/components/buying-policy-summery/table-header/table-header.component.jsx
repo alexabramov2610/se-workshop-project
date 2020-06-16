@@ -14,7 +14,6 @@ const TableHeader = () => {
             <span style={conditionStyle}>Minimum</span>
             <span style={conditionStyle}>Maximum</span>
             <span style={conditionStyle}>Not For Sell Days</span>
-            <span style={conditionStyle}>Countries</span>
             <span style={operatorStyle}>operator</span>
         </HeaderContainer>
     );

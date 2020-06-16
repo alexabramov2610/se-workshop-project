@@ -7,6 +7,7 @@ const assignAgreementSchema = new Schema({
     requiredApprove: [{type: String}],
     approvedBy: [{type: String}],
     storeName: {type: String, required: true},
+    pending: {type: Boolean, default: true}
 });
 
 assignAgreementSchema.plugin(uniqueValidator);

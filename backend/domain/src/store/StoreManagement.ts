@@ -127,8 +127,14 @@ export class StoreManagement {
         if (!storeModel)
             return {data: {result: false, owners: [], agreements: []}, error: {message: errorMsg.E_INVALID_STORE}}
         const storeOwner = this.findStoreOwner(storeModel, user.name);
-        const agreements= await AssignAgreementModel.find( {$or:[{storeName, requiredApprove: user.name}, {storeName, assignedByOwner: user.name}] })
-        const filtered= agreements.filter((a)=> a.requiredApprove.length !== a.approvedBy.length)
+        const agreements = await AssignAgreementModel.find({
+            $or: [{storeName, requiredApprove: user.name, pending: true}, {
+                storeName,
+                assignedByOwner: user.name,
+                pending: true
+            }]
+        })
+        const filtered = agreements.filter((a) => a.requiredApprove.length !== a.approvedBy.length)
         return {
             data: {
                 result: true,
@@ -294,7 +300,7 @@ export class StoreManagement {
         return res;
     }
 
-    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<{res: Res.BoolResponse, notify?: string[]}> {
+    async assignStoreOwner(storeName: string, userToAssign: RegisteredUser, userWhoAssigns: RegisteredUser): Promise<{ res: Res.BoolResponse, notify?: string[] }> {
         logger.debug(`user: ${userWhoAssigns.name} requested to assign user:
                 ${userToAssign.name} as an owner in store: ${JSON.stringify(storeName)}`)
 
@@ -304,7 +310,7 @@ export class StoreManagement {
             error = errorMsg.E_INVALID_STORE;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {res: {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}} ;
+            return {res: {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}};
         }
 
         const userWhoAssignsOwner = this.findStoreOwner(storeModel, userWhoAssigns.name);
@@ -312,7 +318,7 @@ export class StoreManagement {
             error = errorMsg.E_NOT_AUTHORIZED;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
-            return {res :{data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}};
+            return {res: {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}};
         }
 
         if (this.findStoreOwner(storeModel, userToAssign.name)) {   // already store manager
@@ -329,7 +335,8 @@ export class StoreManagement {
                 newOwner: userToAssign.name,
                 requiredApprove,
                 approvedBy: [],
-                storeName
+                storeName,
+                pending: true
             });
             userWhoAssignsOwner.agreements.push(newAgreement);
             userWhoAssignsOwner.markModified('agreements')
@@ -353,7 +360,7 @@ export class StoreManagement {
                     return {data: {result: false}, error: {message: errorMsg.E_DB}}
                 }
         */
-        return {res: {data: {result: true}} ,notify:requiredApprove }
+        return {res: {data: {result: true}}, notify: requiredApprove}
     }
 
     async removeStoreOwner(storeName: string, userToRemove: RegisteredUser, userWhoRemoves: RegisteredUser): Promise<Res.RemoveStoreOwnerResponse> {
@@ -1178,6 +1185,10 @@ export class StoreManagement {
     async addOwnerIfAccepted(newOwner: string, storeName: string): Promise<boolean> {
         try {
             const agreement = await AssignAgreementModel.findOne({storeName, newOwner})
+            if (agreement.pending !== true) {
+                logger.warn(`trying to accept someone who not pending ${newOwner} as an owner in store: ${storeName}, assigned by user ${agreement.assignedByOwner}`)
+                return false;
+            }
             if (agreement.requiredApprove.length === agreement.approvedBy.length && agreement.requiredApprove.sort().every((value, index) => {
                 return value === agreement.approvedBy.sort()[index]
             })) {
@@ -1187,6 +1198,8 @@ export class StoreManagement {
                 userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
                 storeModel.storeOwners.push(ownerToAdd);
                 storeModel.markModified('storeOwners')
+                agreement.pending = false;
+                await agreement.save()
                 await ownerToAdd.save();
                 await userWhoAssignsOwner.save();
                 await storeModel.save()
