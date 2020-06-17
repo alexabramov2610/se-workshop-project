@@ -54,25 +54,68 @@ describe("Add Remove Edit Products, UC: 3.2", () => {
     expect(error).toBeDefined();
   });
 
-  test("Add Owner - Sad Path: store owner logged in, User with ID is already assigned as store owner by", async() => {
-    const newOwner2: Credentials = {
-      userName: "newOwner2",
-      password: "newPass2",
-    };
-   await _serviceBridge.register(newOwner2);
+  test("Add Owner - ￿need aproval by 1 manager.", async() => {
+        const newOwner2: Credentials = {
+            userName: "newOwner2",
+            password: "newPass2",
+        };
+        await _serviceBridge.register(newOwner2);
 
-    await _serviceBridge.login(_driver.getLoginDefaults());
-      await _serviceBridge.createStore(_storeInformation);
-      await _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
-      await _serviceBridge.assignStoreOwner(_storeInformation, {
-      username: newOwner2.userName,
+        await _serviceBridge.login(_driver.getLoginDefaults());
+        await _serviceBridge.createStore(_storeInformation);
+        await _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
+        await _serviceBridge.assignStoreOwner(_storeInformation, {
+            username: newOwner2.userName,
+        });
+        await _serviceBridge.logout();
+        await _serviceBridge.login(_newOwnerCreds);
+        const {data} =  await _serviceBridge.approveStoreOwner({body: { storeName: _storeInformation.name, newOwnerName: newOwner2.userName }})
+        expect(data.result).toBe(true);
     });
-      await _serviceBridge.logout();
 
-      await _serviceBridge.login(_newOwnerCreds);
-    const { error } = await _serviceBridge.assignStoreOwner(_storeInformation, {
-      username: newOwner2.userName,
+
+
+    test("Add Owner - try to approve without pending aproval.", async() => {
+        const newOwner2: Credentials = {
+            userName: "newOwner2",
+            password: "newPass2",
+        };
+        await _serviceBridge.register(newOwner2);
+
+        await _serviceBridge.login(_driver.getLoginDefaults());
+        await _serviceBridge.createStore(_storeInformation);
+        await _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
+        await _serviceBridge.assignStoreOwner(_storeInformation, {
+            username: newOwner2.userName,
+        });
+        await _serviceBridge.logout();
+        await _serviceBridge.login(newOwner2);
+        const {data} =  await _serviceBridge.approveStoreOwner({body: { storeName: _storeInformation.name, newOwnerName: newOwner2.userName }})
+        expect(data.result).toBe(false);
     });
-    expect(error).toBeDefined();
-  });
+
+
+
+    test("Add Owner - check pending approvals.", async() => {
+        const newOwner2: Credentials = {
+            userName: "newOwner2",
+            password: "newPass2",
+        };
+        await _serviceBridge.register(newOwner2);
+
+        await _serviceBridge.login(_driver.getLoginDefaults());
+        await _serviceBridge.createStore(_storeInformation);
+        await _serviceBridge.assignStoreOwner(_storeInformation, _newOwner);
+        await _serviceBridge.assignStoreOwner(_storeInformation, {
+            username: newOwner2.userName,
+        });
+        await _serviceBridge.logout();
+        await _serviceBridge.login(_newOwnerCreds);
+        const {data} =  await _serviceBridge.getOwnersAssignedBy({body: { storeName: _storeInformation.name }})
+        expect(data.agreements[0].requiredApprove.filter(ap=>ap === _newOwner.username)[0]).toBe("new-boss");
+    });
+
+
+
+
 });

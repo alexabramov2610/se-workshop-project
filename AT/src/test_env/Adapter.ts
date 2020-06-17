@@ -8,6 +8,11 @@ import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
 import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
 import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    BoolResponse,
+    GetOwnersAssignedByResponse,
+    WatchVisitorsInfoResponse
+} from "se-workshop-20-interfaces/dist/src/Response";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -331,5 +336,15 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
     async setPublisher(publisher: IPublisher): Promise<void>{
       const x= publisher;
       await ServiceFacade.setPublisher(publisher);
+    },
+
+    async getVisitorsInfo(req: Partial<Req.WatchVisitorsInfoRequest>): Promise<WatchVisitorsInfoResponse>{
+        return await ServiceFacade.watchVisitorsInfo(wrapWithToken(req.body));
+    },
+    async approveStoreOwner(req: Partial<Req.ApproveNewOwnerRequest>): Promise<BoolResponse>{
+        return await ServiceFacade.approveStoreOwner(wrapWithToken(req.body));
+    },
+    async getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>{
+        return await ServiceFacade.getOwnersAssignedBy(wrapWithToken(req.body));
     }
 };
