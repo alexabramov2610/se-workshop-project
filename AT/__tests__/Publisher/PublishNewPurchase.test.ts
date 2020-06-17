@@ -11,14 +11,13 @@ import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder"
 //Agreement Policy
 
 
-
 describe("Publisher Notification, UC: 10 - New Puchase", () => {
     let _driver = new Driver();
     let _serviceBridge: Partial<Bridge>;
     let _testPaymentInfo: PayRequest;
     let _publisher: PublisherMock;
     // let publiser: IPublisher = {}
-    beforeEach(async() => {
+    beforeEach(async () => {
 
         let _driver = new Driver();
         _driver.dropDBDor();
@@ -44,12 +43,12 @@ describe("Publisher Notification, UC: 10 - New Puchase", () => {
     });
 
 
-    test("Publisher Notification - New Purchase Store Owner Logged in",async () => {
+    test("Publisher Notification - New Purchase Store Owner Logged in", async () => {
         //Constants
-        const _shopoholic: Credentials = { userName: "shopoholic", password: "ibuyALL123" };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _shopoholic: Credentials = {userName: "shopoholic", password: "ibuyALL123"};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         const _prodct: Product = new ProductBuilder().getProduct();
-        const _item = { id: 123, catalogNumber: _prodct.catalogNumber };
+        const _item = {id: 123, catalogNumber: _prodct.catalogNumber};
         //Test flow
         await _serviceBridge.createStore(_storeInformation);
         await _serviceBridge.addProductsToStore(_storeInformation, [_prodct]);
@@ -59,18 +58,18 @@ describe("Publisher Notification, UC: 10 - New Puchase", () => {
         await _serviceBridge.login(_shopoholic);
         const res = await _driver.given.store(_storeInformation).products([_prodct]).makeABuy();
         await _serviceBridge.logout();
-        await  _driver.loginWithDefaults();
+        await _driver.loginWithDefaults();
         expect(_publisher.notified.get(EventCode.NEW_PURCHASE).get(_driver.getLoginDefaults().userName)).toBe(1);
         expect(_publisher.notified.get(EventCode.NEW_PURCHASE).size).toBe(1)
     });
 
 
-    test("Publisher Notification - New Purchase Store Owner Logged out",async () => {
+    test("Publisher Notification - New Purchase Store Owner Logged out", async () => {
         //Constants
-        const _shopoholic: Credentials = { userName: "shopoholic", password: "ibuyALL123" };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _shopoholic: Credentials = {userName: "shopoholic", password: "ibuyALL123"};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         const _prodct: Product = new ProductBuilder().getProduct();
-        const _item = { id: 123, catalogNumber: _prodct.catalogNumber };
+        const _item = {id: 123, catalogNumber: _prodct.catalogNumber};
         //Test flow
         await _serviceBridge.createStore(_storeInformation);
         await _serviceBridge.addProductsToStore(_storeInformation, [_prodct]);

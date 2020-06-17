@@ -4,12 +4,6 @@ import {EventCode} from "se-workshop-20-interfaces/dist/src/Enums";
 import * as utils from "../../utils"
 import {PublisherBuilder, PublisherMock} from "../../src/test_env/mocks/builders/publisher-builder";
 import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder";
-//Tests TBD:
-//
-
-//New Purchase
-//Agreement Policy
-
 
 
 describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
@@ -18,7 +12,7 @@ describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
     let _testPaymentInfo: PayRequest;
     let _publisher: PublisherMock;
     // let publiser: IPublisher = {}
-    beforeEach(async() => {
+    beforeEach(async () => {
 
         let _driver = new Driver();
         _driver.dropDBDor();
@@ -43,19 +37,19 @@ describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
         _driver.dropDBDor();
     });
 
-    test("Publisher Notification - Assign Store Owner:Happy Path",async () => {
+    test("Publisher Notification - Assign Store Owner:Happy Path", async () => {
 
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _serviceBridge.register(_newOwnerCreds);
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
@@ -64,18 +58,18 @@ describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
 
     });
 
-    test("Publisher Notification - Assign Store Owner:Sad Patch - no such user to assign ",async () => {
+    test("Publisher Notification - Assign Store Owner:Sad Patch - no such user to assign ", async () => {
 
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
@@ -83,44 +77,43 @@ describe("Publisher Notification, UC: 10 - Assign Store Owner", () => {
 
     });
 
-    test("Publisher Notification - Assign Store Owner:Sad Patch - Store Owner Logged Out ",async () => {
+    test("Publisher Notification - Assign Store Owner:Sad Patch - Store Owner Logged Out ", async () => {
 
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _serviceBridge.register(_newOwnerCreds);
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
         await _serviceBridge.logout();
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
         expect(_publisher.notified.get(EventCode.ASSIGNED_AS_STORE_OWNER)).toBeUndefined();
     });
 
-    test("Publisher Notification - Assign Store Owner:Sad Patch -Assign From Different User i.e not the store owner.",async () => {
+    test("Publisher Notification - Assign Store Owner:Sad Patch -Assign From Different User i.e not the store owner.", async () => {
 
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
         await _serviceBridge.logout();
         await _serviceBridge.login(_newOwnerCreds);
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
         expect(_publisher.notified.get(EventCode.ASSIGNED_AS_STORE_OWNER)).toBeUndefined();
     });
-    //add Policy Agreement Test
 });

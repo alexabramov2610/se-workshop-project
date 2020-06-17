@@ -29,7 +29,7 @@ export class PayForm extends React.Component {
       exp,
       ccnumber,
       cvv,
-      holderID
+      id
     } = this.state;
     const expMonth = exp && exp.split("/")[0];
     const expYear = exp && exp.split("/")[1];

@@ -11,14 +11,13 @@ import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder"
 //Agreement Policy
 
 
-
 describe("Publisher Notification, UC: 10 - Remove Store Owner", () => {
     let _driver = new Driver();
     let _serviceBridge: Partial<Bridge>;
     let _testPaymentInfo: PayRequest;
     let _publisher: PublisherMock;
     // let publiser: IPublisher = {}
-    beforeEach(async() => {
+    beforeEach(async () => {
 
         let _driver = new Driver();
         _driver.dropDBDor();
@@ -43,18 +42,18 @@ describe("Publisher Notification, UC: 10 - Remove Store Owner", () => {
         _driver.dropDBDor();
     });
 
-    test("Publisher Notification - Remove Store Owner",async () => {
+    test("Publisher Notification - Remove Store Owner", async () => {
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _serviceBridge.register(_newOwnerCreds);
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
@@ -71,18 +70,18 @@ describe("Publisher Notification, UC: 10 - Remove Store Owner", () => {
     });
 
 
-    test("Publisher Notification - Remove Store Owner: Remover is Logged Out",async () => {
+    test("Publisher Notification - Remove Store Owner: Remover is Logged Out", async () => {
         const _newOwnerCreds: Credentials = {
             userName: "new-boss",
             password: "owner123",
         };
-        const _newOwner: User = { username: _newOwnerCreds.userName };
-        const _storeInformation: Store = { name: "this-is-the-coolest-store" };
+        const _newOwner: User = {username: _newOwnerCreds.userName};
+        const _storeInformation: Store = {name: "this-is-the-coolest-store"};
         await _serviceBridge.logout();
         await _serviceBridge.register(_newOwnerCreds);
         await _driver.loginWithDefaults();
         await _serviceBridge.createStore(_storeInformation);
-        const { data } = await _serviceBridge.assignStoreOwner(
+        const {data} = await _serviceBridge.assignStoreOwner(
             _storeInformation,
             _newOwner
         );
@@ -98,7 +97,4 @@ describe("Publisher Notification, UC: 10 - Remove Store Owner", () => {
         expect(_publisher.notified.get(EventCode.REMOVED_AS_STORE_OWNER)).toBeUndefined();
 
     });
-
-
-    //add Policy Agreement Test
 });
