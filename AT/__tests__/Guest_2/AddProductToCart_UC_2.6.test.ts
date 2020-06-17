@@ -26,6 +26,7 @@ describe("Guest saves items in the cart, UC: 2.6", () => {
     beforeEach(async() => {
 
         _driver.dropDB()
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()

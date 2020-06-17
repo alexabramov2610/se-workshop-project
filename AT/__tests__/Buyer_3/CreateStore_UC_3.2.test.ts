@@ -9,6 +9,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
     beforeEach(async () => {
         _driver = new Driver()
         _driver.dropDB();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
@@ -17,12 +18,12 @@ describe("Create Store Buyer, UC: 3.2", () => {
         _storeInformation = {name: "mock-name-each"};
     });
 
-
-    afterAll((done) => {
-        _driver.dropDB();
-        utils.terminateSocket();
-        done();
-    });
+    //
+    // afterAll((done) => {
+    //     _driver.dropDB();
+    //     utils.terminateSocket();
+    //     done();
+    // });
 
     test("Create Store - Happy Path: valid store information - logged in user", async (done) => {
         _storeInformation = {name: "some-store"};
@@ -50,6 +51,7 @@ describe("Create Store Buyer, UC: 3.2", () => {
     test("Create Store - Sad Path:  - logged in user sore name taken",async (done) => {
         _storeInformation = {name: "some-store"};
         const res = await _serviceBridge.createStore(_storeInformation);
+        const x=3;
         expect(res.data.name).toBe(_storeInformation.name);
         _storeInformation = {name: "some-store"};
         const error = await _serviceBridge.createStore(_storeInformation);

@@ -14,6 +14,7 @@ describe("Add Remove Edit Products, UC: 4.1", () => {
   beforeEach(async() => {
     _driver = new Driver()
     _driver.dropDBDor();
+    await _driver.reset();
     await _driver.startSession()
     await _driver.initWithDefaults()
     await _driver.registerWithDefaults()

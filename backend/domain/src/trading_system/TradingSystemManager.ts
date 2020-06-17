@@ -398,6 +398,7 @@ export class TradingSystemManager {
         logger.info(`approving user: ${req.body.newOwnerName} as store owner of store: ${req.body.storeName}`)
         const usernameWhoApprove: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.newOwnerName)
+        const x= 3;
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const approved: Res.BoolResponse = await this._storeManager.approveStoreOwner(req.body.storeName, usernameToAssign, usernameWhoApprove);

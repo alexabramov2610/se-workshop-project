@@ -13,6 +13,7 @@ describe("Watch Purchases History, UC: 3.7", () => {
     beforeEach(async () => {
         _driver = new Driver()
         _driver.dropDB();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()

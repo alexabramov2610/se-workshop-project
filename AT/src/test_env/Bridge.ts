@@ -102,4 +102,5 @@ export interface Bridge {
   setPublisher(publisher: IPublisher): Promise<void>;
   approveStoreOwner(req: Partial<Req.ApproveNewOwnerRequest>): Promise<Res.BoolResponse>;
   getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>;
+  initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>;
 }

@@ -17,11 +17,11 @@ describe("Guest watch cart, UC: 2.7", () => {
     let _testItem1: Item;
     let _testItem2: Item;
 
-    beforeEach(async() => {
+    beforeEach(async () => {
         _driver = new Driver();
         _driver.dropDBDor();
-
-        _serviceBridge =await _driver.getBridge()
+        await _driver.reset();
+        _serviceBridge = await _driver.getBridge()
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
@@ -46,14 +46,14 @@ describe("Guest watch cart, UC: 2.7", () => {
 
     });
 
-    test("Non empty cart", async() => {
+    test("Non empty cart", async () => {
         const req = {
             body: {
-              storeName: _testStore1.name,
-              catalogNumber: _testProduct1.catalogNumber,
-              amount:1,
+                storeName: _testStore1.name,
+                catalogNumber: _testProduct1.catalogNumber,
+                amount: 1,
             },
-          } 
+        }
         await _serviceBridge.saveProductToCart(req);
 
         const {data, error} = await _serviceBridge.watchCart();
@@ -81,12 +81,12 @@ describe("Guest watch cart, UC: 2.7", () => {
 
         const req = {
             body: {
-              storeName: _testStore1.name,
-              catalogNumber: _testProduct1.catalogNumber,
-              amount:1,
+                storeName: _testStore1.name,
+                catalogNumber: _testProduct1.catalogNumber,
+                amount: 1,
             },
-          } 
-        await _serviceBridge.saveProductToCart(req);        
+        }
+        await _serviceBridge.saveProductToCart(req);
         const res = await _serviceBridge.watchCart();
         const productsBefore = res.data.cart.products;
 
@@ -97,7 +97,7 @@ describe("Guest watch cart, UC: 2.7", () => {
         expect(bagBefore[0].product.catalogNumber).toEqual(_testProduct1.catalogNumber)
         expect(bagBefore[0].amount).toEqual(amountBefore);
 
-      
+
         await _serviceBridge.saveProductToCart(req);
         const {data, error} = await _serviceBridge.watchCart();
         expect(error).toBeUndefined();
@@ -117,7 +117,7 @@ describe("Guest watch cart, UC: 2.7", () => {
         expect(bag[0].amount).toEqual(amountAfter);
     });
 
-    test("Empty cart", async() => {
+    test("Empty cart", async () => {
         const {data, error} = await _serviceBridge.watchCart();
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
@@ -125,5 +125,5 @@ describe("Guest watch cart, UC: 2.7", () => {
         const {cart: {products}} = data;
         expect(products.length).toEqual(0);
     });
- });
+});
 

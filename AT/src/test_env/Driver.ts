@@ -71,7 +71,7 @@ class Driver {
   }
 
   dropDB(){
-     shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh', {async: false})
+     shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh',{async: false})
   }
 
   dropDBDor(){
@@ -86,7 +86,7 @@ async initWith(cred: Credentials): Promise<Driver> {
   async startSession(): Promise<Driver> {
     const res = await this.bridge.startSession();
     const x = res.data
-    // this.sessionToken =  res.data.token
+    this.sessionToken =  res.data.token
     this.bridge.setToken(this.sessionToken);
     return this;
   }

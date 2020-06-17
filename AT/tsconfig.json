@@ -6,25 +6,7 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "noEmit": true,
-    "jsx": "react"
+    "declaration": true
   },
-  "lib": [
-    "es2015"
-  ],
-  "include": [
-    "src"
-  ]
+  "lib": ["es2015"]
 }

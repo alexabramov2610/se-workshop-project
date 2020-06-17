@@ -14,7 +14,7 @@ describe("Watch Purchases History, UC: 3.7",  () => {
     beforeEach(async () => {
         _driver = new Driver()
         _driver.dropDB();
-        _driver.reset();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         _serviceBridge = _driver.getBridge();

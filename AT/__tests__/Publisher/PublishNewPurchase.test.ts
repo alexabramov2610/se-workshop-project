@@ -21,6 +21,7 @@ describe("Publisher Notification, UC: 10 - New Puchase", () => {
 
         let _driver = new Driver();
         _driver.dropDBDor();
+        await _driver.reset();
         _publisher = new PublisherBuilder()._publisher;
         await _driver.startSession()
         await _driver.initWithDefaults()

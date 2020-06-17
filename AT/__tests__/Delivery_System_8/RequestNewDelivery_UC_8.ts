@@ -13,6 +13,7 @@ describe("Guest buy items, UC: 2.8", () => {
 
     beforeEach(async () => {
         _driver.dropDB()
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
@@ -24,6 +25,8 @@ describe("Guest buy items, UC: 2.8", () => {
             token: "123",
             body: {
                 userDetails: {
+                    name:"ron",
+                    zip: "123456",
                     country: country,
                     city: city,
                     address: address

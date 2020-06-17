@@ -346,5 +346,10 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
     },
     async getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>{
         return await ServiceFacade.getOwnersAssignedBy(wrapWithToken(req.body));
+    },
+    async initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>{
+      const reqWithToken = wrapWithToken(req.body)
+        const x = reqWithToken
+        return await ServiceFacade.initFromFile(reqWithToken);
     }
 };
