@@ -1,12 +1,26 @@
 export const init = async (username) => {
     client = new WebSocket(`wss://localhost:8000/?name=${username}`);
-    client.onmessage = onMessageBackup;
+    client.onmessage = onMessage;
 }
 
-export const setOnMessage = (onMessageCallback) => {
-    onMessageBackup = onMessageCallback;
+export const setOnRoutineMessages = (onMessageCallback) => {
+    onRoutineMessageBackup = onMessageCallback;
+    onMessage = (res) => {
+        onRoutineMessageBackup(res);
+        onStatsUpdateBackup && onStatsUpdateBackup(res);
+    }
+}
+
+export const setOnStatsUpdate = (onUpdateCallback) => {
+    onStatsUpdateBackup = onUpdateCallback;
 }
 
 let client;
-let onMessageBackup;
+let onRoutineMessageBackup;
+
+let onStatsUpdateBackup;
+
+let onMessage;
+
+
 

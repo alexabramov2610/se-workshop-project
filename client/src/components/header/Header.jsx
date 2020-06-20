@@ -14,7 +14,15 @@ import {Link} from "react-router-dom";
 import {CartCtx} from "../../contexts/cart-context";
 import {Dropdown, Menu} from "antd";
 
-const menu = (<Menu>
+const menu = (
+    <Menu>
+        <Menu.Item>
+            <Link
+                to="/system/statistics"
+            >
+                Statistics
+            </Link>
+        </Menu.Item>
         <Menu.Item>
             <Link
                 to="/viewStoresPurchasesHistory"
@@ -46,7 +54,7 @@ export class Header extends React.Component {
     adminOptions = () => {
         return (
             <Dropdown overlay={menu} style={linkStyle} className="hvr-underline-from-center">
-                <div style={{ cursor: "pointer" }}>
+                <div style={{cursor: "pointer"}}>
                     ADMIN
                 </div>
             </Dropdown>
