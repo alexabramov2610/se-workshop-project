@@ -46,8 +46,10 @@ const StatisticsPageContainer = () => {
         const fetchData = async () => {
             const from = dates && dates[0] && dates[0].toDate();
             const to = dates && dates[1] && dates[1].toDate();
-            const rangeRes = await api.getStatistics(from, to);
-            parseRangeResult(rangeRes);
+            if (from && to) {
+                const rangeRes = await api.getStatistics(from, to);
+                parseRangeResult(rangeRes);
+            }
 
             const today = new Date();
             const dayRes = await api.getStatistics(today, today);
