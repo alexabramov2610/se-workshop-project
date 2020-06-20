@@ -55,7 +55,8 @@ export class Store {
     discountPolicy: Discount;
     rating: Rating;
 
-    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[], storeManagers: StoreManager[], receipts: IReceipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
+    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[],
+                storeManagers: StoreManager[], receipts: IReceipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
         this.storeName = storeName;
         this.description = description;
         this.products = products;

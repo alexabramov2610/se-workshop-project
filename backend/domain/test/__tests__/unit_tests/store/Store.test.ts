@@ -1,8 +1,4 @@
-// import {mocked} from "ts-jest/utils";
-// import {ProductModel} from "dal"
-// jest.mock('dal');
 import {StoreManager, StoreOwner} from "../../../../src/user/internal_api";
-import {Store} from "../../../../src/store/Store";
 import {
     BagItem,
     IItem,
@@ -21,8 +17,16 @@ import {Res} from 'se-workshop-20-interfaces'
 import {ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {PurchasePolicy} from "../../../../src/store/PurchasePolicy/PurchasePolicy";
 import {Discount} from "../../../../src/store/discounts/Discount";
+import {
+    createProduct,
+    createStoreManager,
+    createStoreOwner,
+    generateInvalidProducts, generateValidItems,
+    generateValidProducts, generateValidProductsReq
+} from "../utils/utils";
+import {Store} from "../../../../src/store/Store";
 
-describe("Store Management Unit Tests", () => {
+describe("Store Unit Tests", () => {
     let store: Store;
     let firstOwner: StoreOwner;
     let storeManager: StoreManager;
@@ -40,8 +44,9 @@ describe("Store Management Unit Tests", () => {
     const storeManagerName: string = "store-manager-name";
     const basicPermissions: ManagementPermission[] = [ ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS ]
 
-    beforeEach(() => {
-        // mocked(ProductModel).mockClear();
+    beforeEach(async () => {
+        jest.useFakeTimers();
+
         firstOwner = { name: storeOwnerName, assignedStoreManagers: [], assignedStoreOwners: [] };
         storeManager = { name: storeManagerName, managerPermissions: basicPermissions }
 
@@ -57,6 +62,10 @@ describe("Store Management Unit Tests", () => {
         // mockProductModel();
         store = new Store(storeName, description, productsInStore, storeOwners, storeManagers, storeReceipts, firstOwner, purchasePolicy, discountPolicy);
     });
+
+    afterAll(async () => {
+        await new Promise(resolve => setTimeout(resolve, 10));
+    })
 
     test("init test - init", () => {
         expect(store.storeName).toBe(storeName);
@@ -791,61 +800,5 @@ describe("Store Management Unit Tests", () => {
         const bagItems: BagItem[] = [bagItem1, bagItem2, bagItem3];
         expect(store.getBagPrice(bagItems)).toBe(finalPrice);
     });
-
-    function generateValidProductsReq(numberOfItems: number): ProductCatalogNumber[] {
-        const products: ProductCatalogNumber[] = [];
-        for (let i = 1; i < numberOfItems + 1; i++)
-            products.push(createProduct("name", i, 5, ProductCategory.ELECTRONICS));
-
-        return products;
-    }
-
-    function generateValidProducts(numOfItems: number): IProduct[] {
-        const products: IProduct[] = [];
-        for (let i = 1; i < numOfItems + 1; i++)
-            products.push(createProduct("name", i, 5, ProductCategory.ELECTRONICS));
-
-        return products;
-    }
-
-    function generateInvalidProducts(numOfItems: number): IProduct[] {
-        const products: IProduct[] = [];
-        for (let i = 1; i < numOfItems + 1; i++)
-            products.push(createProduct("", i, 5, ProductCategory.ELECTRONICS));
-
-        return products;
-    }
-
-    function generateValidItems(numOfItems: number, startingCatalogId: number, catalogNumberMax: number, startingId: number): IItem[] {
-        const items: IItem[] = [];
-        for (let i = 1; i < numOfItems + 1; i++)
-            items.push(createItem(startingId + i + 1, startingCatalogId + (i % catalogNumberMax) + 1));
-
-        return items;
-    }
-
-    function createStoreOwner(username: string): StoreOwner {
-        return { name: username, assignedStoreOwners: [], assignedStoreManagers: [] }
-    }
-
-    function createStoreManager(username: string): StoreManager {
-        return { name: username, managerPermissions: basicPermissions }
-    }
-
-    function createProduct(name: string, catalogNumber: number, price: number, category: ProductCategory): IProduct {
-        return { name, catalogNumber, price, category}
-    }
-
-    function createItem(id: number, catalogNumber: number): IItem {
-        return { id, catalogNumber }
-    }
-
-    // function mockProductModel() {
-    //     mocked(ProductModel).mockImplementation((): any => {
-    //         return {
-    //             updateOne: async (): Promise<boolean> => true
-    //         }
-    //     });
-    // }
 
 });

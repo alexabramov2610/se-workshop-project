@@ -111,13 +111,13 @@ jobs:
       #          cd AT
       #          npm run comp
       #          cd ..
-#      - name: Unit Tests
-#        run: |
-#          cd backend
-#          cd domain
-#          npm run test:cov
-#          cd ..
-#          cd ..
+      - name: Unit Tests
+        run: |
+          cd backend
+          cd domain
+          npm run test:cov
+          cd ..
+          cd ..
       - name: Integration Tests
         run: |
           cd backend

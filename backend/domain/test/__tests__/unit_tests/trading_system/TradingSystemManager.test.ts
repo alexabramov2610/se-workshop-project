@@ -8,7 +8,6 @@
 // import {Store, StoreManagement} from "../../../../src/store/internal_api";
 // import {RegisteredUser, StoreOwner} from "../../../../src/user/internal_api";
 // import {TradingSystemManager} from "../../../../src/trading_system/TradingSystemManager";
-// import {ContactUsMessage, Item, Product, Receipt} from "../../../../src/trading_system/internal_api";
 // import {ExternalSystemsManager} from '../../../../src/external_systems/ExternalSystemsManager'
 // import {UserManager} from '../../../../src/user/UserManager';
 // import {User} from "../../../../src/user/users/User";
@@ -18,21 +17,25 @@
 // jest.mock('../../../../src/store/StoreManagement');
 // jest.mock('../../../../src/external_systems/ExternalSystemsManager');
 // jest.mock('../../../../src/external_systems/payment_system/PaymentSystem')
-//
-// describe("Store Management Unit Tests", () => {
-//     let tradingSystemManager: TradingSystemManager;
-//     let store: Store;
-//     let user: StoreOwner;
-//     const mockToken: string = "mock-token";
-//     const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
-//     const createStoreRequest: Req.OpenStoreRequest = {
-//         body: {storeName: "new store", description: "new store desc"},
-//         token: "1"
-//     };
-//     cart.set("storeName", [{
-//         product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20, rating: Rating.MEDIUM},
-//         amount: 2
-//     }])
+
+describe("Trading System Manager Unit Tests", () => {
+    // let tradingSystemManager: TradingSystemManager;
+    // let store: Store;
+    // let user: StoreOwner;
+    // const mockToken: string = "mock-token";
+    // const cart: Map<string, BagItem[]> = new Map<string, BagItem[]>();
+    // const createStoreRequest: Req.OpenStoreRequest = {
+    //     body: {storeName: "new store", description: "new store desc"},
+    //     token: "1"
+    // };
+    // cart.set("storeName", [{
+    //     product: {catalogNumber: 5, name: "bamba", category: ProductCategory.HOME, price: 20, rating: Rating.MEDIUM},
+    //     amount: 2
+    // }])
+
+    test("tmp1", () => {
+        expect(true).toBe(true);
+    })
 //
 //     beforeEach(() => {
 //         store = new Store("store", "store desc");
@@ -1587,4 +1590,4 @@
 //     }
 //
 //
-// });
+});
