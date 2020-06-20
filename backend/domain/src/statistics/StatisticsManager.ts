@@ -46,7 +46,10 @@ export class StatisticsManager {
      */
     private async generateStatistics(fromDate: Date, toDate: Date): Promise<DailyStatistics[]> {
         let dailyStatistics: DailyStatistics[] = [];
-        const statsModels = await this.getStatsModelsByDateRange(fromDate, toDate);
+        let statsModels;
+        if (fromDate && toDate) {
+            statsModels = await this.getStatsModelsByDateRange(fromDate, toDate);
+        }
         if (statsModels) {
             statsModels.forEach(stat => {
                 const statistics: VisitorsStatistics = {
