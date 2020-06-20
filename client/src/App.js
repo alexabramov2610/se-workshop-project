@@ -26,6 +26,7 @@ import ViewStoresPurchaseHistoryContainer
     from "./pages/stores-purchase-history-page/view-stores-purchase-history-container";
 import ViewUsersPurchaseHistoryContainer
     from "./pages/user-purchase-history-page/view-user-purcheses-history-container";
+import StatisticsPageContainer from "./pages/statistics-page/statistics-page-container";
 
 
 
@@ -71,14 +72,14 @@ class App extends React.Component {
         });
 
     onLogout = async () => {
-        this.setState({ isLoggedIn: false, systemIsClose: false })
+        this.setState({ isLoggedIn: false, isAdmin: false, systemIsClose: false })
         config.setLoggedInUser(undefined);
-        config.setIsAdmin(false);
+        config.setIsAdmin(undefined);
         await this.cartCountUpdater();
     }
 
     handleInit({ token, status, isSystemUp }) {
-        console.log(isSystemUp)
+        console.log("status", status)
         if (!isSystemUp) this.setState({ systemIsClose: true })
         else if (status && status.data && status.data.username && status.data.username.length > 0) this.onLogin(status.data.username)
         else this.setState({ systemIsClose: false })
@@ -99,7 +100,7 @@ class App extends React.Component {
                         <Route path="/category" component={CategoryPage} />
                         <Route path="/signupsignin" render={(props) => <SignInAndSignUpPage isLoggedIn={this.state.isLoggedIn} onLogin={this.onLogin} />} />
                         <Route exact path="/createStore" render={(props) => <CreateStorePage isLoggedIn={this.state.isLoggedIn} />} />
-                        {/*<Route path="/store/permissions" component={ManageManagersPageContainer} />*/}
+                        <Route path="/system/statistics" component={StatisticsPageContainer} />
                         {/*<Route path="/store/manageBuyingPolicy/:storename" component={} />*/}
                         {/*<Route path="/store/manageBuyingPermissions/:storename" component={} />*/}
                         <Route path="/store/manageProducts/:storename" component={ManageProductsContainer} />

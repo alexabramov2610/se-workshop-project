@@ -46,6 +46,7 @@ const ViewStoresPurchaseHistoryPage = (props) => {
         const pDate = currDate.format('DD/MM/YYYY');
 
         return {
+            key: p.key,
             date: pDate,
             user: p.purchases[0].userName,
             last4: p.payment.lastCC4,

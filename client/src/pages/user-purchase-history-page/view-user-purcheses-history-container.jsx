@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import * as api from '../../utils/api';
 import AdminViewUsersPurchaseHistoryPage from "./view-user-purchases-history";
 import * as generalUtils from "../../utils/utils";
+import Spinner from "../../components/spinner/spinner";
 
 const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
 
@@ -17,6 +18,7 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
 
             const usersRes = await api.getUsers();
             const purchasesHistoryRes = await api.viewUserPurchaseHistory(username);
+            console.log(purchasesHistoryRes);
 
             if (purchasesHistoryRes.data.data.result) {
                 const receipts = purchasesHistoryRes.data.data.receipts;
@@ -41,9 +43,9 @@ const ViewUsersPurchaseHistoryContainer = ({isAdmin}) => {
     };
 
     return (
-        <div>
-            <AdminViewUsersPurchaseHistoryPage data={data}/>
-        </div>
+        fetching
+            ? <Spinner message={"Loading History"}/>
+            : <AdminViewUsersPurchaseHistoryPage data={data}/>
     );
 }
 
