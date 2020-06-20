@@ -4,6 +4,7 @@ import { Credentials, User, Store, Product } from "./types";
 import { Res } from "se-workshop-20-interfaces"
 import shell from "shelljs";
 import {IResponse} from "./mocks/responses";
+import * as ServiceFacade from "service_layer/dist/src/service_facade/ServiceFacade";
 /* Connect to the DB */
 
 
@@ -70,12 +71,14 @@ class Driver {
     return this;
   }
 
-  dropDB(){
+  async dropDB(){
      shell.exec('/Users/rono/School/SE_Workshop/se-workshop-project/AT/dropallmac.sh',{async: false})
+    // const path: string = "../dev-dropall.sh";
+    // await ServiceFacade.dropDB(path);
   }
 
-  dropDBDor(){
-    this.dropDB()
+  async dropDBDor(){
+    await this.dropDB()
  }
 
 async initWith(cred: Credentials): Promise<Driver> {
@@ -97,8 +100,8 @@ async initWith(cred: Credentials): Promise<Driver> {
   }
 
   async loginWithDefaults(): Promise<IResponse> {
-   return await this.bridge.login(this.loginDefCredentials);
-
+    const res = await this.bridge.login(this.loginDefCredentials);
+    return res;
   }
 
   async registerWith(cred: Credentials): Promise<Driver> {
