@@ -69,6 +69,8 @@ export class StatisticsManager {
         const isStoreOwner: boolean = await this.isUserStoreOwner(username);
         const isAdmin: boolean = await this.isUserAdmin(username);
 
+        logger.debug(`[${username}: ${token}] isStoreManager: ${isStoreManager}, isStoreOwner: ${isStoreOwner}, isAdmin" ${isAdmin}`)
+
         if (!isStoreManager && !isStoreOwner && !isAdmin)
             await this.addRegisteredUserVisit(token);
         else if (isStoreManager && !isStoreOwner && !isAdmin)
