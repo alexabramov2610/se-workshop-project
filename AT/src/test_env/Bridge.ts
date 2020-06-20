@@ -9,6 +9,12 @@ import {
 } from "./types";
 import * as DummyTypes from "./mocks/responses";
 import { Req, Res } from "se-workshop-20-interfaces";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+  BoolResponse,
+  GetOwnersAssignedByResponse,
+  WatchVisitorsInfoResponse
+} from "se-workshop-20-interfaces/dist/src/Response";
 
 export interface Bridge {
   setReal?(real: Bridge): void;
@@ -65,6 +71,10 @@ export interface Bridge {
   removeStoreManager(
     req: Partial<Req.RemoveStoreManagerRequest>
   ): Promise<Res.BoolResponse>;
+  removeStoreOwner(
+      req: Partial<Req.RemoveStoreOwnerRequest>
+  ): Promise<Res.BoolResponse>;
+  getVisitorsInfo(req: Partial<Req.WatchVisitorsInfoRequest>): Promise<WatchVisitorsInfoResponse>,
   // removeManagerPermissions(
   //   req: Partial<Req.ChangeManagerPermissionRequest>
   // ): Res.BoolResponse;
@@ -89,5 +99,8 @@ export interface Bridge {
   // removeProductDiscount(req: Req.RemoveDiscountRequest): Res.BoolResponse 
   setPurchasePolicy(req: Req.SetPurchasePolicyRequest): Promise<Res.BoolResponse>;
   viewPurchasePolicy(req: Req.ViewStorePurchasePolicyRequest): Promise<Res.ViewStorePurchasePolicyResponse>;
-
+  setPublisher(publisher: IPublisher): Promise<void>;
+  approveStoreOwner(req: Partial<Req.ApproveNewOwnerRequest>): Promise<Res.BoolResponse>;
+  getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>;
+  initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>;
 }

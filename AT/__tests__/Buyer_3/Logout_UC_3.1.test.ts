@@ -11,6 +11,7 @@ describe("Guest Buyer, UC: 3.1", () => {
     beforeEach(async () => {
         _driver = new Driver()
         _driver.dropDB();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()

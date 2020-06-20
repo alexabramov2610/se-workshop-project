@@ -184,7 +184,7 @@ export const approveStoreOwner = (req: Req.ApproveNewOwnerRequest): Promise<Res.
 UC-4.4
  */
 export const removeStoreOwner = (req: Req.RemoveStoreOwnerRequest): Promise<Res.BoolResponse> => {
-    return runIfOpen(req, StoreService.removeStoreOwner);
+    return runIfOpen(req, runIfLoggedIn(StoreService.removeStoreOwner));
 }
 /*
 UC-4.5

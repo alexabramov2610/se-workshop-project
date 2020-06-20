@@ -45,6 +45,7 @@ describe("Guest buy items, UC: 2.8", () => {
     beforeEach(async() => {
 
         _driver.dropDB();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
@@ -150,6 +151,7 @@ describe("Guest buy items, UC: 2.8", () => {
                         number: "4242424242424242",
                         expMonth: "12",
                         expYear: "08",
+                        id:"203314666",
                         cvv: "123",
                     },
                     address: "St. Cats 123",

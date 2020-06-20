@@ -7,6 +7,12 @@ import { Req, Res } from "se-workshop-20-interfaces";
 import { ISearchResponse } from "./mocks/responses";
 import mongoose from "mongoose";
 import {Request, SaveToCartRequest} from "se-workshop-20-interfaces/dist/src/Request";
+import {IPublisher} from "se-workshop-20-interfaces/dist/src/CommonInterface";
+import {
+    BoolResponse,
+    GetOwnersAssignedByResponse,
+    WatchVisitorsInfoResponse
+} from "se-workshop-20-interfaces/dist/src/Response";
 let token;
 const wrapWithToken = (req: any) => {
   return { body: { ...req }, token };
@@ -202,6 +208,11 @@ return  await this.saveProductToCart(wrapWithToken({storeName: store.name, catal
       const y= req;
       return x;
   },
+  async removeStoreOwner(
+        req: Partial<Req.RemoveStoreOwnerRequest>
+    ): Promise<Res.BoolResponse> {
+        return await ServiceFacade.removeStoreOwner(wrapWithToken(req.body));
+    },
 
   // removeManagerPermissions(
   //   req: Req.ChangeManagerPermissionRequest
@@ -321,7 +332,24 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
     return error
       ? { data: undefined, error: error }
       : { data: data, error: undefined };
-  }
+  },
+    async setPublisher(publisher: IPublisher): Promise<void>{
+      const x= publisher;
+      await ServiceFacade.setPublisher(publisher);
+    },
 
-
+    async getVisitorsInfo(req: Partial<Req.WatchVisitorsInfoRequest>): Promise<WatchVisitorsInfoResponse>{
+        return await ServiceFacade.watchVisitorsInfo(wrapWithToken(req.body));
+    },
+    async approveStoreOwner(req: Partial<Req.ApproveNewOwnerRequest>): Promise<BoolResponse>{
+        return await ServiceFacade.approveStoreOwner(wrapWithToken(req.body));
+    },
+    async getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>{
+        return await ServiceFacade.getOwnersAssignedBy(wrapWithToken(req.body));
+    },
+    async initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>{
+      const reqWithToken = wrapWithToken(req.body)
+        const x = reqWithToken
+        return await ServiceFacade.initFromFile(reqWithToken);
+    }
 };

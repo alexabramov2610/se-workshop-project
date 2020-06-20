@@ -4,8 +4,8 @@ import {ProductBuilder} from "../../src/test_env/mocks/builders/product-builder"
 import * as utils from "../../utils"
 
 
- const ITEM_NOT_FOUND = "Item not found";
- const STORE_NOT_FOUND = "Store not found";
+const ITEM_NOT_FOUND = "Item not found";
+const STORE_NOT_FOUND = "Store not found";
 
 describe("Guest - View Information, UC: 2.4", () => {
     let _driver = new Driver();
@@ -16,8 +16,8 @@ describe("Guest - View Information, UC: 2.4", () => {
 
     beforeEach(async () => {
         _driver.dropDBDor();
-
-        _serviceBridge =await _driver.getBridge()
+        await _driver.reset();
+        _serviceBridge = await _driver.getBridge()
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
@@ -29,7 +29,7 @@ describe("Guest - View Information, UC: 2.4", () => {
 
     });
 
-    afterAll( () => {
+    afterAll(() => {
 
         utils.terminateSocket();
         _driver.dropDB();
@@ -37,11 +37,11 @@ describe("Guest - View Information, UC: 2.4", () => {
     });
 
     test("View valid product", async () => {
-       await _serviceBridge.createStore(_testStore);
-       await _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
-       await _serviceBridge.addItemsToStore(_testStore, [_testItem]);
+        await _serviceBridge.createStore(_testStore);
+        await _serviceBridge.addProductsToStore(_testStore, [_testProduct]);
+        await _serviceBridge.addItemsToStore(_testStore, [_testItem]);
 
-       await _serviceBridge.logout();
+        await _serviceBridge.logout();
 
         const {data, error} = await _serviceBridge.viewProduct(_testStore, _testProduct);
         const product = data.info;
@@ -51,11 +51,11 @@ describe("Guest - View Information, UC: 2.4", () => {
         expect(product.catalogNumber).toEqual(_testProduct.catalogNumber);
     });
 
-    test("View invalid product",async () => {
+    test("View invalid product", async () => {
         await _serviceBridge.createStore(_testStore);
         await _serviceBridge.logout();
 
-        const {data, error} =await  _serviceBridge.viewProduct(_testStore, _testProduct);
+        const {data, error} = await _serviceBridge.viewProduct(_testStore, _testProduct);
         expect(data).toBeUndefined();
         expect(error).toBeDefined();
     });

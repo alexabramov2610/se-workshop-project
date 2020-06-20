@@ -14,6 +14,7 @@ describe("Guest buy items, UC: 2.8", () => {
     beforeEach(async() => {
         let _driver = new Driver();
         _driver.dropDBDor();
+        await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()

@@ -7,13 +7,11 @@ const logger = loggerW(__filename)
 
 export class DeliverySystem {
     private _deliverySys: any;
-    private _name: string;
-    private _isConnected: boolean;
+    private readonly _name: string;
 
     constructor() {
         this._name = "Delivery System"
         this._deliverySys = new DeliverySystemAdapter();
-        this._isConnected = false;
     }
 
     setDeliverySys(real: any): void {
@@ -26,7 +24,6 @@ export class DeliverySystem {
         if (this._deliverySys) {
             try {
                 const isConnected: BoolResponse = await this._deliverySys.connect();
-                this._isConnected = isConnected.data.result ? true : false;
                 isConnected ? logger.info("successfully connected delivery system") :
                     logger.warn("failed connecting delivery system");
                 return isConnected.data.result ? connectSuccess :
@@ -42,12 +39,10 @@ export class DeliverySystem {
     }
 
     async deliver(name: string, country: string, city: string, address: string, zip: string): Promise<number> {
-        if (!this._isConnected) {
-            const connectSuccess : BoolResponse = await this.connect()
-            if(!connectSuccess.data.result){
-                logger.info("payment system is not connected");
-                return -1;
-            }
+        const connectSuccess: BoolResponse = await this.connect()
+        if (!connectSuccess.data.result) {
+            logger.warn("delivery system is not connected");
+            return -1;
         }
         let isDelivered: boolean = false;
         if (this._deliverySys) {
@@ -61,12 +56,10 @@ export class DeliverySystem {
     }
 
     async cancelDeliver(deliveryID: number): Promise<boolean> {
-        if (!this._isConnected) {
-            const connectSuccess: BoolResponse = await this.connect()
-            if (!connectSuccess.data.result) {
-                logger.info("payment system is not connected");
-                return false;
-            }
+        const connectSuccess: BoolResponse = await this.connect()
+        if (!connectSuccess.data.result) {
+            logger.warn("delivery system is not connected");
+            return false;
         }
         if (this._deliverySys) {
             return this._deliverySys.cancelDeliver(deliveryID)

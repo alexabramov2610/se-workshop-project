@@ -37,7 +37,7 @@ export class PaymentSystemAdapter {
                     year: creditCard.expYear,
                     holder: creditCard.holderName,
                     ccv: creditCard.cvv,
-                    id: '123'
+                    id: creditCard.id
                 }),
                 {
                     headers: {

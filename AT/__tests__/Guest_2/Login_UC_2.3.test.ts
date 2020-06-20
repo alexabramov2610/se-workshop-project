@@ -9,7 +9,9 @@ describe("Guest Login, UC: 2.3", () => {
 
     beforeEach(async() => {
         _driver = new Driver();
+        await _driver.reset();
         _driver.dropDBDor();
+        await _driver.reset();
          await _driver.startSession()
          await _driver.initWithDefaults()
          _serviceBridge=await _driver.getBridge()
