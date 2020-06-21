@@ -8,8 +8,11 @@ import * as querystring from "querystring";
 const logger = loggerW(__filename)
 
 export class PaymentSystemAdapter {
-    EXTERNAL_URL: string = "https://cs-bgu-wsep.herokuapp.com/"
+    EXTERNAL_URL: string;
 
+    constructor(url: string) {
+        this.EXTERNAL_URL = url;
+    }
     async connect(): Promise<BoolResponse> {
         try {
             const connectRes = await axios.post(this.EXTERNAL_URL, querystring.stringify({action_type: 'handshake'}),
