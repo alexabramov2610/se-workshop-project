@@ -274,4 +274,39 @@ export async function getItemIds(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
+
+
+}
+
+export async function getStoresNames(req, res) {
+    try {
+        const getStoresWithLimitReq = {
+            body: {prefix: req.query.prefix, limit: req.query.limit},
+            token: req.cookies['token']
+        };
+        req.body = getStoresWithLimitReq;
+        const result = await wrapHttp(req, ServiceFacade.getStoresNames);
+        // console.log('ressss : ' +JSON.stringify(result));
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+
+
+}
+
+export async function getProductsNames(req, res) {
+    try {
+        const getProductssWithLimitReq = {
+            body: {prefix: req.query.prefix, limit: req.query.limit},
+            token: req.cookies['token']
+        };
+        req.body = getProductssWithLimitReq;
+        const result = await wrapHttp(req, ServiceFacade.getProductsNames);
+        // console.log('ressss : ' +JSON.stringify(result));
+        return res.send(result);
+    } catch (err) {
+        return res.send(invalidRes);
+    }
+
 }

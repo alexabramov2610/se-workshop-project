@@ -43,5 +43,6 @@ router.get("/getManagersPermissions", StoreController.getManagersPermissions);  
 router.get("/getOwnersAssignedBy", StoreController.getOwnersAssignedBy);                        //usage: stores/getOwnersAssignedBy/?storeName=shufersal
 router.get("/getPurchasePolicy", StoreController.getPurchasePolicy);              //usage: stores/getPurchasePolicy/?storeName=shufersal
 router.get("/getItemIds/", StoreController.getItemIds);      // usage: stores/getItemIds/?storeName=alibaba&product=3
-
+router.get("/getStoresNames/", StoreController.getStoresNames);      // usage: stores/getStoresNames/?storeName=alibaba&limit=3
+router.get("/getProductsNames/", StoreController.getProductsNames);      // usage: stores/getProductsNames/?storeName=alibaba&limit=3
 export default router;
