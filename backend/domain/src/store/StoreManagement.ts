@@ -1,6 +1,7 @@
 import {Store} from './internal_api'
 import {RegisteredUser, StoreManager} from "../user/internal_api";
 import {Req, Res} from 'se-workshop-20-interfaces'
+
 import {
     BagItem, IDiscount, IItem, IPayment, IProduct, IReceipt, ProductCatalogNumber, ProductInStore,
     Purchase, SearchFilters, SearchQuery, IDiscountPolicy, IDiscountInPolicy, IConditionOfDiscount,
@@ -32,7 +33,6 @@ import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
-
 const logger = loggerW(__filename)
 
 
@@ -86,35 +86,28 @@ export class StoreManagement {
     async findStoresNamesByPrefix(prefix: string, limit): Promise<any> {
         try {
             logger.debug(`findStoresNamesByPrefix trying to find store match with prefix:${prefix} in DB`)
-            // var regex = new RegExp('^$|^'+prefix+'|^([FG]?\\d{5}|\\d{5}[AB])$');
             const arr = await StoreModel.find({ "storeName": {$regex: prefix}});
-            // Person.findOne({ "name" : { $regex: /Ghost/, $options: 'i' } },
-            const res = arr.map(st => st.storeName).split(0,limit);
+            const res = arr.map(st => st.storeName).slice(0,Math.min(limit,arr.length));
             return {data:{result: true, names:res}};
         } catch (e) {
             logger.error(`findStoresNamesByPrefix DB ERROR: ${e}`);
-            return undefined
+             return {data:{result: false,names:[]}, error: {message:errorMsg.E_DB+`\n${e.message}` }};
         }
-        return undefined;
+        return {data:{result: true, names:[]}};
     }
 
     async findProductsNamesByPrefix(prefix: string, limit): Promise<Res.GetNamesResponse> {
         try {
             logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
-            const arr = await ProductModel.find({ $productName: prefix});
-            const res = arr.map(p => p.productName).split(0,limit);
+            const arr = await ProductModel.find({ "name": {$regex: prefix}});
+            const res = arr.map(p => p.productName).slice(0,limit);
             return {data:{result: true, names:res}};
         } catch (e) {
             logger.error(`findProductsNamesByPrefix DB ERROR: ${e}`);
-            return undefined
+            return {data:{result: false,names:[]}, error: {message:errorMsg.E_DB }};
         }
-        return undefined;
+        return {data:{result: true, names:[]}};
     }
-    // data: {
-    //     result: boolean;
-    //     names: string[];
-    // };
-
 
     async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
         try {

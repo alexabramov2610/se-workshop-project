@@ -86,7 +86,7 @@ class App extends React.Component {
     }
 
     async componentDidMount() {
-        api.getStoresNames("st",10);
+        
         api.init(this.handleInit);
         await this.cartCountUpdater();
     }

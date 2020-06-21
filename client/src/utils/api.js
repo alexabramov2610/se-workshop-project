@@ -259,10 +259,11 @@ const stopStatistics = () => {
 }
 
 const getStoresNames = (prefix, limit) => {
-    return instance.get(`${baseDomain}/stores/getStoresNames/?name=${prefix}&limit=${limit}`)
+    
+    return instance.get(`${baseDomain}/stores/getStoresNames/?prefix=${prefix}&limit=${limit}`)
 }
 const getProductsNames = (prefix, limit) => {
-    return instance.get(`${baseDomain}/stores/getProductNames/?name=${prefix}&limit=${limit}`)
+    return instance.get(`${baseDomain}/stores/getProductNames/?prefix=${prefix}&limit=${limit}`)
 }
 
 export {
