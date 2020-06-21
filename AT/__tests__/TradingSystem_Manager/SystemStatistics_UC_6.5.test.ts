@@ -9,7 +9,6 @@ describe("Watch Purchases History, UC: 3.7",  () => {
     async function sleep(ms: number) {
         // login is using then&catch instead of await to reduce time needed for login, so sleep is needed to get the UPDATED stats
         await new Promise(resolve => setTimeout(resolve, ms));
-
     }
 
     let _serviceBridge: Partial<Bridge>;
@@ -86,16 +85,12 @@ describe("Watch Purchases History, UC: 3.7",  () => {
         await  _driver.loginWithDefaults();
         await  _serviceBridge.logout();
         await _serviceBridge.login(_driver.getInitDefaults(),true);
-
         await sleep(500)
-
         const {data} = await  _serviceBridge.getVisitorsInfo({body: { from: start, to: end }})
         console.log(JSON.stringify(data))
-
         expect(data.result).toBe(true);
         expect(data.statistics[0].statistics.owners).toBe(1);
         expect(data.statistics[0].statistics.admins).toBe(1);
-
     });
 
 });
