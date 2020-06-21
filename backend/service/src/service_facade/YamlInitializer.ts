@@ -160,33 +160,48 @@ const createStores = async (stores: any[]): Promise<void> => {
         await loginUser(store.owner, usersMap.get(store.owner), token, false);
         await createStore(store.storeName, token);
 
-        const products: IProduct[] = store.items.reduce((acc, curr) =>
-            acc.concat([{name: curr.name, catalogNumber: curr.catalogNumber, price: curr.price, category: curr.category}]), [])
-        await addNewProducts(store.storeName, products, token);
+        if (store.items) {
+            const products: IProduct[] = store.items.reduce((acc, curr) => {
+                return curr ? acc.concat([{
+                    name: curr.name,
+                    catalogNumber: curr.catalogNumber,
+                    price: curr.price,
+                    category: curr.category
+                }]) : acc;
+            }, [])
+            await addNewProducts(store.storeName, products, token);
 
-        const items: IItem[] = store.items.reduce((acc: IItem[], curr) => {
-            let currItems: IItem[] = [];
-            for (let i = 0; i < curr.quantity; i++) {
-                itemIds.set(curr.catalogNumber, itemIds.get(curr.catalogNumber)+1);
-                currItems.push({ id: itemIds.get(curr.catalogNumber), catalogNumber: curr.catalogNumber });
-            }
-            return acc.concat(currItems);
-        }, []);
-        await addNewItems(store.storeName, items, token);
-        await logout(token);
-
-        for (const currAssign of store.managers) {
-            await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
-            await assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
-            if (currAssign.permissions && currAssign.permissions.length > 0)
-                await addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
-            await logout(token);
+            const items: IItem[] = store.items.reduce((acc: IItem[], curr) => {
+                if (!curr)
+                    return acc
+                let currItems: IItem[] = [];
+                for (let i = 0; i < curr.quantity; i++) {
+                    itemIds.set(curr.catalogNumber, itemIds.get(curr.catalogNumber)+1);
+                    currItems.push({ id: itemIds.get(curr.catalogNumber), catalogNumber: curr.catalogNumber });
+                }
+                return acc.concat(currItems);
+            }, []);
+            await addNewItems(store.storeName, items, token);
         }
 
-        for (const currAssign of store.owners) {
-            await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
-            await assignStoreOwner(store.storeName, currAssign.assigner, currAssign.assignee, token);
-            await logout(token);
+        await logout(token);
+
+        if (store.managers) {
+            for (const currAssign of store.managers) {
+                await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
+                await assignStoreManager(store.storeName, currAssign.assigner, currAssign.assignee, token);
+                if (currAssign.permissions && currAssign.permissions.length > 0)
+                    await addPermissions(currAssign.assignee, store.storeName, currAssign.permissions, token)
+                await logout(token);
+            }
+        }
+
+        if (store.managers) {
+            for (const currAssign of store.owners) {
+                await loginUser(currAssign.assigner, usersMap.get(currAssign.assigner), token, false);
+                await assignStoreOwner(store.storeName, currAssign.assigner, currAssign.assignee, token);
+                await logout(token);
+            }
         }
     }
 }

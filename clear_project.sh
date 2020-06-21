@@ -21,56 +21,56 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}======================= CLEANING API =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $api
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  dal
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $dal
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  client
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}====================== CLEANING CLIENT =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $client
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  communication
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}=================== CLEANING COMMUNICATION =================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $communication
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  publisher
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}===================== CLEANING PUBLISHER ===================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $publisher
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  domain
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}====================== CLEANING DOMAIN =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}===================== CLEANING SERVICE =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $service
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  AT
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}======================= CLEANING AT ========================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $AT
-sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 
 

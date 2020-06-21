@@ -1,44 +1,26 @@
 init:
-  username: "username1"
+  username: "A1"
   password: "password"
 users:
   -
-    username: "username2"
+    username: "U1"
     password: "password"
   -
-    username: "username3"
+    username: "U2"
     password: "password"
   -
-    username: "username4"
+    username: "U11"
     password: "password"
   -
-    username: "username5"
+    username: "U12"
     password: "password"
   -
-    username: "username6"
+    username: "U13"
     password: "password"
 stores:
   -
-    storeName: "store1"
-    owner: "username2"
+    storeName: "S2"
+    owner: "U11"
     items:
-      -
-        catalogNumber: 1
-        name: "diapers"
-        price: 30
-        quantity: 20
-        category: "GENERAL"
     managers:
-      -
-        assigner: "username2"
-        assignee: "username3"
-        permissions:
-          -
-            "MANAGE_INVENTORY"
     owners:
-      -
-        assigner: "username2"
-        assignee: "username5"
-      -
-        assigner: "username5"
-        assignee: "username6"
