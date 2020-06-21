@@ -311,11 +311,11 @@ export const getAllUsers = async (req: Req.Request): Promise<Res.GetAllUsersResp
 }
 
 export const getStoresNames = async (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
-    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, runIfHaveToken(StoreService.getStoresNames));
 }
 
 export const getProductsNames = async (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
-    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+    return runIfOpen(req, runIfHaveToken(StoreService.getProductsNames));
 }
 
 /*

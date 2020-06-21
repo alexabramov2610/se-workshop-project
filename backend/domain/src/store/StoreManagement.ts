@@ -86,7 +86,9 @@ export class StoreManagement {
     async findStoresNamesByPrefix(prefix: string, limit): Promise<any> {
         try {
             logger.debug(`findStoresNamesByPrefix trying to find store match with prefix:${prefix} in DB`)
-            const arr = await StoreModel.find({ $storeName: prefix});
+            // var regex = new RegExp('^$|^'+prefix+'|^([FG]?\\d{5}|\\d{5}[AB])$');
+            const arr = await StoreModel.find({ "storeName": {$regex: prefix}});
+            // Person.findOne({ "name" : { $regex: /Ghost/, $options: 'i' } },
             const res = arr.map(st => st.storeName).split(0,limit);
             return {data:{result: true, names:res}};
         } catch (e) {

@@ -282,7 +282,6 @@ export async function getStoresNames(req, res) {
     try {
         const getStoresWithLimitReq = {
             body: {prefix: req.query.prefix, limit: req.query.limit},
-            token: req.cookies['token']
         };
         req.body = getStoresWithLimitReq;
         const result = await wrapHttp(req, ServiceFacade.getStoresNames);
@@ -291,8 +290,6 @@ export async function getStoresNames(req, res) {
     } catch (err) {
         return res.send(invalidRes);
     }
-
-
 }
 
 export async function getProductsNames(req, res) {
