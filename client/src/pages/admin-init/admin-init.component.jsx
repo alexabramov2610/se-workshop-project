@@ -1,5 +1,5 @@
 import React from "react";
-import { history } from "../../utils/config";
+import * as config from "../../utils/config";
 import {
   CreateStorePageContainer,
   StoreFormContainer,
@@ -39,7 +39,10 @@ class AdminInit extends React.Component {
       firstAdminName: "",
     });
     await api.adminInit(firstAdminName, firstAdminPassword);
-    this.setState({ afterInit: true }, () => window.location.reload());
+     // this.setState({ afterInit: true }, () => window.location.reload());
+    //  console.log('history push')
+    // window.location.reload()
+    this.props.changeStatus();
   };
 
   handleChange = (event) => {
@@ -51,8 +54,9 @@ class AdminInit extends React.Component {
   render() {
     const { firstAdminName, firstAdminPassword } = this.state;
     const { isLoggedIn } = this.props;
-    this.state.afterInit && window.location.reload();
+    this.state.afterInit && this.props.changeStatus();
     return (
+      
       <CreateStorePageContainer>
         <StoreFormContainer>
           <CreateStoreTitle>Set Up System Admin</CreateStoreTitle>
