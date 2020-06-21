@@ -21,6 +21,14 @@ describe("Guest buy items, UC: 2.8", () => {
         await _driver.loginWithDefaults()
         _serviceBridge = await _driver.getBridge();
 
+        await _serviceBridge.logout();
+        await _serviceBridge.login(_driver.getInitDefaults());
+
+        const res = await  _serviceBridge.mockDeliverySys();
+        await _serviceBridge.logout();
+        await _driver.loginWithDefaults();
+
+
         _testPaymentInfo = {
             token: "123", body: {
                 payment: _driver.getPaymentInfo().payment,
