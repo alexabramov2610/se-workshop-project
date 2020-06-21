@@ -86,7 +86,7 @@ export class DeliverySystem {
     }
 
     private validateDelivery(country: string, city: string, address: string) {
-        logger.info(`validating delivery to: ${address}, ${city}`);
+        logger.info(`validating delivery to: address: ${address}, city: ${city}, country: ${country}`);
         const invalid = country.length <= 0 || city.length <= 0 || address.length <= 0;
         return !invalid;
     }

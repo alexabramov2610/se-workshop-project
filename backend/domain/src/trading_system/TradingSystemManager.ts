@@ -930,7 +930,7 @@ export class TradingSystemManager {
     }
 
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
-        logger.info(`setting external payment system `)
+        logger.info(`setting external delivery system `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         const isAdmin :boolean= await this._userManager.verifyAdminLogin(user);
         if(!isAdmin)
