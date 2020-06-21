@@ -84,8 +84,6 @@ class Search extends React.Component {
 
     clearFilters() {
         this.setState({
-            storeName: "",
-            productName: "",
             priceRange: "",
             productRating: "",
             storeRating: "",
