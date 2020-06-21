@@ -258,6 +258,13 @@ const stopStatistics = () => {
     return instance.get(`${baseDomain}/system/stopStatistics/`)
 }
 
+const getStoresNames = (prefix, limit) => {
+    return instance.get(`${baseDomain}/stores/getStoresNames/?name=${prefix}&limit=${limit}`)
+}
+const getProductsNames = (prefix, limit) => {
+    return instance.get(`${baseDomain}/stores/getProductNames/?name=${prefix}&limit=${limit}`)
+}
+
 export {
     stopStatistics,
     getStatistics,
@@ -306,4 +313,6 @@ export {
     removeItem,
     removeProduct,
     getAllCategories,
+    getStoresNames,
+    getProductsNames
 };

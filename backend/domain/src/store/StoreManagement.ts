@@ -35,6 +35,9 @@ import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 
 const logger = loggerW(__filename)
 
+
+
+
 export class StoreManagement {
     private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy", "purchasePolicy"];
     private _externalSystems: ExternalSystemsManager;
@@ -78,6 +81,38 @@ export class StoreManagement {
         }
         return undefined;
     }
+
+
+    async findStoresNamesByPrefix(prefix: string, limit): Promise<any> {
+        try {
+            logger.debug(`findStoresNamesByPrefix trying to find store match with prefix:${prefix} in DB`)
+            const arr = await StoreModel.find({ $storeName: prefix});
+            const res = arr.map(st => st.storeName).split(0,limit);
+            return {data:{result: true, names:res}};
+        } catch (e) {
+            logger.error(`findStoresNamesByPrefix DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+
+    async findProductsNamesByPrefix(prefix: string, limit): Promise<Res.GetNamesResponse> {
+        try {
+            logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
+            const arr = await ProductModel.find({ $productName: prefix});
+            const res = arr.map(p => p.productName).split(0,limit);
+            return {data:{result: true, names:res}};
+        } catch (e) {
+            logger.error(`findProductsNamesByPrefix DB ERROR: ${e}`);
+            return undefined
+        }
+        return undefined;
+    }
+    // data: {
+    //     result: boolean;
+    //     names: string[];
+    // };
+
 
     async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
         try {

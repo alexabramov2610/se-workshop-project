@@ -490,6 +490,20 @@ export class TradingSystemManager {
         return this._storeManager.getStoresWithOffset(+limit, +offset);
     }
 
+    async getStoresNames(req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> {
+        logger.info(`fetching all stores names starts with prefix: ${req.body.prefix}`);
+        const limit: number = req.body.limit;
+        const prefix: string = req.body.prefix;
+        return this._storeManager.findStoresNamesByPrefix(prefix, limit);
+    }
+
+    async getProductsNames(req: Req.GetNamesRequest): Promise<Res.GetNamesResponse>{
+        logger.info(`fetching all products names starts with prefix: ${req.body.prefix}`);
+        const limit: number = req.body.limit;
+        const prefix: string = req.body.prefix;
+        return this._storeManager.findProductsNamesByPrefix(prefix, limit);
+    }
+
     async getAllProductsInStore(req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> {
         logger.info(`getting all products in store ${req.body.storeName}`);
         const storeName: string = req.body.storeName;

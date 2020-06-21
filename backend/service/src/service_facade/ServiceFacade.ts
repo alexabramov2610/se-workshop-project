@@ -310,6 +310,14 @@ export const getAllUsers = async (req: Req.Request): Promise<Res.GetAllUsersResp
     return runIfOpen(req, runIfHaveToken(UserService.getAllUsers))
 }
 
+export const getStoresNames = async (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+}
+
+export const getProductsNames = async (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
+    return runIfOpen(req, runIfHaveToken(StoreService.getStoresWithOffset));
+}
+
 /*
 Utils
  */
