@@ -92,9 +92,12 @@ class App extends React.Component {
     }
 
     render() {
-        return (!this.state.systemIsClose) ? (
+        console.log('system status',this.state.systemIsClose)
+        return  (
             <CartCtx.Provider value={{ addToCart: this.addToCart, cartItemsCounter: this.state.cartItemsCounter, cartCountUpdater: this.cartCountUpdater }} >
                 <Router history={history}>
+                {(this.state.systemIsClose) ?  <AdminInit history={history} changeStatus={ () => this.setState({systemIsClose:false} )}/> : 
+                    <>
                     <Header isLoggedIn={this.state.isLoggedIn} isAdmin={this.state.isAdmin} onLogout={this.onLogout} />
                     <Switch>
                         <Route exact path="/" render={(props) => <HomePageContainer isLoggedIn={this.state.isLoggedIn} />} />
@@ -113,11 +116,11 @@ class App extends React.Component {
                         <Route exact path="/viewStoresPurchasesHistory" render={(props) => <ViewStoresPurchaseHistoryContainer isAdmin={true}/>} />
                         <Route exact path="/viewUsersPurchasesHistory" render={(props) => <ViewUsersPurchaseHistoryContainer />} />
                     </Switch>
+                    </>
+                    }
                 </Router>
             </CartCtx.Provider>
-
-        ) : <AdminInit history={history} />
-
+        )
     }
 }
 
