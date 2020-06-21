@@ -15,7 +15,7 @@ export class UserManager {
     private readonly DEFAULT_USER_POPULATION: string[] = ["receipts", "pendingEvents"];
     private loggedInUsers: Map<string, string>;                  // token -> username
     private guests: Map<string, Guest>;
-    private admins: Map<string, string>;
+    private _admins: Map<string, string>;
     private _externalSystems: ExternalSystemsManager;
     private _usersCache: Map<string, any>;
     private MAX_CACHE_SIZE = 50;
@@ -24,8 +24,12 @@ export class UserManager {
         this._externalSystems = externalSystems;
         this.loggedInUsers = new Map();
         this.guests = new Map<string, Guest>();
-        this.admins = new Map();
+        this._admins = new Map();
         this._usersCache = new Map();
+    }
+
+    get admins(): Map<string, string> {
+        return this._admins;
     }
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
@@ -66,7 +70,7 @@ export class UserManager {
             if (req.body.asAdmin) {
                 const isAdmin: boolean = await this.verifyAdminLogin(rUser);
                 if (isAdmin)
-                    this.admins.set(req.token, userName);
+                    this._admins.set(req.token, userName);
                 else
                     return {data: {result: false}, error: {message: errorMsg.E_NA}}
             }
@@ -97,8 +101,8 @@ export class UserManager {
             return {data: {result: false}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         }
         this.loggedInUsers.delete(req.token)
-        if (this.admins.has(req.token))
-            this.admins.delete(req.token)
+        if (this._admins.has(req.token))
+            this._admins.delete(req.token)
         this.guests.set(req.token, createGuest());
         return {data: {result: true}}
     }
@@ -201,7 +205,7 @@ export class UserManager {
     }
 
     checkIsAdminByToken(token: string): boolean {
-        return this.admins.has(token);
+        return this._admins.has(token);
     }
 
     isLoggedIn(userToCheck: string): boolean {
@@ -228,7 +232,7 @@ export class UserManager {
 
     async setAdmin(req: Req.SetAdminRequest): Promise<Res.BoolResponse> {
         const admin: Admin = await this.getAdminByToken(req.token);
-        if (this.admins.size !== 0 && (!admin)) {
+        if (this._admins.size !== 0 && (!admin)) {
             // there is already admin - only admin can assign another.
             return {data: {result: false}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         }

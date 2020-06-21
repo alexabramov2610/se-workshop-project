@@ -934,8 +934,10 @@ export class TradingSystemManager {
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external delivery system `)
         const isAdmin: boolean = await this._userManager.checkIsAdminByToken(req.token);
-        if (!isAdmin)
+        if (!isAdmin){
+            logger.warn(`setting external delivery system failed, not admin! admins: ${this._userManager.admins} `)
             return {data: {result: false}, error: {message: errorMsg.E_NA}}
+        }
         this._externalSystems.deliverySystem.setDeliverySys(req.body.system)
         return {data: {result: true}}
     }

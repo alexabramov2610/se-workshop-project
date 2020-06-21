@@ -10,6 +10,7 @@ export class DeliverySystem {
     private _deliverySys: any;
     private readonly _name: string;
     DEFAULT_URL: string = "https://cs-bgu-wsep.herokuapp.com/"
+
     constructor() {
         this._name = "Delivery System"
         this._deliverySys = new DeliverySystemAdapter(this.DEFAULT_URL);
@@ -62,11 +63,14 @@ export class DeliverySystem {
                 return !res ? -1 : res;
             } else {
                 isDelivered = this.validateDelivery(country, city, address)
-                if (!isDelivered)
-                    logger.error("delivery failed")
+                if (!isDelivered) {
+                    logger.error("delivery failed - missing details")
+                    return -1;
+                } else
+                    return Math.random() * (1000 - 1) + 1;
             }
-            return Math.random() * (1000 - 1) + 1;
-        }   catch (e) {
+
+        } catch (e) {
             logger.error(`deliver: ${e}`);
             return -1;
         }
