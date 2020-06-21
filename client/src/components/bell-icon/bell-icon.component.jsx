@@ -17,6 +17,7 @@ const types = {
     WARNING: 2,
     ERROR: 3,
     SUCCESS: 4,
+    STATS_UPDATE: 100
 };
 
 const BellIcon = () => {
@@ -26,7 +27,7 @@ const BellIcon = () => {
     const isMounting = useRef(true);
 
     useEffect(() => {
-        wssClient.setOnMessage(handleNotification);
+        wssClient.setOnRoutineMessages(handleNotification);
     }, []);
 
     useEffect(() => {
@@ -55,6 +56,9 @@ const BellIcon = () => {
                 NotificationManager.success(payload.message);
                 break;
             }
+            case types.STATS_UPDATE: {
+                break;
+            }
             default:
                 throw new Error("Unknown notification");
         }
@@ -62,6 +66,7 @@ const BellIcon = () => {
 
     const handleNotification = (res) => {
         const payload = JSON.parse(res.data);
+        if (payload.type === types.STATS_UPDATE) return;
         setNotifications((prevNotifications) => [...prevNotifications, payload]);
         notifyUser(payload);
     };

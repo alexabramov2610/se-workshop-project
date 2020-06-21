@@ -42,6 +42,7 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
         const pDate = currDate.format('DD/MM/YYYY');
         return {
             key: p.key,
+            transactionID: p.payment.transactionID,
             date: pDate,
             user: p.purchases[0].userName,
             last4: p.payment.lastCC4,
@@ -84,6 +85,10 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
 };
 
 const columns = [
+    {
+        title: 'Transaction ID',
+        dataIndex: 'transactionID',
+    },
     {
         title: 'Date',
         dataIndex: 'date',

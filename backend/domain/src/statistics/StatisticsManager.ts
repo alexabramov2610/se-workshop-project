@@ -46,7 +46,10 @@ export class StatisticsManager {
      */
     private async generateStatistics(fromDate: Date, toDate: Date): Promise<DailyStatistics[]> {
         let dailyStatistics: DailyStatistics[] = [];
-        const statsModels = await this.getStatsModelsByDateRange(fromDate, toDate);
+        let statsModels;
+        if (fromDate && toDate) {
+            statsModels = await this.getStatsModelsByDateRange(fromDate, toDate);
+        }
         if (statsModels) {
             statsModels.forEach(stat => {
                 const statistics: VisitorsStatistics = {
@@ -68,6 +71,8 @@ export class StatisticsManager {
         const isStoreManager: boolean = await this.isUserStoreManager(username);
         const isStoreOwner: boolean = await this.isUserStoreOwner(username);
         const isAdmin: boolean = await this.isUserAdmin(username);
+
+        logger.debug(`[${username}: ${token}] isStoreManager: ${isStoreManager}, isStoreOwner: ${isStoreOwner}, isAdmin" ${isAdmin}`)
 
         if (!isStoreManager && !isStoreOwner && !isAdmin)
             await this.addRegisteredUserVisit(token);
@@ -116,6 +121,7 @@ export class StatisticsManager {
     private async isUserAdmin(username: string): Promise<boolean> {
         try {
             const admins = await AdminModel.find({}).populate('user');
+            logger.debug(`[${username}] isUserAdmin:  ${JSON.stringify(admins)}`)
             for (const admin of admins) {
                 if (admin.user.name === username)
                     return true;
@@ -233,12 +239,13 @@ export class StatisticsManager {
     private async getTodayStatsModel(): Promise<any> {
         try {
             const today: Date = this.getCleanDate(new Date());
-            let manager = await VisitorsStatisticsModel.findOne({date: today});
-            if (!manager) {
+            logger.debug("today: " + today)
+            let stats = await VisitorsStatisticsModel.findOne({date: today});
+            if (!stats) {
                 logger.info(`creating visitor statistics for date: {${today}}`)
-                manager = new VisitorsStatisticsModel({date: today, guests: 0, registeredUsers: 0, managers: 0, owners: 0, admins: 0})
+                stats = new VisitorsStatisticsModel({date: today, guests: 0, registeredUsers: 0, managers: 0, owners: 0, admins: 0})
             }
-            return manager;
+            return stats;
         } catch (e) {
             logger.error(`getTodayStatsModel: DB ERROR: ${e}`)
             return undefined;

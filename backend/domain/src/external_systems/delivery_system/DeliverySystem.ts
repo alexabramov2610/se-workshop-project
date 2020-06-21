@@ -26,7 +26,7 @@ export class DeliverySystem {
                 const isConnected: BoolResponse = await this._deliverySys.connect();
                 isConnected ? logger.info("successfully connected delivery system") :
                     logger.warn("failed connecting delivery system");
-                return isConnected.data.result ? connectSuccess :
+                return isConnected ? connectSuccess :
                     {error: {message: errorMsg.E_CON + " : " + this._name}, data: {result: false}};
             } catch (e) {
                 const error: string = `${errorMsg.E_CON}. message: ${e}`;
@@ -45,14 +45,20 @@ export class DeliverySystem {
             return -1;
         }
         let isDelivered: boolean = false;
-        if (this._deliverySys) {
-            return this._deliverySys.deliver()
-        } else {
-            isDelivered = this.validateDelivery(country, city, address)
-            if (!isDelivered)
-                logger.error("delivery failed")
+        try {
+            if (this._deliverySys) {
+                const res = await this._deliverySys.deliver()
+                return !res ? -1 : res;
+            } else {
+                isDelivered = this.validateDelivery(country, city, address)
+                if (!isDelivered)
+                    logger.error("delivery failed")
+            }
+            return Math.random() * (1000 - 1) + 1;
+        }   catch (e) {
+            logger.error(`deliver: ${e}`);
+            return -1;
         }
-        return Math.random() * (1000 - 1) + 1;
     }
 
     async cancelDeliver(deliveryID: number): Promise<boolean> {

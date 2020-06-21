@@ -12,25 +12,31 @@
 // } from "se-workshop-20-interfaces/dist/src/CommonInterface";
 // import {errorMsg} from "../../../../src/api-int/Error";
 // import {ManagementPermission, ProductCategory, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
-// import {Product, Receipt} from "../../../../src/trading_system/internal_api";
 // import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 // import {Res} from 'se-workshop-20-interfaces'
 // import {StringTuple} from "../../../../src/api-int/internal_api";
-//
+// import {createStore} from "../utils/utils";
+
 // const storeReq = {storeName: "mock-store", description: "storeDescription"}
-// let store: Store = new Store("name", "storeDesc");
-// describe("Store Management Unit Tests", () => {
-//     let storeManagement: StoreManagement;
-//     beforeEach(() => {
-//         storeManagement = new StoreManagement(new ExternalSystemsManager());
-//         store = new Store("store-name", "storeDesc");
-//     });
-//
-//
-//     test("verifyStore success", () => {
-//         const storeToCheck: Store = new Store("mock-store", "storeDescription");
-//         expect(storeManagement.isStoreLegal(storeToCheck)).toBe(true);
-//     });
+
+describe("Store Management Unit Tests", () => {
+    // let storeManagement: StoreManagement;
+    // let store: Store;
+    // beforeEach(() => {
+    //     storeManagement = new StoreManagement(new ExternalSystemsManager());
+    //     store = createStore("store-name", "storeDesc");
+    // });
+
+    test("tmp", () => {
+        expect(true).toBe(true);
+    });
+
+
+
+// test("verifyStore success", () => {
+    //     const storeToCheck: Store = new Store("mock-store", "storeDescription");
+    //     expect(storeManagement.isStoreLegal(storeToCheck)).toBe(true);
+    // });
 //
 //     test("verifyStore failure", () => {
 //         const storeToCheck: Store = new Store("", "storeDescription");
@@ -1650,4 +1656,4 @@
 //         jest.spyOn(storeManagement, "verifyStoreOperation").mockReturnValue(mockValidationRes);
 //     }
 //
-// });
+});

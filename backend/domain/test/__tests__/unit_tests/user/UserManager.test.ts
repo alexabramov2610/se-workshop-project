@@ -3,7 +3,6 @@
 // import {RegisteredUser, User, StoreManager} from "../../../../src/user/internal_api";
 // import {ExternalSystemsManager} from "../../../../src/external_systems/internal_api";
 // import {BagItem, Cart, CartProduct, ProductCategory} from "se-workshop-20-interfaces/dist/src/CommonInterface";
-// import {Product} from "../../../../src/trading_system/data/Product";
 // import {mocked} from "ts-jest/utils";
 // import {SecuritySystem} from "../../../../src/external_systems/security_system/SecuritySystem";
 // import {Guest} from "../../../../src/user/users/Guest";
@@ -11,12 +10,19 @@
 //
 // jest.mock('../../../../src/external_systems/security_system/SecuritySystem');
 // jest.mock('dal');
-//
-// describe("RegisteredUser Management Unit Tests", () => {
-//     const encPassword: string = "enchardpwformocking";
-//     const token: string = "mock-token-for-testing";
-//     let userManager: UserManager;
-//
+
+describe("User Manager tmp", () => {
+    test("temp111", () => {
+        expect(true).toBe(true);
+    })
+});
+
+// describe("User Manager  Unit Tests", () => {
+// const encPassword: string = "enchardpwformocking";
+// const token: string = "mock-token-for-testing";
+// let userManager: UserManager;
+
+
 //     beforeEach(() => {
 //         mockSecuritySystem();
 //         mockDAL();

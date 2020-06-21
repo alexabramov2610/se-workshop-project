@@ -5,17 +5,15 @@ import {RegisteredUser, StoreManager, StoreOwner} from "../user/internal_api";
 import {
     BagItem, ICondition,
     IDiscount, IDiscountInPolicy, IItem,
-    IPayment,
     IProduct, IPurchasePolicyElement, IReceipt, ISimplePurchasePolicy,
     ProductCatalogNumber,
     ProductCategory,
     ProductInStore,
     ProductWithQuantity,
-    Purchase,
     SearchFilters,
     SearchQuery
 } from "se-workshop-20-interfaces/dist/src/CommonInterface";
-import {Operators, ManagementPermission, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
+import {Operators, Rating} from "se-workshop-20-interfaces/dist/src/Enums";
 import {ShownDiscount} from "./discounts/ShownDiscount";
 import {CondDiscount} from "./discounts/CondDiscount";
 import {Discount} from "./discounts/Discount";
@@ -57,13 +55,15 @@ export class Store {
     discountPolicy: Discount;
     rating: Rating;
 
-    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[], storeManagers: StoreManager[], receipts: IReceipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
+    constructor(storeName: string, description: string, products: Map<IProduct, IItem[]>, storeOwner: StoreOwner[],
+                storeManagers: StoreManager[], receipts: IReceipt[], firstOwner: StoreOwner, purchasePolicy: PurchasePolicy, discountPolicy: Discount) {
         this.storeName = storeName;
         this.description = description;
         this.products = products;
         this.storeOwners = storeOwner
         this.storeManagers = storeManagers;
         this.receipts = receipts;
+        this.firstOwner = firstOwner;
         this.purchasePolicy = purchasePolicy;
         this.discountPolicy = discountPolicy;
         this.rating = Rating.MEDIUM;
@@ -155,12 +155,6 @@ export class Store {
             logger.warn(`adding user: ${storeOwner.name} as an owner of store: ${this.storeName} FAILED!`);
             return {data: {result: false}, error: {message: Error.E_ASSIGN + "owner."}}
         }
-    }
-
-    setFirstOwner(user: RegisteredUser): void {
-        const firstOwner: StoreOwner = {name: user.name, assignedStoreOwners: [], assignedStoreManagers: []};
-        this.storeOwners.push(firstOwner);
-        this.firstOwner = firstOwner;
     }
 
     removeItems(items: IItem[]): Res.ItemsRemovalResponse {
@@ -395,9 +389,9 @@ export class Store {
         const itemsRemaining: IItem[] = items.slice(amount, items.length);
         try {
             const res = await ProductModel.updateOne({_id: productInStore.db_id}, {items: itemsRemaining})
-            logger.debug(`updated products db ${res}`)
+            logger.info(`updated products db ${res}`)
         } catch (e) {
-            logger.error(`DB ERROR ${e}`)
+            logger.error(`getItemsFromStock: DB ERROR ${e}`)
         }
         this.products.set(productInStore, itemsRemaining)
         return itemsToReturn;

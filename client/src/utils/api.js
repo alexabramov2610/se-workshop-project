@@ -249,7 +249,18 @@ const approveStoreOwner = async (ownerName, storeName) => {
     return instance.post(`${baseDomain}/stores/approveStoreOwner`, req);
 }
 
+const getStatistics = (from, to) => {
+    console.log(`${baseDomain}/system/getStatistics/?from=${from}&to=${to}`);
+    return instance.get(`${baseDomain}/system/getStatistics/?from=${from}&to=${to}`)
+}
+
+const stopStatistics = () => {
+    return instance.get(`${baseDomain}/system/stopStatistics/`)
+}
+
 export {
+    stopStatistics,
+    getStatistics,
     approveStoreOwner,
     getOwnersAssignedBy,
     getUsers,

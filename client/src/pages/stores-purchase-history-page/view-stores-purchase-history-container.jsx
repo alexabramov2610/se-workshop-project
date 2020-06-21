@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import * as api from '../../utils/api';
 import * as generalUtils from "../../utils/utils";
 import ViewStoresPurchaseHistoryPage from "./view-stores-purchase-history-page";
+import Spinner from "../../components/spinner/spinner";
 
 const ViewStoresPurchaseHistoryContainer = (props) => {
 
@@ -41,7 +42,9 @@ const ViewStoresPurchaseHistoryContainer = (props) => {
     };
 
     return (
-        <ViewStoresPurchaseHistoryPage data={data} isAdmin={props.isAdmin}/>
+        fetching
+            ? <Spinner message={"Loading History"}/>
+            : <ViewStoresPurchaseHistoryPage data={data} isAdmin={props.isAdmin}/>
     );
 
 }

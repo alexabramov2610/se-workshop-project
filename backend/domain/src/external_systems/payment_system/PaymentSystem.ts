@@ -23,7 +23,7 @@ export class PaymentSystem {
         const success: BoolResponse = {data: {result: true}};
         if (this._paymentSys) {
             try {
-                const isConnected: BoolResponse = await this._paymentSys.connect();
+                const isConnected: boolean = await this.connectToExternal();
                 isConnected ? logger.info("successfully connected payment system") :
                     logger.warn("failed connecting payment system");
                 return isConnected ? success :
@@ -38,6 +38,19 @@ export class PaymentSystem {
         }
     }
 
+    async connectToExternal(): Promise<boolean> {
+        try {
+            const isConnected = await this._paymentSys.connect();
+            if (isConnected) // &&....        //TODO: change it to support external sys methods
+                return true;
+            return false;
+        } catch (e) {
+            const error: string = `${errorMsg.E_CON}. message: ${e}`;
+            logger.error(error);
+            return false;
+        }
+    }
+
     async pay(price: number, creditCard: CreditCard): Promise<number> {
         const connectSuccess: BoolResponse = await this.connect()
         if (!connectSuccess.data.result) {
@@ -46,7 +59,13 @@ export class PaymentSystem {
         logger.info("trying to charge");
         let isPaid: boolean = false;
         if (this._paymentSys) {
-            return this._paymentSys.pay(price, creditCard)
+            try {
+                const res = await this._paymentSys.pay(price, creditCard)
+                return res ? res : -1;
+            } catch (e) {
+                logger.error(`pay external system error: ${e}`)
+                return -1;
+            }
         } else {
             isPaid = this.validateCreditCard(creditCard)
             if (!isPaid) {

@@ -5,6 +5,13 @@ import * as utils from "../../utils"
 
 
 describe("Watch Purchases History, UC: 3.7",  () => {
+    jest.setTimeout(50000);
+    async function sleep(ms: number) {
+        // login is using then&catch instead of await to reduce time needed for login, so sleep is needed to get the UPDATED stats
+        await new Promise(resolve => setTimeout(resolve, ms));
+
+    }
+
     let _serviceBridge: Partial<Bridge>;
     let _driver: Driver;
     let _item: Item;
@@ -12,18 +19,18 @@ describe("Watch Purchases History, UC: 3.7",  () => {
     let _store: Store;
     let _shopoholic: Credentials;
     beforeEach(async () => {
-        _driver = new Driver()
-        _driver.dropDB();
+        _driver = await new Driver()
+        await _driver.dropDB();
         await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
-        _serviceBridge = _driver.getBridge();
+        _serviceBridge = await _driver.getBridge();
         await _serviceBridge.logout()
     });
 
 
     afterEach(async () => {
-        _driver.dropDB()
+        await _driver.dropDB()
         await utils.terminateSocket();
     });
 
@@ -35,6 +42,7 @@ describe("Watch Purchases History, UC: 3.7",  () => {
         await  _driver.loginWithDefaults();
         await  _serviceBridge.logout();
         await _serviceBridge.login(_driver.getInitDefaults(),true);
+        await sleep(500)
         const {data} = await  _serviceBridge.getVisitorsInfo({body: { from: start, to: end }})
         expect(data.result).toBe(true);
         expect(data.statistics[0].statistics.registeredUsers).toBe(2);
@@ -51,6 +59,7 @@ describe("Watch Purchases History, UC: 3.7",  () => {
         await  _driver.loginWithDefaults();
         await _serviceBridge.logout();
         await _serviceBridge.login(_driver.getInitDefaults(),true);
+        await sleep(500)
         const {data} = await  _serviceBridge.getVisitorsInfo({body: { from: start, to: end }})
         expect(data.result).toBe(true);
         expect(data.statistics[0].statistics.owners).toBe(1);
@@ -74,10 +83,19 @@ describe("Watch Purchases History, UC: 3.7",  () => {
             newManager
         );
         await  _serviceBridge.logout();
+        await  _driver.loginWithDefaults();
+        await  _serviceBridge.logout();
         await _serviceBridge.login(_driver.getInitDefaults(),true);
+
+        await sleep(500)
+
         const {data} = await  _serviceBridge.getVisitorsInfo({body: { from: start, to: end }})
+        console.log(JSON.stringify(data))
+
         expect(data.result).toBe(true);
         expect(data.statistics[0].statistics.owners).toBe(1);
+        expect(data.statistics[0].statistics.admins).toBe(1);
+
     });
 
 });

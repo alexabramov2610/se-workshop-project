@@ -17,6 +17,7 @@
     "start:clean:alex": "sudo service mongod start ; cd ../../ && ./dropall.sh && ./compile_project.sh && cd communication/http && sudo rm -r dist logs ; babel src -d dist && chown alex:alex dist && node dist/index.js",
     "start:alex": "sudo service mongod start ; cd ../../ && ./compile_project.sh && cd communication/http && sudo rm -r dist logs ; babel src -d dist && chown alex:alex dist && node dist/index.js",
     "run:alex": "sudo service mongod start && sudo rm -r dist logs ; babel src -d dist && chown alex:alex dist && node dist/index.js",
+    "run:avishai": "sudo rm -rf dist logs ; babel src -d dist && chown avishaiyaniv:staff dist && node dist/index.js",
     "start:ron": "cd ../../ && ./dropallmac.sh && ./compile_project_mac.sh; cd ./communication/http/ && NODE_ENV=development PORT=4000 DEBUG=1 nodemon --exec babel-node src/index.js"
   },
   "author": "",
