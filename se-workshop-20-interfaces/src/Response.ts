@@ -170,9 +170,16 @@ interface WatchVisitorsInfoResponse extends Response {
     data: { result: boolean, statistics: DailyStatistics[] }
 }
 
+interface GetNamesResponse extends Response {
+    data: { result: boolean, names: string[] }
+}
+
+
+
 export {
     WatchVisitorsInfoResponse,
     RemoveStoreOwnerResponse,
+    GetNamesResponse,
     GetItemsIdsResponse,
     GetOwnersAssignedByResponse,
     GetAllManagersPermissionsResponse,

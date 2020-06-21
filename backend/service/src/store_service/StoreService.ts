@@ -198,6 +198,14 @@ export const getStoresWithOffset = (req: Req.GetStoresWithOffsetRequest): Promis
     return ts.getStoresWithOffset(req);
 }
 
+export const getStoresNames = (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
+    return ts.getStoresNames(req);
+}
+
+export const getProductsNames = (req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> => {
+    return ts.getProductsNames(req);
+}
+
 export const getAllProductsInStore = (req: Req.GetAllProductsInStoreRequest): Promise<Res.GetAllProductsInStoreResponse> => {
     return ts.getAllProductsInStore(req);
 }

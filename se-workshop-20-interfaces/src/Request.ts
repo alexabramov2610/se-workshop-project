@@ -290,8 +290,13 @@ interface SetPaymentSystemRequest extends Request {
 interface SetDeliverySystemRequest extends Request {
     body: { system: any }
 }
+interface GetNamesRequest extends Request {
+    body: { prefix: string, limit: number }
+}
+
 export {
     SetDeliverySystemRequest,
+    GetNamesRequest,
     SetPaymentSystemRequest,
     WatchVisitorsInfoRequest,
     ApproveNewOwnerRequest,
