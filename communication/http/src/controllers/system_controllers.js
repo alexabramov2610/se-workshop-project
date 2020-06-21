@@ -14,7 +14,14 @@ export async function initFromFile(req,res) {
     return res.send(result)
 }
 
-
+export async function setPaymentSystem(req,res) {
+    const result = await wrapHttp(req, ServiceFacade.setPaymentSystem);
+    return res.send(result)
+}
+export async function setDeliverySystem(req,res) {
+    const result = await wrapHttp(req, ServiceFacade.setDeliverySystem);
+    return res.send(result)
+}
 // get
 
 

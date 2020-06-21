@@ -4,6 +4,8 @@ import * as SystemControllers from "../controllers/system_controllers"
 const router = express.Router();
 
 router.post("/init", SystemControllers.systemInit);
+router.post("/setPaymentSystem/", SystemControllers.setPaymentSystem);
+router.post("/setDeliverySystem/", SystemControllers.setDeliverySystem);
 
 router.get("/initFile", SystemControllers.initFromFile);
 router.get("/status", SystemControllers.isLoggedIn);

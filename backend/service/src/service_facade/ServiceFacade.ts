@@ -246,13 +246,18 @@ UC-7
 export const pay = (req: Req.PayRequest): Promise<Res.PaymentResponse> => {
     return runIfOpen(req, runIfHaveToken(BuyingService.pay));
 }
+export const setPaymentSystem = (req: Req.SetPaymentSystemRequest): Promise<Res.BoolResponse> => {
+    return runIfOpen(req, runIfHaveToken(BuyingService.setPaymentSystem));
+}
 /*
 UC-8
  */
 export const deliver = (req: Req.DeliveryRequest): Promise<Res.DeliveryResponse> => {
     return runIfOpen(req, runIfHaveToken(BuyingService.deliver));
 };
-
+export const setDeliverySystem = (req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> => {
+    return runIfOpen(req, runIfHaveToken(BuyingService.setDeliverySystem));
+}
 /*
 correctness-constraints
  */

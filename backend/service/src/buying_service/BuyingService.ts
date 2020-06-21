@@ -69,3 +69,11 @@ export const pay = (req: Req.PayRequest): Promise<Res.PaymentResponse> => {
 export const deliver = (req: Req.DeliveryRequest): Promise<Res.DeliveryResponse> => {
     return ts.deliver(req)
 };
+
+
+export const setPaymentSystem = (req: Req.SetPaymentSystemRequest): Promise<Res.BoolResponse> => {
+    return ts.setPaymentSystem(req)
+}
+
+export const setDeliverySystem = (req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> => {
+    return ts.setDeliverySystem(req)}

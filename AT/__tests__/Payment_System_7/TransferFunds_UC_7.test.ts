@@ -50,6 +50,14 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(data).toBeUndefined();
     });
 
+    test("Invalid request - missing credit invalid date",async () => {
+        _testPaymentInfo.body.payment.cardDetails.expMonth = "11";
+        _testPaymentInfo.body.payment.cardDetails.expYear = "11";
+        const {data, error} = await _serviceBridge.pay(_testPaymentInfo);
+        expect(error).toBeDefined();
+        expect(data).toBeUndefined();
+    });
+
     // test("Invalid request - missing location details", async () => {
     //     _testPaymentInfo.body.payment.address = undefined;
     //     const {data, error} =await _serviceBridge.pay(_testPaymentInfo);
