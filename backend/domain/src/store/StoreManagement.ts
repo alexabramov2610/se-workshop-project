@@ -957,7 +957,11 @@ export class StoreManagement {
     }
 
     async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
-        const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
+        const storeM = await this.findStoreModelByName(storeName, ["discountPolicy", "products"]);
+        storeM.discountPolicy.children = storeM.discountPolicy.children.filter((discount) => this.isValid(discount.startDate, discount.duration))
+        await storeM.discountPolicy.save()
+        // const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
+        const store:Store = StoreMapper.storeMapperFromDB(storeM);
         const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
         const children: Map<Discount, Operators> = discount.children;
         const discountInPolicy: IDiscountInPolicy[] = [];
@@ -968,6 +972,16 @@ export class StoreManagement {
         const policy: IDiscountPolicy = {discounts: discountInPolicy}
 
         return policy;
+    }
+
+    private isValid(date: Date, duration: number): boolean {
+        const today = new Date();
+        const endDate = this.addMinutes(date, duration * 24 * 60);
+        return today < endDate;
+    }
+
+    private addMinutes(date, minutes): Date {
+        return new Date(date.getTime() + minutes * 60000);
     }
 
     async getStorePurchasePolicy(user: RegisteredUser, storeName: string): Promise<IPurchasePolicy> {

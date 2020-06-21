@@ -921,22 +921,22 @@ export class TradingSystemManager {
 
     async setPaymentSystem(req: Req.SetPaymentSystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external payment system `)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const isAdmin :boolean= await this._userManager.verifyAdminLogin(user);
+        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
         if(!isAdmin)
             return {data: {result: false}, error:{message: errorMsg.E_NA}}
         this._externalSystems.paymentSystem.setPaymentSys(req.body.system)
         return {data: {result:true}}
     }
+
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
-        logger.info(`setting external payment system `)
-        const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
-        const isAdmin :boolean= await this._userManager.verifyAdminLogin(user);
+        logger.info(`setting external delivery system `)
+        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
         if(!isAdmin)
             return {data: {result: false}, error:{message: errorMsg.E_NA}}
         this._externalSystems.deliverySystem.setDeliverySys(req.body.system)
         return {data: {result:true}}
     }
+
     private async removePendingsByOwners(owners: string[], storeName: string): Promise<void> {
         try {
             await AssignAgreementModel.deleteMany({
