@@ -282,7 +282,17 @@ interface WatchVisitorsInfoRequest extends Request {
     body: { from: Date, to: Date }
 }
 
+
+interface SetPaymentSystemRequest extends Request {
+    body: { system: any }
+}
+
+interface SetDeliverySystemRequest extends Request {
+    body: { system: any }
+}
 export {
+    SetDeliverySystemRequest,
+    SetPaymentSystemRequest,
     WatchVisitorsInfoRequest,
     ApproveNewOwnerRequest,
     GetItemsIdsRequest,

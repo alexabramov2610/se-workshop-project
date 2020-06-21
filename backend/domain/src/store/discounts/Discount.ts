@@ -75,15 +75,14 @@ export abstract class Discount {
         const endDate = this.addMinutes(this.startDate, this.duration * 24 * 60);
         return today < endDate;
     }
-
+    protected addMinutes(date, minutes): Date {
+        return new Date(date.getTime() + minutes * 60000);
+    }
     protected isProductInDiscount(bagItem: BagItem): boolean {
         return this._productsInDiscount.indexOf(bagItem.product.catalogNumber) !== -1 || this._category === bagItem.product.category
     }
 
-    protected addMinutes(date, minutes): Date {
 
-        return new Date(date.getTime() + minutes * 60000);
-    }
 
     public getConditions(): Map<Condition, Operators>{
         return undefined

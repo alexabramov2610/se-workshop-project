@@ -348,8 +348,22 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
         return await ServiceFacade.getOwnersAssignedBy(wrapWithToken(req.body));
     },
     async initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>{
-      const reqWithToken = wrapWithToken(req.body)
+        const reqWithToken = wrapWithToken(req.body)
         const x = reqWithToken
         return await ServiceFacade.initFromFile(reqWithToken);
+    },
+
+    async mockDeliverySys(): Promise<BoolResponse>{
+      const req = {body: {system: "test"}}
+        const reqWithToken = wrapWithToken(req.body)
+        const x = reqWithToken
+        const res = await ServiceFacade.setDeliverySystem(reqWithToken);
+      return res;
+    },
+    async mockPaymentSys(): Promise<BoolResponse>{
+        const req = {body: {system: "test"}}
+        const reqWithToken = wrapWithToken(req.body)
+        const x = reqWithToken
+        return await ServiceFacade.setPaymentSystem(reqWithToken);
     }
 };

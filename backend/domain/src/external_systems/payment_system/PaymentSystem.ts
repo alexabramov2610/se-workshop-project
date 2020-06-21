@@ -8,14 +8,25 @@ const logger = loggerW(__filename)
 export class PaymentSystem {
     private _paymentSys: any;
     private readonly _name: string;
+    DEFAULT_URL: string = "https://cs-bgu-wsep.herokuapp.com/"
 
     constructor() {
         this._name = "Payment System"
-        this._paymentSys = new PaymentSystemAdapter();
+        this._paymentSys = new PaymentSystemAdapter(this.DEFAULT_URL);
     }
 
-    setPaymentSys(real: any) {
-        this._paymentSys = real;
+    setPaymentSys(real: any): void {
+        if (typeof real === 'string') {
+            if (real === 'test') {
+                this._paymentSys = null;
+            } else if (real === 'default') {
+                this._paymentSys = new PaymentSystemAdapter(this.DEFAULT_URL);
+            } else {
+                this._paymentSys = new PaymentSystemAdapter(real);
+            }
+        } else {
+            this._paymentSys = real;
+        }
     }
 
     async connect(): Promise<BoolResponse> {

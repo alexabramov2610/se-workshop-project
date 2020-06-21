@@ -1,6 +1,7 @@
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
 import {errorMsg, loggerW} from "../../api-int/internal_api";
 import {DeliverySystemAdapter} from "./DeliverySystemAdapter";
+import {PaymentSystemAdapter} from "../payment_system/PaymentSystemAdapter";
 
 const logger = loggerW(__filename)
 
@@ -8,14 +9,24 @@ const logger = loggerW(__filename)
 export class DeliverySystem {
     private _deliverySys: any;
     private readonly _name: string;
-
+    DEFAULT_URL: string = "https://cs-bgu-wsep.herokuapp.com/"
     constructor() {
         this._name = "Delivery System"
-        this._deliverySys = new DeliverySystemAdapter();
+        this._deliverySys = new DeliverySystemAdapter(this.DEFAULT_URL);
     }
 
     setDeliverySys(real: any): void {
-        this._deliverySys = real;
+        if (typeof real === 'string') {
+            if (real === 'test') {
+                this._deliverySys = null;
+            } else if (real === 'default') {
+                this._deliverySys = new DeliverySystemAdapter(this.DEFAULT_URL);
+            } else {
+                this._deliverySys = new DeliverySystemAdapter(real);
+            }
+        } else {
+            this._deliverySys = real;
+        }
     }
 
     async connect(): Promise<BoolResponse> {
@@ -75,7 +86,7 @@ export class DeliverySystem {
     }
 
     private validateDelivery(country: string, city: string, address: string) {
-        logger.info(`validating delivery to: ${address}, ${city}`);
+        logger.info(`validating delivery to: address: ${address}, city: ${city}, country: ${country}`);
         const invalid = country.length <= 0 || city.length <= 0 || address.length <= 0;
         return !invalid;
     }

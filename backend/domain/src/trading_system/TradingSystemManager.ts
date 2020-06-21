@@ -451,6 +451,7 @@ export class TradingSystemManager {
         return this._storeManager.setDiscountPolicy(user, req.body.storeName, req.body.policy)
     }
 
+
     async viewDiscountsPolicy(req: Req.ViewStoreDiscountsPolicyRequest): Promise<Res.ViewStoreDiscountsPolicyResponse> {
         logger.info(`retrieving discount policy of store ${req.body.storeName} `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -916,6 +917,24 @@ export class TradingSystemManager {
         logger.debug(`trying to unlock: ${stores}`)
         this._storeManager.locks = this._storeManager.locks.filter((s) => !stores.some((locks) => locks === s))
         return true;
+    }
+
+    async setPaymentSystem(req: Req.SetPaymentSystemRequest): Promise<Res.BoolResponse> {
+        logger.info(`setting external payment system `)
+        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
+        if(!isAdmin)
+            return {data: {result: false}, error:{message: errorMsg.E_NA}}
+        this._externalSystems.paymentSystem.setPaymentSys(req.body.system)
+        return {data: {result:true}}
+    }
+
+    async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
+        logger.info(`setting external delivery system `)
+        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
+        if(!isAdmin)
+            return {data: {result: false}, error:{message: errorMsg.E_NA}}
+        this._externalSystems.deliverySystem.setDeliverySys(req.body.system)
+        return {data: {result:true}}
     }
 
     private async removePendingsByOwners(owners: string[], storeName: string): Promise<void> {

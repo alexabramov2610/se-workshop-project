@@ -13,13 +13,22 @@ describe("Guest buy items, UC: 2.8", () => {
 
     beforeEach(async () => {
         _driver.dropDB()
+
         await _driver.reset();
         await _driver.startSession()
         await _driver.initWithDefaults()
         await _driver.registerWithDefaults()
         await _driver.loginWithDefaults()
         _serviceBridge =  _driver.getBridge();
+        await _serviceBridge.logout();
 
+        await _serviceBridge.login(_driver.getInitDefaults(),true);
+
+        const res = await  _serviceBridge.mockDeliverySys();
+        await _serviceBridge.logout();
+        await _driver.loginWithDefaults();
+
+        const res2 =4;
         const {country, city, address} = _driver.getPaymentInfo().payment;
         _testDeliveryInfo = {
             token: "123",
