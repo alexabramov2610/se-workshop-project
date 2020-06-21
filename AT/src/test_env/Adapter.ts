@@ -357,7 +357,8 @@ async  setDiscountsPolicy(req: Req.SetDiscountsPolicyRequest){
       const req = {body: {system: "test"}}
         const reqWithToken = wrapWithToken(req.body)
         const x = reqWithToken
-        return await ServiceFacade.setDeliverySystem(reqWithToken);
+        const res = await ServiceFacade.setDeliverySystem(reqWithToken);
+      return res;
     },
     async mockPaymentSys(): Promise<BoolResponse>{
         const req = {body: {system: "test"}}

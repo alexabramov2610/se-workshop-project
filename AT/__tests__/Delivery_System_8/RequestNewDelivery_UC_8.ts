@@ -21,7 +21,8 @@ describe("Guest buy items, UC: 2.8", () => {
         await _driver.loginWithDefaults()
         _serviceBridge =  _driver.getBridge();
         await _serviceBridge.logout();
-        await _serviceBridge.login(_driver.getInitDefaults());
+
+        await _serviceBridge.login(_driver.getInitDefaults(),true);
 
         const res = await  _serviceBridge.mockDeliverySys();
         await _serviceBridge.logout();
