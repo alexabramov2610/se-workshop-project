@@ -17,12 +17,15 @@ export class UserManager {
     private guests: Map<string, Guest>;
     private admins: Map<string, string>;
     private _externalSystems: ExternalSystemsManager;
+    private _usersCache: Map<string, any>;
+    private MAX_CACHE_SIZE = 50;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
         this.loggedInUsers = new Map();
         this.guests = new Map<string, Guest>();
         this.admins = new Map();
+        this._usersCache = new Map();
     }
 
     async register(req: Req.RegisterRequest): Promise<Res.BoolResponse> {
@@ -30,7 +33,15 @@ export class UserManager {
         const password = req.body.password;
         const hashed = await this._externalSystems.securitySystem.encryptPassword(password);
         try {
-            await UserModel.create({name: userName, password: hashed, cart: new Map(), receipts: [], pendingEvents: []})
+            const newUser = await UserModel.create({
+                name: userName,
+                password: hashed,
+                cart: new Map(),
+                receipts: [],
+                pendingEvents: []
+            })
+            this.pushToUserCache(userName, newUser);
+
             logger.debug(`${userName} has registered to the system `);
             return {data: {result: true}}
         } catch (e) {
@@ -70,20 +81,20 @@ export class UserManager {
     }
 
     async verifyAdminLogin(rUserModel): Promise<boolean> {
-       try {
-           const admin = await AdminModel.findOne({user: rUserModel._id});
-           return admin ? true : false;
-       } catch (e) {
-           logger.error(`verifyAdminLogin DB ERROR: ${e}`)
-       }
-       return false;
+        try {
+            const admin = await AdminModel.findOne({user: rUserModel._id});
+            return admin ? true : false;
+        } catch (e) {
+            logger.error(`verifyAdminLogin DB ERROR: ${e}`)
+        }
+        return false;
     }
 
     async logout(req: Req.LogoutRequest): Promise<Res.BoolResponse> {
         logger.debug(`logging out success`);
         if (!this.loggedInUsers.has(req.token)) {
             logger.warn("user is not logged in!")
-            return { data: { result: false }, error: { message: errorMsg.E_NOT_LOGGED_IN } }
+            return {data: {result: false}, error: {message: errorMsg.E_NOT_LOGGED_IN}}
         }
         this.loggedInUsers.delete(req.token)
         if (this.admins.has(req.token))
@@ -94,12 +105,18 @@ export class UserManager {
 
     async getUserByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
         try {
+            const fromCache = this._usersCache.get(name)
+            if (fromCache) {
+                const cart = await UserMapper.cartMapperFromDB(fromCache.cart)
+                return createRegisteredUser(fromCache.name, fromCache.password, fromCache.pendingEvents, fromCache.receipts, cart);
+            }
+
             logger.debug(`trying to find user ${name} in DB`)
             const populateQuery = populateWith.map(field => {
                 return {path: field}
             });
             const u = await UserModel.findOne({name}).populate(populateQuery);
-            if(!u)
+            if (!u)
                 return u;
             const cart = await UserMapper.cartMapperFromDB(u.cart)
             return createRegisteredUser(u.name, u.password, u.pendingEvents, u.receipts, cart);
@@ -111,6 +128,10 @@ export class UserManager {
 
     async getUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
         try {
+            const fromCache = this._usersCache.get(name)
+            if (fromCache) {
+                return fromCache
+            }
             logger.debug(`trying to find user ${name} in DB`)
             const populateQuery = populateWith.map(field => {
                 return {path: field}
@@ -154,10 +175,10 @@ export class UserManager {
         }
     }
 
-    getLoggedInUserByToken(token: string,populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
+    getLoggedInUserByToken(token: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<RegisteredUser> {
         const username = this.loggedInUsers.get(token)
         if (username) {
-            return this.getUserByName(username,populateWith)
+            return this.getUserByName(username, populateWith)
         } else {
             return undefined
         }
@@ -189,6 +210,10 @@ export class UserManager {
 
     async findUserModelByName(name: string, populateWith = this.DEFAULT_USER_POPULATION): Promise<any> {
         try {
+            const fromCache = this._usersCache.get(name)
+            if (fromCache) {
+                return fromCache
+            }
             const populateQuery = populateWith.map(field => {
                 return {path: field}
             });
@@ -256,7 +281,7 @@ export class UserManager {
             const rUser = user as RegisteredUser;
             const cart = UserMapper.cartMapperToDB(rUser.cart);
             try {
-                await UserModel.updateOne({name: rUser.name}, {cart})
+               await this.updateUserModel(rUser.name, {cart})
                 return true;
             } catch (e) {
                 return false;
@@ -297,14 +322,13 @@ export class UserManager {
         if (rUser) {
             try {
                 const cart = UserMapper.cartMapperToDB(rUser.cart);
-                await UserModel.updateOne({name: rUser.name}, {cart})
+                await  this.updateUserModel(rUser.name, {cart})
                 return {data: {result: true}}
             } catch (e) {
                 logger.error(`removeProductFromCart ${e}`)
                 return {data: {result: false}, error: {message: errorMsg.E_DB}}
             }
-        }
-        else // guest
+        } else // guest
             return {data: {result: true}};
 
     }
@@ -334,8 +358,19 @@ export class UserManager {
         return {
             data: {
                 result: true, receipts: user.receipts.map(r => {
-                    // @ts-ignore
-                    return {date: r.date, purchases: Array.from(r.purchases), payment: {lastCC4: r.lastCC4? r.lastCC4: r.payment.lastCC4 , totalCharged: r.totalCharged? r.totalCharged : r.payment.totalCharged , transactionID: r.transactionID? r.transactionID : r.payment.transactionID}}
+
+                    return {
+                        date: r.date,
+                        purchases: Array.from(r.purchases),
+                        payment: {
+                            // @ts-ignore
+                            lastCC4: r.lastCC4 ? r.lastCC4 : r.payment.lastCC4,
+                            // @ts-ignore
+                            totalCharged: r.totalCharged ? r.totalCharged : r.payment.totalCharged,
+                            // @ts-ignore
+                            transactionID: r.transactionID ? r.transactionID : r.payment.transactionID
+                        }
+                    }
                 })
             }
         }
@@ -398,22 +433,36 @@ export class UserManager {
 
     async getAllUsers(req: Req.Request): Promise<Res.GetAllUsersResponse> {
         if (!this.checkIsAdminByToken(req.token))
-            return { data: {result: false, users:[] }, error: {message: errorMsg.E_NOT_AUTHORIZED} }
+            return {data: {result: false, users: []}, error: {message: errorMsg.E_NOT_AUTHORIZED}}
         try {
             const adminName: string = this.getLoggedInUsernameByToken(req.token);
             logger.debug(`trying to retrieve all users for admin: ${adminName} from DB`)
             const u = await UserModel.find({})
             if (!u)
                 throw new Error(`retrieved undefined from DB`)
-            return { data: {result: true, users: u.map(currUser => currUser.name) } }
+            return {data: {result: true, users: u.map(currUser => currUser.name)}}
         } catch (e) {
             logger.error(`getAllUsers DB ERROR: ${e}`)
-            return { data: {result: false, users:[] }, error: {message: e} }
+            return {data: {result: false, users: []}, error: {message: e}}
         }
     }
 
+    async updateUserModel(name: string, fields: any): Promise<boolean> {
+        try {
+            const u = await UserModel.findOneAndUpdate({name}, fields, {new: true})
+            this.pushToUserCache(name, u)
+            return true;
+        } catch (e) {
+            logger.error(`updateUserModel DB ERROR cant ${e}`)
+            return false;
+        }
+    }
 
-
-
-
+    pushToUserCache(userName: any, newUser: any) {
+        if (this._usersCache.has(userName))
+            this._usersCache.delete(userName);
+        else if (this._usersCache.size === this.MAX_CACHE_SIZE)
+            this._usersCache.delete(this._usersCache.keys().next().value);
+        this._usersCache.set(userName, newUser)
+    }
 }

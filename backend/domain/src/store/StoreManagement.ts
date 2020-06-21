@@ -26,7 +26,7 @@ import {
     StoreModel,
     StoreOwnerModel,
     PurchasePolicyModel,
-    AssignAgreementModel
+    AssignAgreementModel, UserModel
 } from 'dal'
 import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
@@ -39,33 +39,26 @@ export class StoreManagement {
     private readonly DEFAULT_STORE_POPULATION: string[] = ["products", "storeOwners", "storeManagers", "receipts", "firstOwner", "discountPolicy", "purchasePolicy"];
     private _externalSystems: ExternalSystemsManager;
     locks: string[];
+    private _storesCache: Map<string, any>;
+    private MAX_CACHE_SIZE = 50;
 
     constructor(externalSystems: ExternalSystemsManager) {
         this._externalSystems = externalSystems;
         this.locks = []
+        this._storesCache = new Map<string, any>();
     }
 
     async findStoreByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store> {
         const storeModel = await this.findStoreModelByName(storeName, populateWith);
         return StoreMapper.storeMapperFromDB(storeModel);
-        // try {
-        //     logger.debug(`findStoreByName trying to find store ${storeName} in DB`)
-        //     const populateQuery = populateWith.map(field => {
-        //         return {path: field}
-        //     });
-        //     const s = await StoreModel.findOne({storeName}).populate(populateQuery)
-        //         .populate(populateQuery);
-        //     const store: Store = StoreMapper.storeMapperFromDB(s);
-        //     return store;
-        // } catch (e) {
-        //     logger.error(`findStoreByName DB ERROR: ${e}`);
-        //     return undefined
-        // }
-        // return undefined;
     }
 
     async findStoreModelByName(storeName: string, populateWith = this.DEFAULT_STORE_POPULATION): Promise<any> {
         try {
+            const fromCache = this._storesCache.get(storeName)
+            if (fromCache) {
+                return fromCache
+            }
             logger.debug(`findStoreModelByName trying to find store ${storeName} in DB`)
             const populateQuery = populateWith.map(field => {
                 return {path: field}
@@ -90,7 +83,8 @@ export class StoreManagement {
             return s.map(currStore => StoreMapper.storeMapperFromDB(currStore));
         } catch (e) {
             logger.error(`findAllStores DB ERROR: ${e}`);
-            return [];
+            const storesFromCache = Array.from(this._storesCache.values())
+            return storesFromCache.map(currStore => StoreMapper.storeMapperFromDB(currStore));
         }
         return [];
     }
@@ -103,8 +97,16 @@ export class StoreManagement {
             const storeOwners = [firstOwner]
             const discountPolicy = await DiscountPolicyModel.create({children: [], storeName})
             const purchasePolicy = await PurchasePolicyModel.create({children: [], storeName})
-            await StoreModel.create({storeName, description, firstOwner, storeOwners, discountPolicy, purchasePolicy})
+            const newStore = await StoreModel.create({
+                storeName,
+                description,
+                firstOwner,
+                storeOwners,
+                discountPolicy,
+                purchasePolicy
+            })
             await firstOwner.save();
+            this.pushToStoreCache(storeName, newStore);
             logger.info(`successfully added store: ${storeName} with first owner: ${owner.name} to system`)
             return {data: {result: true}}
         } catch (e) {
@@ -272,6 +274,7 @@ export class StoreManagement {
                 newProductsInserted.forEach((p) => storeModel.products.push(p));
                 storeModel.markModified('products')
                 await storeModel.save()
+                this.pushToStoreCache(storeName, storeModel)
                 logger.info(`new products updated success in DB`);
             } catch (e) {
                 logger.error(`addNewProducts DB ERROR: ${e}`);
@@ -291,6 +294,7 @@ export class StoreManagement {
                 res.data.productsRemoved.forEach(p => storeModel.products.pull(p.db_id));
                 storeModel.markModified('products')
                 await storeModel.save();
+                this.pushToStoreCache(storeName, storeModel)
                 logger.info(`removed products from store ${storeName}`);
             } catch (e) {
                 logger.error(`removeProducts DB ERROR: ${e}`);
@@ -327,6 +331,15 @@ export class StoreManagement {
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
             return {res: {data: {result: false}, error: {message: error}}};
         }
+
+        const alreadyAgreement = await AssignAgreementModel.findOne({storeName, newOwner: userToAssign.name})
+        if(alreadyAgreement){
+            error = errorMsg.E_AL;
+            logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
+                ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
+            return {res: {data: {result: false}, error: {message: error}}};
+        }
+
         const allOwners: string[] = storeModel.storeOwners.map((owner) => owner.name);
         const requiredApprove = allOwners.filter((name) => name !== userWhoAssigns.name)
         try {
@@ -341,25 +354,11 @@ export class StoreManagement {
             userWhoAssignsOwner.agreements.push(newAgreement);
             userWhoAssignsOwner.markModified('agreements')
             await userWhoAssignsOwner.save()
+            this.pushToStoreCache(storeName, storeModel)
         } catch (e) {
             logger.error(`assignStoreOwner DB ERROR: ${e}`);
             return {res: {data: {result: false}, error: {message: errorMsg.E_DB}}}
         }
-        /*
-                try {
-                    const ownerToAdd = new StoreOwnerModel({name: userToAssign.name})
-                    userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
-                    storeModel.storeOwners.push(ownerToAdd);
-                    storeModel.markModified('storeOwners')
-                    await ownerToAdd.save();
-                    await userWhoAssignsOwner.save();
-                    await storeModel.save()
-                    logger.info(`successfully assigned user: ${userToAssign.name} as an owner in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
-                } catch (e) {
-                    logger.error(`assignStoreOwner DB ERROR: ${e}`);
-                    return {data: {result: false}, error: {message: errorMsg.E_DB}}
-                }
-        */
         return {res: {data: {result: true}}, notify: requiredApprove}
     }
 
@@ -418,6 +417,7 @@ export class StoreManagement {
             });
             await userWhoRemovesDoc.save();
             await storeModel.save();
+            this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully removed user: ${userToRemove.name} as an owner in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
         } catch (e) {
             logger.error(`removeStoreOwner DB ERROR: ${e}`);
@@ -480,6 +480,7 @@ export class StoreManagement {
             await newManagerModel.save();
             await userWhoAssignsOwner.save();
             await storeModel.save();
+            this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully assigned user: ${userToAssign.name} as a manager in store: ${storeName}, assigned by user ${userWhoAssigns.name}`)
         } catch (e) {
             logger.error(`assignStoreOwner DB ERROR: ${e}`);
@@ -532,6 +533,7 @@ export class StoreManagement {
             await StoreManagerModel.deleteOne({_id: userManagerToRemoveDoc.id})
             await userWhoRemovesDoc.save();
             await storeModel.save();
+            this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully removed user: ${userToRemove.name} as a manager in store: ${storeName}, assigned by user ${userWhoRemoves.name}`)
         } catch (e) {
             logger.error(`assignStoreOwner DB ERROR: ${e}`);
@@ -592,6 +594,7 @@ export class StoreManagement {
             storeModel.markModified('storeManagers')
             await userManagerToAddDoc.save();
             await storeModel.save();
+            this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully added permissions to user: ${usernameToChange}`)
         } catch (e) {
             logger.error(`addManagerPermissions DB ERROR: ${e}`);
@@ -647,6 +650,7 @@ export class StoreManagement {
             storeModel.markModified('storeManagers')
             await userManagerToAddDoc.save();
             await storeModel.save();
+            this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully removed permissions from user: ${managerToChange}`)
         } catch (e) {
             logger.error(`addManagerPermissions DB ERROR: ${e}`);
@@ -923,8 +927,7 @@ export class StoreManagement {
                 purchases
             });
             store.addReceipt(receipt);
-            const res = await StoreModel.updateOne({storeName: store.storeName}, {receipts: store.receipts})
-
+           await this.updateStoreModel(store.storeName,{receipts: store.receipts} )
         } catch (e) {
             logger.error(`DB ERROR ${e}`);
             return [];
@@ -949,19 +952,20 @@ export class StoreManagement {
     }
 
     async setDiscountPolicy(user: RegisteredUser, storeName: string, discounts: IDiscountPolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
+        const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const isSuccess: boolean = await store.setDiscountPolicy(discounts.discounts);
+
+        this._storesCache.delete(storeName)
         return isSuccess ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_DB}}
     }
 
     async getStoreDiscountPolicy(user: RegisteredUser, storeName: string): Promise<IDiscountPolicy> {
-        const storeM = await this.findStoreModelByName(storeName, ["discountPolicy", "products"]);
+        const storeM = await this.findStoreModelByName(storeName);
         storeM.discountPolicy.children = storeM.discountPolicy.children.filter((discount) => this.isValid(discount.startDate, discount.duration))
         await storeM.discountPolicy.save()
-        // const store: Store = await this.findStoreByName(storeName, ["discountPolicy", "products"]);
-        const store:Store = StoreMapper.storeMapperFromDB(storeM);
+        const store: Store = StoreMapper.storeMapperFromDB(storeM);
         const discount: DiscountPolicy = store.discountPolicy as DiscountPolicy;
         const children: Map<Discount, Operators> = discount.children;
         const discountInPolicy: IDiscountInPolicy[] = [];
@@ -985,7 +989,7 @@ export class StoreManagement {
     }
 
     async getStorePurchasePolicy(user: RegisteredUser, storeName: string): Promise<IPurchasePolicy> {
-        const store: Store = await this.findStoreByName(storeName, ["purchasePolicy", "products"]);
+        const store: Store = await this.findStoreByName(storeName);
         const purchasePolicy: PurchasePolicyImpl = store.purchasePolicy as PurchasePolicyImpl;
         const children: Map<PurchasePolicy, Operators> = purchasePolicy.children;
         const purchasePolicyElements: IPurchasePolicyElement[] = [];
@@ -999,10 +1003,11 @@ export class StoreManagement {
     }
 
     async setPurchasePolicy(user: RegisteredUser, storeName: any, policy: IPurchasePolicy): Promise<Res.BoolResponse> {
-        const store: Store = await this.findStoreByName(storeName, ["purchasePolicy", "products"]);
+        const store: Store = await this.findStoreByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
         const setPolicyOk: boolean = await store.setPurchasePolicy(policy.policy);
+        this._storesCache.delete(storeName)
         return setPolicyOk ? {data: {result: true}} :
             {data: {result: setPolicyOk}, error: {message: setPolicyOk ? undefined : errorMsg.SET_POLICY_FAILED}}
     }
@@ -1217,6 +1222,7 @@ export class StoreManagement {
                 await ownerToAdd.save();
                 await userWhoAssignsOwner.save();
                 await storeModel.save()
+                this.pushToStoreCache(storeName, storeModel)
                 logger.info(`successfully assigned user: ${newOwner} as an owner in store: ${storeName}, assigned by user ${agreement.assignedByOwner}`)
                 return true;
             } else {
@@ -1228,4 +1234,25 @@ export class StoreManagement {
             return false;
         }
     }
+
+
+    async updateStoreModel(storeName: string, fields: any): Promise<boolean> {
+        try {
+            const u = await StoreModel.findOneAndUpdate({storeName}, fields, {new: true})
+            this.pushToStoreCache(storeName, u)
+            return true;
+        } catch (e) {
+            logger.error(`updateUserModel DB ERROR cant ${e}`)
+            return false;
+        }
+    }
+
+    pushToStoreCache(storeName: any, newUser: any) {
+        if (this._storesCache.has(storeName))
+            this._storesCache.delete(storeName);
+        else if (this._storesCache.size === this.MAX_CACHE_SIZE)
+            this._storesCache.delete(this._storesCache.keys().next().value);
+        this._storesCache.set(storeName, newUser)
+    }
+
 }

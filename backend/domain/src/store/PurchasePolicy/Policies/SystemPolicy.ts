@@ -5,6 +5,7 @@ import {RegisteredUser} from "../../../user/users/RegisteredUser";
 
 export class SystemPolicy extends PurchasePolicy {
     private _notForSellDays: WeekDays[];
+    days: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     public constructor(notForSellDays: WeekDays[]) {
         super()
@@ -24,9 +25,8 @@ export class SystemPolicy extends PurchasePolicy {
     }
 
     isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean {
-        const days: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const date = new Date();
-        const dayName: string = days[date.getDay()];
+        const dayName: string = this.days[date.getDay()];
         for (const d of this.notForSellDays) {
             if (d.toString() === dayName)
                 return false

@@ -3,7 +3,7 @@ import * as api from '../../utils/api';
 import * as generalUtils from "../../utils/utils";
 import ViewStoresPurchaseHistoryPage from "./view-stores-purchase-history-page";
 import Spinner from "../../components/spinner/spinner";
-
+import { isAdmin } from "../../utils/config";
 const ViewStoresPurchaseHistoryContainer = (props) => {
 
     const [fetching, setFetching] = useState(false);
@@ -16,7 +16,7 @@ const ViewStoresPurchaseHistoryContainer = (props) => {
             setFetching(true);
             await generalUtils.sleep(1000);
 
-            const storesRes = await api.getStores(0, 100);
+            const storesRes = isAdmin && await api.getStores(0, 100);
             const purchasesHistoryRes = await api.viewStorePurchaseHistory(storeName);
 
             if (purchasesHistoryRes.data.data.result) {
@@ -25,7 +25,8 @@ const ViewStoresPurchaseHistoryContainer = (props) => {
                 setPurchasesHistory(keyedHistory);
             }
             console.log(purchasesHistoryRes);
-            setStores(storesRes.data.data.stores.map(s => s.storeName));
+            if(isAdmin)
+                setStores(storesRes.data.data.stores.map(s => s.storeName));
             setFetching(false);
         }
 

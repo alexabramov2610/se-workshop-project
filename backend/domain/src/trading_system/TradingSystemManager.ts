@@ -28,7 +28,7 @@ import {formatString} from "../api-int/utils";
 import {logoutUserByName} from "../../index";
 import {ReceiptModel, UserModel, SystemModel, SubscriberModel, AssignAgreementModel} from "dal";
 import * as UserMapper from '../user/UserMapper'
-import { StatisticsManager } from "../statistics/StatisticsManager";
+import {StatisticsManager} from "../statistics/StatisticsManager";
 
 const logger = loggerW(__filename)
 
@@ -38,7 +38,7 @@ export class TradingSystemManager {
     private readonly _externalSystems: ExternalSystemsManager;
     private state: TradingSystemState;
     private _publisher: IPublisher;
-    private statisticsManager :StatisticsManager;
+    private statisticsManager: StatisticsManager;
 
     constructor() {
         this.statisticsManager = new StatisticsManager();
@@ -97,10 +97,10 @@ export class TradingSystemManager {
     async watchVisitorsInfo(req: Req.WatchVisitorsInfoRequest): Promise<Res.WatchVisitorsInfoResponse> {
         const adminUsername: string = this._userManager.getLoggedInUsernameByToken(req.token);
         if (!adminUsername || !this._userManager.checkIsAdminByToken(req.token))
-            return { data: { result: false, statistics: [] }, error: { message: errorMsg.E_BAD_OPERATION } }
+            return {data: {result: false, statistics: []}, error: {message: errorMsg.E_BAD_OPERATION}}
         this._publisher.subscribe(adminUsername, EventCode.WATCH_STATISTICS, "", "");
         const statistics: DailyStatistics[] = await this.statisticsManager.newStatisticsRequest(adminUsername, req.body.from, req.body.to);
-        return { data: { result: true, statistics } }
+        return {data: {result: true, statistics}}
     }
 
     async updateAdminsForRealTimeStatisticsChange(adminsToUpdate: string[]) {
@@ -119,6 +119,7 @@ export class TradingSystemManager {
         const adminUsername: string = this._userManager.getLoggedInUsernameByToken(req.token);
         this.statisticsManager.clearDailyRealTimeStatisticsSubscription(adminUsername);
     }
+
     //endregion
 
     // region basic ops
@@ -190,6 +191,7 @@ export class TradingSystemManager {
         try {
             userModel.pendingEvents = eventToResend;
             await userModel.save();
+            this._userManager.pushToUserCache(username,userModel)
         } catch (e) {
             logger.error(`login: DB ERROR: ${e}`)
         }
@@ -244,9 +246,7 @@ export class TradingSystemManager {
         if (amount <= 0)
             return {data: {result: false}, error: {message: errorMsg.E_ITEMS_ADD}}
         const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token, ["cart"]);
-
         const user: User = rUser ? rUser : this._userManager.getGuestByToken(req.token);
-
         const store: Store = await this._storeManager.findStoreByName(req.body.storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}}
@@ -398,7 +398,7 @@ export class TradingSystemManager {
         logger.info(`approving user: ${req.body.newOwnerName} as store owner of store: ${req.body.storeName}`)
         const usernameWhoApprove: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
         const usernameToAssign: RegisteredUser = await this._userManager.getUserByName(req.body.newOwnerName)
-        const x= 3;
+        const x = 3;
         if (!usernameToAssign)
             return {data: {result: false}, error: {message: errorMsg.E_USER_DOES_NOT_EXIST}};
         const approved: Res.BoolResponse = await this._storeManager.approveStoreOwner(req.body.storeName, usernameToAssign, usernameWhoApprove);
@@ -834,7 +834,10 @@ export class TradingSystemManager {
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();
                 uModel.receipts = rUser.receipts;
-                await UserModel.updateOne({name: rUser.name}, {cart: uModel.cart, receipts: uModel.receipts})
+                await this._userManager.updateUserModel(rUser.name,  {
+                    cart: uModel.cart,
+                    receipts: uModel.receipts
+                })
                 logger.debug(`user saved after reset the cart and added receipt `);
             }
             logger.info(`purchase request: successfully purchased`)
@@ -873,7 +876,7 @@ export class TradingSystemManager {
         const rUser: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token);
         if (rUser) {
             try {
-                await UserModel.updateOne({name: rUser.name}, {cart: UserMapper.cartMapperToDB(cart)})
+                await this._userManager.updateUserModel(rUser.name, {cart: UserMapper.cartMapperToDB(cart)})
             } catch (e) {
                 logger.error(`calculateFinalPrices DB ERROR ${e}`)
             }
@@ -921,20 +924,20 @@ export class TradingSystemManager {
 
     async setPaymentSystem(req: Req.SetPaymentSystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external payment system `)
-        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
-        if(!isAdmin)
-            return {data: {result: false}, error:{message: errorMsg.E_NA}}
+        const isAdmin: boolean = await this._userManager.checkIsAdminByToken(req.token);
+        if (!isAdmin)
+            return {data: {result: false}, error: {message: errorMsg.E_NA}}
         this._externalSystems.paymentSystem.setPaymentSys(req.body.system)
-        return {data: {result:true}}
+        return {data: {result: true}}
     }
 
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external delivery system `)
-        const isAdmin :boolean= await this._userManager.checkIsAdminByToken(req.token);
-        if(!isAdmin)
-            return {data: {result: false}, error:{message: errorMsg.E_NA}}
+        const isAdmin: boolean = await this._userManager.checkIsAdminByToken(req.token);
+        if (!isAdmin)
+            return {data: {result: false}, error: {message: errorMsg.E_NA}}
         this._externalSystems.deliverySystem.setDeliverySys(req.body.system)
-        return {data: {result:true}}
+        return {data: {result: true}}
     }
 
     private async removePendingsByOwners(owners: string[], storeName: string): Promise<void> {

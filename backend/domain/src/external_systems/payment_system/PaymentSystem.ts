@@ -85,7 +85,7 @@ export class PaymentSystem {
             }
             isPaid = this.validateBalance(creditCard, price);
             if (!isPaid) {
-                logger.error("payment failed - ough money")
+                logger.error("payment failed - not enough money")
                 return -1
             }
             return Math.random() * (1000 - 1) + 1;
