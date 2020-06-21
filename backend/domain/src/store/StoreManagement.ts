@@ -93,7 +93,7 @@ export class StoreManagement {
         try {
             logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
             const arr = await ProductModel.find({ "name": {$regex: prefix}});
-            const res = arr.map(p => p.productName).slice(0,limit);
+            const res = arr.map(p => p.name).slice(0,limit);
             return {data:{result: true, names:res}};
         } catch (e) {
             logger.error(`findProductsNamesByPrefix DB ERROR: ${e}`);
