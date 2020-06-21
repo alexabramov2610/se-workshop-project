@@ -4,7 +4,7 @@ import {DiscountPageCtx} from "../../pages/discount-page/discount-page-ctx";
 
 const {Option} = Select;
 
-const SearchSelect = ({size, isMultiple, bordered, placeholder, options, onChangeCallback, initialValue, value, width, isLoading}) => {
+const SearchSelect = ({size, isMultiple, bordered,onSearch, placeholder, options, onChangeCallback, initialValue, value, width, isLoading}) => {
 
     function onBlur() {
         console.log('blur');
@@ -12,10 +12,6 @@ const SearchSelect = ({size, isMultiple, bordered, placeholder, options, onChang
 
     function onFocus() {
         console.log('focus');
-    }
-
-    function onSearch(val) {
-        console.log('search:', val);
     }
 
     return (

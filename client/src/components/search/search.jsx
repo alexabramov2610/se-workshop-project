@@ -7,6 +7,7 @@ import FormInput from "../form-input/form-input.component";
 import { CustomButton } from "../custom-button/custom-button.component";
 import { InputGroup, FormControl, Dropdown, Button } from "react-bootstrap";
 import * as config from "../../utils/config";
+import { SearchWithDropDown } from './search-dropdown'
 import {
   SearchContainer,
   SignInTitle,
@@ -96,6 +97,7 @@ class Search extends React.Component {
           <SignInTitle>Search Items</SignInTitle>
           <form onSubmit={this.handleSubmit}>
             <SearchInputsContainer>
+            <SearchWithDropDown/>
               <FormInput
                 name="productName"
                 type="text"
