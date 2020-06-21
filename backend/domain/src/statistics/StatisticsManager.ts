@@ -123,7 +123,7 @@ export class StatisticsManager {
             const admins = await AdminModel.find({}).populate('user');
             logger.debug(`[${username}] isUserAdmin:  ${JSON.stringify(admins)}`)
             for (const admin of admins) {
-                if (admin.user.name === username)
+                if (admin.user && admin.user.name === username)
                     return true;
             }
         } catch (e) {

@@ -12,7 +12,7 @@ import {RegisteredUser} from "domain_layer/dist/src/user/users/RegisteredUser";
 import * as utils from "./utils"
 import * as ServiceFacade from "../../../src/service_facade/ServiceFacade"
 
-jest.setTimeout(15000);
+jest.setTimeout(1500000);
 
 describe("Store Owner Integration Tests", () => {
     const storeOwnerName: string = "store-owner";
@@ -574,104 +574,7 @@ describe("Store Owner Integration Tests", () => {
         expect(removeStoreOwnerResponse.data.result).toBe(false);
         done();
     });
-    /* TODO need to adapt the test to the new "approve" system
 
-        it("assign and remove store owners - multiple assignees", async (done) => {
-            // const store: Store = new Store("name", "store desc");
-            const pw: string = "ababababababa";
-            const owners: StoreOwner[] = [
-                createStoreOwner("name2"),
-                createStoreOwner("name3"),
-                createStoreOwner("name4"),
-                createStoreOwner("name5"),
-                createStoreOwner("name6"),
-                createStoreOwner("name7"),
-                createStoreOwner("name8")
-            ]
-
-            /** storeOwnerRegisteredUser -> owners[0]
-             *  storeOwnerRegisteredUser -> owners[1]
-             *
-             *  owners[0] -> owners[2]
-             *  owners[0] -> owners[3]
-             *
-             *  owners[1] -> owners[4]
-             *  owners[1] -> owners[5]
-             *
-             *  owners[4] -> owners[6]
-
-
-            await utils.logout(token);
-
-            for (const owner of owners) {
-                await utils.registerUser(owner.name, pw, token, false);
-            }
-
-
-            // assignStoreOwnerRequest -> 0,1
-            await utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
-            let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {
-                body: {storeName, usernameToAssign: owners[0].name},
-                token
-            };
-            let assignStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[1].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-
-            // 0 -> 2,3
-            await utils.loginUser(owners[0].name, pw, token, true);
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[2].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[3].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-            // 1 -> 4,5
-            await utils.loginUser(owners[1].name, pw, token, true);
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[4].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[5].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-            // 4 -> 6
-            await utils.loginUser(owners[4].name, pw, token, true);
-            assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[6].name}, token};
-            assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
-            expect(assignStoreOwnerResponse.data.result).toBe(true);
-
-
-            // storeOwnerRegisteredUser removes owner1: 4,5,6 should be removed
-            await utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
-            const removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {
-                body: {
-                    storeName,
-                    usernameToRemove: owners[1].name
-                }, token
-            };
-            const removeStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
-
-            expect(removeStoreOwnerResponse.data.result).toBe(true);
-
-            const storeInfoReq: Req.StoreInfoRequest = {body: {storeName}, token};
-            const storeInfoRes: Res.StoreInfoResponse = await ServiceFacade.viewStoreInfo(storeInfoReq);
-
-            const expectedOwners: string[] = [storeOwnerRegisteredUser.name, owners[0].name, owners[2].name, owners[3].name]
-
-            expect(storeInfoRes.data.result).toBe(true);
-            expect(storeInfoRes.data.info.storeOwnersNames).toHaveLength(4);
-            expectedOwners.forEach(ownerName => expect(storeInfoRes.data.info.storeOwnersNames).toContainEqual(ownerName))
-            done();
-        });
-    */
     it("assign, remove store managers and change permissions", async (done) => {
         const newUsername1: string = "new-assign-mock1";
         const newUsername2: string = "new-assign-mock2";
@@ -1009,3 +912,103 @@ describe("Store Owner Integration Tests", () => {
     });
 });
 
+
+
+/* TODO need to adapt the test to the new "approve" system
+
+     it("assign and remove store owners - multiple assignees", async (done) => {
+         // const store: Store = new Store("name", "store desc");
+         const pw: string = "ababababababa";
+         const owners: StoreOwner[] = [
+             createStoreOwner("name2"),
+             createStoreOwner("name3"),
+             createStoreOwner("name4"),
+             createStoreOwner("name5"),
+             createStoreOwner("name6"),
+             createStoreOwner("name7"),
+             createStoreOwner("name8")
+         ]
+
+         /** storeOwnerRegisteredUser -> owners[0]
+          *  storeOwnerRegisteredUser -> owners[1]
+          *
+          *  owners[0] -> owners[2]
+          *  owners[0] -> owners[3]
+          *
+          *  owners[1] -> owners[4]
+          *  owners[1] -> owners[5]
+          *
+          *  owners[4] -> owners[6]
+
+
+         await utils.logout(token);
+
+         for (const owner of owners) {
+             await utils.registerUser(owner.name, pw, token, false);
+         }
+
+
+         // assignStoreOwnerRequest -> 0,1
+         await utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, false);
+         let assignStoreOwnerRequest: Req.AssignStoreOwnerRequest = {
+             body: {storeName, usernameToAssign: owners[0].name},
+             token
+         };
+         let assignStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[1].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+
+         // 0 -> 2,3
+         await utils.loginUser(owners[0].name, pw, token, true);
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[2].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[3].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+         // 1 -> 4,5
+         await utils.loginUser(owners[1].name, pw, token, true);
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[4].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[5].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+         // 4 -> 6
+         await utils.loginUser(owners[4].name, pw, token, true);
+         assignStoreOwnerRequest = {body: {storeName, usernameToAssign: owners[6].name}, token};
+         assignStoreOwnerResponse = await ServiceFacade.assignStoreOwner(assignStoreOwnerRequest);
+         expect(assignStoreOwnerResponse.data.result).toBe(true);
+
+
+         // storeOwnerRegisteredUser removes owner1: 4,5,6 should be removed
+         await utils.loginUser(storeOwnerRegisteredUser.name, storeOwnerRegisteredUser.password, token, true);
+         const removeStoreOwnerRequest: Req.RemoveStoreOwnerRequest = {
+             body: {
+                 storeName,
+                 usernameToRemove: owners[1].name
+             }, token
+         };
+         const removeStoreOwnerResponse: Res.BoolResponse = await ServiceFacade.removeStoreOwner(removeStoreOwnerRequest);
+
+         expect(removeStoreOwnerResponse.data.result).toBe(true);
+
+         const storeInfoReq: Req.StoreInfoRequest = {body: {storeName}, token};
+         const storeInfoRes: Res.StoreInfoResponse = await ServiceFacade.viewStoreInfo(storeInfoReq);
+
+         const expectedOwners: string[] = [storeOwnerRegisteredUser.name, owners[0].name, owners[2].name, owners[3].name]
+
+         expect(storeInfoRes.data.result).toBe(true);
+         expect(storeInfoRes.data.info.storeOwnersNames).toHaveLength(4);
+         expectedOwners.forEach(ownerName => expect(storeInfoRes.data.info.storeOwnersNames).toContainEqual(ownerName))
+         done();
+     });
+ */

@@ -453,7 +453,10 @@ export class UserManager {
 
     async updateUserModel(name: string, fields: any): Promise<boolean> {
         try {
-            const u = await UserModel.findOneAndUpdate({name}, fields, {new: true})
+            const populateQuery = this.DEFAULT_USER_POPULATION.map(field => {
+                return {path: field}
+            });
+            const u = await UserModel.findOneAndUpdate({name}, fields, {new: true}).populate(populateQuery)
             this.pushToUserCache(name, u)
             return true;
         } catch (e) {

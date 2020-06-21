@@ -23,58 +23,58 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}======================= CLEANING API =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $api
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  data access
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}======================= CLEANING DAL =======================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $dal
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  client
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}====================== CLEANING CLIENT =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $client
-#rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+#sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  communication
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}=================== CLEANING COMMUNICATION =================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $http
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 cd $websocket
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  publisher
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}===================== CLEANING PUBLISHER ===================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $publisher
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  domain
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}====================== CLEANING DOMAIN =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}===================== CLEANING SERVICE =====================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $service
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #####  AT
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}======================= CLEANING AT ========================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $AT
-rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
+sudo rm -r node_modules logs package-lock.json dist coverage && echo -e "${GREEN}FINISHED${NC}"
 
 #################################################################################
 ##############################       INSTALL       ##############################

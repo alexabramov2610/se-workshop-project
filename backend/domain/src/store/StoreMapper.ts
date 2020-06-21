@@ -47,11 +47,11 @@ export function productsAndItemsMapperFromDB(products: any): Map<IProduct, IItem
 
     products.forEach((product) => {
         const retrievedProduct: IProduct = productFromDbToDomain(product)
-        const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
-            const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
-            return acc.concat(item);
-        }, []);
-        mappedProducts.set(retrievedProduct, retrievedItems);
+            const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
+                const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
+                return acc.concat(item);
+            }, []);
+            mappedProducts.set(retrievedProduct, retrievedItems);
     });
 
     return mappedProducts;

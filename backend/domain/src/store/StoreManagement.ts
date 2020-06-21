@@ -503,11 +503,11 @@ export class StoreManagement {
                     [ManagementPermission.WATCH_PURCHASES_HISTORY, ManagementPermission.WATCH_USER_QUESTIONS, ManagementPermission.REPLY_USER_QUESTIONS]
             };
             const newManagerModel = new StoreManagerModel(managerToAdd);
+            await newManagerModel.save();
             userWhoAssignsOwner.managersAssigned.push(newManagerModel);
             storeModel.storeManagers.push(newManagerModel);
             storeModel.markModified('storeOwners')
             storeModel.markModified('storeManagers')
-            await newManagerModel.save();
             await userWhoAssignsOwner.save();
             await storeModel.save();
             this.pushToStoreCache(storeName, storeModel)
@@ -683,7 +683,7 @@ export class StoreManagement {
             this.pushToStoreCache(storeName, storeModel)
             logger.info(`successfully removed permissions from user: ${managerToChange}`)
         } catch (e) {
-            logger.error(`addManagerPermissions DB ERROR: ${e}`);
+            logger.error(`removeManagerPermissions DB ERROR: ${e}`);
             return {data: {result: false}, error: {message: errorMsg.E_DB}}
         }
         return {data: {result: true}};
@@ -1244,12 +1244,12 @@ export class StoreManagement {
                 const storeModel = await this.findStoreModelByName(storeName); // Document
                 const userWhoAssignsOwner = this.findStoreOwner(storeModel, agreement.assignedByOwner);
                 const ownerToAdd = new StoreOwnerModel({name: newOwner})
+                await ownerToAdd.save();
                 userWhoAssignsOwner.ownersAssigned.push(ownerToAdd);
                 storeModel.storeOwners.push(ownerToAdd);
                 storeModel.markModified('storeOwners')
                 agreement.pending = false;
                 await agreement.save()
-                await ownerToAdd.save();
                 await userWhoAssignsOwner.save();
                 await storeModel.save()
                 this.pushToStoreCache(storeName, storeModel)
@@ -1268,11 +1268,14 @@ export class StoreManagement {
 
     async updateStoreModel(storeName: string, fields: any): Promise<boolean> {
         try {
-            const u = await StoreModel.findOneAndUpdate({storeName}, fields, {new: true})
+            const populateQuery = this.DEFAULT_STORE_POPULATION.map(field => {
+                return {path: field}
+            });
+            const u = await StoreModel.findOneAndUpdate({storeName}, fields, {new: true}).populate(populateQuery)
             this.pushToStoreCache(storeName, u)
             return true;
         } catch (e) {
-            logger.error(`updateUserModel DB ERROR cant ${e}`)
+            logger.error(`updateStoreModel DB ERROR cant ${e}`)
             return false;
         }
     }
