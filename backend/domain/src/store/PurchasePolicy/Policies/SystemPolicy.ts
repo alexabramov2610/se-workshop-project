@@ -23,13 +23,22 @@ export class SystemPolicy extends PurchasePolicy {
         return false;
     }
 
-    isSatisfied(bagItems: BagItem[],user?: RegisteredUser): boolean {
+    isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean {
+        const days: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const date = new Date();
+        const dayName: string = days[date.getDay()];
+        for (const d of this.notForSellDays) {
+            if (d.toString() === dayName)
+                return false
+        }
         return true;
     }
-    public getPolicyTag():string{
+
+    public getPolicyTag(): string {
         return "system";
     }
-    public getNotForSellDays() : WeekDays[]{
+
+    public getNotForSellDays(): WeekDays[] {
         return this._notForSellDays;
     }
 

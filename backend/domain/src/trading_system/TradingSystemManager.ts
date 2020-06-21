@@ -928,6 +928,7 @@ export class TradingSystemManager {
         this._externalSystems.paymentSystem.setPaymentSys(req.body.system)
         return {data: {result:true}}
     }
+
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external payment system `)
         const user: RegisteredUser = await this._userManager.getLoggedInUserByToken(req.token)
@@ -937,6 +938,7 @@ export class TradingSystemManager {
         this._externalSystems.deliverySystem.setDeliverySys(req.body.system)
         return {data: {result:true}}
     }
+
     private async removePendingsByOwners(owners: string[], storeName: string): Promise<void> {
         try {
             await AssignAgreementModel.deleteMany({
