@@ -9,11 +9,10 @@ class Connection {
         mongoose.set("useUnifiedTopology", true);
         mongoose.set('useCreateIndex', true);
         mongoose.set('useFindAndModify', false);
-
         mongoose
-            .connect(url)
+            .connect(url, {serverSelectionTimeoutMS: 700})
             .then(ref => console.log("Establish new connection with url", url))
-            .catch(err => console.log("Could not connect to mongo server!",url,err));
+            .catch(err => console.log("Could not connect to mongo server!", url, err));
     }
 }
 

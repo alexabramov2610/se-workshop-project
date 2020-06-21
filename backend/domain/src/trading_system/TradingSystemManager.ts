@@ -879,7 +879,9 @@ export class TradingSystemManager {
     async calculateFinalPrices(req: Req.CalcFinalPriceReq): Promise<Res.CartFinalPriceRes> {
         logger.info(`calculating final prices of user cart`)
         const user = await this._userManager.getUserByToken(req.token);
-        const cart: Map<string, BagItem[]> = this._userManager.getUserCart(user)
+        if (!user)
+            return {data: {result: false}, error: {message: errorMsg.E_NF}}
+        const cart: Map<string, BagItem[]> = user.cart;
         let finalPrice: number = 0;
 
         for (const [storeName, bagItems] of cart.entries()) {
@@ -895,6 +897,7 @@ export class TradingSystemManager {
                 await this._userManager.updateUserModel(rUser.name, {cart: UserMapper.cartMapperToDB(cart)})
             } catch (e) {
                 logger.error(`calculateFinalPrices DB ERROR ${e}`)
+                return {data: {result: false}, error: {message: errorMsg.E_DB}}
             }
         }
         return {data: {result: true, price: finalPrice}}
