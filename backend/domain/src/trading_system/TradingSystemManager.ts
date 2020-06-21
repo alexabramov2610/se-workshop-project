@@ -39,6 +39,7 @@ export class TradingSystemManager {
     private state: TradingSystemState;
     private _publisher: IPublisher;
     private statisticsManager: StatisticsManager;
+    private isOpen: boolean;
 
     constructor() {
         this.statisticsManager = new StatisticsManager();
@@ -47,6 +48,7 @@ export class TradingSystemManager {
         this._userManager = new UserManager(this._externalSystems);
         this._storeManager = new StoreManagement(this._externalSystems);
         this.state = TradingSystemState.CLOSED;
+        this.isOpen = false;
         this.initSubscribers()
             .then(() => logger.info("publisher has been successfully initialized"))
             .catch((e) => logger.error(`failed initializing publisher, error: ${e}`));
@@ -191,7 +193,7 @@ export class TradingSystemManager {
         try {
             userModel.pendingEvents = eventToResend;
             await userModel.save();
-            this._userManager.pushToUserCache(username,userModel)
+            this._userManager.pushToUserCache(username, userModel)
         } catch (e) {
             logger.error(`login: DB ERROR: ${e}`)
         }
@@ -497,7 +499,7 @@ export class TradingSystemManager {
         return this._storeManager.findStoresNamesByPrefix(prefix, limit);
     }
 
-    async getProductsNames(req: Req.GetNamesRequest): Promise<Res.GetNamesResponse>{
+    async getProductsNames(req: Req.GetNamesRequest): Promise<Res.GetNamesResponse> {
         logger.info(`fetching all products names starts with prefix: ${req.body.prefix}`);
         const limit: number = req.body.limit;
         const prefix: string = req.body.prefix;
@@ -848,7 +850,7 @@ export class TradingSystemManager {
                 const uModel = await UserModel.findOne({name: rUser.name});
                 uModel.cart.clear();
                 uModel.receipts = rUser.receipts;
-                await this._userManager.updateUserModel(rUser.name,  {
+                await this._userManager.updateUserModel(rUser.name, {
                     cart: uModel.cart,
                     receipts: uModel.receipts
                 })
@@ -902,14 +904,15 @@ export class TradingSystemManager {
 
     async getTradeSystemState(): Promise<Res.TradingSystemStateResponse> {
         try {
-            const ans = await SystemModel.findOne({})
+            const ans = await SystemModel.findOne({}).maxTimeMS(2000);
             if (ans) {
-                const isOpen: boolean = ans.isSystemUp;
-                return {data: {state: isOpen ? TradingSystemState.OPEN : TradingSystemState.CLOSED}};
+                this.isOpen = ans.isSystemUp;
+                return {data: {state: this.isOpen ? TradingSystemState.OPEN : TradingSystemState.CLOSED}};
             }
             return {data: {state: TradingSystemState.CLOSED}};
         } catch (e) {
             logger.error(`getTradeSystemState: DB ERROR ${e}`)
+            return {data: {state: this.isOpen ? TradingSystemState.OPEN : TradingSystemState.CLOSED}};
         }
     }
 
@@ -948,7 +951,7 @@ export class TradingSystemManager {
     async setDeliverySystem(req: Req.SetDeliverySystemRequest): Promise<Res.BoolResponse> {
         logger.info(`setting external delivery system `)
         const isAdmin: boolean = await this._userManager.checkIsAdminByToken(req.token);
-        if (!isAdmin){
+        if (!isAdmin) {
             logger.warn(`setting external delivery system failed, not admin! admins: ${this._userManager.admins} `)
             return {data: {result: false}, error: {message: errorMsg.E_NA}}
         }
@@ -980,7 +983,6 @@ export class TradingSystemManager {
             }
         } catch (e) {
             logger.error(`removePendingsByOwners DB ERROR delete required`)
-
         }
     }
 }

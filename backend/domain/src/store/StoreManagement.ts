@@ -1268,7 +1268,6 @@ export class StoreManagement {
         }
     }
 
-
     async updateStoreModel(storeName: string, fields: any): Promise<boolean> {
         try {
             const populateQuery = this.DEFAULT_STORE_POPULATION.map(field => {
