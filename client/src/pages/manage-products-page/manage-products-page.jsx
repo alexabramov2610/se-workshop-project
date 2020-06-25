@@ -52,7 +52,6 @@ class ManageProductsPage extends React.Component {
     }
     else
       Message.error(addRes.data.error.message)
-
   };
 
   handleChange = (event) => {
@@ -117,6 +116,7 @@ class ManageProductsPage extends React.Component {
                         options={Object.keys(Category).map((c, i) => {
                           return { key: i, text: c, value: c };
                         })}
+                        value={this.state.category}
                         onChange={this.handleChange}
                         required={true}
                       />
