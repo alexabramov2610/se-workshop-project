@@ -1,5 +1,6 @@
 export const addKeys = (collection) => {
-    return collection.map((item, index) => {
+    if(!collection) return [];
+    return collection && collection.map((item, index) => {
         return {key: index + "", ...item};
     });
 }

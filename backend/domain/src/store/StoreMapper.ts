@@ -20,6 +20,7 @@ import {UserPolicy} from "./PurchasePolicy/Policies/UserPolicy";
 import {ProductPolicy} from "./PurchasePolicy/Policies/ProductPolicy";
 import {BagPolicy} from "./PurchasePolicy/Policies/BagPolicy";
 import {SystemPolicy} from "./PurchasePolicy/Policies/SystemPolicy";
+import {IsOnDiscountCondition} from "./discounts/conditions/IsOnDiscountCondition";
 
 
 export function productFromDbToDomain(product): IProduct {
@@ -47,11 +48,11 @@ export function productsAndItemsMapperFromDB(products: any): Map<IProduct, IItem
 
     products.forEach((product) => {
         const retrievedProduct: IProduct = productFromDbToDomain(product)
-            const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
-                const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
-                return acc.concat(item);
-            }, []);
-            mappedProducts.set(retrievedProduct, retrievedItems);
+        const retrievedItems: IItem[] = product.items.reduce((acc, curr) => {
+            const item: IItem = {db_id: curr._id, id: curr.id, catalogNumber: curr.catalogNumber};
+            return acc.concat(item);
+        }, []);
+        mappedProducts.set(retrievedProduct, retrievedItems);
     });
 
     return mappedProducts;
@@ -151,6 +152,7 @@ function parseCondition(ifCondition): Condition {
         return new MinPayCondition(ifCondition.minPay);
     } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
         return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
-    }
+    } else if (ifCondition.catalogNumber && +ifCondition.catalogNumber)
+        return new IsOnDiscountCondition(ifCondition.catalogNumber)
     return undefined;
 }

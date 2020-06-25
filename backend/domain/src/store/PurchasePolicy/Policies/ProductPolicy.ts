@@ -43,7 +43,10 @@ export class ProductPolicy extends PurchasePolicy {
 
     isSatisfied(bagItems: BagItem[], user?: RegisteredUser): boolean {
         const bagItem: BagItem = bagItems.find((item) => item.product.catalogNumber === this.catalogNumber)
-        if (!bagItem) return true;
+        if(!bagItem && this._minAmount !== 0)
+            return false;
+        if (!bagItem)
+            return true;
         return this.minAmount <= bagItem.amount && bagItem.amount <= this.maxAmount;
     }
     public getCatalogNumber() : number{

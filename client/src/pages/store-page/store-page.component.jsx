@@ -16,7 +16,6 @@ const {Sider, Content} = Layout;
 const screens = [
     <StoreOverview/>,
     <ViewStoresPurchaseHistoryContainer isAdmin={false}/>,
-    <div>EDIT STORE INFO</div>,
     <ManageProductsContainer/>,
     <DiscountPageContainer/>,
     <BuyingPolicyPageContainer/>,

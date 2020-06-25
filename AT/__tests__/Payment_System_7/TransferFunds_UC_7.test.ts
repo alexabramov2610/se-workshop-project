@@ -22,9 +22,9 @@ describe("Guest buy items, UC: 2.8", () => {
         _serviceBridge = await _driver.getBridge();
 
         await _serviceBridge.logout();
-        await _serviceBridge.login(_driver.getInitDefaults());
+        await _serviceBridge.login(_driver.getInitDefaults(),true);
 
-        const res = await  _serviceBridge.mockDeliverySys();
+        const res = await  _serviceBridge.mockPaymentSys();
         await _serviceBridge.logout();
         await _driver.loginWithDefaults();
 
@@ -51,8 +51,15 @@ describe("Guest buy items, UC: 2.8", () => {
         expect(error).toBeUndefined();
     });
 
-    test("Invalid request - missing credit card details",async () => {
+    test("Invalid request - missing credit card details no number",async () => {
         _testPaymentInfo.body.payment.cardDetails.number = "";
+        const {data, error} = await _serviceBridge.pay(_testPaymentInfo);
+        expect(error).toBeDefined();
+        expect(data).toBeUndefined();
+    });
+
+    test("Invalid request - missing credit card details - invalid card number",async () => {
+        _testPaymentInfo.body.payment.cardDetails.number = "ggg";
         const {data, error} = await _serviceBridge.pay(_testPaymentInfo);
         expect(error).toBeDefined();
         expect(data).toBeUndefined();
@@ -62,14 +69,10 @@ describe("Guest buy items, UC: 2.8", () => {
         _testPaymentInfo.body.payment.cardDetails.expMonth = "11";
         _testPaymentInfo.body.payment.cardDetails.expYear = "11";
         const {data, error} = await _serviceBridge.pay(_testPaymentInfo);
+       console.log('data',data)
+        console.log('error',error)
         expect(error).toBeDefined();
         expect(data).toBeUndefined();
     });
 
-    // test("Invalid request - missing location details", async () => {
-    //     _testPaymentInfo.body.payment.address = undefined;
-    //     const {data, error} =await _serviceBridge.pay(_testPaymentInfo);
-    //     expect(error).toBeDefined();
-    //     expect(data).toBeUndefined();
-    // });
  });

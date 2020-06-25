@@ -8,8 +8,8 @@ describe("Remove Managers, UC: 4.7", () => {
     let _storeInformation: Store;
     let _driver: Driver;
     let _newManagerCreds: Credentials;
+    _driver = new Driver();
     beforeEach(async () => {
-        _driver = new Driver();
         _driver.dropDB();
         await _driver.reset();
         await _driver.startSession();
@@ -49,7 +49,7 @@ describe("Remove Managers, UC: 4.7", () => {
 
 
     test("Remove managers - id is not a manager id", async () => {
-        _driver.loginWithDefaults();
+        await _driver.loginWithDefaults();
         const {data, error} = await _serviceBridge.removeStoreManager({
             body: {
                 storeName: _storeInformation.name,

@@ -67,7 +67,6 @@ const ConditionCreateTable = ({disabled}) => {
                     : `Get ${utils.getPercentage(props)}% off selected products if product: ${condition.catalogNumber} has discount`
 
             }</Table.Cell>
-
         );
     }
 

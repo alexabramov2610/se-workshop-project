@@ -27,12 +27,16 @@ const DiscountPageContainer = () => {
         const fetchData = async () => {
             const productsRes = await api.getStoreProducts(storename);
             const categoriesRes = await api.getStoreCategories(storename);
-            const fetchedProducts = productsRes.data.data.products.map(p => {
-                return {key: p.product.catalogNumber, ...p.product};
-            });
-            const fetchedCategories = categoriesRes.data.data.categories;
-            setProducts(fetchedProducts);
-            setCategories(fetchedCategories);
+            if (!productsRes.data.error) {
+                const fetchedProducts = productsRes.data.data.products.map(p => {
+                    return {key: p.product.catalogNumber, ...p.product};
+                });
+                setProducts(fetchedProducts);
+            }
+            if (!categoriesRes.data.error) {
+                const fetchedCategories = categoriesRes.data.data.categories;
+                setCategories(fetchedCategories);
+            }
         };
 
         fetchData();
@@ -41,17 +45,19 @@ const DiscountPageContainer = () => {
     useEffect(() => {
         const fetchData = async () => {
             const policyRes = await api.getDiscountPolicy(storename);
-            const keyedDiscounts = generalUtils.addKeys(policyRes.data.data.policy.discounts);
-            const keyedConditions = keyedDiscounts.map(d => {
-                const currConditions = d.discount.condition;
-                return currConditions
-                    ? generalUtils.addKeys(currConditions)
-                    : []
-            });
-            keyedDiscounts.forEach((d, i) => {
-                d.discount.condition = keyedConditions[i];
-            });
-            setPolicyDiscounts(keyedDiscounts);
+            if (!policyRes.data.error) {
+                const keyedDiscounts = generalUtils.addKeys(policyRes.data.data.policy.discounts);
+                const keyedConditions = keyedDiscounts.map(d => {
+                    const currConditions = d.discount.condition;
+                    return currConditions
+                        ? generalUtils.addKeys(currConditions)
+                        : []
+                });
+                keyedDiscounts.forEach((d, i) => {
+                    d.discount.condition = keyedConditions[i];
+                });
+                setPolicyDiscounts(keyedDiscounts);
+            }
         };
 
         fetchData();
@@ -120,7 +126,7 @@ const DiscountPageContainer = () => {
 
     return (
         <DiscountPageCtx.Provider value={providerState}>
-            {console.log(policyDiscounts)}
+            {console.log("policyDiscounts: ", policyDiscounts)}
             {
                 !policyDiscounts || !products || !categories
                     ? <Spinner message={"Loading..."}/>
