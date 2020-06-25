@@ -10,11 +10,21 @@ import {isEditedDiscount, isEditMode} from "../../../pages/discount-page/discoun
 
 const CreationRow = () => {
 
-    const [amountView, setView] = useState(false);
+    const [amountView, setAmountView] = useState(false);
 
-    const handleConditionChange = (e) => {
-        e.target.value === "minAmount"
-            ? setView(true) : setView(false);
+    const handleConditionChange = (e, props) => {
+        if (e.target.value === "minAmount") {
+            setAmountView(true);
+        }
+        else {
+            props.setCondition(prevCond => {
+                return {
+                    ...prevCond,
+                    condition: {...prevCond.condition, minAmount: 0}
+                }
+            });
+            setAmountView(false);
+        }
     }
 
     const handleOperatorChange = (e, props) => {
@@ -81,7 +91,7 @@ const CreationRow = () => {
             <Table.Cell style={{width: "33.3%"}}>
                 <Radio.Group buttonStyle="solid" size={"small"}
                              defaultValue="onDiscount"
-                             onChange={handleConditionChange}>
+                             onChange={(e) => handleConditionChange(e, props)}>
                     <Radio.Button value="minAmount">Minimum Amount</Radio.Button>
                     <Space>
                         <Radio.Button value="onDiscount">On Discount</Radio.Button>

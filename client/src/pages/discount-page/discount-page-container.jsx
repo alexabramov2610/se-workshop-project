@@ -126,7 +126,7 @@ const DiscountPageContainer = () => {
 
     return (
         <DiscountPageCtx.Provider value={providerState}>
-            {console.log(policyDiscounts)}
+            {console.log("policyDiscounts: ", policyDiscounts)}
             {
                 !policyDiscounts || !products || !categories
                     ? <Spinner message={"Loading..."}/>
