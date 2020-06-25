@@ -76,10 +76,10 @@ export class Store {
         const notAddedItems: IItem[] = [];
 
         for (const item of items) {
-            const catalogNumber = item.catalogNumber;
-
+            const catalogNumber: number = +item.catalogNumber;
             const product: IProduct = this.getProductByCatalogNumber(catalogNumber);
-            if (product && !this.containsItem(product, item)) {
+            // @ts-ignore
+            if (catalogNumber && /^\d+$/.test(item.id) && item.id && product && !this.containsItem(product, item)) {
                 this.products.set(product, this.products.get(product).concat([item]));
                 addedItems.push(item);
             } else {
@@ -571,7 +571,8 @@ export class Store {
     }
 
     private containsItem(product: IProduct, item: IItem): boolean {
-        return this.products.get(product).reduce((acc, currItem) => acc || currItem.id === item.id, false)
+        const items: IItem[] = this.products.get(product)
+        return items.reduce((acc, currItem) => acc || +currItem.id === +item.id, false)
     }
 
     private matchingFilters(product: IProduct, filters: SearchFilters, query: SearchQuery): boolean {

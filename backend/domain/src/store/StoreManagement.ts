@@ -33,6 +33,7 @@ import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
+import {type} from "os";
 const logger = loggerW(__filename)
 
 
@@ -251,6 +252,7 @@ export class StoreManagement {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         const res: Res.ItemsAdditionResponse = store.addItems(itemsReq);
+
         if (res.data.result) {
             try {
                 res.data.itemsAdded.forEach(item => {
