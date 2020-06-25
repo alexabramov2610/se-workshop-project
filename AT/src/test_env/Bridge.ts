@@ -104,4 +104,5 @@ export interface Bridge {
   getOwnersAssignedBy(req: Partial<Req.GetOwnersAssignedByRequest>): Promise<GetOwnersAssignedByResponse>;
   initFromFile(req: Partial<Req.InitFromFileRequest>): Promise<Res.BoolResponse>;
   mockDeliverySys(): Promise<BoolResponse>;
+  mockPaymentSys(): Promise<BoolResponse>;
 }

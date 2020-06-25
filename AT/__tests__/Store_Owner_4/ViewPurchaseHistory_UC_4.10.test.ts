@@ -49,7 +49,6 @@ describe("Watch Purchases History, UC: 3.7", async () => {
         await _serviceBridge.login(_shopoholic);
         await _driver.given.store(_store).products([_prodct]).makeABuy();
         await _serviceBridge.logout();
-
         const res = await _serviceBridge.viewStorePurchasesHistory({
             body: {storeName: _store.name},
         });

@@ -147,7 +147,7 @@ describe("Assign Store Owner, UC: 4.3", () => {
         const {data} = await _serviceBridge.assignStoreOwner(_storeInformation, {
             username: newOwner2.userName,
         });
-        expect(data.result).toBe(false);
+        expect(data).toBe(undefined);
     });
 
     test("Add Owner - try to assign from 2 different owners. after approved already.", async () => {
