@@ -9,7 +9,7 @@ import * as api from "../../utils/api";
 import {CartCtx} from "../../contexts/cart-context";
 import {ProductDetails} from "./products-box.styles";
 
-export const ProductBox = ({name, price, rating, store, cn}) => (
+export const ProductBox = ({name, price, rating, store, cn, category}) => (
     <Card className="text-center grid-item">
         <Card.Body>
             <Card.Title>
@@ -18,11 +18,12 @@ export const ProductBox = ({name, price, rating, store, cn}) => (
             </Card.Title>
             <ProductDetails>
                 <div>Price: {price}</div>
+                <div>Category: {category}</div>
                 <div>
                     Store: <Link to={`/store/${store}`}>{store}</Link>
                 </div>
                 <div>
-                    Rating :{" "}
+                    Rating :
                     {[1, 2, 3, 4, 5].map(
                         (e, index) =>
                             index < rating && (

@@ -35,6 +35,7 @@ export class ManageProductBox extends React.Component {
           </Card.Title>
           <ProductDetails>
             <div>Price: {this.props.price}</div>
+            <div>Category: {this.props.category}</div>
             <div>Quantity: {this.state.info.quantity}</div>
             <div>
               Store:{" "}

@@ -1,7 +1,7 @@
 export const parseConditions = (conditions) => {
     return conditions.reduce((acc, curr) => {
         const currDesc = curr.condition && curr.condition.minPay
-            ? `store minimum subtotal: ${curr.condition.minPay} `
+            ? `store minimum subtotal: ${curr.condition.minPay} ₪ `
             : curr.condition && curr.condition.minAmount
                 ? `minimum amount: ${curr.condition.minAmount} for product: ${curr.condition.catalogNumber} `
                 : `on discount: ${curr.condition.catalogNumber} `;
