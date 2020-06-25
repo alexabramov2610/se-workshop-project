@@ -35,6 +35,7 @@ import {
     PurchasePolicyModel,
     PurchasePolicyElementModel
 } from "dal"
+import {IsOnDiscountCondition} from "./discounts/conditions/IsOnDiscountCondition";
 
 const logger = loggerW(__filename)
 
@@ -546,7 +547,7 @@ export class Store {
                 isValid: true
             }
         } else {
-            const error: string = `invalid product: ${product}. isNameValid ${isNameValid} isIdValid ${isIdValid} isPriceValid ${isPriceValid} isCategoryValid ${isCategoryValid} `;
+            const error: string = `invalid product isNameValid ${isNameValid} isIdValid ${isIdValid} isPriceValid ${isPriceValid} isCategoryValid ${isCategoryValid} `;
             logger.warn(error);
             return {
                 isValid: false, error
@@ -622,6 +623,8 @@ export class Store {
         } else if (ifCondition.minAmount || +ifCondition.minAmount === 0) {
             logger.info(`new min amount discount ${ifCondition.minAmount}`)
             return new MinAmountCondition(ifCondition.catalogNumber, ifCondition.minAmount);
+        } else if (ifCondition.catalogNumber && +ifCondition.catalogNumber) {
+            return new IsOnDiscountCondition(ifCondition.catalogNumber)
         }
         logger.warn(`parse condition failed ${JSON.stringify(ifCondition)}`)
         return undefined;
