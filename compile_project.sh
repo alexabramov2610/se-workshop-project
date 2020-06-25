@@ -36,18 +36,18 @@ sudo rm -rf dist
 npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  client
-echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}==================== COMPILING CLIENT ====================${NC}"
-echo -e "${BLUE}==========================================================${NC}"
-cd $client
+#echo -e "${BLUE}==========================================================${NC}"
+#echo -e "${BLUE}==================== COMPILING CLIENT ====================${NC}"
+#echo -e "${BLUE}==========================================================${NC}"
+#cd $client
 #sudo rm -rf dist
 #npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  websocket
-echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}=================== COMPILING WEBSOCKET ==================${NC}"
-echo -e "${BLUE}==========================================================${NC}"
-cd $websocket
+#echo -e "${BLUE}==========================================================${NC}"
+#echo -e "${BLUE}=================== COMPILING WEBSOCKET ==================${NC}"
+#echo -e "${BLUE}==========================================================${NC}"
+#cd $websocket
 #sudo rm -rf dist
 #npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
@@ -84,9 +84,9 @@ sudo rm -rf dist
 npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  AT
-echo -e "${BLUE}==========================================================${NC}"
-echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
-echo -e "${BLUE}==========================================================${NC}"
-cd $AT
+#echo -e "${BLUE}==========================================================${NC}"
+#echo -e "${BLUE}====================== COMPILING AT ======================${NC}"
+#echo -e "${BLUE}==========================================================${NC}"
+#cd $AT
 #npm run comp && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 

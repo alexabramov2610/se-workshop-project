@@ -1,21 +1,15 @@
 import {Res, Req} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
-
-export const verifyPurchasePreConditions = async (req: Req.PurchaseRequest): Promise<[Res.BoolResponse, Res.BoolResponse]> => {
-    const isPolicyOkReq: Req.VerifyPurchasePolicy = {body: {}, token: req.token}
-    return Promise.all([
-        ts.verifyStorePolicy(isPolicyOkReq),
-        ts.verifyCart({ body: {}, token: req.token })
-    ])
-}
-
 export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseResponse> => {
-    const verification: [Res.BoolResponse, Res.BoolResponse] = await verifyPurchasePreConditions(req);
-        if (!verification[0].data.result)
-            return verification[0];
-        if (!verification[1].data.result)
-            return verification[1];
+    const isPolicyOkReq: Req.VerifyPurchasePolicy = {body: {}, token: req.token}
+    let verifyRes: Res.BoolResponse = await ts.verifyStorePolicy(isPolicyOkReq);
+    if (!verifyRes.data.result)
+        return verifyRes;
+
+    verifyRes = await ts.verifyCart(isPolicyOkReq);
+    if (!verifyRes.data.result)
+        return verifyRes;
 
     // calculate price after discount
     const calcRes: Res.CartFinalPriceRes = await ts.calculateFinalPrices({body: {}, token: req.token});
