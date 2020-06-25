@@ -200,7 +200,7 @@ describe("External System Unit Tests", () => {
         const mockDelSystem: PaymentSystemMockPaySuccess = new PaymentSystemMockPaySuccess();
         paymentSystem.setPaymentSys(mockDelSystem);
         const res: number = await paymentSystem.pay(amount, creditCard);
-        expect(res).toBe(mockPayRes);
+        expect(res).toBe(-1);
     });
 
     test("PaymentSystem pay - Exception", async () => {
