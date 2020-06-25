@@ -94,8 +94,8 @@ export class StoreManagement {
             logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
             const arr = await ProductModel.find({"name": {$regex: prefix, $options: 'i'}});
             const notMoreThanLen = arr.map(p => p.name).slice(0, limit);
-            const res = notMoreThanLen.filter(function (elem, pos) {
-                return notMoreThanLen.indexOf(elem) == pos;
+            const res = notMoreThanLen.filter((elem, pos) => {
+                return notMoreThanLen.indexOf(elem) === pos;
             })
             return {data: {result: true, names: res}};
         } catch (e) {
@@ -1064,7 +1064,7 @@ export class StoreManagement {
         const isPolicyOk: boolean = store.verifyStorePolicy(user, bagItems);
         return isPolicyOk ? {data: {result: true}} : {
             data: {result: false},
-            error: {message: errorMsg.VERIFY_POLICY_FAILED + "in store" + storeName}
+            error: {message: errorMsg.VERIFY_POLICY_FAILED + " in store " + storeName}
         }
     }
 
