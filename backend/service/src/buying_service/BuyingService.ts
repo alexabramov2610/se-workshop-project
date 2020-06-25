@@ -41,7 +41,7 @@ export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseRe
             token: req.token,
         });
         if (!isCartOnStockVer.data.result) {
-            await ts.unlockStores(lock);
+            ts.unlockStores(lock).then().catch()
             return isCartOnStockVer;
         }
         const isPaid: Res.PaymentResponse = await ts.pay({
@@ -50,15 +50,15 @@ export const purchase = async (req: Req.PurchaseRequest): Promise<Res.PurchaseRe
         });
         if (!isPaid.data.result)
         {
-            await ts.unlockStores(lock);
+            ts.unlockStores(lock).then().catch()
             return isPaid;
         }
         const updateStockRequest: Req.UpdateStockRequest = {token: req.token, body: {payment: isPaid.data.payment}}
         const purchaseRes: Res.PurchaseResponse = await ts.purchase(updateStockRequest)
-        await ts.unlockStores(lock);
+        ts.unlockStores(lock).then().catch()
         return purchaseRes
     } catch (e) {
-        await ts.unlockStores(lock);
+        ts.unlockStores(lock).then().catch()
         return {data: {result: false}}
     }
 

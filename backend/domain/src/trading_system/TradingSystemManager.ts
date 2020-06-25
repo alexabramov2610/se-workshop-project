@@ -859,7 +859,7 @@ export class TradingSystemManager {
             }
             logger.info(`purchase request: successfully purchased`)
             const username: string = rUser ? rUser.name : 'guest';
-            await this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
+            this.notifyStoreOwnerOfNewPurchases(Array.from(cart.keys()), username);
             return {data: {result: true, receipt: {purchases, date: receipt.date, payment: req.body.payment}}}
         } catch (e) {
             logger.error(`purchase: DB ERROR ${e}`);
