@@ -17,7 +17,7 @@ export const ProductBox = ({name, price, rating, store, cn, category}) => (
                 {name}
             </Card.Title>
             <ProductDetails>
-                <div>Price: {price}</div>
+                <div>Price: {`${price} ₪`}</div>
                 <div>Category: {category}</div>
                 <div>
                     Store: <Link to={`/store/${store}`}>{store}</Link>
