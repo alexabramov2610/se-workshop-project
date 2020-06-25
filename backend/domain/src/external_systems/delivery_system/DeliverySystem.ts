@@ -60,7 +60,7 @@ export class DeliverySystem {
         try {
             if (this._deliverySys) {
                 const res = await this._deliverySys.deliver()
-                return !res ? -1 : res;
+                return res && (typeof res === "number") ? res : -1
             } else {
                 isDelivered = this.validateDelivery(country, city, address)
                 if (!isDelivered) {

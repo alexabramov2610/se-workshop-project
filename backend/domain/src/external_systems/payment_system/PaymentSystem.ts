@@ -72,7 +72,7 @@ export class PaymentSystem {
         if (this._paymentSys) {
             try {
                 const res = await this._paymentSys.pay(price, creditCard)
-                return res ? res : -1;
+                return res && (typeof res === "number")? res : -1;
             } catch (e) {
                 logger.error(`pay external system error: ${e}`)
                 return -1;
