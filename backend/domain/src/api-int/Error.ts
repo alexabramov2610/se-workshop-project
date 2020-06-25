@@ -55,7 +55,8 @@ const errorMsg:ErrorMessages = {
     E_ASSIGN_SELF: "You cannot assign yourself",
     E_MAX_AMOUNT_REACHED: "You have reached the maximum amount of this product",
     E_DB: "Database error",
-    E_AGREEMENT: "Failed to approve new store owner"
+    E_AGREEMENT: "Failed to approve new store owner",
+    E_MODIFY_PRODUCT: "Failed to modify product"
 
 
 };
