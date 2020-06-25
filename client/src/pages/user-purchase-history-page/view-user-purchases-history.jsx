@@ -21,7 +21,7 @@ const getExtended = (record) => {
                         <Descriptions.Item style={itemStyle} label="Store:">{purchase.storeName}</Descriptions.Item>
                         <Descriptions.Item style={itemStyle}
                                            label="Product:">{purchase.item.catalogNumber}</Descriptions.Item>
-                        <Descriptions.Item style={itemStyle} label="Price:">{purchase.price + "$"}</Descriptions.Item>
+                        <Descriptions.Item style={itemStyle} label="Price:">{purchase.price + "₪"}</Descriptions.Item>
                     </React.Fragment>
                 )
             })}
@@ -46,7 +46,7 @@ const AdminViewUsersPurchaseHistoryPage = (props) => {
             date: pDate,
             user: p.purchases[0].userName,
             last4: p.payment.lastCC4,
-            total: p.payment.totalCharged + "$",
+            total: p.payment.totalCharged + "₪",
             purchases: p.purchases
         };
     });

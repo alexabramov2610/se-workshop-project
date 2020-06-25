@@ -30,6 +30,7 @@ export class ProductsGrid extends React.Component {
                     this.state.products.map((p, index) => {
                         return this.props.manage ? <ManageProductBox
                             name={p.name}
+                            category={p.category.toLowerCase()}
                             price={p.price}
                             key={index}
                             rating={p.rating}
@@ -37,6 +38,7 @@ export class ProductsGrid extends React.Component {
                             cn={p.catalogNumber}
                         /> : <ProductBox
                             name={p.name}
+                            category={p.category.toLowerCase()}
                             price={p.price}
                             key={index}
                             rating={p.rating}

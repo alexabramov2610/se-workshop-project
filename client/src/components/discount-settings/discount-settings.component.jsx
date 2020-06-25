@@ -93,7 +93,7 @@ const DiscountSettings = () => {
                             value={getSubTotal(props)}
                             onChange={e => handleMinPayChange(e, props)}
                             size="small"
-                            formatter={value => `${value}$`}
+                            formatter={value => `${value}₪`}
                             min={0}
                         />
                     </div>
