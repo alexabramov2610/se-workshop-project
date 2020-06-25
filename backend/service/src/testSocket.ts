@@ -587,84 +587,92 @@ export async function t4() {
     const prod3: IProduct = {name: "name3", catalogNumber: 3, price: 300, category: ProductCategory.CLOTHING};
     const prod4: IProduct = {name: "name4", catalogNumber: 4, price: 400, category: ProductCategory.HOBBIES};
 
+    const prod1t4: IProduct = {name: "name1", catalogNumber: 1, price: 100, category: ProductCategory.GENERAL};
+    const prod2t4: IProduct = {name: "name2", catalogNumber: 2, price: 100, category: ProductCategory.ELECTRONICS};
+    const prod3t4: IProduct = {name: "name3", catalogNumber: 3, price: 100, category: ProductCategory.CLOTHING};
+    const prod4t4: IProduct = {name: "name4", catalogNumber: 4, price: 100, category: ProductCategory.HOBBIES};
+
     const item1: IItem = {id: 1, catalogNumber: prod1.catalogNumber};
     const item2: IItem = {id: 2, catalogNumber: prod2.catalogNumber};
     const item3: IItem = {id: 3, catalogNumber: prod3.catalogNumber};
     const item4: IItem = {id: 4, catalogNumber: prod4.catalogNumber};
 
     const products: IProduct[] = [prod1, prod2, prod3, prod4];
+    const productst4: IProduct[] = [prod1t4, prod2t4, prod3t4, prod4t4];
+
     const items: IItem[] = [item1, item2, item3, item4];
 
-    token = await NewSessionSession();
+    await systemInit();
+
 
     // store 1
-    await registerUser(buyer1.name, buyer1.password, token, false);
-    await loginUser(buyer1.name, buyer1.password, token, false);
+    token = await initSessionRegisterLogin(buyer1.name, buyer1.password);
+    console.log("creating store...")
     await createStore(storeName1, token);
-    await addNewProducts(storeName1, products, token, true);
+    await addNewProducts(storeName1, productst4, token, true);
     await addNewItems(storeName1, items, token, true);
 
     // store 2
     await registerUser(buyer2.name, buyer2.password, token, true);
     await loginUser(buyer2.name, buyer2.password, token, false);
     await createStore(storeName2, token);
-    await addNewProducts(storeName2, products, token, true);
+    await addNewProducts(storeName2, productst4, token, true);
     await addNewItems(storeName2, items, token, true);
 
     // store 3
     await registerUser(buyer3.name, buyer3.password, token, true);
     await loginUser(buyer3.name, buyer3.password, token, false);
     await createStore(storeName3, token);
-    await addNewProducts(storeName3, products, token, true);
+    await addNewProducts(storeName3, productst4, token, true);
     await addNewItems(storeName3, items, token, true);
 
     // store 4
     await registerUser(buyer4.name, buyer4.password, token, true);
     await loginUser(buyer4.name, buyer4.password, token, false);
     await createStore(storeName4, token);
-    await addNewProducts(storeName4, products, token, true);
+    await addNewProducts(storeName4, productst4, token, true);
     await addNewItems(storeName4, items, token, true);
 
     // store 5
     await registerUser(buyer5.name, buyer5.password, token, true);
     await loginUser(buyer5.name, buyer5.password, token, false);
     await createStore(storeName5, token);
-    await addNewProducts(storeName5, products, token, true);
+    await addNewProducts(storeName5, productst4, token, true);
     await addNewItems(storeName5, items, token, true);
 
     // store 6
     await registerUser(buyer6.name, buyer6.password, token, true);
     await loginUser(buyer6.name, buyer6.password, token, false);
     await createStore(storeName6, token);
-    await addNewProducts(storeName6, products, token, true);
+    await addNewProducts(storeName6, productst4, token, true);
     await addNewItems(storeName6, items, token, true);
 
     // store 7
     await registerUser(buyer7.name, buyer7.password, token, true);
     await loginUser(buyer7.name, buyer7.password, token, false);
     await createStore(storeName7, token);
-    await addNewProducts(storeName7, products, token, true);
+    await addNewProducts(storeName7, productst4, token, true);
     await addNewItems(storeName7, items, token, true);
 
     // store 8
     await registerUser(buyer8.name, buyer8.password, token, true);
     await loginUser(buyer8.name, buyer8.password, token, false);
     await createStore(storeName8, token);
-    await addNewProducts(storeName8, products, token, true);
+    await addNewProducts(storeName8, productst4, token, true);
     await addNewItems(storeName8, items, token, true);
 
     // store 9
     await registerUser(buyer9.name, buyer9.password, token, true);
     await loginUser(buyer9.name, buyer9.password, token, false);
     await createStore(storeName9, token);
-    await addNewProducts(storeName9, products, token, true);
+    await addNewProducts(storeName9, productst4, token, true);
     await addNewItems(storeName9, items, token, true);
 
     // store 10
     await registerUser(buyer10.name, buyer10.password, token, true);
     await loginUser(buyer10.name, buyer10.password, token, false);
     await createStore(storeName10, token);
-    await addNewProducts(storeName10, products, token, true);
+    await addNewProducts(storeName10, productst4, token, true);
     await addNewItems(storeName10, items, token, true);
 
     console.log(token)
