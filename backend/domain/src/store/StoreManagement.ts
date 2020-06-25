@@ -33,9 +33,9 @@ import * as StoreMapper from './StoreMapper'
 import {productsMapperFromDB} from "./StoreMapper";
 import {mapToJson} from "../api-int/utils";
 import {BoolResponse} from "se-workshop-20-interfaces/dist/src/Response";
+import {type} from "os";
+
 const logger = loggerW(__filename)
-
-
 
 
 export class StoreManagement {
@@ -79,30 +79,30 @@ export class StoreManagement {
     async findStoresNamesByPrefix(prefix: string, limit): Promise<any> {
         try {
             logger.debug(`findStoresNamesByPrefix trying to find store match with prefix:${prefix} in DB`)
-            const arr = await StoreModel.find({ "storeName": {$regex: prefix, $options: 'i'}});
-            const res = arr.map(st => st.storeName).slice(0,Math.min(limit,arr.length));
-            return {data:{result: true, names:res}};
+            const arr = await StoreModel.find({"storeName": {$regex: prefix, $options: 'i'}});
+            const res = arr.map(st => st.storeName).slice(0, Math.min(limit, arr.length));
+            return {data: {result: true, names: res}};
         } catch (e) {
             logger.error(`findStoresNamesByPrefix DB ERROR: ${e}`);
-             return {data:{result: false,names:[]}, error: {message:errorMsg.E_DB+`\n${e.message}` }};
+            return {data: {result: false, names: []}, error: {message: errorMsg.E_DB + `\n${e.message}`}};
         }
-        return {data:{result: true, names:[]}};
+        return {data: {result: true, names: []}};
     }
 
     async findProductsNamesByPrefix(prefix: string, limit): Promise<Res.GetNamesResponse> {
         try {
             logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
-            const arr = await ProductModel.find({ "name": {$regex: prefix, $options: 'i'}});
-            const notMoreThanLen = arr.map(p => p.name).slice(0,limit);
-           const res =  notMoreThanLen.filter(function(elem, pos) {
+            const arr = await ProductModel.find({"name": {$regex: prefix, $options: 'i'}});
+            const notMoreThanLen = arr.map(p => p.name).slice(0, limit);
+            const res = notMoreThanLen.filter(function (elem, pos) {
                 return notMoreThanLen.indexOf(elem) == pos;
             })
-            return {data:{result: true, names:res}};
+            return {data: {result: true, names: res}};
         } catch (e) {
             logger.error(`findProductsNamesByPrefix DB ERROR: ${e}`);
-            return {data:{result: false,names:[]}, error: {message:errorMsg.E_DB }};
+            return {data: {result: false, names: []}, error: {message: errorMsg.E_DB}};
         }
-        return {data:{result: true, names:[]}};
+        return {data: {result: true, names: []}};
     }
 
     async findAllStores(populateWith = this.DEFAULT_STORE_POPULATION): Promise<Store[]> {
@@ -212,6 +212,10 @@ export class StoreManagement {
     async changeProductName(username: string, catalogNumber: number, storeName: string, newProductName: string): Promise<Res.BoolResponse> {
         logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} name in store: ${storeName} 
             to ${newProductName}`);
+        if (!newProductName || !(newProductName.length > 0)) {
+            logger.warn(`changeProductName: cant change name to ${newProductName}`);
+            return {data: {result: false}, error: {message: errorMsg.E_MODIFY_PRODUCT}};
+        }
         const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
@@ -224,17 +228,22 @@ export class StoreManagement {
             return {data: {result: true}};
         } catch (e) {
             logger.warn(`changeProductName: error ${e}`);
-            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+            this._storesCache.delete(storeName)
+            return {data: {result: false}, error: {message: errorMsg.E_MODIFY_PRODUCT}};
         }
     }
 
     async changeProductPrice(username: string, catalogNumber: number, storeName: string, newPrice: number): Promise<Res.BoolResponse> {
-        logger.debug(`changeProductName: ${username} changes product: ${catalogNumber} price in store: ${storeName} 
+        logger.debug(`changeProductPrice: ${username} changes product: ${catalogNumber} price in store: ${storeName} 
             to ${newPrice}`);
+        // @ts-ignore
+        if (!newPrice || !/^\d+$/.test(newPrice)) {
+            logger.warn(`changeProductPrice: cant change price to ${newPrice}`);
+            return {data: {result: false}, error: {message: errorMsg.E_MODIFY_PRODUCT}};
+        }
         const store = await this.findStoreModelByName(storeName);
         if (!store)
             return {data: {result: false}, error: {message: errorMsg.E_INVALID_STORE}};
-        // const product: IProduct = store.getProductByCatalogNumber(catalogNumber);
         const productToChange = store.products.find((p) => p.catalogNumber === +catalogNumber)
         productToChange.price = newPrice;
         try {
@@ -242,8 +251,9 @@ export class StoreManagement {
             logger.info(`changeProductPrice: successfully changed price`);
             return {data: {result: true}};
         } catch (e) {
-            logger.warn(`changeProductName: error ${e}`);
-            return {data: {result: false}, error: {message: errorMsg.E_DB}};
+            logger.warn(`changeProductPrice: error ${e}`);
+            this._storesCache.delete(storeName)
+            return {data: {result: false}, error: {message: errorMsg.E_MODIFY_PRODUCT}};
         }
     }
 
@@ -251,6 +261,7 @@ export class StoreManagement {
         const storeModel = await this.findStoreModelByName(storeName); // Document
         const store: Store = StoreMapper.storeMapperFromDB(storeModel);
         const res: Res.ItemsAdditionResponse = store.addItems(itemsReq);
+
         if (res.data.result) {
             try {
                 res.data.itemsAdded.forEach(item => {
@@ -366,7 +377,7 @@ export class StoreManagement {
         }
 
         const alreadyAgreement = await AssignAgreementModel.findOne({storeName, newOwner: userToAssign.name})
-        if(alreadyAgreement){
+        if (alreadyAgreement) {
             error = errorMsg.E_AL;
             logger.warn(`user: ${userWhoAssigns.name} failed to assign user:
                 ${userToAssign.name} as an owner in store: ${storeName}. error: ${error}`);
@@ -960,7 +971,7 @@ export class StoreManagement {
                 purchases
             });
             store.addReceipt(receipt);
-           await this.updateStoreModel(store.storeName,{receipts: store.receipts} )
+            await this.updateStoreModel(store.storeName, {receipts: store.receipts})
         } catch (e) {
             logger.error(`DB ERROR ${e}`);
             return [];
