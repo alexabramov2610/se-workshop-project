@@ -1089,7 +1089,7 @@ export class StoreManagement {
                 const catalogNumber: number = condition.getCatalogNumber();
                 const minPay: number = condition.getMinPay();
                 const minAmount: number = condition.getMinAmount();
-                if (typeof minAmount === undefined && typeof minPay === undefined) {
+                if (typeof minAmount === "undefined" && typeof minPay === "undefined") {
                     conditions.push({
                         condition: {
                             catalogNumber

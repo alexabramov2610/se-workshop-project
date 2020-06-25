@@ -11,7 +11,7 @@ export class IsOnDiscountCondition extends Condition {
 
     isSatisfied(bag: BagItem[]): boolean {
         const bagItem: BagItem = bag.find((b) => b.product.catalogNumber === this._catalogNumber)
-        return bagItem.product.price * bagItem.amount > bagItem.finalPrice
+        return bagItem && bagItem.product.price * bagItem.amount > bagItem.finalPrice
     }
     getCatalogNumber(){
         return this._catalogNumber;
