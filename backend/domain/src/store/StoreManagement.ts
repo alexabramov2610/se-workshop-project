@@ -79,7 +79,7 @@ export class StoreManagement {
     async findStoresNamesByPrefix(prefix: string, limit): Promise<any> {
         try {
             logger.debug(`findStoresNamesByPrefix trying to find store match with prefix:${prefix} in DB`)
-            const arr = await StoreModel.find({ "storeName": {$regex: prefix}});
+            const arr = await StoreModel.find({ "storeName": {$regex: prefix, $options: 'i'}});
             const res = arr.map(st => st.storeName).slice(0,Math.min(limit,arr.length));
             return {data:{result: true, names:res}};
         } catch (e) {
@@ -92,7 +92,7 @@ export class StoreManagement {
     async findProductsNamesByPrefix(prefix: string, limit): Promise<Res.GetNamesResponse> {
         try {
             logger.debug(`findProductsNamesByPrefix trying to find product match with prefix:${prefix} in DB`)
-            const arr = await ProductModel.find({ "name": {$regex: prefix}});
+            const arr = await ProductModel.find({ "name": {$regex: prefix, $options: 'i'}});
             const notMoreThanLen = arr.map(p => p.name).slice(0,limit);
            const res =  notMoreThanLen.filter(function(elem, pos) {
                 return notMoreThanLen.indexOf(elem) == pos;
