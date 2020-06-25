@@ -52,8 +52,8 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${BLUE}================= RUNNING DOMAIN UNIT TESTS ================${NC}"
 echo -e "${BLUE}============================================================${NC}"
 cd $domain
-sudo jest --clearCache
-sudo TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
+#sudo jest --clearCache
+#sudo TEST_MODE=1 SILENT=1 MONGODB_URI=mongodb://localhost:27017/dev-trading-system-db jest --maxWorkers=1 --forceExit --detectOpenHandles && echo -e "${GREEN}FINISHED${NC}" || echo -e "${RED}FAILED${NC}"
 
 #####  service
 echo -e "${BLUE}============================================================${NC}"

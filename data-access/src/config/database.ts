@@ -10,7 +10,7 @@ class Connection {
         mongoose.set('useCreateIndex', true);
         mongoose.set('useFindAndModify', false);
         mongoose
-            .connect(url, {serverSelectionTimeoutMS: 700})
+            .connect(url, {serverSelectionTimeoutMS: 1500})
             .then(ref => console.log("Establish new connection with url", url))
             .catch(err => console.log("Could not connect to mongo server!", url, err));
     }
