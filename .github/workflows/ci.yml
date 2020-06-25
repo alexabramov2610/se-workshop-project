@@ -118,13 +118,13 @@ jobs:
           npm run test:cov
           cd ..
           cd ..
-      - name: Integration Tests
-        run: |
-          cd backend
-          cd service
-          npm run test
-          cd ..
-          cd ..
+#      - name: Integration Tests
+#        run: |
+#          cd backend
+#          cd service
+#          npm run test
+#          cd ..
+#          cd ..
 #      - name: Acceptance Tests
 #        run: |
 #          cd AT
