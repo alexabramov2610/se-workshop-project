@@ -2,7 +2,7 @@ import {Res, Req} from "se-workshop-20-interfaces"
 import {tradingSystem as ts} from "../service_facade/ServiceFacade";
 
 
-const verifyPurchasePreConditions = async (req: Req.PurchaseRequest): Promise<[Res.BoolResponse, Res.BoolResponse]> {
+export const verifyPurchasePreConditions = async (req: Req.PurchaseRequest): Promise<[Res.BoolResponse, Res.BoolResponse]> => {
     const isPolicyOkReq: Req.VerifyPurchasePolicy = {body: {}, token: req.token}
     return Promise.all([
         ts.verifyStorePolicy(isPolicyOkReq),
