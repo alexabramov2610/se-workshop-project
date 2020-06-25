@@ -546,7 +546,7 @@ export class Store {
                 isValid: true
             }
         } else {
-            const error: string = `invalid product: ${product}. isNameValid ${isNameValid} isIdValid ${isIdValid} isPriceValid ${isPriceValid} isCategoryValid ${isCategoryValid} `;
+            const error: string = `invalid product isNameValid ${isNameValid} isIdValid ${isIdValid} isPriceValid ${isPriceValid} isCategoryValid ${isCategoryValid} `;
             logger.warn(error);
             return {
                 isValid: false, error
