@@ -391,7 +391,9 @@ export class UserManager {
     async verifyCredentials(req: Req.VerifyCredentialsReq): Promise<Res.BoolResponse> {
         try {
             const rUser = await UserModel.findOne({name: req.body.username})
-            const isValid: boolean = rUser && this.verifyPassword(req.body.username, req.body.password, rUser.password)
+            if(!rUser)
+                return {data: {result: false}, error: {message: errorMsg.E_NF}}
+            const isValid: boolean = this.verifyPassword(req.body.username, req.body.password, rUser.password)
             return isValid ? {data: {result: true}} : {data: {result: false}, error: {message: errorMsg.E_BP}}
         } catch (e) {
             logger.error(`verifyCredentials DB ERROR: ${e}`);
